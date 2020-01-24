@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using EpsilonScript.Lexer;
 using Xunit;
 
 namespace EpsilonScript.Tests
@@ -7,7 +8,7 @@ namespace EpsilonScript.Tests
   {
     [Theory]
     [MemberData(nameof(CorrectData))]
-    public void Lexer_Parenthesis_Correctly(string input, params Lexer.Token[] expected)
+    public void Lexer_Parenthesis_Correctly(string input, params Token[] expected)
     {
       Succeeds(input, expected);
     }
@@ -21,57 +22,57 @@ namespace EpsilonScript.Tests
           new object[]
           {
             "(",
-            new Lexer.Token("(", Lexer.TokenType.LeftParenthesis)
+            new Token("(", TokenType.LeftParenthesis)
           },
           new object[]
           {
             ")",
-            new Lexer.Token(")", Lexer.TokenType.RightParenthesis)
+            new Token(")", TokenType.RightParenthesis)
           },
           new object[]
           {
             " (",
-            new Lexer.Token("(", Lexer.TokenType.LeftParenthesis)
+            new Token("(", TokenType.LeftParenthesis)
           },
           new object[]
           {
             ") ",
-            new Lexer.Token(")", Lexer.TokenType.RightParenthesis)
+            new Token(")", TokenType.RightParenthesis)
           },
           new object[]
           {
             "()",
-            new Lexer.Token("(", Lexer.TokenType.LeftParenthesis),
-            new Lexer.Token(")", Lexer.TokenType.RightParenthesis)
+            new Token("(", TokenType.LeftParenthesis),
+            new Token(")", TokenType.RightParenthesis)
           },
           new object[]
           {
             ")(",
-            new Lexer.Token(")", Lexer.TokenType.RightParenthesis),
-            new Lexer.Token("(", Lexer.TokenType.LeftParenthesis)
+            new Token(")", TokenType.RightParenthesis),
+            new Token("(", TokenType.LeftParenthesis)
           },
           new object[]
           {
             "()()()",
-            new Lexer.Token("(", Lexer.TokenType.LeftParenthesis),
-            new Lexer.Token(")", Lexer.TokenType.RightParenthesis),
-            new Lexer.Token("(", Lexer.TokenType.LeftParenthesis),
-            new Lexer.Token(")", Lexer.TokenType.RightParenthesis),
-            new Lexer.Token("(", Lexer.TokenType.LeftParenthesis),
-            new Lexer.Token(")", Lexer.TokenType.RightParenthesis)
+            new Token("(", TokenType.LeftParenthesis),
+            new Token(")", TokenType.RightParenthesis),
+            new Token("(", TokenType.LeftParenthesis),
+            new Token(")", TokenType.RightParenthesis),
+            new Token("(", TokenType.LeftParenthesis),
+            new Token(")", TokenType.RightParenthesis)
           },
           new object[]
           {
             "(())())()",
-            new Lexer.Token("(", Lexer.TokenType.LeftParenthesis),
-            new Lexer.Token("(", Lexer.TokenType.LeftParenthesis),
-            new Lexer.Token(")", Lexer.TokenType.RightParenthesis),
-            new Lexer.Token(")", Lexer.TokenType.RightParenthesis),
-            new Lexer.Token("(", Lexer.TokenType.LeftParenthesis),
-            new Lexer.Token(")", Lexer.TokenType.RightParenthesis),
-            new Lexer.Token(")", Lexer.TokenType.RightParenthesis),
-            new Lexer.Token("(", Lexer.TokenType.LeftParenthesis),
-            new Lexer.Token(")", Lexer.TokenType.RightParenthesis)
+            new Token("(", TokenType.LeftParenthesis),
+            new Token("(", TokenType.LeftParenthesis),
+            new Token(")", TokenType.RightParenthesis),
+            new Token(")", TokenType.RightParenthesis),
+            new Token("(", TokenType.LeftParenthesis),
+            new Token(")", TokenType.RightParenthesis),
+            new Token(")", TokenType.RightParenthesis),
+            new Token("(", TokenType.LeftParenthesis),
+            new Token(")", TokenType.RightParenthesis)
           },
         };
       }

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using EpsilonScript.Lexer;
 using Xunit;
 
 namespace EpsilonScript.Tests
@@ -7,7 +8,7 @@ namespace EpsilonScript.Tests
   {
     [Theory]
     [MemberData(nameof(CorrectData))]
-    public void Lexer_Combination_Correctly(string input, params Lexer.Token[] expected)
+    public void Lexer_Combination_Correctly(string input, params Token[] expected)
     {
       Succeeds(input, expected);
     }
@@ -21,73 +22,73 @@ namespace EpsilonScript.Tests
           new object[]
           {
             "(failed == 100 || invincible == true) && !(time >= 25.0e0)",
-            new Lexer.Token("(", Lexer.TokenType.LeftParenthesis),
-            new Lexer.Token("failed", Lexer.TokenType.Identifier),
-            new Lexer.Token("==", Lexer.TokenType.ComparisonEqual),
-            new Lexer.Token("100", Lexer.TokenType.Integer),
-            new Lexer.Token("||", Lexer.TokenType.BooleanOrOperator),
-            new Lexer.Token("invincible", Lexer.TokenType.Identifier),
-            new Lexer.Token("==", Lexer.TokenType.ComparisonEqual),
-            new Lexer.Token("true", Lexer.TokenType.BooleanLiteralTrue),
-            new Lexer.Token(")", Lexer.TokenType.RightParenthesis),
-            new Lexer.Token("&&", Lexer.TokenType.BooleanAndOperator),
-            new Lexer.Token("!", Lexer.TokenType.NegateOperator),
-            new Lexer.Token("(", Lexer.TokenType.LeftParenthesis),
-            new Lexer.Token("time", Lexer.TokenType.Identifier),
-            new Lexer.Token(">=", Lexer.TokenType.ComparisonGreaterThanOrEqualTo),
-            new Lexer.Token("25.0e0", Lexer.TokenType.Float),
-            new Lexer.Token(")", Lexer.TokenType.RightParenthesis)
+            new Token("(", TokenType.LeftParenthesis),
+            new Token("failed", TokenType.Identifier),
+            new Token("==", TokenType.ComparisonEqual),
+            new Token("100", TokenType.Integer),
+            new Token("||", TokenType.BooleanOrOperator),
+            new Token("invincible", TokenType.Identifier),
+            new Token("==", TokenType.ComparisonEqual),
+            new Token("true", TokenType.BooleanLiteralTrue),
+            new Token(")", TokenType.RightParenthesis),
+            new Token("&&", TokenType.BooleanAndOperator),
+            new Token("!", TokenType.NegateOperator),
+            new Token("(", TokenType.LeftParenthesis),
+            new Token("time", TokenType.Identifier),
+            new Token(">=", TokenType.ComparisonGreaterThanOrEqualTo),
+            new Token("25.0e0", TokenType.Float),
+            new Token(")", TokenType.RightParenthesis)
           },
           new object[]
           {
             "(failed==100||invincible==true)&&!(time>=25.0e0)",
-            new Lexer.Token("(", Lexer.TokenType.LeftParenthesis),
-            new Lexer.Token("failed", Lexer.TokenType.Identifier),
-            new Lexer.Token("==", Lexer.TokenType.ComparisonEqual),
-            new Lexer.Token("100", Lexer.TokenType.Integer),
-            new Lexer.Token("||", Lexer.TokenType.BooleanOrOperator),
-            new Lexer.Token("invincible", Lexer.TokenType.Identifier),
-            new Lexer.Token("==", Lexer.TokenType.ComparisonEqual),
-            new Lexer.Token("true", Lexer.TokenType.BooleanLiteralTrue),
-            new Lexer.Token(")", Lexer.TokenType.RightParenthesis),
-            new Lexer.Token("&&", Lexer.TokenType.BooleanAndOperator),
-            new Lexer.Token("!", Lexer.TokenType.NegateOperator),
-            new Lexer.Token("(", Lexer.TokenType.LeftParenthesis),
-            new Lexer.Token("time", Lexer.TokenType.Identifier),
-            new Lexer.Token(">=", Lexer.TokenType.ComparisonGreaterThanOrEqualTo),
-            new Lexer.Token("25.0e0", Lexer.TokenType.Float),
-            new Lexer.Token(")", Lexer.TokenType.RightParenthesis)
+            new Token("(", TokenType.LeftParenthesis),
+            new Token("failed", TokenType.Identifier),
+            new Token("==", TokenType.ComparisonEqual),
+            new Token("100", TokenType.Integer),
+            new Token("||", TokenType.BooleanOrOperator),
+            new Token("invincible", TokenType.Identifier),
+            new Token("==", TokenType.ComparisonEqual),
+            new Token("true", TokenType.BooleanLiteralTrue),
+            new Token(")", TokenType.RightParenthesis),
+            new Token("&&", TokenType.BooleanAndOperator),
+            new Token("!", TokenType.NegateOperator),
+            new Token("(", TokenType.LeftParenthesis),
+            new Token("time", TokenType.Identifier),
+            new Token(">=", TokenType.ComparisonGreaterThanOrEqualTo),
+            new Token("25.0e0", TokenType.Float),
+            new Token(")", TokenType.RightParenthesis)
           },
           new object[]
           {
             "failed = (count + 1) * 5 / 2; failed > 10",
-            new Lexer.Token("failed", Lexer.TokenType.Identifier),
-            new Lexer.Token("=", Lexer.TokenType.AssignmentOperator),
-            new Lexer.Token("(", Lexer.TokenType.LeftParenthesis),
-            new Lexer.Token("count", Lexer.TokenType.Identifier),
-            new Lexer.Token("+", Lexer.TokenType.PlusSign),
-            new Lexer.Token("1", Lexer.TokenType.Integer),
-            new Lexer.Token(")", Lexer.TokenType.RightParenthesis),
-            new Lexer.Token("*", Lexer.TokenType.MultiplyOperator),
-            new Lexer.Token("5", Lexer.TokenType.Integer),
-            new Lexer.Token("/", Lexer.TokenType.DivideOperator),
-            new Lexer.Token("2", Lexer.TokenType.Integer),
-            new Lexer.Token(";", Lexer.TokenType.Semicolon),
-            new Lexer.Token("failed", Lexer.TokenType.Identifier),
-            new Lexer.Token(">", Lexer.TokenType.ComparisonGreaterThan),
-            new Lexer.Token("10", Lexer.TokenType.Integer)
+            new Token("failed", TokenType.Identifier),
+            new Token("=", TokenType.AssignmentOperator),
+            new Token("(", TokenType.LeftParenthesis),
+            new Token("count", TokenType.Identifier),
+            new Token("+", TokenType.PlusSign),
+            new Token("1", TokenType.Integer),
+            new Token(")", TokenType.RightParenthesis),
+            new Token("*", TokenType.MultiplyOperator),
+            new Token("5", TokenType.Integer),
+            new Token("/", TokenType.DivideOperator),
+            new Token("2", TokenType.Integer),
+            new Token(";", TokenType.Semicolon),
+            new Token("failed", TokenType.Identifier),
+            new Token(">", TokenType.ComparisonGreaterThan),
+            new Token("10", TokenType.Integer)
           },
           new object[]
           {
             "result = rand(0, 10)",
-            new Lexer.Token("result", Lexer.TokenType.Identifier),
-            new Lexer.Token("=", Lexer.TokenType.AssignmentOperator),
-            new Lexer.Token("rand", Lexer.TokenType.Identifier),
-            new Lexer.Token("(", Lexer.TokenType.LeftParenthesis),
-            new Lexer.Token("0", Lexer.TokenType.Integer),
-            new Lexer.Token(",", Lexer.TokenType.Comma),
-            new Lexer.Token("10", Lexer.TokenType.Integer),
-            new Lexer.Token(")", Lexer.TokenType.RightParenthesis)
+            new Token("result", TokenType.Identifier),
+            new Token("=", TokenType.AssignmentOperator),
+            new Token("rand", TokenType.Identifier),
+            new Token("(", TokenType.LeftParenthesis),
+            new Token("0", TokenType.Integer),
+            new Token(",", TokenType.Comma),
+            new Token("10", TokenType.Integer),
+            new Token(")", TokenType.RightParenthesis)
           },
         };
       }

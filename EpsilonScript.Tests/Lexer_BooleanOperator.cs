@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using EpsilonScript.Lexer;
 using Xunit;
 
 namespace EpsilonScript.Tests
@@ -7,7 +8,7 @@ namespace EpsilonScript.Tests
   {
     [Theory]
     [MemberData(nameof(CorrectData))]
-    public void Lexer_BooleanOperator_Correctly(string input, params Lexer.Token[] expected)
+    public void Lexer_BooleanOperator_Correctly(string input, params Token[] expected)
     {
       Succeeds(input, expected);
     }
@@ -28,36 +29,36 @@ namespace EpsilonScript.Tests
           new object[]
           {
             "||",
-            new Lexer.Token("||", Lexer.TokenType.BooleanOrOperator)
+            new Token("||", TokenType.BooleanOrOperator)
           },
           new object[]
           {
             "|| ||",
-            new Lexer.Token("||", Lexer.TokenType.BooleanOrOperator),
-            new Lexer.Token("||", Lexer.TokenType.BooleanOrOperator)
+            new Token("||", TokenType.BooleanOrOperator),
+            new Token("||", TokenType.BooleanOrOperator)
           },
           new object[]
           {
             "||||",
-            new Lexer.Token("||", Lexer.TokenType.BooleanOrOperator),
-            new Lexer.Token("||", Lexer.TokenType.BooleanOrOperator)
+            new Token("||", TokenType.BooleanOrOperator),
+            new Token("||", TokenType.BooleanOrOperator)
           },
           new object[]
           {
             "&&",
-            new Lexer.Token("&&", Lexer.TokenType.BooleanAndOperator)
+            new Token("&&", TokenType.BooleanAndOperator)
           },
           new object[]
           {
             "&& &&",
-            new Lexer.Token("&&", Lexer.TokenType.BooleanAndOperator),
-            new Lexer.Token("&&", Lexer.TokenType.BooleanAndOperator)
+            new Token("&&", TokenType.BooleanAndOperator),
+            new Token("&&", TokenType.BooleanAndOperator)
           },
           new object[]
           {
             "&&&&",
-            new Lexer.Token("&&", Lexer.TokenType.BooleanAndOperator),
-            new Lexer.Token("&&", Lexer.TokenType.BooleanAndOperator)
+            new Token("&&", TokenType.BooleanAndOperator),
+            new Token("&&", TokenType.BooleanAndOperator)
           },
         };
       }
@@ -69,14 +70,14 @@ namespace EpsilonScript.Tests
       {
         return new[]
         {
-          new object[] { "&" },
-          new object[] { " &" },
-          new object[] { "& " },
-          new object[] { "& &" },
-          new object[] { "|" },
-          new object[] { " |" },
-          new object[] { "| " },
-          new object[] { "| |" },
+          new object[] {"&"},
+          new object[] {" &"},
+          new object[] {"& "},
+          new object[] {"& &"},
+          new object[] {"|"},
+          new object[] {" |"},
+          new object[] {"| "},
+          new object[] {"| |"},
         };
       }
     }

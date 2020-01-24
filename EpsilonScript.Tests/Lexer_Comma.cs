@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using EpsilonScript.Lexer;
 using Xunit;
 
 namespace EpsilonScript.Tests
@@ -7,7 +8,7 @@ namespace EpsilonScript.Tests
   {
     [Theory]
     [MemberData(nameof(CorrectData))]
-    public void Lexer_Comma_Correctly(string input, params Lexer.Token[] expected)
+    public void Lexer_Comma_Correctly(string input, params Token[] expected)
     {
       Succeeds(input, expected);
     }
@@ -21,36 +22,36 @@ namespace EpsilonScript.Tests
           new object[]
           {
             ",",
-            new Lexer.Token(",", Lexer.TokenType.Comma)
+            new Token(",", TokenType.Comma)
           },
           new object[]
           {
             " ,",
-            new Lexer.Token(",", Lexer.TokenType.Comma)
+            new Token(",", TokenType.Comma)
           },
           new object[]
           {
             ", ",
-            new Lexer.Token(",", Lexer.TokenType.Comma)
+            new Token(",", TokenType.Comma)
           },
           new object[]
           {
             ",,",
-            new Lexer.Token(",", Lexer.TokenType.Comma),
-            new Lexer.Token(",", Lexer.TokenType.Comma)
+            new Token(",", TokenType.Comma),
+            new Token(",", TokenType.Comma)
           },
           new object[]
           {
             ", ,",
-            new Lexer.Token(",", Lexer.TokenType.Comma),
-            new Lexer.Token(",", Lexer.TokenType.Comma)
+            new Token(",", TokenType.Comma),
+            new Token(",", TokenType.Comma)
           },
           new object[]
           {
             ",,,",
-            new Lexer.Token(",", Lexer.TokenType.Comma),
-            new Lexer.Token(",", Lexer.TokenType.Comma),
-            new Lexer.Token(",", Lexer.TokenType.Comma)
+            new Token(",", TokenType.Comma),
+            new Token(",", TokenType.Comma),
+            new Token(",", TokenType.Comma)
           },
         };
       }

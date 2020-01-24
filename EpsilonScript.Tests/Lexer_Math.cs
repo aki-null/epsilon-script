@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using EpsilonScript.Lexer;
 using Xunit;
 
 namespace EpsilonScript.Tests
@@ -7,7 +8,7 @@ namespace EpsilonScript.Tests
   {
     [Theory]
     [MemberData(nameof(CorrectData))]
-    public void Lexer_Math_Correctly(string input, params Lexer.Token[] expected)
+    public void Lexer_Math_Correctly(string input, params Token[] expected)
     {
       Succeeds(input, expected);
     }
@@ -21,110 +22,110 @@ namespace EpsilonScript.Tests
           new object[]
           {
             "+",
-            new Lexer.Token("+", Lexer.TokenType.PlusSign)
+            new Token("+", TokenType.PlusSign)
           },
           new object[]
           {
             " +",
-            new Lexer.Token("+", Lexer.TokenType.PlusSign)
+            new Token("+", TokenType.PlusSign)
           },
           new object[]
           {
             "+ ",
-            new Lexer.Token("+", Lexer.TokenType.PlusSign)
+            new Token("+", TokenType.PlusSign)
           },
           new object[]
           {
             "+ +",
-            new Lexer.Token("+", Lexer.TokenType.PlusSign),
-            new Lexer.Token("+", Lexer.TokenType.PlusSign)
+            new Token("+", TokenType.PlusSign),
+            new Token("+", TokenType.PlusSign)
           },
           new object[]
           {
             "++",
-            new Lexer.Token("+", Lexer.TokenType.PlusSign),
-            new Lexer.Token("+", Lexer.TokenType.PlusSign)
+            new Token("+", TokenType.PlusSign),
+            new Token("+", TokenType.PlusSign)
           },
           new object[]
           {
             "-",
-            new Lexer.Token("-", Lexer.TokenType.MinusSign)
+            new Token("-", TokenType.MinusSign)
           },
           new object[]
           {
             " -",
-            new Lexer.Token("-", Lexer.TokenType.MinusSign)
+            new Token("-", TokenType.MinusSign)
           },
           new object[]
           {
             "- ",
-            new Lexer.Token("-", Lexer.TokenType.MinusSign)
+            new Token("-", TokenType.MinusSign)
           },
           new object[]
           {
             "- -",
-            new Lexer.Token("-", Lexer.TokenType.MinusSign),
-            new Lexer.Token("-", Lexer.TokenType.MinusSign)
+            new Token("-", TokenType.MinusSign),
+            new Token("-", TokenType.MinusSign)
           },
           new object[]
           {
             "--",
-            new Lexer.Token("-", Lexer.TokenType.MinusSign),
-            new Lexer.Token("-", Lexer.TokenType.MinusSign)
+            new Token("-", TokenType.MinusSign),
+            new Token("-", TokenType.MinusSign)
           },
           new object[]
           {
             "*",
-            new Lexer.Token("*", Lexer.TokenType.MultiplyOperator)
+            new Token("*", TokenType.MultiplyOperator)
           },
           new object[]
           {
             " *",
-            new Lexer.Token("*", Lexer.TokenType.MultiplyOperator)
+            new Token("*", TokenType.MultiplyOperator)
           },
           new object[]
           {
             "* ",
-            new Lexer.Token("*", Lexer.TokenType.MultiplyOperator)
+            new Token("*", TokenType.MultiplyOperator)
           },
           new object[]
           {
             "* *",
-            new Lexer.Token("*", Lexer.TokenType.MultiplyOperator),
-            new Lexer.Token("*", Lexer.TokenType.MultiplyOperator)
+            new Token("*", TokenType.MultiplyOperator),
+            new Token("*", TokenType.MultiplyOperator)
           },
           new object[]
           {
             "**",
-            new Lexer.Token("*", Lexer.TokenType.MultiplyOperator),
-            new Lexer.Token("*", Lexer.TokenType.MultiplyOperator)
+            new Token("*", TokenType.MultiplyOperator),
+            new Token("*", TokenType.MultiplyOperator)
           },
           new object[]
           {
             "/",
-            new Lexer.Token("/", Lexer.TokenType.DivideOperator)
+            new Token("/", TokenType.DivideOperator)
           },
           new object[]
           {
             " /",
-            new Lexer.Token("/", Lexer.TokenType.DivideOperator)
+            new Token("/", TokenType.DivideOperator)
           },
           new object[]
           {
             "/ ",
-            new Lexer.Token("/", Lexer.TokenType.DivideOperator)
+            new Token("/", TokenType.DivideOperator)
           },
           new object[]
           {
             "/ /",
-            new Lexer.Token("/", Lexer.TokenType.DivideOperator),
-            new Lexer.Token("/", Lexer.TokenType.DivideOperator)
+            new Token("/", TokenType.DivideOperator),
+            new Token("/", TokenType.DivideOperator)
           },
           new object[]
           {
             "//",
-            new Lexer.Token("/", Lexer.TokenType.DivideOperator),
-            new Lexer.Token("/", Lexer.TokenType.DivideOperator)
+            new Token("/", TokenType.DivideOperator),
+            new Token("/", TokenType.DivideOperator)
           },
         };
       }

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using EpsilonScript.Lexer;
 using Xunit;
 
 namespace EpsilonScript.Tests
@@ -7,7 +8,7 @@ namespace EpsilonScript.Tests
   {
     [Theory]
     [MemberData(nameof(CorrectData))]
-    public void Lexer_Comparison_Correctly(string input, params Lexer.Token[] expected)
+    public void Lexer_Comparison_Correctly(string input, params Token[] expected)
     {
       Succeeds(input, expected);
     }
@@ -21,104 +22,104 @@ namespace EpsilonScript.Tests
           new object[]
           {
             "==",
-            new Lexer.Token("==", Lexer.TokenType.ComparisonEqual)
+            new Token("==", TokenType.ComparisonEqual)
           },
           new object[]
           {
             "== ==",
-            new Lexer.Token("==", Lexer.TokenType.ComparisonEqual),
-            new Lexer.Token("==", Lexer.TokenType.ComparisonEqual)
+            new Token("==", TokenType.ComparisonEqual),
+            new Token("==", TokenType.ComparisonEqual)
           },
           new object[]
           {
             "====",
-            new Lexer.Token("==", Lexer.TokenType.ComparisonEqual),
-            new Lexer.Token("==", Lexer.TokenType.ComparisonEqual)
+            new Token("==", TokenType.ComparisonEqual),
+            new Token("==", TokenType.ComparisonEqual)
           },
           new object[]
           {
             "!=",
-            new Lexer.Token("!=", Lexer.TokenType.ComparisonNotEqual)
+            new Token("!=", TokenType.ComparisonNotEqual)
           },
           new object[]
           {
             "!= !=",
-            new Lexer.Token("!=", Lexer.TokenType.ComparisonNotEqual),
-            new Lexer.Token("!=", Lexer.TokenType.ComparisonNotEqual)
+            new Token("!=", TokenType.ComparisonNotEqual),
+            new Token("!=", TokenType.ComparisonNotEqual)
           },
           new object[]
           {
             "!=!=",
-            new Lexer.Token("!=", Lexer.TokenType.ComparisonNotEqual),
-            new Lexer.Token("!=", Lexer.TokenType.ComparisonNotEqual)
+            new Token("!=", TokenType.ComparisonNotEqual),
+            new Token("!=", TokenType.ComparisonNotEqual)
           },
           new object[]
           {
             "<=",
-            new Lexer.Token("<=", Lexer.TokenType.ComparisonLessThanOrEqualTo)
+            new Token("<=", TokenType.ComparisonLessThanOrEqualTo)
           },
           new object[]
           {
             "<= <=",
-            new Lexer.Token("<=", Lexer.TokenType.ComparisonLessThanOrEqualTo),
-            new Lexer.Token("<=", Lexer.TokenType.ComparisonLessThanOrEqualTo)
+            new Token("<=", TokenType.ComparisonLessThanOrEqualTo),
+            new Token("<=", TokenType.ComparisonLessThanOrEqualTo)
           },
           new object[]
           {
             "<=<=",
-            new Lexer.Token("<=", Lexer.TokenType.ComparisonLessThanOrEqualTo),
-            new Lexer.Token("<=", Lexer.TokenType.ComparisonLessThanOrEqualTo)
+            new Token("<=", TokenType.ComparisonLessThanOrEqualTo),
+            new Token("<=", TokenType.ComparisonLessThanOrEqualTo)
           },
           new object[]
           {
             ">=",
-            new Lexer.Token(">=", Lexer.TokenType.ComparisonGreaterThanOrEqualTo)
+            new Token(">=", TokenType.ComparisonGreaterThanOrEqualTo)
           },
           new object[]
           {
             ">= >=",
-            new Lexer.Token(">=", Lexer.TokenType.ComparisonGreaterThanOrEqualTo),
-            new Lexer.Token(">=", Lexer.TokenType.ComparisonGreaterThanOrEqualTo)
+            new Token(">=", TokenType.ComparisonGreaterThanOrEqualTo),
+            new Token(">=", TokenType.ComparisonGreaterThanOrEqualTo)
           },
           new object[]
           {
             ">=>=",
-            new Lexer.Token(">=", Lexer.TokenType.ComparisonGreaterThanOrEqualTo),
-            new Lexer.Token(">=", Lexer.TokenType.ComparisonGreaterThanOrEqualTo)
+            new Token(">=", TokenType.ComparisonGreaterThanOrEqualTo),
+            new Token(">=", TokenType.ComparisonGreaterThanOrEqualTo)
           },
           new object[]
           {
             "<",
-            new Lexer.Token("<", Lexer.TokenType.ComparisonLessThan)
+            new Token("<", TokenType.ComparisonLessThan)
           },
           new object[]
           {
             "< <",
-            new Lexer.Token("<", Lexer.TokenType.ComparisonLessThan),
-            new Lexer.Token("<", Lexer.TokenType.ComparisonLessThan)
+            new Token("<", TokenType.ComparisonLessThan),
+            new Token("<", TokenType.ComparisonLessThan)
           },
           new object[]
           {
             "<<",
-            new Lexer.Token("<", Lexer.TokenType.ComparisonLessThan),
-            new Lexer.Token("<", Lexer.TokenType.ComparisonLessThan)
+            new Token("<", TokenType.ComparisonLessThan),
+            new Token("<", TokenType.ComparisonLessThan)
           },
           new object[]
           {
             ">",
-            new Lexer.Token(">", Lexer.TokenType.ComparisonGreaterThan)
+            new Token(">", TokenType.ComparisonGreaterThan)
           },
           new object[]
           {
             "> >",
-            new Lexer.Token(">", Lexer.TokenType.ComparisonGreaterThan),
-            new Lexer.Token(">", Lexer.TokenType.ComparisonGreaterThan)
+            new Token(">", TokenType.ComparisonGreaterThan),
+            new Token(">", TokenType.ComparisonGreaterThan)
           },
           new object[]
           {
             ">>",
-            new Lexer.Token(">", Lexer.TokenType.ComparisonGreaterThan),
-            new Lexer.Token(">", Lexer.TokenType.ComparisonGreaterThan)
+            new Token(">", TokenType.ComparisonGreaterThan),
+            new Token(">", TokenType.ComparisonGreaterThan)
           },
         };
       }

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using EpsilonScript.Lexer;
 using Xunit;
 
 namespace EpsilonScript.Tests
@@ -7,7 +8,7 @@ namespace EpsilonScript.Tests
   {
     [Theory]
     [MemberData(nameof(CorrectData))]
-    public void Lexer_Semicolon_Correctly(string input, params Lexer.Token[] expected)
+    public void Lexer_Semicolon_Correctly(string input, params Token[] expected)
     {
       Succeeds(input, expected);
     }
@@ -21,29 +22,29 @@ namespace EpsilonScript.Tests
           new object[]
           {
             ";",
-            new Lexer.Token(";", Lexer.TokenType.Semicolon)
+            new Token(";", TokenType.Semicolon)
           },
           new object[]
           {
             " ;",
-            new Lexer.Token(";", Lexer.TokenType.Semicolon)
+            new Token(";", TokenType.Semicolon)
           },
           new object[]
           {
             "; ",
-            new Lexer.Token(";", Lexer.TokenType.Semicolon)
+            new Token(";", TokenType.Semicolon)
           },
           new object[]
           {
             "; ;",
-            new Lexer.Token(";", Lexer.TokenType.Semicolon),
-            new Lexer.Token(";", Lexer.TokenType.Semicolon)
+            new Token(";", TokenType.Semicolon),
+            new Token(";", TokenType.Semicolon)
           },
           new object[]
           {
             ";;",
-            new Lexer.Token(";", Lexer.TokenType.Semicolon),
-            new Lexer.Token(";", Lexer.TokenType.Semicolon)
+            new Token(";", TokenType.Semicolon),
+            new Token(";", TokenType.Semicolon)
           },
         };
       }

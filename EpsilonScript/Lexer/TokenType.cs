@@ -1,0 +1,34 @@
+namespace EpsilonScript.Lexer
+{
+  public enum TokenType
+  {
+    None,
+    Identifier,
+    LeftParenthesis,
+    RightParenthesis,
+    Comma,
+    Semicolon,
+    ComparisonEqual,
+    ComparisonNotEqual,
+    ComparisonLessThan,
+    ComparisonGreaterThan,
+    ComparisonLessThanOrEqualTo,
+    ComparisonGreaterThanOrEqualTo,
+    NegateOperator,
+    BooleanOrOperator,
+    BooleanAndOperator,
+    BooleanLiteralTrue,
+    BooleanLiteralFalse,
+    AssignmentOperator,
+    AssignmentAddOperator,
+    AssignmentSubtractOperator,
+    AssignmentMultiplyOperator,
+    AssignmentDivideOperator,
+    PlusSign,
+    MinusSign,
+    MultiplyOperator,
+    DivideOperator,
+    Integer,
+    Float,
+  }
+}

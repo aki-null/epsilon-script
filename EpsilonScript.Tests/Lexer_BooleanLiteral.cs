@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using EpsilonScript.Lexer;
 using Xunit;
 
 namespace EpsilonScript.Tests
@@ -7,7 +8,7 @@ namespace EpsilonScript.Tests
   {
     [Theory]
     [MemberData(nameof(CorrectData))]
-    public void Lexer_Identifier_Correctly(string input, params Lexer.Token[] expected)
+    public void Lexer_Identifier_Correctly(string input, params Token[] expected)
     {
       Succeeds(input, expected);
     }
@@ -21,44 +22,44 @@ namespace EpsilonScript.Tests
           new object[]
           {
             "true",
-            new Lexer.Token("true", Lexer.TokenType.BooleanLiteralTrue)
+            new Token("true", TokenType.BooleanLiteralTrue)
           },
           new object[]
           {
             "false",
-            new Lexer.Token("false", Lexer.TokenType.BooleanLiteralFalse)
+            new Token("false", TokenType.BooleanLiteralFalse)
           },
           new object[]
           {
             " true",
-            new Lexer.Token("true", Lexer.TokenType.BooleanLiteralTrue)
+            new Token("true", TokenType.BooleanLiteralTrue)
           },
           new object[]
           {
             " false",
-            new Lexer.Token("false", Lexer.TokenType.BooleanLiteralFalse)
+            new Token("false", TokenType.BooleanLiteralFalse)
           },
           new object[]
           {
             "true ",
-            new Lexer.Token("true", Lexer.TokenType.BooleanLiteralTrue)
+            new Token("true", TokenType.BooleanLiteralTrue)
           },
           new object[]
           {
             "false ",
-            new Lexer.Token("false", Lexer.TokenType.BooleanLiteralFalse)
+            new Token("false", TokenType.BooleanLiteralFalse)
           },
           new object[]
           {
             "true false",
-            new Lexer.Token("true", Lexer.TokenType.BooleanLiteralTrue),
-            new Lexer.Token("false", Lexer.TokenType.BooleanLiteralFalse)
+            new Token("true", TokenType.BooleanLiteralTrue),
+            new Token("false", TokenType.BooleanLiteralFalse)
           },
           new object[]
           {
             "false true",
-            new Lexer.Token("false", Lexer.TokenType.BooleanLiteralFalse),
-            new Lexer.Token("true", Lexer.TokenType.BooleanLiteralTrue)
+            new Token("false", TokenType.BooleanLiteralFalse),
+            new Token("true", TokenType.BooleanLiteralTrue)
           },
         };
       }
