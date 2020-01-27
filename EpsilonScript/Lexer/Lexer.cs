@@ -126,7 +126,7 @@ namespace EpsilonScript.Lexer
           {
             // float
             AcceptRun(Numbers);
-            if (Accept("e"))
+            if (Accept("eE"))
             {
               // Accept + or -
               if (!Accept("+"))

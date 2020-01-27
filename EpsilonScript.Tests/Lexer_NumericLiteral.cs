@@ -98,6 +98,31 @@ namespace EpsilonScript.Tests
             "1.0e-99",
             new Token("1.0e-99", TokenType.Float)
           },
+          new object[]
+          {
+            "1.0E0",
+            new Token("1.0E0", TokenType.Float)
+          },
+          new object[]
+          {
+            "1.0E99",
+            new Token("1.0E99", TokenType.Float)
+          },
+          new object[]
+          {
+            "1.0E+99",
+            new Token("1.0E+99", TokenType.Float)
+          },
+          new object[]
+          {
+            "1.0E-0",
+            new Token("1.0E-0", TokenType.Float)
+          },
+          new object[]
+          {
+            "1.0E-99",
+            new Token("1.0E-99", TokenType.Float)
+          },
         };
       }
     }

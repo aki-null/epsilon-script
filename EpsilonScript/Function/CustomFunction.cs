@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using EpsilonScript.AST;
 using EpsilonScript.Parser;
 
-namespace EpsilonScript
+namespace EpsilonScript.Function
 {
   public class CustomFunction
   {
@@ -19,6 +19,9 @@ namespace EpsilonScript
       BoolFloatFloatFloat,
     }
 
+    // List of all possible function signatures.
+    // Anything that doesn't fit into one of these signatures can't be used.
+    // This is done to avoid using dynamic function invocation using reflection for performance optimization.
     private readonly Func<int, int> _funcIntInt;
     private readonly Func<float, int> _funcFloatInt;
     private readonly Func<int, float> _funcIntFloat;
@@ -27,6 +30,18 @@ namespace EpsilonScript
     private readonly Func<float, float, float> _funcFloatFloatFloat;
     private readonly Func<bool, int, int, int> _funcBoolIntIntInt;
     private readonly Func<bool, float, float, float> _funcBoolFloatFloatFloat;
+
+    // Cached list of all function parameters
+    private static readonly Type[] IntParamType = {EpsilonScript.Type.Integer};
+    private static readonly Type[] FloatParamType = {EpsilonScript.Type.Float};
+    private static readonly Type[] IntIntParamTYpe = {EpsilonScript.Type.Integer, EpsilonScript.Type.Integer};
+    private static readonly Type[] FloatFloatParamType = {EpsilonScript.Type.Float, EpsilonScript.Type.Float};
+
+    private static readonly Type[] BoolIntIntParamType =
+      {EpsilonScript.Type.Boolean, EpsilonScript.Type.Integer, EpsilonScript.Type.Integer};
+
+    private static readonly Type[] BoolFloatFloatParamType =
+      {EpsilonScript.Type.Boolean, EpsilonScript.Type.Float, EpsilonScript.Type.Float};
 
     private FunctionType Type { get; }
 
@@ -51,7 +66,7 @@ namespace EpsilonScript
       }
     }
 
-    private int NumberOfArguments
+    private int NumberOfParameters
     {
       get
       {
@@ -70,7 +85,26 @@ namespace EpsilonScript
       }
     }
 
-    public bool IsConstant { get; private set; }
+    public Type[] ParameterTypes
+    {
+      get
+      {
+        return Type switch
+        {
+          FunctionType.IntInt => IntParamType,
+          FunctionType.FloatInt => FloatParamType,
+          FunctionType.IntFloat => IntParamType,
+          FunctionType.FloatFloat => FloatParamType,
+          FunctionType.IntIntInt => IntIntParamTYpe,
+          FunctionType.FloatFloatFloat => FloatFloatParamType,
+          FunctionType.BoolIntIntInt => BoolIntIntParamType,
+          FunctionType.BoolFloatFloatFloat => BoolFloatFloatParamType,
+          _ => throw new ArgumentOutOfRangeException(nameof(Type), Type, "Unsupported function type")
+        };
+      }
+    }
+
+    public bool IsConstant { get; }
 
     public CustomFunction(string name, Func<int, int> func, bool isConstant = false)
     {
@@ -136,39 +170,40 @@ namespace EpsilonScript
       IsConstant = isConstant;
     }
 
-    private void CheckArgumentCount(List<Node> arguments)
+    private void CheckParameterCount(List<Node> parameters)
     {
-      if ((arguments?.Count ?? 0) != NumberOfArguments)
+      if ((parameters?.Count ?? 0) != NumberOfParameters)
       {
-        throw new RuntimeException($"Invalid number of arguments for function: {Name}");
+        throw new RuntimeException($"Invalid number of parameters for function: {Name}");
       }
     }
 
-    public int ExecuteInt(List<Node> arguments)
+    public int ExecuteInt(List<Node> parameters)
     {
-      CheckArgumentCount(arguments);
+      CheckParameterCount(parameters);
       return Type switch
       {
-        FunctionType.IntInt => _funcIntInt(arguments[0].IntegerValue),
-        FunctionType.FloatInt => _funcFloatInt(arguments[0].FloatValue),
-        FunctionType.IntIntInt => _funcIntIntInt(arguments[0].IntegerValue, arguments[1].IntegerValue),
-        FunctionType.BoolIntIntInt => _funcBoolIntIntInt(arguments[0].BooleanValue, arguments[1].IntegerValue,
-          arguments[2].IntegerValue),
+        FunctionType.IntInt => _funcIntInt(parameters[0].IntegerValue),
+        FunctionType.FloatInt => _funcFloatInt(parameters[0].FloatValue),
+        FunctionType.IntIntInt => _funcIntIntInt(parameters[0].IntegerValue, parameters[1].IntegerValue),
+        FunctionType.BoolIntIntInt => _funcBoolIntIntInt(parameters[0].BooleanValue, parameters[1].IntegerValue,
+          parameters[2].IntegerValue),
         _ => throw new ArgumentOutOfRangeException(nameof(Type), Type,
           "Unsupported function type (does not return integer?)")
       };
     }
 
-    public float ExecuteFloat(List<Node> arguments)
+    public float ExecuteFloat(List<Node> parameters)
     {
-      CheckArgumentCount(arguments);
+      CheckParameterCount(parameters);
       return Type switch
       {
-        FunctionType.IntFloat => _funcIntFloat(arguments[0].IntegerValue),
-        FunctionType.FloatFloat => _funcFloatFloat(arguments[0].FloatValue),
-        FunctionType.FloatFloatFloat => _funcFloatFloatFloat(arguments[0].FloatValue, arguments[1].FloatValue),
-        FunctionType.BoolFloatFloatFloat => _funcBoolFloatFloatFloat(arguments[0].BooleanValue, arguments[1].FloatValue,
-          arguments[2].FloatValue),
+        FunctionType.IntFloat => _funcIntFloat(parameters[0].IntegerValue),
+        FunctionType.FloatFloat => _funcFloatFloat(parameters[0].FloatValue),
+        FunctionType.FloatFloatFloat => _funcFloatFloatFloat(parameters[0].FloatValue, parameters[1].FloatValue),
+        FunctionType.BoolFloatFloatFloat => _funcBoolFloatFloatFloat(parameters[0].BooleanValue,
+          parameters[1].FloatValue,
+          parameters[2].FloatValue),
         _ => throw new ArgumentOutOfRangeException(nameof(Type), Type,
           "Unsupported function type (does not return float?)")
       };

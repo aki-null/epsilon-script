@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using EpsilonScript.Function;
 using EpsilonScript.Parser;
 
 namespace EpsilonScript.AST
@@ -10,8 +11,9 @@ namespace EpsilonScript.AST
 
     public override bool IsConstant => _leftNode.IsConstant && _rightNode.IsConstant;
 
-    public override void Build(Stack<Node> rpnStack, Element element, IDictionary<string, VariableValue> variables,
-      IDictionary<string, CustomFunction> functions)
+    public override void Build(Stack<Node> rpnStack, Element element, Compiler.Options options,
+      IDictionary<string, VariableValue> variables,
+      IDictionary<string, CustomFunctionOverload> functions)
     {
       if (!rpnStack.TryPop(out _rightNode) || !rpnStack.TryPop(out _leftNode))
       {

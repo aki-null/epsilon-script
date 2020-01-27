@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using EpsilonScript.Function;
 using EpsilonScript.Parser;
 
 namespace EpsilonScript.AST
@@ -43,14 +44,15 @@ namespace EpsilonScript.AST
       };
     }
 
-    public static Node Build(IList<Element> elements, IDictionary<string, VariableValue> variables,
-      IDictionary<string, CustomFunction> functions)
+    public static Node Build(List<Element> elements, Compiler.Options options,
+      IDictionary<string, VariableValue> variables,
+      IDictionary<string, CustomFunctionOverload> functions)
     {
       var rpnStack = new Stack<Node>();
       foreach (var element in elements)
       {
         var node = CreateNode(element.Type);
-        node.Build(rpnStack, element, variables, functions);
+        node.Build(rpnStack, element, options, variables, functions);
         rpnStack.Push(node);
       }
 
