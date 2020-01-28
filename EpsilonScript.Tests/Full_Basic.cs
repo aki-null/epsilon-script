@@ -47,5 +47,23 @@ namespace EpsilonScript.Tests
       Assert.Equal(Type.Float, rootNode.ValueType);
       Assert.True(Math.IsNearlyEqual(rootNode.FloatValue, 100.2f));
     }
+
+    [Fact]
+    private void Full_CompilerReuse_Succeeds()
+    {
+      var compiler = new Compiler();
+      var script = compiler.Compile("0");
+      script.Execute();
+      Assert.Equal(Type.Integer, script.ValueType);
+      Assert.Equal(0, script.IntegerValue);
+      script = compiler.Compile("1");
+      script.Execute();
+      Assert.Equal(Type.Integer, script.ValueType);
+      Assert.Equal(1, script.IntegerValue);
+      script = compiler.Compile("2.0");
+      script.Execute();
+      Assert.Equal(Type.Float, script.ValueType);
+      Assert.Equal(2.0f, script.IntegerValue);
+    }
   }
 }

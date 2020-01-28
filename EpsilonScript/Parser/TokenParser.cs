@@ -138,6 +138,8 @@ namespace EpsilonScript.Parser
     public void Parse(IList<Token> tokens)
     {
       _tokens = tokens;
+      _index = 0;
+      Elements.Clear();
 
       while (!IsEnd)
       {
