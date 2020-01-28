@@ -15,6 +15,8 @@ namespace EpsilonScript.AST
     private Node _rightNode;
     private ElementType _operationType;
 
+    public override bool IsConstant => _leftNode.IsConstant && _rightNode.IsConstant;
+
     public override void Build(Stack<Node> rpnStack, Element element, Compiler.Options options,
       IDictionary<string, VariableValue> variables,
       IDictionary<string, CustomFunctionOverload> functions)
@@ -81,6 +83,18 @@ namespace EpsilonScript.AST
 
       IntegerValue = BooleanValue ? 1 : 0;
       FloatValue = IntegerValue;
+    }
+
+    public override Node Optimize()
+    {
+      if (IsConstant)
+      {
+        Execute(null);
+        return CreateValueNode();
+      }
+      _leftNode = _leftNode.Optimize();
+      _rightNode = _rightNode.Optimize();
+      return this;
     }
   }
 }

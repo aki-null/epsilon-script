@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using EpsilonScript.Function;
 using EpsilonScript.Parser;
@@ -21,6 +22,27 @@ namespace EpsilonScript.AST
 
     public virtual void Execute(IDictionary<string, VariableValue> variablesOverride)
     {
+    }
+
+    public virtual Node Optimize()
+    {
+      return this;
+    }
+
+    public Node CreateValueNode()
+    {
+      switch (ValueType)
+      {
+        case ValueType.Integer:
+          return new IntegerNode(IntegerValue);
+        case ValueType.Float:
+          return new FloatNode(FloatValue);
+        case ValueType.Boolean:
+          return new BooleanNode(BooleanValue);
+        default:
+          throw new ArgumentOutOfRangeException(nameof(ValueType), ValueType,
+            "Unsupported value type");
+      }
     }
   }
 }

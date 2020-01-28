@@ -23,6 +23,22 @@ namespace EpsilonScript.Tests
       Assert.Equal(expectedBool, node.BooleanValue);
     }
 
+    [Theory]
+    [InlineData(0.0f)]
+    [InlineData(1.0f)]
+    [InlineData(1.2f)]
+    [InlineData(3.402823E+38)]
+    public void AST_CreateFloat_Succeeds(float value)
+    {
+      var node = new FloatNode(value);
+      var expectedInt = (int) value;
+      var expectedBool = expectedInt != 0;
+      Assert.Equal(ValueType.Float, node.ValueType);
+      Assert.Equal(expectedInt, node.IntegerValue);
+      Assert.True(Math.IsNearlyEqual(value, node.FloatValue));
+      Assert.Equal(expectedBool, node.BooleanValue);
+    }
+
     public static IEnumerable<object[]> CorrectData
     {
       get

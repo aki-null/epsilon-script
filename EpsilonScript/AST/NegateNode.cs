@@ -35,5 +35,16 @@ namespace EpsilonScript.AST
       IntegerValue = BooleanValue ? 1 : 0;
       FloatValue = IntegerValue;
     }
+
+    public override Node Optimize()
+    {
+      if (IsConstant)
+      {
+        Execute(null);
+        return CreateValueNode();
+      }
+      _childNode = _childNode.Optimize();
+      return this;
+    }
   }
 }

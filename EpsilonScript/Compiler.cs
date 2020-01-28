@@ -62,6 +62,8 @@ namespace EpsilonScript
       _rpnConverter.Convert(_tokenParser.Elements);
       // Build AST
       var rootNode = ASTBuilder.Build(_rpnConverter.Rpn, options, variables, _functions);
+      // Optimize
+      rootNode = rootNode.Optimize();
       // Create script wrapper
       return new CompiledScript(rootNode);
     }

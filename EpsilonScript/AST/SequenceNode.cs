@@ -33,5 +33,17 @@ namespace EpsilonScript.AST
       BooleanValue = _rightNode.BooleanValue;
       TupleValue = _rightNode.TupleValue;
     }
+
+    public override Node Optimize()
+    {
+      if (IsConstant)
+      {
+        Execute(null);
+        return CreateValueNode();
+      }
+      _leftNode = _leftNode.Optimize();
+      _rightNode = _rightNode.Optimize();
+      return this;
+    }
   }
 }

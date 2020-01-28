@@ -58,5 +58,14 @@ namespace EpsilonScript.AST
         child.Execute(variablesOverride);
       }
     }
+
+    public override Node Optimize()
+    {
+      for (var i = 0; i < TupleValue.Count; ++i)
+      {
+        TupleValue[i] = TupleValue[i].Optimize();
+      }
+      return this;
+    }
   }
 }

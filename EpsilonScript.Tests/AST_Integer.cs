@@ -38,6 +38,21 @@ namespace EpsilonScript.Tests
       });
     }
 
+    [Theory]
+    [InlineData(0)]
+    [InlineData(1)]
+    [InlineData(2147483647)]
+    public void AST_CreateInteger_Succeeds(int value)
+    {
+      var node = new IntegerNode(value);
+      var expectedFloat = (float) value;
+      var expectedBool = value != 0;
+      Assert.Equal(ValueType.Integer, node.ValueType);
+      Assert.Equal(value, node.IntegerValue);
+      Assert.True(Math.IsNearlyEqual(expectedFloat, node.FloatValue));
+      Assert.Equal(expectedBool, node.BooleanValue);
+    }
+
     public static IEnumerable<object[]> CorrectData
     {
       get

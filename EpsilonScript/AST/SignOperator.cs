@@ -76,5 +76,16 @@ namespace EpsilonScript.AST
             "Unsupported value type for sign change");
       }
     }
+
+    public override Node Optimize()
+    {
+      if (IsConstant)
+      {
+        Execute(null);
+        return CreateValueNode();
+      }
+      _childNode = _childNode.Optimize();
+      return this;
+    }
   }
 }

@@ -99,5 +99,17 @@ namespace EpsilonScript.AST
 
       BooleanValue = IntegerValue != 0;
     }
+
+    public override Node Optimize()
+    {
+      if (IsConstant)
+      {
+        Execute(null);
+        return CreateValueNode();
+      }
+      _leftNode = _leftNode.Optimize();
+      _rightNode = _rightNode.Optimize();
+      return this;
+    }
   }
 }
