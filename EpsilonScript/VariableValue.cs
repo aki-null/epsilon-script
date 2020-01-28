@@ -12,13 +12,17 @@ namespace EpsilonScript
     {
       get
       {
-        return Type switch
+        switch (Type)
         {
-          Type.Integer => _integerValue,
-          Type.Float => (int) _floatValue,
-          Type.Boolean => (_booleanValue ? 1 : 0),
-          _ => throw new ArgumentOutOfRangeException(nameof(Type), Type, "Unsupported variable type")
-        };
+          case Type.Integer:
+            return _integerValue;
+          case Type.Float:
+            return (int) _floatValue;
+          case Type.Boolean:
+            return (_booleanValue ? 1 : 0);
+          default:
+            throw new ArgumentOutOfRangeException(nameof(Type), Type, "Unsupported variable type");
+        }
       }
       set
       {
@@ -45,13 +49,17 @@ namespace EpsilonScript
     {
       get
       {
-        return Type switch
+        switch (Type)
         {
-          Type.Integer => _integerValue,
-          Type.Float => _floatValue,
-          Type.Boolean => throw new InvalidCastException("A boolean value cannot be casted to a float value"),
-          _ => throw new ArgumentOutOfRangeException(nameof(Type), Type, "Unsupported variable type")
-        };
+          case Type.Integer:
+            return _integerValue;
+          case Type.Float:
+            return _floatValue;
+          case Type.Boolean:
+            throw new InvalidCastException("A boolean value cannot be casted to a float value");
+          default:
+            throw new ArgumentOutOfRangeException(nameof(Type), Type, "Unsupported variable type");
+        }
       }
       set
       {
@@ -77,13 +85,17 @@ namespace EpsilonScript
     {
       get
       {
-        return Type switch
+        switch (Type)
         {
-          Type.Integer => _integerValue != 0,
-          Type.Float => throw new InvalidCastException("A float value cannot be casted to a boolean value"),
-          Type.Boolean => _booleanValue,
-          _ => throw new ArgumentOutOfRangeException(nameof(Type), Type, "Unsupported variable type")
-        };
+          case Type.Integer:
+            return _integerValue != 0;
+          case Type.Float:
+            throw new InvalidCastException("A float value cannot be casted to a boolean value");
+          case Type.Boolean:
+            return _booleanValue;
+          default:
+            throw new ArgumentOutOfRangeException(nameof(Type), Type, "Unsupported variable type");
+        }
       }
       set
       {

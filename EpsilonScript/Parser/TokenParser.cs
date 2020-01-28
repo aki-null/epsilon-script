@@ -14,7 +14,9 @@ namespace EpsilonScript.Parser
     private Token NextToken => _tokens[_index + 1];
     private bool IsNextTokenAvailable => _index + 1 < _tokens.Count;
     private bool IsEnd => _index >= _tokens.Count;
-    private ElementType? PreviousElementType => Elements.Count > 0 ? Elements[^1].Type : (ElementType?) null;
+
+    private ElementType? PreviousElementType =>
+      Elements.Count > 0 ? Elements[Elements.Count - 1].Type : (ElementType?) null;
 
     private void PushElement(Token token, ElementType type)
     {
@@ -23,37 +25,92 @@ namespace EpsilonScript.Parser
 
     private void PushElementDirect(Token token)
     {
-      var mappedType = token.Type switch
+      ElementType mappedType;
+      switch (token.Type)
       {
-        TokenType.None => ElementType.None,
-        TokenType.LeftParenthesis => ElementType.LeftParenthesis,
-        TokenType.RightParenthesis => ElementType.RightParenthesis,
-        TokenType.Comma => ElementType.Comma,
-        TokenType.Semicolon => ElementType.Semicolon,
-        TokenType.ComparisonEqual => ElementType.ComparisonEqual,
-        TokenType.ComparisonNotEqual => ElementType.ComparisonNotEqual,
-        TokenType.ComparisonLessThan => ElementType.ComparisonLessThan,
-        TokenType.ComparisonGreaterThan => ElementType.ComparisonGreaterThan,
-        TokenType.ComparisonLessThanOrEqualTo => ElementType.ComparisonLessThanOrEqualTo,
-        TokenType.ComparisonGreaterThanOrEqualTo => ElementType.ComparisonGreaterThanOrEqualTo,
-        TokenType.NegateOperator => ElementType.NegateOperator,
-        TokenType.BooleanOrOperator => ElementType.BooleanOrOperator,
-        TokenType.BooleanAndOperator => ElementType.BooleanAndOperator,
-        TokenType.BooleanLiteralTrue => ElementType.BooleanLiteralTrue,
-        TokenType.BooleanLiteralFalse => ElementType.BooleanLiteralFalse,
-        TokenType.AssignmentOperator => ElementType.AssignmentOperator,
-        TokenType.AssignmentAddOperator => ElementType.AssignmentAddOperator,
-        TokenType.AssignmentSubtractOperator => ElementType.AssignmentSubtractOperator,
-        TokenType.AssignmentMultiplyOperator => ElementType.AssignmentMultiplyOperator,
-        TokenType.AssignmentDivideOperator => ElementType.AssignmentDivideOperator,
-        TokenType.PlusSign => ElementType.AddOperator,
-        TokenType.MultiplyOperator => ElementType.MultiplyOperator,
-        TokenType.DivideOperator => ElementType.DivideOperator,
-        TokenType.Integer => ElementType.Integer,
-        TokenType.Float => ElementType.Float,
-        _ => throw new ArgumentOutOfRangeException(nameof(token.Type), token.Type,
-          "No direct token to element type map available")
-      };
+        case TokenType.None:
+          mappedType = ElementType.None;
+          break;
+        case TokenType.LeftParenthesis:
+          mappedType = ElementType.LeftParenthesis;
+          break;
+        case TokenType.RightParenthesis:
+          mappedType = ElementType.RightParenthesis;
+          break;
+        case TokenType.Comma:
+          mappedType = ElementType.Comma;
+          break;
+        case TokenType.Semicolon:
+          mappedType = ElementType.Semicolon;
+          break;
+        case TokenType.ComparisonEqual:
+          mappedType = ElementType.ComparisonEqual;
+          break;
+        case TokenType.ComparisonNotEqual:
+          mappedType = ElementType.ComparisonNotEqual;
+          break;
+        case TokenType.ComparisonLessThan:
+          mappedType = ElementType.ComparisonLessThan;
+          break;
+        case TokenType.ComparisonGreaterThan:
+          mappedType = ElementType.ComparisonGreaterThan;
+          break;
+        case TokenType.ComparisonLessThanOrEqualTo:
+          mappedType = ElementType.ComparisonLessThanOrEqualTo;
+          break;
+        case TokenType.ComparisonGreaterThanOrEqualTo:
+          mappedType = ElementType.ComparisonGreaterThanOrEqualTo;
+          break;
+        case TokenType.NegateOperator:
+          mappedType = ElementType.NegateOperator;
+          break;
+        case TokenType.BooleanOrOperator:
+          mappedType = ElementType.BooleanOrOperator;
+          break;
+        case TokenType.BooleanAndOperator:
+          mappedType = ElementType.BooleanAndOperator;
+          break;
+        case TokenType.BooleanLiteralTrue:
+          mappedType = ElementType.BooleanLiteralTrue;
+          break;
+        case TokenType.BooleanLiteralFalse:
+          mappedType = ElementType.BooleanLiteralFalse;
+          break;
+        case TokenType.AssignmentOperator:
+          mappedType = ElementType.AssignmentOperator;
+          break;
+        case TokenType.AssignmentAddOperator:
+          mappedType = ElementType.AssignmentAddOperator;
+          break;
+        case TokenType.AssignmentSubtractOperator:
+          mappedType = ElementType.AssignmentSubtractOperator;
+          break;
+        case TokenType.AssignmentMultiplyOperator:
+          mappedType = ElementType.AssignmentMultiplyOperator;
+          break;
+        case TokenType.AssignmentDivideOperator:
+          mappedType = ElementType.AssignmentDivideOperator;
+          break;
+        case TokenType.PlusSign:
+          mappedType = ElementType.AddOperator;
+          break;
+        case TokenType.MultiplyOperator:
+          mappedType = ElementType.MultiplyOperator;
+          break;
+        case TokenType.DivideOperator:
+          mappedType = ElementType.DivideOperator;
+          break;
+        case TokenType.Integer:
+          mappedType = ElementType.Integer;
+          break;
+        case TokenType.Float:
+          mappedType = ElementType.Float;
+          break;
+        default:
+          throw new ArgumentOutOfRangeException(nameof(token.Type), token.Type,
+            "No direct token to element type map available");
+      }
+
       PushElement(token, mappedType);
     }
 
@@ -63,13 +120,16 @@ namespace EpsilonScript.Parser
       {
         // Next token must exist for a sign operator to work on
         if (!IsNextTokenAvailable) return false;
-        return PreviousElementType switch
+        switch (PreviousElementType)
         {
-          null => true, // Start of an expression
-          ElementType.LeftParenthesis => true, // Inside of parenthesis start
-          ElementType.RightParenthesis => false, // Right after an end of parenthesis
-          _ => PreviousElementType.Value.IsOperator() // Cannot subtract after an operator
-        };
+          case null:
+          case ElementType.LeftParenthesis:
+            return true;
+          case ElementType.RightParenthesis:
+            return false;
+          default:
+            return PreviousElementType.Value.IsOperator();
+        }
       }
     }
 
@@ -115,8 +175,7 @@ namespace EpsilonScript.Parser
               // Insert null element because parenthesis was opened but closed immediately for a function call.
               // This is needed so a function element has something to build its parameter list on even if no parameters
               // were specified.
-              PushElement(new Token("", TokenType.None, currentToken.LineNumber, currentToken.Position),
-                ElementType.None);
+              PushElement(new Token("", TokenType.None, currentToken.LineNumber), ElementType.None);
             }
 
             PushElementDirect(currentToken);

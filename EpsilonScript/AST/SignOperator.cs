@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using EpsilonScript.Function;
+using EpsilonScript.Helper;
 using EpsilonScript.Parser;
 
 namespace EpsilonScript.AST
@@ -37,24 +38,36 @@ namespace EpsilonScript.AST
       switch (ValueType)
       {
         case ValueType.Integer:
-          IntegerValue = _operationType switch
+          switch (_operationType)
           {
-            ElementType.PositiveOperator => _childNode.IntegerValue,
-            ElementType.NegativeOperator => -_childNode.IntegerValue,
-            _ => throw new ArgumentOutOfRangeException(nameof(_operationType), _operationType,
-              "Unsupported operation type for sign change")
-          };
+            case ElementType.PositiveOperator:
+              IntegerValue = _childNode.IntegerValue;
+              break;
+            case ElementType.NegativeOperator:
+              IntegerValue = -_childNode.IntegerValue;
+              break;
+            default:
+              throw new ArgumentOutOfRangeException(nameof(_operationType), _operationType,
+                "Unsupported operation type for sign change");
+          }
+
           FloatValue = IntegerValue;
           BooleanValue = IntegerValue != 0;
           break;
         case ValueType.Float:
-          FloatValue = _operationType switch
+          switch (_operationType)
           {
-            ElementType.PositiveOperator => _childNode.FloatValue,
-            ElementType.NegativeOperator => -_childNode.FloatValue,
-            _ => throw new ArgumentOutOfRangeException(nameof(_operationType), _operationType,
-              "Unsupported operation type for sign change")
-          };
+            case ElementType.PositiveOperator:
+              FloatValue = _childNode.FloatValue;
+              break;
+            case ElementType.NegativeOperator:
+              FloatValue = -_childNode.FloatValue;
+              break;
+            default:
+              throw new ArgumentOutOfRangeException(nameof(_operationType), _operationType,
+                "Unsupported operation type for sign change");
+          }
+
           IntegerValue = (int) FloatValue;
           BooleanValue = IntegerValue != 0;
           break;

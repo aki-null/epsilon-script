@@ -42,16 +42,18 @@ namespace EpsilonScript.Parser
   {
     public static bool IsValue(this ElementType type)
     {
-      return type switch
+      switch (type)
       {
-        ElementType.None => true,
-        ElementType.Variable => true,
-        ElementType.BooleanLiteralTrue => true,
-        ElementType.BooleanLiteralFalse => true,
-        ElementType.Integer => true,
-        ElementType.Float => true,
-        _ => false
-      };
+        case ElementType.None:
+        case ElementType.Variable:
+        case ElementType.BooleanLiteralTrue:
+        case ElementType.BooleanLiteralFalse:
+        case ElementType.Integer:
+        case ElementType.Float:
+          return true;
+        default:
+          return false;
+      }
     }
 
     public static bool IsOperator(this ElementType type)
@@ -61,84 +63,99 @@ namespace EpsilonScript.Parser
 
     public static int Precedence(this ElementType type)
     {
-      return type switch
+      switch (type)
       {
-        ElementType.Function => 8,
-        ElementType.NegateOperator => 8,
-        ElementType.PositiveOperator => 8,
-        ElementType.NegativeOperator => 8,
-        ElementType.MultiplyOperator => 7,
-        ElementType.DivideOperator => 7,
-        ElementType.AddOperator => 6,
-        ElementType.SubtractOperator => 6,
-        ElementType.ComparisonEqual => 5,
-        ElementType.ComparisonNotEqual => 5,
-        ElementType.ComparisonLessThan => 5,
-        ElementType.ComparisonGreaterThan => 5,
-        ElementType.ComparisonLessThanOrEqualTo => 5,
-        ElementType.ComparisonGreaterThanOrEqualTo => 5,
-        ElementType.BooleanAndOperator => 4,
-        ElementType.BooleanOrOperator => 3,
-        ElementType.AssignmentOperator => 2,
-        ElementType.AssignmentAddOperator => 2,
-        ElementType.AssignmentSubtractOperator => 2,
-        ElementType.AssignmentMultiplyOperator => 2,
-        ElementType.AssignmentDivideOperator => 2,
-        ElementType.Comma => 1,
-        ElementType.Semicolon => 0,
-        ElementType.None => -1,
-        ElementType.Variable => -1,
-        ElementType.FunctionStartParenthesis => -1,
-        ElementType.LeftParenthesis => -1,
-        ElementType.RightParenthesis => -1,
-        ElementType.BooleanLiteralTrue => -1,
-        ElementType.BooleanLiteralFalse => -1,
-        ElementType.Integer => -1,
-        ElementType.Float => -1,
-        _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
-      };
+        case ElementType.Function:
+        case ElementType.NegateOperator:
+        case ElementType.PositiveOperator:
+        case ElementType.NegativeOperator:
+          return 8;
+        case ElementType.MultiplyOperator:
+        case ElementType.DivideOperator:
+          return 7;
+        case ElementType.AddOperator:
+        case ElementType.SubtractOperator:
+          return 6;
+        case ElementType.ComparisonEqual:
+        case ElementType.ComparisonNotEqual:
+        case ElementType.ComparisonLessThan:
+        case ElementType.ComparisonGreaterThan:
+        case ElementType.ComparisonLessThanOrEqualTo:
+        case ElementType.ComparisonGreaterThanOrEqualTo:
+          return 5;
+        case ElementType.BooleanAndOperator:
+          return 4;
+        case ElementType.BooleanOrOperator:
+          return 3;
+        case ElementType.AssignmentOperator:
+        case ElementType.AssignmentAddOperator:
+        case ElementType.AssignmentSubtractOperator:
+        case ElementType.AssignmentMultiplyOperator:
+        case ElementType.AssignmentDivideOperator:
+          return 2;
+        case ElementType.Comma:
+          return 1;
+        case ElementType.Semicolon:
+          return 0;
+        case ElementType.None:
+        case ElementType.Variable:
+        case ElementType.FunctionStartParenthesis:
+        case ElementType.LeftParenthesis:
+        case ElementType.RightParenthesis:
+        case ElementType.BooleanLiteralTrue:
+        case ElementType.BooleanLiteralFalse:
+        case ElementType.Integer:
+        case ElementType.Float:
+          return -1;
+        default:
+          throw new ArgumentOutOfRangeException(nameof(type), type, null);
+      }
     }
 
     public static Associativity Associativity(this ElementType type)
     {
-      return type switch
+      switch (type)
       {
-        // Operators
-        ElementType.Function => Parser.Associativity.Right,
-        ElementType.NegateOperator => Parser.Associativity.Right,
-        ElementType.NegativeOperator => Parser.Associativity.Right,
-        ElementType.PositiveOperator => Parser.Associativity.Right,
-        ElementType.MultiplyOperator => Parser.Associativity.Left,
-        ElementType.DivideOperator => Parser.Associativity.Left,
-        ElementType.AddOperator => Parser.Associativity.Left,
-        ElementType.SubtractOperator => Parser.Associativity.Left,
-        ElementType.ComparisonEqual => Parser.Associativity.Left,
-        ElementType.ComparisonNotEqual => Parser.Associativity.Left,
-        ElementType.ComparisonLessThan => Parser.Associativity.Left,
-        ElementType.ComparisonGreaterThan => Parser.Associativity.Left,
-        ElementType.ComparisonLessThanOrEqualTo => Parser.Associativity.Left,
-        ElementType.ComparisonGreaterThanOrEqualTo => Parser.Associativity.Left,
-        ElementType.BooleanOrOperator => Parser.Associativity.Left,
-        ElementType.BooleanAndOperator => Parser.Associativity.Left,
-        ElementType.AssignmentOperator => Parser.Associativity.Right,
-        ElementType.AssignmentAddOperator => Parser.Associativity.Right,
-        ElementType.AssignmentSubtractOperator => Parser.Associativity.Right,
-        ElementType.AssignmentMultiplyOperator => Parser.Associativity.Right,
-        ElementType.AssignmentDivideOperator => Parser.Associativity.Right,
-        ElementType.Comma => Parser.Associativity.Left,
-        ElementType.Semicolon => Parser.Associativity.Left,
-        // Non-operators
-        ElementType.None => Parser.Associativity.None,
-        ElementType.Variable => Parser.Associativity.None,
-        ElementType.FunctionStartParenthesis => Parser.Associativity.None,
-        ElementType.LeftParenthesis => Parser.Associativity.None,
-        ElementType.RightParenthesis => Parser.Associativity.None,
-        ElementType.BooleanLiteralTrue => Parser.Associativity.None,
-        ElementType.BooleanLiteralFalse => Parser.Associativity.None,
-        ElementType.Integer => Parser.Associativity.None,
-        ElementType.Float => Parser.Associativity.None,
-        _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
-      };
+        case ElementType.Function:
+        case ElementType.NegateOperator:
+        case ElementType.NegativeOperator:
+        case ElementType.PositiveOperator:
+          return Parser.Associativity.Right;
+        case ElementType.MultiplyOperator:
+        case ElementType.DivideOperator:
+        case ElementType.AddOperator:
+        case ElementType.SubtractOperator:
+        case ElementType.ComparisonEqual:
+        case ElementType.ComparisonNotEqual:
+        case ElementType.ComparisonLessThan:
+        case ElementType.ComparisonGreaterThan:
+        case ElementType.ComparisonLessThanOrEqualTo:
+        case ElementType.ComparisonGreaterThanOrEqualTo:
+        case ElementType.BooleanOrOperator:
+        case ElementType.BooleanAndOperator:
+          return Parser.Associativity.Left;
+        case ElementType.AssignmentOperator:
+        case ElementType.AssignmentAddOperator:
+        case ElementType.AssignmentSubtractOperator:
+        case ElementType.AssignmentMultiplyOperator:
+        case ElementType.AssignmentDivideOperator:
+          return Parser.Associativity.Right;
+        case ElementType.Comma:
+        case ElementType.Semicolon:
+          return Parser.Associativity.Left;
+        case ElementType.None:
+        case ElementType.Variable:
+        case ElementType.FunctionStartParenthesis:
+        case ElementType.LeftParenthesis:
+        case ElementType.RightParenthesis:
+        case ElementType.BooleanLiteralTrue:
+        case ElementType.BooleanLiteralFalse:
+        case ElementType.Integer:
+        case ElementType.Float:
+          return Parser.Associativity.None;
+        default:
+          throw new ArgumentOutOfRangeException(nameof(type), type, null);
+      }
     }
   }
 }

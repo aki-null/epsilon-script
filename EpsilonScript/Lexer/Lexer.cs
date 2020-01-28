@@ -19,7 +19,6 @@ namespace EpsilonScript.Lexer
     private int _current;
     private int _startLineNumber;
     private int _currentLineNumber;
-    private int _position;
 
     private bool Backup()
     {
@@ -39,7 +38,7 @@ namespace EpsilonScript.Lexer
 
     private bool Accept(string chars)
     {
-      if (chars.Contains(Next()))
+      if (chars.IndexOf(Next()) >= 0)
       {
         return true;
       }
@@ -51,7 +50,7 @@ namespace EpsilonScript.Lexer
     private bool AcceptRun(string chars)
     {
       var success = false;
-      while (chars.Contains(Next()))
+      while (chars.IndexOf(Next()) >= 0)
       {
         success = true;
       }
@@ -79,9 +78,8 @@ namespace EpsilonScript.Lexer
 
     private Token Emit(TokenType tokenType)
     {
-      var token = new Token(CurrentToken, tokenType, _startLineNumber, _position);
+      var token = new Token(CurrentToken, tokenType, _startLineNumber);
       _start = _current;
-      _position = _start;
       _startLineNumber = _currentLineNumber;
       return token;
     }
@@ -93,7 +91,6 @@ namespace EpsilonScript.Lexer
       _current = 0;
       _startLineNumber = 1;
       _currentLineNumber = 1;
-      _position = 1;
 
       var tokens = new List<Token>();
 

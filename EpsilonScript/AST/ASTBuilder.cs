@@ -9,39 +9,54 @@ namespace EpsilonScript.AST
   {
     private static Node CreateNode(ElementType type)
     {
-      return type switch
+      switch (type)
       {
-        ElementType.None => (Node) new NullNode(),
-        ElementType.Variable => new VariableNode(),
-        ElementType.Function => new FunctionNode(),
-        ElementType.Comma => new TupleNode(),
-        ElementType.Semicolon => new SequenceNode(),
-        ElementType.ComparisonEqual => new ComparisonNode(),
-        ElementType.ComparisonNotEqual => new ComparisonNode(),
-        ElementType.ComparisonLessThan => new ComparisonNode(),
-        ElementType.ComparisonGreaterThan => new ComparisonNode(),
-        ElementType.ComparisonLessThanOrEqualTo => new ComparisonNode(),
-        ElementType.ComparisonGreaterThanOrEqualTo => new ComparisonNode(),
-        ElementType.NegateOperator => new NegateNode(),
-        ElementType.PositiveOperator => new SignOperator(),
-        ElementType.NegativeOperator => new SignOperator(),
-        ElementType.BooleanOrOperator => new BooleanOperationNode(),
-        ElementType.BooleanAndOperator => new BooleanOperationNode(),
-        ElementType.BooleanLiteralTrue => new BooleanNode(),
-        ElementType.BooleanLiteralFalse => new BooleanNode(),
-        ElementType.AssignmentOperator => new AssignmentNode(),
-        ElementType.AssignmentAddOperator => new AssignmentNode(),
-        ElementType.AssignmentSubtractOperator => new AssignmentNode(),
-        ElementType.AssignmentMultiplyOperator => new AssignmentNode(),
-        ElementType.AssignmentDivideOperator => new AssignmentNode(),
-        ElementType.AddOperator => new ArithmeticNode(),
-        ElementType.SubtractOperator => new ArithmeticNode(),
-        ElementType.MultiplyOperator => new ArithmeticNode(),
-        ElementType.DivideOperator => new ArithmeticNode(),
-        ElementType.Integer => new IntegerNode(),
-        ElementType.Float => new FloatNode(),
-        _ => throw new ArgumentOutOfRangeException()
-      };
+        case ElementType.None:
+          return new NullNode();
+        case ElementType.Variable:
+          return new VariableNode();
+        case ElementType.Function:
+          return new FunctionNode();
+        case ElementType.Comma:
+          return new TupleNode();
+        case ElementType.Semicolon:
+          return new SequenceNode();
+        case ElementType.ComparisonEqual:
+        case ElementType.ComparisonNotEqual:
+        case ElementType.ComparisonLessThan:
+        case ElementType.ComparisonGreaterThan:
+        case ElementType.ComparisonLessThanOrEqualTo:
+        case ElementType.ComparisonGreaterThanOrEqualTo:
+          return new ComparisonNode();
+        case ElementType.NegateOperator:
+          return new NegateNode();
+        case ElementType.PositiveOperator:
+        case ElementType.NegativeOperator:
+          return new SignOperator();
+        case ElementType.BooleanOrOperator:
+        case ElementType.BooleanAndOperator:
+          return new BooleanOperationNode();
+        case ElementType.BooleanLiteralTrue:
+        case ElementType.BooleanLiteralFalse:
+          return new BooleanNode();
+        case ElementType.AssignmentOperator:
+        case ElementType.AssignmentAddOperator:
+        case ElementType.AssignmentSubtractOperator:
+        case ElementType.AssignmentMultiplyOperator:
+        case ElementType.AssignmentDivideOperator:
+          return new AssignmentNode();
+        case ElementType.AddOperator:
+        case ElementType.SubtractOperator:
+        case ElementType.MultiplyOperator:
+        case ElementType.DivideOperator:
+          return new ArithmeticNode();
+        case ElementType.Integer:
+          return new IntegerNode();
+        case ElementType.Float:
+          return new FloatNode();
+        default:
+          throw new ArgumentOutOfRangeException();
+      }
     }
 
     public static Node Build(List<Element> elements, Compiler.Options options,

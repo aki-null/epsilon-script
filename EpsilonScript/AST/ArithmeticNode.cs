@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using EpsilonScript.Function;
+using EpsilonScript.Helper;
 using EpsilonScript.Parser;
 
 namespace EpsilonScript.AST
@@ -27,26 +28,36 @@ namespace EpsilonScript.AST
 
     private int CalculateIntegerValue()
     {
-      return _operator switch
+      switch (_operator)
       {
-        ElementType.AddOperator => (_leftNode.IntegerValue + _rightNode.IntegerValue),
-        ElementType.SubtractOperator => (_leftNode.IntegerValue - _rightNode.IntegerValue),
-        ElementType.MultiplyOperator => (_leftNode.IntegerValue * _rightNode.IntegerValue),
-        ElementType.DivideOperator => (_leftNode.IntegerValue / _rightNode.IntegerValue),
-        _ => throw new ArgumentOutOfRangeException(nameof(_operator), _operator, "Unsupported operator type")
-      };
+        case ElementType.AddOperator:
+          return _leftNode.IntegerValue + _rightNode.IntegerValue;
+        case ElementType.SubtractOperator:
+          return _leftNode.IntegerValue - _rightNode.IntegerValue;
+        case ElementType.MultiplyOperator:
+          return _leftNode.IntegerValue * _rightNode.IntegerValue;
+        case ElementType.DivideOperator:
+          return _leftNode.IntegerValue / _rightNode.IntegerValue;
+        default:
+          throw new ArgumentOutOfRangeException(nameof(_operator), _operator, "Unsupported operator type");
+      }
     }
 
     private float CalculateFloatValue()
     {
-      return _operator switch
+      switch (_operator)
       {
-        ElementType.AddOperator => (_leftNode.FloatValue + _rightNode.FloatValue),
-        ElementType.SubtractOperator => (_leftNode.FloatValue - _rightNode.FloatValue),
-        ElementType.MultiplyOperator => (_leftNode.FloatValue * _rightNode.FloatValue),
-        ElementType.DivideOperator => (_leftNode.FloatValue / _rightNode.FloatValue),
-        _ => throw new ArgumentOutOfRangeException(nameof(_operator), _operator, "Unsupported operator type")
-      };
+        case ElementType.AddOperator:
+          return _leftNode.FloatValue + _rightNode.FloatValue;
+        case ElementType.SubtractOperator:
+          return _leftNode.FloatValue - _rightNode.FloatValue;
+        case ElementType.MultiplyOperator:
+          return _leftNode.FloatValue * _rightNode.FloatValue;
+        case ElementType.DivideOperator:
+          return _leftNode.FloatValue / _rightNode.FloatValue;
+        default:
+          throw new ArgumentOutOfRangeException(nameof(_operator), _operator, "Unsupported operator type");
+      }
     }
 
     public override void Execute()
@@ -59,12 +70,18 @@ namespace EpsilonScript.AST
         throw new RuntimeException("An arithmetic operation cannot be performed on a boolean value");
       }
 
-      ValueType = _leftNode.ValueType switch
+      switch (_leftNode.ValueType)
       {
-        ValueType.Integer => _rightNode.ValueType,
-        ValueType.Float => ValueType.Float,
-        _ => ValueType
-      };
+        case ValueType.Integer:
+          ValueType = _rightNode.ValueType;
+          break;
+        case ValueType.Float:
+          ValueType = ValueType.Float;
+          break;
+        default:
+          ValueType = ValueType;
+          break;
+      }
 
       switch (ValueType)
       {

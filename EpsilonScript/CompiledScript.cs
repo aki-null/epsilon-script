@@ -30,13 +30,20 @@ namespace EpsilonScript
       }
 
       _rootNode.Execute();
-      ValueType = _rootNode.ValueType switch
+      switch (_rootNode.ValueType)
       {
-        AST.ValueType.Integer => Type.Integer,
-        AST.ValueType.Float => Type.Float,
-        AST.ValueType.Boolean => Type.Boolean,
-        _ => throw new RuntimeException("AST root node returned invalid value type")
-      };
+        case AST.ValueType.Integer:
+          ValueType = Type.Integer;
+          break;
+        case AST.ValueType.Float:
+          ValueType = Type.Float;
+          break;
+        case AST.ValueType.Boolean:
+          ValueType = Type.Boolean;
+          break;
+        default:
+          throw new RuntimeException("AST root node returned invalid value type");
+      }
 
       _isResultCached = true;
     }

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using EpsilonScript.Function;
+using EpsilonScript.Helper;
 using EpsilonScript.Parser;
 
 namespace EpsilonScript.AST
@@ -75,14 +76,21 @@ namespace EpsilonScript.AST
       {
         var parameter = _parameters[i];
         parameter.Execute();
-        _parameterTypes[i] = parameter.ValueType switch
+        switch (parameter.ValueType)
         {
-          ValueType.Integer => Type.Integer,
-          ValueType.Float => Type.Float,
-          ValueType.Boolean => Type.Boolean,
-          _ => throw new ArgumentOutOfRangeException(nameof(_parameters), parameter.ValueType,
-            "Unsupported parameter value type")
-        };
+          case ValueType.Integer:
+            _parameterTypes[i] = Type.Integer;
+            break;
+          case ValueType.Float:
+            _parameterTypes[i] = Type.Float;
+            break;
+          case ValueType.Boolean:
+            _parameterTypes[i] = Type.Boolean;
+            break;
+          default:
+            throw new ArgumentOutOfRangeException(nameof(_parameters), parameter.ValueType,
+              "Unsupported parameter value type");
+        }
       }
 
       var function = _functionOverload.Find(_parameterTypes);
@@ -91,13 +99,18 @@ namespace EpsilonScript.AST
         throw new RuntimeException("A function with given type signature is undefined");
       }
 
-      ValueType = function.ReturnType switch
+      switch (function.ReturnType)
       {
-        Type.Integer => ValueType.Integer,
-        Type.Float => ValueType.Float,
-        _ => throw new ArgumentOutOfRangeException(nameof(function.ReturnType), function.ReturnType,
-          "Unsupported function return type")
-      };
+        case Type.Integer:
+          ValueType = ValueType.Integer;
+          break;
+        case Type.Float:
+          ValueType = ValueType.Float;
+          break;
+        default:
+          throw new ArgumentOutOfRangeException(nameof(function.ReturnType), function.ReturnType,
+            "Unsupported function return type");
+      }
 
       switch (ValueType)
       {

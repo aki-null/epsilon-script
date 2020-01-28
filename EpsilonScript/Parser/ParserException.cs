@@ -6,32 +6,25 @@ namespace EpsilonScript.Parser
   [Serializable]
   public class ParserException : Exception
   {
-    public int LineNumber { get; private set; }
-    public int Position { get; private set; }
-
-    public ParserException(in Token token)
+    private static string FormatMessage(in Token token, string message)
     {
-      LineNumber = token.LineNumber;
-      Position = token.Position;
+      return string.IsNullOrEmpty(message)
+        ? $"{token}: Unknown error"
+        : $"{token}: {message}";
+    }
+
+    public ParserException(in Token token) : base(FormatMessage(token, ""))
+    {
     }
 
     public ParserException(in Token token, string message)
-      : base(message)
+      : base(FormatMessage(token, message))
     {
-      LineNumber = token.LineNumber;
-      Position = token.Position;
     }
 
     public ParserException(in Token token, string message, Exception inner)
-      : base(message, inner)
+      : base(FormatMessage(token, message), inner)
     {
-      LineNumber = token.LineNumber;
-      Position = token.Position;
-    }
-
-    public override string ToString()
-    {
-      return $"{LineNumber}:{Position}: {Message}";
     }
   }
 }

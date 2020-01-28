@@ -40,13 +40,17 @@ namespace EpsilonScript.Function
         return LeafFunction;
       }
 
-      return paramTypes[index] switch
+      switch (paramTypes[index])
       {
-        Type.Integer => FindOverload(paramTypes, index, _integerNode, _floatNode),
-        Type.Float => FindOverload(paramTypes, index, _floatNode, _integerNode),
-        Type.Boolean => _booleanNode?.Find(paramTypes, index + 1),
-        _ => throw new ArgumentOutOfRangeException(nameof(paramTypes), paramTypes[index], "Unsupported parameter type")
-      };
+        case Type.Integer:
+          return FindOverload(paramTypes, index, _integerNode, _floatNode);
+        case Type.Float:
+          return FindOverload(paramTypes, index, _floatNode, _integerNode);
+        case Type.Boolean:
+          return _booleanNode?.Find(paramTypes, index + 1);
+        default:
+          throw new ArgumentOutOfRangeException(nameof(paramTypes), paramTypes[index], "Unsupported parameter type");
+      }
     }
 
     public void Build(CustomFunction function, int index = 0)
