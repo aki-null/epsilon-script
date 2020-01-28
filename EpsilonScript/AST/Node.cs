@@ -19,7 +19,7 @@ namespace EpsilonScript.AST
       IDictionary<string, VariableValue> variables,
       IDictionary<string, CustomFunctionOverload> functions);
 
-    public virtual void Execute()
+    public virtual void Execute(IDictionary<string, VariableValue> variablesOverride)
     {
     }
   }

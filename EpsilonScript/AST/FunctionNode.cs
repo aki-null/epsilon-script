@@ -68,14 +68,14 @@ namespace EpsilonScript.AST
       }
     }
 
-    public override void Execute()
+    public override void Execute(IDictionary<string, VariableValue> variablesOverride)
     {
       // Execute each parameter and populate type information for function invocation
       // Parameter type is undefined until executed, due to the fact that a variable type may change after compilation
       for (var i = 0; i < _parameters.Count; ++i)
       {
         var parameter = _parameters[i];
-        parameter.Execute();
+        parameter.Execute(variablesOverride);
         switch (parameter.ValueType)
         {
           case ValueType.Integer:

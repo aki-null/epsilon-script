@@ -28,12 +28,12 @@ namespace EpsilonScript.AST
       }
     }
 
-    public override void Execute()
+    public override void Execute(IDictionary<string, VariableValue> variablesOverride)
     {
       switch (_operationType)
       {
         case ElementType.BooleanOrOperator:
-          _leftNode.Execute();
+          _leftNode.Execute(variablesOverride);
           if (_leftNode.ValueType != ValueType.Boolean)
           {
             throw new RuntimeException(OperationTypeErrorMessage);
@@ -45,7 +45,7 @@ namespace EpsilonScript.AST
             break;
           }
 
-          _rightNode.Execute();
+          _rightNode.Execute(variablesOverride);
           if (_rightNode.ValueType != ValueType.Boolean)
           {
             throw new RuntimeException(OperationTypeErrorMessage);
@@ -54,7 +54,7 @@ namespace EpsilonScript.AST
           BooleanValue = _rightNode.BooleanValue;
           break;
         case ElementType.BooleanAndOperator:
-          _leftNode.Execute();
+          _leftNode.Execute(variablesOverride);
           if (_leftNode.ValueType != ValueType.Boolean)
           {
             throw new RuntimeException(OperationTypeErrorMessage);
@@ -66,7 +66,7 @@ namespace EpsilonScript.AST
             break;
           }
 
-          _rightNode.Execute();
+          _rightNode.Execute(variablesOverride);
           if (_rightNode.ValueType != ValueType.Boolean)
           {
             throw new RuntimeException(OperationTypeErrorMessage);

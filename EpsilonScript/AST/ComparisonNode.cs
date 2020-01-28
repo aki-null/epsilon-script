@@ -72,10 +72,10 @@ namespace EpsilonScript.AST
       }
     }
 
-    public override void Execute()
+    public override void Execute(IDictionary<string, VariableValue> variablesOverride)
     {
-      _leftNode.Execute();
-      _rightNode.Execute();
+      _leftNode.Execute(variablesOverride);
+      _rightNode.Execute(variablesOverride);
 
       switch (_comparisonType)
       {

@@ -7,8 +7,8 @@ namespace EpsilonScript.AST
 {
   public class VariableNode : Node
   {
-    private IDictionary<string, VariableValue> _variables;
     private string _variableName;
+    private IDictionary<string, VariableValue> _variables;
 
     public override bool IsConstant => false;
 
@@ -20,11 +20,14 @@ namespace EpsilonScript.AST
       _variables = variables;
     }
 
-    public override void Execute()
+    public override void Execute(IDictionary<string, VariableValue> variablesOverride)
     {
-      if (_variables == null || !_variables.TryGetValue(_variableName, out var variable))
+      if (variablesOverride == null || !variablesOverride.TryGetValue(_variableName, out var variable))
       {
-        throw new RuntimeException($"Undefined variable found: {_variableName}");
+        if (_variables == null || !_variables.TryGetValue(_variableName, out variable))
+        {
+          throw new RuntimeException($"Undefined variable: {_variableName}");
+        }
       }
 
       Variable = variable;

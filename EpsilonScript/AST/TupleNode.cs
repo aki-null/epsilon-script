@@ -51,11 +51,11 @@ namespace EpsilonScript.AST
       TupleValue.Add(rightNode);
     }
 
-    public override void Execute()
+    public override void Execute(IDictionary<string, VariableValue> variablesOverride)
     {
       foreach (var child in TupleValue)
       {
-        child.Execute();
+        child.Execute(variablesOverride);
       }
     }
   }

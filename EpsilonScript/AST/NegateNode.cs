@@ -23,9 +23,9 @@ namespace EpsilonScript.AST
       }
     }
 
-    public override void Execute()
+    public override void Execute(IDictionary<string, VariableValue> variablesOverride)
     {
-      _childNode.Execute();
+      _childNode.Execute(variablesOverride);
       if (_childNode.ValueType != ValueType.Boolean)
       {
         throw new RuntimeException("Cannot negate a non-boolean value");

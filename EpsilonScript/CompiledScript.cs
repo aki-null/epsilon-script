@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using EpsilonScript.AST;
 using EpsilonScript.Parser;
 
@@ -21,7 +22,7 @@ namespace EpsilonScript
       IsConstant = rootNode.IsConstant;
     }
 
-    public void Execute()
+    public void Execute(IDictionary<string, VariableValue> variablesOverride = null)
     {
       // Do not execute this again if the script is completely constant, and it has been executed at least once.
       if (IsConstant && _isResultCached)
@@ -29,7 +30,7 @@ namespace EpsilonScript
         return;
       }
 
-      _rootNode.Execute();
+      _rootNode.Execute(variablesOverride);
       switch (_rootNode.ValueType)
       {
         case AST.ValueType.Integer:

@@ -25,9 +25,9 @@ namespace EpsilonScript.AST
       _operationType = element.Type;
     }
 
-    public override void Execute()
+    public override void Execute(IDictionary<string, VariableValue> variablesOverride)
     {
-      _childNode.Execute();
+      _childNode.Execute(variablesOverride);
 
       ValueType = _childNode.ValueType;
       if (ValueType != ValueType.Integer && ValueType != ValueType.Float)
