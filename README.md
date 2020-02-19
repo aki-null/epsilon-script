@@ -16,7 +16,7 @@ Documentation is still lacking, but the core features are usable. There are not 
 
 ## Context
 
-It is common to use a scripting engine like Lua to let the game designers write the game logic for maximum freedom, but that is not always feasible. Many games require constant content update updates after the first release and are typically maintained for many years with minimum software regression.
+It is common to use a scripting engine like Lua to let the game designers write the game logic for maximum freedom, but that is not always feasible. Many games require constant content updates after the first release and are typically maintained for many years with minimum software regression.
 
 Data-driven approach (e.g. Microsoft Excel, Google Spreadsheet, Unity serialization, etc) is often chosen, which trades freedom with a more controlled environment, but entering complex expression can become cumbersome or even impossible. EpsilonScript is one of my attempts to empower the game designers with a strength of expression in such an environment.
 
