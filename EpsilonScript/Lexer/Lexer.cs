@@ -296,6 +296,9 @@ namespace EpsilonScript.Lexer
             }
 
             break;
+          case '%':
+            tokens.Add(Emit(TokenType.ModuloOperator));
+            break;
           case ',':
             tokens.Add(Emit(TokenType.Comma));
             break;

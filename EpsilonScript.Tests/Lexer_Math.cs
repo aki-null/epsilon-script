@@ -127,6 +127,33 @@ namespace EpsilonScript.Tests
             new Token("/", TokenType.DivideOperator),
             new Token("/", TokenType.DivideOperator)
           },
+          new object[]
+          {
+            "%",
+            new Token("%", TokenType.ModuloOperator)
+          },
+          new object[]
+          {
+            " %",
+            new Token("/", TokenType.ModuloOperator)
+          },
+          new object[]
+          {
+            "% ",
+            new Token("/", TokenType.ModuloOperator)
+          },
+          new object[]
+          {
+            "% %",
+            new Token("%", TokenType.ModuloOperator),
+            new Token("%", TokenType.ModuloOperator)
+          },
+          new object[]
+          {
+            "%%",
+            new Token("%", TokenType.ModuloOperator),
+            new Token("%", TokenType.ModuloOperator)
+          },
         };
       }
     }

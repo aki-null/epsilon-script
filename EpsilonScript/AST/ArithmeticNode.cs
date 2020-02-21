@@ -38,6 +38,8 @@ namespace EpsilonScript.AST
           return _leftNode.IntegerValue * _rightNode.IntegerValue;
         case ElementType.DivideOperator:
           return _leftNode.IntegerValue / _rightNode.IntegerValue;
+        case ElementType.ModuloOperator:
+          return _leftNode.IntegerValue % _rightNode.IntegerValue;
         default:
           throw new ArgumentOutOfRangeException(nameof(_operator), _operator, "Unsupported operator type");
       }
@@ -55,6 +57,8 @@ namespace EpsilonScript.AST
           return _leftNode.FloatValue * _rightNode.FloatValue;
         case ElementType.DivideOperator:
           return _leftNode.FloatValue / _rightNode.FloatValue;
+        case ElementType.ModuloOperator:
+          return _leftNode.FloatValue % _rightNode.FloatValue;
         default:
           throw new ArgumentOutOfRangeException(nameof(_operator), _operator, "Unsupported operator type");
       }
@@ -107,6 +111,7 @@ namespace EpsilonScript.AST
         Execute(null);
         return CreateValueNode();
       }
+
       _leftNode = _leftNode.Optimize();
       _rightNode = _rightNode.Optimize();
       return this;

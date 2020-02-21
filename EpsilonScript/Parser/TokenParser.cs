@@ -100,6 +100,9 @@ namespace EpsilonScript.Parser
         case TokenType.DivideOperator:
           mappedType = ElementType.DivideOperator;
           break;
+        case TokenType.ModuloOperator:
+          mappedType = ElementType.ModuloOperator;
+          break;
         case TokenType.Integer:
           mappedType = ElementType.Integer;
           break;

@@ -49,6 +49,7 @@ namespace EpsilonScript.AST
         case ElementType.SubtractOperator:
         case ElementType.MultiplyOperator:
         case ElementType.DivideOperator:
+        case ElementType.ModuloOperator:
           return new ArithmeticNode();
         case ElementType.Integer:
           return new IntegerNode();

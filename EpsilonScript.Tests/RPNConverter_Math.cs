@@ -332,6 +332,21 @@ namespace EpsilonScript.Tests
               new Element(new Token("+", TokenType.PlusSign), ElementType.AddOperator),
             }
           },
+          new object[]
+          {
+            new Element[]
+            {
+              new Element(new Token("2", TokenType.Integer), ElementType.Integer),
+              new Element(new Token("%", TokenType.ModuloOperator), ElementType.ModuloOperator),
+              new Element(new Token("5", TokenType.Integer), ElementType.Integer),
+            },
+            new Element[]
+            {
+              new Element(new Token("2", TokenType.Integer), ElementType.Integer),
+              new Element(new Token("5", TokenType.Integer), ElementType.Integer),
+              new Element(new Token("%", TokenType.ModuloOperator), ElementType.ModuloOperator),
+            }
+          },
         };
       }
     }

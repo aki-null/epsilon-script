@@ -34,6 +34,7 @@ namespace EpsilonScript.Parser
     SubtractOperator,
     MultiplyOperator,
     DivideOperator,
+    ModuloOperator,
     Integer,
     Float,
   }
@@ -72,6 +73,7 @@ namespace EpsilonScript.Parser
           return 8;
         case ElementType.MultiplyOperator:
         case ElementType.DivideOperator:
+        case ElementType.ModuloOperator:
           return 7;
         case ElementType.AddOperator:
         case ElementType.SubtractOperator:
@@ -123,6 +125,7 @@ namespace EpsilonScript.Parser
           return Parser.Associativity.Right;
         case ElementType.MultiplyOperator:
         case ElementType.DivideOperator:
+        case ElementType.ModuloOperator:
         case ElementType.AddOperator:
         case ElementType.SubtractOperator:
         case ElementType.ComparisonEqual:

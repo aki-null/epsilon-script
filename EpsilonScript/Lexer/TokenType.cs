@@ -28,6 +28,7 @@ namespace EpsilonScript.Lexer
     MinusSign,
     MultiplyOperator,
     DivideOperator,
+    ModuloOperator,
     Integer,
     Float,
   }
