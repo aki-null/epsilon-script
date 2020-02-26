@@ -135,12 +135,12 @@ namespace EpsilonScript.Tests
           new object[]
           {
             " %",
-            new Token("/", TokenType.ModuloOperator)
+            new Token("%", TokenType.ModuloOperator)
           },
           new object[]
           {
             "% ",
-            new Token("/", TokenType.ModuloOperator)
+            new Token("%", TokenType.ModuloOperator)
           },
           new object[]
           {

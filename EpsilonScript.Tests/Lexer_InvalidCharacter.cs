@@ -26,7 +26,6 @@ namespace EpsilonScript.Tests
           new object[] {"@"},
           new object[] {"#"},
           new object[] {"$"},
-          new object[] {"%"},
           new object[] {"^"},
           new object[] {":"},
           new object[] {"'"},
