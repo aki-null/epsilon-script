@@ -72,6 +72,11 @@ namespace EpsilonScript.AST
         rpnStack.Push(node);
       }
 
+      if (rpnStack.Count > 1)
+      {
+        throw new RuntimeException("Missing operator(s) to process all values");
+      }
+
       return rpnStack.Pop();
     }
   }
