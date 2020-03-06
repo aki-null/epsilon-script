@@ -17,28 +17,30 @@ Documentation is still lacking, but the core features are usable. There are not 
 
 ## Samples
 
-### Math
+### Arithmetics
 
-Code
+Basic arithmetic operators (`+`, `-`, `*`, `/`, `%`) are supported. Parentheses (`(`, `)`) are recognized too.
+
+#### Code
 
 ```c#
 var compiler = new Compiler();
-var script = compiler.Compile("1 + 2 + 3 * 2", Compiler.Options.Immutable);
+var script = compiler.Compile("(1 + 2 + 3 * 2) * 2", Compiler.Options.Immutable);
 script.Execute();
 Console.WriteLine(script.IntgerValue);
 ```
 
-Result
+#### Result
 
 ```
-9
+18
 ```
 
-### Math with variables
+### Variables
 
-Both reading and writing to a variable are supported in EpsilonScript.
+Variables can be read, and also be assigned to (`=`). Compound assignment operators can be used too (`+=`, `-=`, `*=`, `/=`).
 
-Code
+#### Code
 
 ```c#
 var compiler = new Compiler();
@@ -49,7 +51,7 @@ script.Execute();
 Console.WriteLine(variables["val"].FloatValue);
 ```
 
-Result
+#### Result
 
 ```
 430.0
@@ -59,15 +61,45 @@ Result
 
 Variables cannot be defined inside the script. This is done on purpose to prevent the expression from doing "too much".
 
+### Comparison
+
+Basic comparison operators are supported (`==`, `!=`, `<`, `<=`, `>`, `>=`) as well as logical operators (`!`, `&&` `||`).
+
+#### Code
+
+```c#
+var compiler = new Compiler();
+var variables = new Dictionary<string, VariableValue> {["val"] = new VariableValue(43.0f)};
+var script = compiler.Compile("val >= 0.0 && val < 50.0", 
+Compiler.Options.Immutable, variables);
+script.Execute();
+Console.WriteLine(script.BooleanValue);
+```
+
+#### Result
+
+```
+True
+```
+
 ### Functions
 
 Functions are supported in EpsilonScript. There are built-in functions, but custom functions can be defined too.
+
+#### Code
 
 ```c#
 var compiler = new Compiler();
 compiler.AddCustomFunction(new CustomFunction("rand", (float d) => Random.Range(0.0f, d)));
 var script = compiler.Compile("rand(0, 10)", Compiler.Options.Immutable);
 script.Execute();
+Console.WriteLine(script.FloatValue);
+```
+
+#### Result
+
+```
+3.1
 ```
 
 The list of default built-in functions can be found [here](https://github.com/aki-null/epsilon-script/blob/master/EpsilonScript/Compiler.cs).
