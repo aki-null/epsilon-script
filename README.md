@@ -63,7 +63,7 @@ Variables cannot be defined inside the script. This is done on purpose to preven
 
 ### Comparison
 
-Basic comparison operators are supported (`==`, `!=`, `<`, `<=`, `>`, `>=`) as well as logical operators (`!`, `&&` `||`).
+Basic comparison operators are supported (`==`, `!=`, `<`, `<=`, `>`, `>=`) as well as logical operators (`!`, `&&`, `||`).
 
 #### Code
 
