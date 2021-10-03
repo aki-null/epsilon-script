@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using EpsilonScript.AST;
 using EpsilonScript.Parser;
 
@@ -7,7 +8,7 @@ namespace EpsilonScript.Function
 {
   public class CustomFunction
   {
-    private enum FunctionType
+    private enum Signature
     {
       IntInt,
       FloatInt,
@@ -19,17 +20,25 @@ namespace EpsilonScript.Function
       BoolFloatFloatFloat,
     }
 
-    // List of all possible function signatures.
-    // Anything that doesn't fit into one of these signatures can't be used.
-    // This is done to avoid using dynamic function invocation using reflection for performance optimization.
-    private readonly Func<int, int> _funcIntInt;
-    private readonly Func<float, int> _funcFloatInt;
-    private readonly Func<int, float> _funcIntFloat;
-    private readonly Func<float, float> _funcFloatFloat;
-    private readonly Func<int, int, int> _funcIntIntInt;
-    private readonly Func<float, float, float> _funcFloatFloatFloat;
-    private readonly Func<bool, int, int, int> _funcBoolIntIntInt;
-    private readonly Func<bool, float, float, float> _funcBoolFloatFloatFloat;
+    [StructLayout(LayoutKind.Explicit)]
+    private struct CustomFunctionUnion
+    {
+      // List of all possible function signatures.
+      // Anything that doesn't fit into one of these signatures can't be used.
+      // This is done to avoid using dynamic function invocation using reflection for performance optimization.
+      [FieldOffset(0)] public Func<int, int> intInt;
+      [FieldOffset(0)] public Func<float, int> floatInt;
+      [FieldOffset(0)] public Func<int, float> intFloat;
+      [FieldOffset(0)] public Func<float, float> floatFloat;
+      [FieldOffset(0)] public Func<int, int, int> intIntInt;
+      [FieldOffset(0)] public Func<float, float, float> floatFloatFloat;
+      [FieldOffset(0)] public Func<bool, int, int, int> boolIntIntInt;
+      [FieldOffset(0)] public Func<bool, float, float, float> boolFloatFloatFloat;
+    }
+
+    private Signature Type { get; }
+    private readonly CustomFunctionUnion _func;
+    public string Name { get; }
 
     // Cached list of all function parameters
     private static readonly Type[] IntParamType = {EpsilonScript.Type.Integer};
@@ -43,29 +52,25 @@ namespace EpsilonScript.Function
     private static readonly Type[] BoolFloatFloatParamType =
       {EpsilonScript.Type.Boolean, EpsilonScript.Type.Float, EpsilonScript.Type.Float};
 
-    private FunctionType Type { get; }
-
-    public string Name { get; }
-
     public Type ReturnType
     {
       get
       {
         switch (Type)
         {
-          case FunctionType.IntInt:
-          case FunctionType.FloatInt:
+          case Signature.IntInt:
+          case Signature.FloatInt:
             return EpsilonScript.Type.Integer;
-          case FunctionType.IntFloat:
-          case FunctionType.FloatFloat:
+          case Signature.IntFloat:
+          case Signature.FloatFloat:
             return EpsilonScript.Type.Float;
-          case FunctionType.IntIntInt:
+          case Signature.IntIntInt:
             return EpsilonScript.Type.Integer;
-          case FunctionType.FloatFloatFloat:
+          case Signature.FloatFloatFloat:
             return EpsilonScript.Type.Float;
-          case FunctionType.BoolIntIntInt:
+          case Signature.BoolIntIntInt:
             return EpsilonScript.Type.Integer;
-          case FunctionType.BoolFloatFloatFloat:
+          case Signature.BoolFloatFloatFloat:
             return EpsilonScript.Type.Float;
           default:
             throw new ArgumentOutOfRangeException(nameof(Type), Type, "Unsupported function type");
@@ -79,16 +84,16 @@ namespace EpsilonScript.Function
       {
         switch (Type)
         {
-          case FunctionType.IntInt:
-          case FunctionType.FloatInt:
-          case FunctionType.IntFloat:
-          case FunctionType.FloatFloat:
+          case Signature.IntInt:
+          case Signature.FloatInt:
+          case Signature.IntFloat:
+          case Signature.FloatFloat:
             return 1;
-          case FunctionType.IntIntInt:
-          case FunctionType.FloatFloatFloat:
+          case Signature.IntIntInt:
+          case Signature.FloatFloatFloat:
             return 2;
-          case FunctionType.BoolIntIntInt:
-          case FunctionType.BoolFloatFloatFloat:
+          case Signature.BoolIntIntInt:
+          case Signature.BoolFloatFloatFloat:
             return 3;
           default:
             throw new ArgumentOutOfRangeException(nameof(Type), Type, "Unsupported function type");
@@ -102,19 +107,19 @@ namespace EpsilonScript.Function
       {
         switch (Type)
         {
-          case FunctionType.IntInt:
-          case FunctionType.IntFloat:
+          case Signature.IntInt:
+          case Signature.IntFloat:
             return IntParamType;
-          case FunctionType.FloatInt:
-          case FunctionType.FloatFloat:
+          case Signature.FloatInt:
+          case Signature.FloatFloat:
             return FloatParamType;
-          case FunctionType.IntIntInt:
+          case Signature.IntIntInt:
             return IntIntParamTYpe;
-          case FunctionType.FloatFloatFloat:
+          case Signature.FloatFloatFloat:
             return FloatFloatParamType;
-          case FunctionType.BoolIntIntInt:
+          case Signature.BoolIntIntInt:
             return BoolIntIntParamType;
-          case FunctionType.BoolFloatFloatFloat:
+          case Signature.BoolFloatFloatFloat:
             return BoolFloatFloatParamType;
           default:
             throw new ArgumentOutOfRangeException(nameof(Type), Type, "Unsupported function type");
@@ -127,64 +132,64 @@ namespace EpsilonScript.Function
     public CustomFunction(string name, Func<int, int> func, bool isConstant = false)
     {
       Name = name;
-      _funcIntInt = func;
-      Type = FunctionType.IntInt;
+      Type = Signature.IntInt;
+      _func.intInt = func;
       IsConstant = isConstant;
     }
 
     public CustomFunction(string name, Func<float, int> func, bool isConstant = false)
     {
       Name = name;
-      _funcFloatInt = func;
-      Type = FunctionType.FloatInt;
+      Type = Signature.FloatInt;
+      _func.floatInt = func;
       IsConstant = isConstant;
     }
 
     public CustomFunction(string name, Func<int, float> func, bool isConstant = false)
     {
       Name = name;
-      _funcIntFloat = func;
-      Type = FunctionType.IntFloat;
+      Type = Signature.IntFloat;
+      _func.intFloat = func;
       IsConstant = isConstant;
     }
 
     public CustomFunction(string name, Func<float, float> func, bool isConstant = false)
     {
       Name = name;
-      _funcFloatFloat = func;
-      Type = FunctionType.FloatFloat;
+      Type = Signature.FloatFloat;
+      _func.floatFloat = func;
       IsConstant = isConstant;
     }
 
     public CustomFunction(string name, Func<int, int, int> func, bool isConstant = false)
     {
       Name = name;
-      _funcIntIntInt = func;
-      Type = FunctionType.IntIntInt;
+      Type = Signature.IntIntInt;
+      _func.intIntInt = func;
       IsConstant = isConstant;
     }
 
     public CustomFunction(string name, Func<float, float, float> func, bool isConstant = false)
     {
       Name = name;
-      _funcFloatFloatFloat = func;
-      Type = FunctionType.FloatFloatFloat;
+      Type = Signature.FloatFloatFloat;
+      _func.floatFloatFloat = func;
       IsConstant = isConstant;
     }
 
     public CustomFunction(string name, Func<bool, float, float, float> func, bool isConstant = false)
     {
       Name = name;
-      _funcBoolFloatFloatFloat = func;
-      Type = FunctionType.BoolFloatFloatFloat;
+      Type = Signature.BoolFloatFloatFloat;
+      _func.boolFloatFloatFloat = func;
       IsConstant = isConstant;
     }
 
     public CustomFunction(string name, Func<bool, int, int, int> func, bool isConstant = false)
     {
       Name = name;
-      _funcBoolIntIntInt = func;
-      Type = FunctionType.BoolIntIntInt;
+      Type = Signature.BoolIntIntInt;
+      _func.boolIntIntInt = func;
       IsConstant = isConstant;
     }
 
@@ -201,14 +206,15 @@ namespace EpsilonScript.Function
       CheckParameterCount(parameters);
       switch (Type)
       {
-        case FunctionType.IntInt:
-          return _funcIntInt(parameters[0].IntegerValue);
-        case FunctionType.FloatInt:
-          return _funcFloatInt(parameters[0].FloatValue);
-        case FunctionType.IntIntInt:
-          return _funcIntIntInt(parameters[0].IntegerValue, parameters[1].IntegerValue);
-        case FunctionType.BoolIntIntInt:
-          return _funcBoolIntIntInt(parameters[0].BooleanValue, parameters[1].IntegerValue, parameters[2].IntegerValue);
+        case Signature.IntInt:
+          return _func.intInt(parameters[0].IntegerValue);
+        case Signature.FloatInt:
+          return _func.floatInt(parameters[0].FloatValue);
+        case Signature.IntIntInt:
+          return _func.intIntInt(parameters[0].IntegerValue, parameters[1].IntegerValue);
+        case Signature.BoolIntIntInt:
+          return _func.boolIntIntInt(parameters[0].BooleanValue, parameters[1].IntegerValue,
+            parameters[2].IntegerValue);
         default:
           throw new ArgumentOutOfRangeException(nameof(Type), Type,
             "Unsupported function type (does not return integer?)");
@@ -220,14 +226,14 @@ namespace EpsilonScript.Function
       CheckParameterCount(parameters);
       switch (Type)
       {
-        case FunctionType.IntFloat:
-          return _funcIntFloat(parameters[0].IntegerValue);
-        case FunctionType.FloatFloat:
-          return _funcFloatFloat(parameters[0].FloatValue);
-        case FunctionType.FloatFloatFloat:
-          return _funcFloatFloatFloat(parameters[0].FloatValue, parameters[1].FloatValue);
-        case FunctionType.BoolFloatFloatFloat:
-          return _funcBoolFloatFloatFloat(parameters[0].BooleanValue, parameters[1].FloatValue,
+        case Signature.IntFloat:
+          return _func.intFloat(parameters[0].IntegerValue);
+        case Signature.FloatFloat:
+          return _func.floatFloat(parameters[0].FloatValue);
+        case Signature.FloatFloatFloat:
+          return _func.floatFloatFloat(parameters[0].FloatValue, parameters[1].FloatValue);
+        case Signature.BoolFloatFloatFloat:
+          return _func.boolFloatFloatFloat(parameters[0].BooleanValue, parameters[1].FloatValue,
             parameters[2].FloatValue);
         default:
           throw new ArgumentOutOfRangeException(nameof(Type), Type,
