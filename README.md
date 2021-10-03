@@ -27,7 +27,7 @@ Basic arithmetic operators (`+`, `-`, `*`, `/`, `%`) are supported. Parentheses 
 var compiler = new Compiler();
 var script = compiler.Compile("(1 + 2 + 3 * 2) * 2", Compiler.Options.Immutable);
 script.Execute();
-Console.WriteLine(script.IntgerValue);
+Console.WriteLine(script.IntegerValue);
 ```
 
 #### Result
