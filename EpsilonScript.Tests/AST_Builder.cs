@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using EpsilonScript.AST;
-using EpsilonScript.Lexer;
+using EpsilonScript.Intermediate;
 using EpsilonScript.Parser;
 using Xunit;
 
@@ -12,7 +12,17 @@ namespace EpsilonScript.Tests
     [MemberData(nameof(FailData))]
     public void AST_Build_Fails(List<Element> elements)
     {
-      Assert.Throws<RuntimeException>(() => { ASTBuilder.Build(elements, Compiler.Options.Immutable, null, null); });
+      Assert.Throws<RuntimeException>(() =>
+      {
+        var builder = new AstBuilder(null);
+        builder.Configure(Compiler.Options.Immutable, null);
+        foreach (var element in elements)
+        {
+          builder.Push(element);
+        }
+
+        builder.End();
+      });
     }
 
     public static IEnumerable<object[]> FailData

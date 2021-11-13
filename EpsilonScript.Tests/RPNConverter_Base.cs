@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using EpsilonScript.Intermediate;
 using EpsilonScript.Parser;
 using Xunit;
 
@@ -8,10 +9,17 @@ namespace EpsilonScript.Tests
   {
     protected static void Succeeds(IList<Element> input, IList<Element> expected)
     {
-      var rpnConverter = new RPNConverter();
-      rpnConverter.Convert(new List<Element>(input));
+      var elementReader = new TestElementReader();
+      var rpnConverter = new RpnConverter(elementReader);
+      foreach (var element in input)
+      {
+        rpnConverter.Push(element);
+      }
 
-      var output = rpnConverter.Rpn;
+      rpnConverter.End();
+      Assert.True(elementReader.EndCalled, "Element reader not closed");
+
+      var output = elementReader.Elements;
       Assert.Equal(output.Count, expected.Count);
 
       for (var i = 0; i < output.Count; ++i)
@@ -22,8 +30,17 @@ namespace EpsilonScript.Tests
 
     protected static void Fails(IList<Element> input)
     {
-      var rpnConverter = new RPNConverter();
-      Assert.Throws<ParserException>(() => { rpnConverter.Convert(new List<Element>(input)); });
+      var elementReader = new TestElementReader();
+      var rpnConverter = new RpnConverter(elementReader);
+      Assert.Throws<ParserException>(() =>
+      {
+        foreach (var element in input)
+        {
+          rpnConverter.Push(element);
+        }
+
+        rpnConverter.End();
+      });
     }
   }
 }

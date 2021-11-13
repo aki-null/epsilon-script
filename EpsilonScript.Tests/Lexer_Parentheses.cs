@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using EpsilonScript.Lexer;
+using EpsilonScript.Intermediate;
 using Xunit;
 
 namespace EpsilonScript.Tests

@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using EpsilonScript.Lexer;
+using EpsilonScript.Intermediate;
 using EpsilonScript.Parser;
 using Xunit;
 
@@ -9,15 +9,23 @@ namespace EpsilonScript.Tests
   {
     protected static void Succeeds(IList<Token> input, IList<Element> expected)
     {
-      var tokenParser = new TokenParser();
-      tokenParser.Parse(input);
-      var output = tokenParser.Elements;
+      var elementReader = new TestElementReader();
+      var tokenParser = new TokenParser(elementReader);
+      foreach (var token in input)
+      {
+        tokenParser.Push(token);
+      }
+
+      tokenParser.End();
+      var output = elementReader.Elements;
       Assert.Equal(output.Count, expected.Count);
 
       for (var i = 0; i < output.Count; ++i)
       {
         Assert.Equal(output[i], expected[i]);
       }
+
+      Assert.True(elementReader.EndCalled, "Element reader not closed");
     }
 
     protected static object[] CreateTestData(params Element[] elements)

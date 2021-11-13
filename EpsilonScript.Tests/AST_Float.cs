@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using EpsilonScript.AST;
-using EpsilonScript.Lexer;
-using EpsilonScript.Parser;
+using EpsilonScript.Intermediate;
 using Xunit;
 
 namespace EpsilonScript.Tests
@@ -31,7 +30,7 @@ namespace EpsilonScript.Tests
     public void AST_CreateFloat_Succeeds(float value)
     {
       var node = new FloatNode(value);
-      var expectedInt = (int) value;
+      var expectedInt = (int)value;
       var expectedBool = expectedInt != 0;
       Assert.Equal(ValueType.Float, node.ValueType);
       Assert.Equal(expectedInt, node.IntegerValue);

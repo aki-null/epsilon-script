@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using EpsilonScript.AST;
-using EpsilonScript.Parser;
 
 namespace EpsilonScript
 {

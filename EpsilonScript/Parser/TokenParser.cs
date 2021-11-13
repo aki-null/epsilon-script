@@ -1,26 +1,45 @@
 using System;
-using System.Collections.Generic;
-using EpsilonScript.Lexer;
+using EpsilonScript.Intermediate;
 
 namespace EpsilonScript.Parser
 {
-  public class TokenParser
+  public class TokenParser : ITokenReader
   {
-    private int _index;
-    private IList<Token> _tokens;
+    private enum State
+    {
+      Init = 0,
+      Process,
+      End
+    }
 
-    public List<Element> Elements { get; } = new List<Element>();
+    private State _state;
 
-    private Token NextToken => _tokens[_index + 1];
-    private bool IsNextTokenAvailable => _index + 1 < _tokens.Count;
-    private bool IsEnd => _index >= _tokens.Count;
+    private bool IsNextTokenAvailable => _state == State.Process;
 
-    private ElementType? PreviousElementType =>
-      Elements.Count > 0 ? Elements[Elements.Count - 1].Type : (ElementType?) null;
+    private Token _currentToken;
+    private Token _nextToken;
+
+    private ElementType? _previousElementType;
+
+    private readonly IElementReader _output;
+
+    public TokenParser(IElementReader output)
+    {
+      _output = output;
+    }
+
+    public void Reset()
+    {
+      _state = State.Init;
+      _currentToken = new Token();
+      _nextToken = new Token();
+      _previousElementType = null;
+    }
 
     private void PushElement(Token token, ElementType type)
     {
-      Elements.Add(new Element(token, type));
+      _previousElementType = type;
+      _output.Push(new Element(token, type));
     }
 
     private void PushElementDirect(Token token)
@@ -123,7 +142,7 @@ namespace EpsilonScript.Parser
       {
         // Next token must exist for a sign operator to work on
         if (!IsNextTokenAvailable) return false;
-        switch (PreviousElementType)
+        switch (_previousElementType)
         {
           case null:
           case ElementType.LeftParenthesis:
@@ -131,68 +150,77 @@ namespace EpsilonScript.Parser
           case ElementType.RightParenthesis:
             return false;
           default:
-            return PreviousElementType.Value.IsOperator();
+            return _previousElementType.Value.IsOperator();
         }
       }
     }
 
-    private bool IsCurrentTokenFunction => IsNextTokenAvailable && NextToken.Type == TokenType.LeftParenthesis;
+    private bool IsCurrentTokenFunction => IsNextTokenAvailable && _nextToken.Type == TokenType.LeftParenthesis;
 
-    public void Parse(IList<Token> tokens)
+    private void Process()
     {
-      _tokens = tokens;
-      _index = 0;
-      Elements.Clear();
+      if (_state == State.Init) return;
 
-      while (!IsEnd)
+      switch (_currentToken.Type)
       {
-        var currentToken = _tokens[_index];
-        switch (currentToken.Type)
-        {
-          case TokenType.Identifier:
-            // Detect whether the current token is a function or a variable
-            PushElement(currentToken, IsCurrentTokenFunction ? ElementType.Function : ElementType.Variable);
-            break;
-          case TokenType.MinusSign:
-            // Detect whether the current token is a negative operator or a subtract operator
-            PushElement(currentToken,
-              IsCurrentTokenSignOperator ? ElementType.NegativeOperator : ElementType.SubtractOperator);
-            break;
-          case TokenType.PlusSign:
-            // Detect whether the current token is a positive operator or a add operator
-            PushElement(currentToken,
-              IsCurrentTokenSignOperator ? ElementType.PositiveOperator : ElementType.AddOperator);
-            break;
-          case TokenType.LeftParenthesis:
-            if (PreviousElementType == ElementType.Function)
-            {
-              PushElement(currentToken, ElementType.FunctionStartParenthesis);
-            }
-            else
-            {
-              PushElementDirect(currentToken);
-            }
+        case TokenType.Identifier:
+          // Detect whether the current token is a function or a variable
+          PushElement(_currentToken, IsCurrentTokenFunction ? ElementType.Function : ElementType.Variable);
+          break;
+        case TokenType.MinusSign:
+          // Detect whether the current token is a negative operator or a subtract operator
+          PushElement(_currentToken,
+            IsCurrentTokenSignOperator ? ElementType.NegativeOperator : ElementType.SubtractOperator);
+          break;
+        case TokenType.PlusSign:
+          // Detect whether the current token is a positive operator or a add operator
+          PushElement(_currentToken,
+            IsCurrentTokenSignOperator ? ElementType.PositiveOperator : ElementType.AddOperator);
+          break;
+        case TokenType.LeftParenthesis:
+          if (_previousElementType == ElementType.Function)
+          {
+            PushElement(_currentToken, ElementType.FunctionStartParenthesis);
+          }
+          else
+          {
+            PushElementDirect(_currentToken);
+          }
 
-            break;
-          case TokenType.RightParenthesis:
-            if (PreviousElementType == ElementType.FunctionStartParenthesis)
-            {
-              // Insert null element because parenthesis was opened but closed immediately for a function call.
-              // This is needed so a function element has something to build its parameter list on even if no parameters
-              // were specified.
-              PushElement(new Token("", TokenType.None, currentToken.LineNumber), ElementType.None);
-            }
+          break;
+        case TokenType.RightParenthesis:
+          if (_previousElementType == ElementType.FunctionStartParenthesis)
+          {
+            // Insert null element because parenthesis was opened but closed immediately for a function call.
+            // This is needed so a function element has something to build its parameter list on even if no parameters
+            // were specified.
+            PushElement(new Token(ReadOnlyMemory<char>.Empty, TokenType.None, _currentToken.LineNumber),
+              ElementType.None);
+          }
 
-            PushElementDirect(currentToken);
-            break;
-          default:
-            // All other token types can be directly mapped to a corresponding element type
-            PushElementDirect(currentToken);
-            break;
-        }
-
-        ++_index;
+          PushElementDirect(_currentToken);
+          break;
+        default:
+          // All other token types can be directly mapped to a corresponding element type
+          PushElementDirect(_currentToken);
+          break;
       }
+    }
+
+    public void Push(Token token)
+    {
+      _currentToken = _nextToken;
+      _nextToken = token;
+      Process();
+      _state = State.Process;
+    }
+
+    public void End()
+    {
+      _currentToken = _nextToken;
+      _state = State.End;
+      Process();
+      _output.End();
     }
   }
 }

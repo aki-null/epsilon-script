@@ -1,6 +1,6 @@
 using System;
 
-namespace EpsilonScript.Parser
+namespace EpsilonScript
 {
   [Serializable]
   public class RuntimeException : Exception

@@ -1,4 +1,4 @@
-namespace EpsilonScript.Lexer
+namespace EpsilonScript.Intermediate
 {
   public enum TokenType
   {

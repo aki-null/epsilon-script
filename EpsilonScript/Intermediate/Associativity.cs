@@ -1,4 +1,4 @@
-﻿namespace EpsilonScript.Parser
+﻿namespace EpsilonScript.Intermediate
 {
   public enum Associativity
   {

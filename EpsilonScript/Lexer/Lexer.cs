@@ -1,44 +1,66 @@
-using System.Collections.Generic;
+using System;
+using System.Runtime.CompilerServices;
+using EpsilonScript.Intermediate;
 
 namespace EpsilonScript.Lexer
 {
-  public class Lexer
+  public ref struct Lexer
   {
-    private const char Eof = (char) 0;
-    private const string Alphabets = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    private const string Numbers = "0123456789";
-    private const string IdentifierStart = Alphabets + "_";
-    private const string IdentifierBody = IdentifierStart + Numbers;
+    private const char Eof = (char)0;
 
     private const string BooleanTrueToken = "true";
     private const string BooleanFalseToken = "false";
 
-    private string _content;
-
+    private ReadOnlyMemory<char> _buffer;
+    private ReadOnlySpan<char> _spanBuffer;
     private int _start;
     private int _current;
     private int _startLineNumber;
     private int _currentLineNumber;
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static bool IsIdentifierStart(char c)
+    {
+      return c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z' || c == '_';
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static bool IsExponent(char c)
+    {
+      return c == 'e' || c == 'E';
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static bool IsNumber(char c)
+    {
+      return c >= '0' && c <= '9';
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static bool IsIdentifierBody(char c)
+    {
+      return IsIdentifierStart(c) || IsNumber(c);
+    }
+
     private bool Backup()
     {
       if (_current <= _start) return false;
       --_current;
-      if (_current < _content.Length && _content[_current] == '\n') --_currentLineNumber;
+      if (_current < _spanBuffer.Length && _spanBuffer[_current] == '\n') --_currentLineNumber;
       return true;
     }
 
     private char Next()
     {
-      var res = _current >= _content.Length ? Eof : _content[_current];
+      var res = _current >= _spanBuffer.Length ? Eof : _spanBuffer[_current];
       if (res == '\n') ++_currentLineNumber;
       ++_current;
       return res;
     }
 
-    private bool Accept(string chars)
+    private bool AcceptIdentifierStart()
     {
-      if (chars.IndexOf(Next()) >= 0)
+      if (IsIdentifierStart(Next()))
       {
         return true;
       }
@@ -47,10 +69,44 @@ namespace EpsilonScript.Lexer
       return false;
     }
 
-    private bool AcceptRun(string chars)
+    private bool AcceptExponent()
+    {
+      if (IsExponent(Next()))
+      {
+        return true;
+      }
+
+      Backup();
+      return false;
+    }
+
+    private bool Accept(char c)
+    {
+      if (c == Next())
+      {
+        return true;
+      }
+
+      Backup();
+      return false;
+    }
+
+    private bool AcceptRunIdentifierBody()
     {
       var success = false;
-      while (chars.IndexOf(Next()) >= 0)
+      while (IsIdentifierBody(Next()))
+      {
+        success = true;
+      }
+
+      Backup();
+      return success;
+    }
+
+    private bool AcceptRunNumbers()
+    {
+      var success = false;
+      while (IsNumber(Next()))
       {
         success = true;
       }
@@ -74,75 +130,101 @@ namespace EpsilonScript.Lexer
       Ignore();
     }
 
-    private string CurrentToken => _content.Substring(_start, _current - _start).Trim();
+    private ReadOnlySpan<char> CurrentToken => _spanBuffer.Slice(_start, _current - _start).Trim();
+
+    private ReadOnlyMemory<char> OutputToken
+    {
+      get
+      {
+        // We use ReadOnlySpan to read and trim the token
+        var tokenSpan = _spanBuffer.Slice(_start, _current - _start);
+        var idx = 0;
+        while (idx < tokenSpan.Length && char.IsWhiteSpace(tokenSpan[idx]))
+        {
+          ++idx;
+        }
+
+        tokenSpan = tokenSpan[idx..];
+
+        // ReadOnlyMemory of equivalent range from tokenSpan above
+        var result = _buffer.Slice(_start + idx, tokenSpan.Length);
+
+        idx = tokenSpan.Length - 1;
+        while (idx >= 0 && char.IsWhiteSpace(tokenSpan[idx]))
+        {
+          --idx;
+        }
+
+        return result[..(idx + 1)];
+      }
+    }
 
     private Token Emit(TokenType tokenType)
     {
-      var token = new Token(CurrentToken, tokenType, _startLineNumber);
+      var token = new Token(OutputToken, tokenType, _startLineNumber);
       _start = _current;
       _startLineNumber = _currentLineNumber;
       return token;
     }
 
-    public IList<Token> Analyze(string content)
+    public void Execute(ReadOnlyMemory<char> content, ITokenReader output)
     {
-      _content = content;
+      _buffer = content;
+      _spanBuffer = content.Span;
       _start = 0;
       _current = 0;
       _startLineNumber = 1;
       _currentLineNumber = 1;
 
-      var tokens = new List<Token>();
-
       while (true)
       {
         SkipWhiteSpaces();
-        if (Accept(IdentifierStart))
+        if (AcceptIdentifierStart())
         {
-          AcceptRun(IdentifierBody);
+          AcceptRunIdentifierBody();
           var token = CurrentToken;
-          switch (token)
+          if (token.Equals(BooleanTrueToken.AsSpan(), StringComparison.Ordinal))
           {
-            case BooleanTrueToken:
-              tokens.Add(Emit(TokenType.BooleanLiteralTrue));
-              break;
-            case BooleanFalseToken:
-              tokens.Add(Emit(TokenType.BooleanLiteralFalse));
-              break;
-            default:
-              tokens.Add(Emit(TokenType.Identifier));
-              break;
+            output.Push(Emit(TokenType.BooleanLiteralTrue));
+          }
+          else if (token.Equals(BooleanFalseToken.AsSpan(), StringComparison.Ordinal))
+          {
+            output.Push(Emit(TokenType.BooleanLiteralFalse));
+          }
+          else
+          {
+            output.Push(Emit(TokenType.Identifier));
           }
 
           continue;
         }
 
-        if (AcceptRun(Numbers))
+        if (AcceptRunNumbers())
         {
-          if (Accept("."))
+          if (Accept('.'))
           {
             // float
-            AcceptRun(Numbers);
-            if (Accept("eE"))
+            AcceptRunNumbers();
+            if (AcceptExponent())
             {
               // Accept + or -
-              if (!Accept("+"))
+              if (!Accept('+'))
               {
-                Accept("-");
+                Accept('-');
               }
 
               // Integers lead by + or - sign
-              if (!AcceptRun(Numbers))
+              if (!AcceptRunNumbers())
               {
                 throw new LexerException(_startLineNumber, "Integer value is required for float exponent value");
               }
             }
 
-            tokens.Add(Emit(TokenType.Float));
+            output.Push(Emit(TokenType.Float));
           }
           else
           {
-            tokens.Add(Emit(TokenType.Integer));
+            output.Push(Emit(TokenType.Integer));
           }
 
           continue;
@@ -152,23 +234,24 @@ namespace EpsilonScript.Lexer
         switch (nextChar)
         {
           case Eof:
-            return tokens;
+            output.End();
+            return;
           case '(':
-            tokens.Add(Emit(TokenType.LeftParenthesis));
+            output.Push(Emit(TokenType.LeftParenthesis));
             break;
           case ')':
-            tokens.Add(Emit(TokenType.RightParenthesis));
+            output.Push(Emit(TokenType.RightParenthesis));
             break;
           case '=':
             nextChar = Next();
             switch (nextChar)
             {
               case '=':
-                tokens.Add(Emit(TokenType.ComparisonEqual));
+                output.Push(Emit(TokenType.ComparisonEqual));
                 break;
               default:
                 Backup();
-                tokens.Add(Emit(TokenType.AssignmentOperator));
+                output.Push(Emit(TokenType.AssignmentOperator));
                 break;
             }
 
@@ -178,11 +261,11 @@ namespace EpsilonScript.Lexer
             switch (nextChar)
             {
               case '=':
-                tokens.Add(Emit(TokenType.ComparisonLessThanOrEqualTo));
+                output.Push(Emit(TokenType.ComparisonLessThanOrEqualTo));
                 break;
               default:
                 Backup();
-                tokens.Add(Emit(TokenType.ComparisonLessThan));
+                output.Push(Emit(TokenType.ComparisonLessThan));
                 break;
             }
 
@@ -192,11 +275,11 @@ namespace EpsilonScript.Lexer
             switch (nextChar)
             {
               case '=':
-                tokens.Add(Emit(TokenType.ComparisonGreaterThanOrEqualTo));
+                output.Push(Emit(TokenType.ComparisonGreaterThanOrEqualTo));
                 break;
               default:
                 Backup();
-                tokens.Add(Emit(TokenType.ComparisonGreaterThan));
+                output.Push(Emit(TokenType.ComparisonGreaterThan));
                 break;
             }
 
@@ -206,11 +289,11 @@ namespace EpsilonScript.Lexer
             switch (nextChar)
             {
               case '=':
-                tokens.Add(Emit(TokenType.ComparisonNotEqual));
+                output.Push(Emit(TokenType.ComparisonNotEqual));
                 break;
               default:
                 Backup();
-                tokens.Add(Emit(TokenType.NegateOperator));
+                output.Push(Emit(TokenType.NegateOperator));
                 break;
             }
 
@@ -219,12 +302,12 @@ namespace EpsilonScript.Lexer
             nextChar = Next();
             if (nextChar == '|')
             {
-              tokens.Add(Emit(TokenType.BooleanOrOperator));
+              output.Push(Emit(TokenType.BooleanOrOperator));
             }
             else
             {
               throw new LexerException(_startLineNumber,
-                $"OR boolean operand requires two vertical bar characters (||)");
+                "OR boolean operand requires two vertical bar characters (||)");
             }
 
             break;
@@ -232,11 +315,11 @@ namespace EpsilonScript.Lexer
             nextChar = Next();
             if (nextChar == '&')
             {
-              tokens.Add(Emit(TokenType.BooleanAndOperator));
+              output.Push(Emit(TokenType.BooleanAndOperator));
             }
             else
             {
-              throw new LexerException(_startLineNumber, $"AND boolean operand requires two ampersand characters (&&)");
+              throw new LexerException(_startLineNumber, "AND boolean operand requires two ampersand characters (&&)");
             }
 
             break;
@@ -245,11 +328,11 @@ namespace EpsilonScript.Lexer
             switch (nextChar)
             {
               case '=':
-                tokens.Add(Emit(TokenType.AssignmentAddOperator));
+                output.Push(Emit(TokenType.AssignmentAddOperator));
                 break;
               default:
                 Backup();
-                tokens.Add(Emit(TokenType.PlusSign));
+                output.Push(Emit(TokenType.PlusSign));
                 break;
             }
 
@@ -259,11 +342,11 @@ namespace EpsilonScript.Lexer
             switch (nextChar)
             {
               case '=':
-                tokens.Add(Emit(TokenType.AssignmentSubtractOperator));
+                output.Push(Emit(TokenType.AssignmentSubtractOperator));
                 break;
               default:
                 Backup();
-                tokens.Add(Emit(TokenType.MinusSign));
+                output.Push(Emit(TokenType.MinusSign));
                 break;
             }
 
@@ -273,11 +356,11 @@ namespace EpsilonScript.Lexer
             switch (nextChar)
             {
               case '=':
-                tokens.Add(Emit(TokenType.AssignmentMultiplyOperator));
+                output.Push(Emit(TokenType.AssignmentMultiplyOperator));
                 break;
               default:
                 Backup();
-                tokens.Add(Emit(TokenType.MultiplyOperator));
+                output.Push(Emit(TokenType.MultiplyOperator));
                 break;
             }
 
@@ -287,23 +370,23 @@ namespace EpsilonScript.Lexer
             switch (nextChar)
             {
               case '=':
-                tokens.Add(Emit(TokenType.AssignmentDivideOperator));
+                output.Push(Emit(TokenType.AssignmentDivideOperator));
                 break;
               default:
                 Backup();
-                tokens.Add(Emit(TokenType.DivideOperator));
+                output.Push(Emit(TokenType.DivideOperator));
                 break;
             }
 
             break;
           case '%':
-            tokens.Add(Emit(TokenType.ModuloOperator));
+            output.Push(Emit(TokenType.ModuloOperator));
             break;
           case ',':
-            tokens.Add(Emit(TokenType.Comma));
+            output.Push(Emit(TokenType.Comma));
             break;
           case ';':
-            tokens.Add(Emit(TokenType.Semicolon));
+            output.Push(Emit(TokenType.Semicolon));
             break;
           default:
             throw new LexerException(_startLineNumber, $"Unexpected character found: {nextChar}");

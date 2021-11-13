@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using EpsilonScript.Lexer;
+using EpsilonScript.Intermediate;
 using Xunit;
 
 namespace EpsilonScript.Tests
@@ -133,16 +133,16 @@ namespace EpsilonScript.Tests
       {
         return new[]
         {
-          new object[] {"0.0e"},
-          new object[] {"100.e"},
-          new object[] {"+100.e"},
-          new object[] {"-100.e"},
-          new object[] {"100.e+"},
-          new object[] {"100.e-"},
-          new object[] {"+100.e+"},
-          new object[] {"+100.e-"},
-          new object[] {"-100.e+"},
-          new object[] {"-100.e-"},
+          new object[] { "0.0e" },
+          new object[] { "100.e" },
+          new object[] { "+100.e" },
+          new object[] { "-100.e" },
+          new object[] { "100.e+" },
+          new object[] { "100.e-" },
+          new object[] { "+100.e+" },
+          new object[] { "+100.e-" },
+          new object[] { "-100.e+" },
+          new object[] { "-100.e-" },
         };
       }
     }

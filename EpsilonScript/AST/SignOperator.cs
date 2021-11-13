@@ -1,8 +1,7 @@
 using System;
 using System.Collections.Generic;
 using EpsilonScript.Function;
-using EpsilonScript.Helper;
-using EpsilonScript.Parser;
+using EpsilonScript.Intermediate;
 
 namespace EpsilonScript.AST
 {
@@ -68,7 +67,7 @@ namespace EpsilonScript.AST
                 "Unsupported operation type for sign change");
           }
 
-          IntegerValue = (int) FloatValue;
+          IntegerValue = (int)FloatValue;
           BooleanValue = IntegerValue != 0;
           break;
         default:
@@ -84,6 +83,7 @@ namespace EpsilonScript.AST
         Execute(null);
         return CreateValueNode();
       }
+
       _childNode = _childNode.Optimize();
       return this;
     }

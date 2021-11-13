@@ -1,6 +1,6 @@
 using System;
 
-namespace EpsilonScript.Parser
+namespace EpsilonScript.Intermediate
 {
   public enum ElementType
   {
@@ -122,7 +122,7 @@ namespace EpsilonScript.Parser
         case ElementType.NegateOperator:
         case ElementType.NegativeOperator:
         case ElementType.PositiveOperator:
-          return Parser.Associativity.Right;
+          return Intermediate.Associativity.Right;
         case ElementType.MultiplyOperator:
         case ElementType.DivideOperator:
         case ElementType.ModuloOperator:
@@ -136,16 +136,16 @@ namespace EpsilonScript.Parser
         case ElementType.ComparisonGreaterThanOrEqualTo:
         case ElementType.BooleanOrOperator:
         case ElementType.BooleanAndOperator:
-          return Parser.Associativity.Left;
+          return Intermediate.Associativity.Left;
         case ElementType.AssignmentOperator:
         case ElementType.AssignmentAddOperator:
         case ElementType.AssignmentSubtractOperator:
         case ElementType.AssignmentMultiplyOperator:
         case ElementType.AssignmentDivideOperator:
-          return Parser.Associativity.Right;
+          return Intermediate.Associativity.Right;
         case ElementType.Comma:
         case ElementType.Semicolon:
-          return Parser.Associativity.Left;
+          return Intermediate.Associativity.Left;
         case ElementType.None:
         case ElementType.Variable:
         case ElementType.FunctionStartParenthesis:
@@ -155,7 +155,7 @@ namespace EpsilonScript.Parser
         case ElementType.BooleanLiteralFalse:
         case ElementType.Integer:
         case ElementType.Float:
-          return Parser.Associativity.None;
+          return Intermediate.Associativity.None;
         default:
           throw new ArgumentOutOfRangeException(nameof(type), type, null);
       }

@@ -1,6 +1,6 @@
+using System;
 using System.Collections.Generic;
-using EpsilonScript.Lexer;
-using EpsilonScript.Parser;
+using EpsilonScript.Intermediate;
 using Xunit;
 
 namespace EpsilonScript.Tests
@@ -50,7 +50,7 @@ namespace EpsilonScript.Tests
             {
               new Element(new Token("var", TokenType.Identifier), ElementType.Function),
               new Element(new Token("(", TokenType.LeftParenthesis), ElementType.FunctionStartParenthesis),
-              new Element(new Token("", TokenType.None), ElementType.None),
+              new Element(new Token(ReadOnlyMemory<char>.Empty, TokenType.None), ElementType.None),
               new Element(new Token(")", TokenType.RightParenthesis), ElementType.RightParenthesis),
             },
           },

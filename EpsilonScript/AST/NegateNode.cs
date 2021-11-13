@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using EpsilonScript.Function;
-using EpsilonScript.Helper;
-using EpsilonScript.Parser;
+using EpsilonScript.Intermediate;
 
 namespace EpsilonScript.AST
 {
@@ -43,6 +42,7 @@ namespace EpsilonScript.AST
         Execute(null);
         return CreateValueNode();
       }
+
       _childNode = _childNode.Optimize();
       return this;
     }

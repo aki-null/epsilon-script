@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using EpsilonScript.Function;
-using EpsilonScript.Parser;
+using EpsilonScript.Intermediate;
 
 namespace EpsilonScript.AST
 {
@@ -10,7 +10,7 @@ namespace EpsilonScript.AST
     {
       ValueType = ValueType.Float;
       FloatValue = value;
-      IntegerValue = (int) FloatValue;
+      IntegerValue = (int)FloatValue;
       BooleanValue = IntegerValue != 0;
     }
 
@@ -27,7 +27,7 @@ namespace EpsilonScript.AST
       IDictionary<string, VariableValue> variables,
       IDictionary<string, CustomFunctionOverload> functions)
     {
-      Initialize(float.Parse(element.Token.Text));
+      Initialize(float.Parse(element.Token.Text.Span));
     }
   }
 }

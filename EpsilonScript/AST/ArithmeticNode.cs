@@ -1,8 +1,7 @@
 using System;
 using System.Collections.Generic;
 using EpsilonScript.Function;
-using EpsilonScript.Helper;
-using EpsilonScript.Parser;
+using EpsilonScript.Intermediate;
 
 namespace EpsilonScript.AST
 {
@@ -95,7 +94,7 @@ namespace EpsilonScript.AST
           break;
         case ValueType.Float:
           FloatValue = CalculateFloatValue();
-          IntegerValue = (int) FloatValue;
+          IntegerValue = (int)FloatValue;
           break;
         default:
           throw new ArgumentOutOfRangeException(nameof(ValueType), ValueType, "Unsupported value type");

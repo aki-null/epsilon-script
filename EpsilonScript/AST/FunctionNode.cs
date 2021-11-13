@@ -1,8 +1,7 @@
 using System;
 using System.Collections.Generic;
 using EpsilonScript.Function;
-using EpsilonScript.Helper;
-using EpsilonScript.Parser;
+using EpsilonScript.Intermediate;
 
 namespace EpsilonScript.AST
 {
@@ -35,14 +34,17 @@ namespace EpsilonScript.AST
       IDictionary<string, VariableValue> variables,
       IDictionary<string, CustomFunctionOverload> functions)
     {
-      if (!functions.TryGetValue(element.Token.Text, out _functionOverload))
+      // Unfortunately function name string needs to be allocated here to make a dictionary lookup
+      var functionName = element.Token.Text.ToString();
+
+      if (!functions.TryGetValue(functionName, out _functionOverload))
       {
-        throw new ParserException(element.Token, $"Undefined function: {element.Token.Text}");
+        throw new ParserException(element.Token, $"Undefined function: {functionName}");
       }
 
       if (!rpnStack.TryPop(out var childNode))
       {
-        throw new ParserException(element.Token, $"Cannot find parameters for calling function: {element.Token.Text}");
+        throw new ParserException(element.Token, $"Cannot find parameters for calling function: {functionName}");
       }
 
       switch (childNode.ValueType)
@@ -121,7 +123,7 @@ namespace EpsilonScript.AST
           break;
         case ValueType.Float:
           FloatValue = function.ExecuteFloat(_parameters);
-          IntegerValue = (int) FloatValue;
+          IntegerValue = (int)FloatValue;
           break;
         default:
           throw new ArgumentOutOfRangeException(nameof(ValueType), ValueType, "Unsupported function return type");

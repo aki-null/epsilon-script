@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using EpsilonScript.AST;
-using EpsilonScript.Lexer;
-using EpsilonScript.Parser;
+using EpsilonScript.Intermediate;
 using Xunit;
 
 namespace EpsilonScript.Tests
@@ -30,7 +29,7 @@ namespace EpsilonScript.Tests
     {
       var node = new BooleanNode(value);
       var expectedInt = value ? 1 : 0;
-      var expectedFloat = (float) expectedInt;
+      var expectedFloat = (float)expectedInt;
       Assert.Equal(ValueType.Boolean, node.ValueType);
       Assert.Equal(expectedInt, node.IntegerValue);
       Assert.True(Math.IsNearlyEqual(expectedFloat, node.FloatValue));

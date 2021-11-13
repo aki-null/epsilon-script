@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using EpsilonScript.AST;
-using EpsilonScript.Parser;
 
 namespace EpsilonScript.Function
 {
@@ -41,16 +40,16 @@ namespace EpsilonScript.Function
     public string Name { get; }
 
     // Cached list of all function parameters
-    private static readonly Type[] IntParamType = {EpsilonScript.Type.Integer};
-    private static readonly Type[] FloatParamType = {EpsilonScript.Type.Float};
-    private static readonly Type[] IntIntParamTYpe = {EpsilonScript.Type.Integer, EpsilonScript.Type.Integer};
-    private static readonly Type[] FloatFloatParamType = {EpsilonScript.Type.Float, EpsilonScript.Type.Float};
+    private static readonly Type[] IntParamType = { EpsilonScript.Type.Integer };
+    private static readonly Type[] FloatParamType = { EpsilonScript.Type.Float };
+    private static readonly Type[] IntIntParamTYpe = { EpsilonScript.Type.Integer, EpsilonScript.Type.Integer };
+    private static readonly Type[] FloatFloatParamType = { EpsilonScript.Type.Float, EpsilonScript.Type.Float };
 
     private static readonly Type[] BoolIntIntParamType =
-      {EpsilonScript.Type.Boolean, EpsilonScript.Type.Integer, EpsilonScript.Type.Integer};
+      { EpsilonScript.Type.Boolean, EpsilonScript.Type.Integer, EpsilonScript.Type.Integer };
 
     private static readonly Type[] BoolFloatFloatParamType =
-      {EpsilonScript.Type.Boolean, EpsilonScript.Type.Float, EpsilonScript.Type.Float};
+      { EpsilonScript.Type.Boolean, EpsilonScript.Type.Float, EpsilonScript.Type.Float };
 
     public Type ReturnType
     {

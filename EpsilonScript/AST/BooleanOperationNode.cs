@@ -1,8 +1,7 @@
 using System;
 using System.Collections.Generic;
 using EpsilonScript.Function;
-using EpsilonScript.Helper;
-using EpsilonScript.Parser;
+using EpsilonScript.Intermediate;
 
 namespace EpsilonScript.AST
 {
@@ -92,6 +91,7 @@ namespace EpsilonScript.AST
         Execute(null);
         return CreateValueNode();
       }
+
       _leftNode = _leftNode.Optimize();
       _rightNode = _rightNode.Optimize();
       return this;
