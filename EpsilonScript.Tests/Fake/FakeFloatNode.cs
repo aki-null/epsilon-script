@@ -1,7 +1,9 @@
-using EpsilonScript.Parser;
+using System;
+using System.Collections.Generic;
 using EpsilonScript.AST;
 using EpsilonScript.Function;
-using System.Collections.Generic;
+using EpsilonScript.Intermediate;
+using ValueType = EpsilonScript.AST.ValueType;
 
 namespace EpsilonScript.Tests
 {
@@ -11,7 +13,7 @@ namespace EpsilonScript.Tests
     {
       ValueType = ValueType.Float;
       FloatValue = value;
-      IntegerValue = (int) value;
+      IntegerValue = (int)value;
       BooleanValue = IntegerValue != 0;
     }
 
@@ -19,7 +21,7 @@ namespace EpsilonScript.Tests
       IDictionary<string, VariableValue> variables,
       IDictionary<string, CustomFunctionOverload> functions)
     {
-      throw new System.NotImplementedException("Fake nodes cannot be built from RPN srack");
+      throw new NotImplementedException("Fake nodes cannot be built from RPN srack");
     }
   }
 }

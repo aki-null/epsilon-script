@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using EpsilonScript.Function;
-using EpsilonScript.Helper;
-using EpsilonScript.Parser;
+using EpsilonScript.Intermediate;
 
 namespace EpsilonScript.AST
 {
@@ -65,6 +64,7 @@ namespace EpsilonScript.AST
       {
         TupleValue[i] = TupleValue[i].Optimize();
       }
+
       return this;
     }
   }

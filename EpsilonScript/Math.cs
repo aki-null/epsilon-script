@@ -4,7 +4,7 @@ namespace EpsilonScript
   {
     private static unsafe int UnsafeFLoatAsInt32(float f)
     {
-      return *((int*) &f);
+      return *((int*)&f);
     }
 
     // https://randomascii.wordpress.com/2012/02/25/comparing-floating-point-numbers-2012-edition/

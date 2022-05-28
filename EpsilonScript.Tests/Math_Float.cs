@@ -14,9 +14,9 @@ namespace EpsilonScript.Tests
     [Fact]
     public void Math_Float_SmallDifferenceEqualsCorrectly()
     {
-      var a = (float) System.Math.PI;
-      var b = (float) System.Math.Sqrt(a);
-      var c = (float) System.Math.Sqrt(b);
+      var a = (float)System.Math.PI;
+      var b = (float)System.Math.Sqrt(a);
+      var c = (float)System.Math.Sqrt(b);
       var d = c * c * c * c;
       Assert.False(a == d);
       Assert.True(Math.IsNearlyEqual(a, d));

@@ -1,16 +1,14 @@
 ﻿using System;
-using EpsilonScript.Lexer;
+using EpsilonScript.Intermediate;
 
-namespace EpsilonScript.Parser
+namespace EpsilonScript
 {
   [Serializable]
   public class ParserException : Exception
   {
     private static string FormatMessage(in Token token, string message)
     {
-      return string.IsNullOrEmpty(message)
-        ? $"{token}: Unknown error"
-        : $"{token}: {message}";
+      return string.IsNullOrEmpty(message) ? $"{token.ToString()}: Unknown error" : $"{token.ToString()}: {message}";
     }
 
     public ParserException(in Token token) : base(FormatMessage(token, ""))

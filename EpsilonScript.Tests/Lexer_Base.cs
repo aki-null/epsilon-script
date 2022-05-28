@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using EpsilonScript.Intermediate;
 using EpsilonScript.Lexer;
 using Xunit;
 
@@ -9,25 +11,28 @@ namespace EpsilonScript.Tests
     protected static void Succeeds(string testStr, Token[] expected)
     {
       var lexer = new Lexer.Lexer();
-      using var expectedNext = ((IEnumerable<Token>) expected).GetEnumerator();
-      foreach (var token in lexer.Analyze(testStr))
+      var tokenReader = new TestTokenReader();
+      using var expectedNext = ((IEnumerable<Token>)expected).GetEnumerator();
+      lexer.Execute(testStr.AsMemory(), tokenReader);
+      foreach (var token in tokenReader.Tokens)
       {
         Assert.True(expectedNext.MoveNext(), "Too many tokens");
         Assert.Equal(expectedNext.Current.Type, token.Type);
-        Assert.Equal(expectedNext.Current.Text, token.Text);
+        Assert.Equal(expectedNext.Current.Text.ToString(), token.Text.ToString());
       }
 
       Assert.False(expectedNext.MoveNext(), "Not enough tokens");
+
+      Assert.True(tokenReader.EndCalled, "Token reader not closed");
     }
 
     protected static void Fails(string testStr)
     {
-      var lexer = new Lexer.Lexer();
       Assert.Throws<LexerException>(() =>
       {
-        foreach (var token in lexer.Analyze(testStr))
-        {
-        }
+        var lexer = new Lexer.Lexer();
+        var tokenReader = new TestTokenReader();
+        lexer.Execute(testStr.AsMemory(), tokenReader);
       });
     }
   }

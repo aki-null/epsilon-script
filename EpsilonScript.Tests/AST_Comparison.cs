@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using EpsilonScript.AST;
-using EpsilonScript.Lexer;
-using EpsilonScript.Parser;
+using EpsilonScript.Intermediate;
 using Xunit;
 
 namespace EpsilonScript.Tests
@@ -18,7 +17,7 @@ namespace EpsilonScript.Tests
       rpn.Push(leftNode);
       rpn.Push(rightNode);
       node.Build(rpn, new Element(new Token("==", TokenType.ComparisonEqual), ElementType.ComparisonEqual),
-          Compiler.Options.None, null, null);
+        Compiler.Options.None, null, null);
       node = node.Optimize();
       Assert.True(typeof(BooleanNode) == node.GetType());
       Assert.Equal(ValueType.Boolean, node.ValueType);

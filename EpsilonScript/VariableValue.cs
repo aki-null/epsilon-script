@@ -17,7 +17,7 @@ namespace EpsilonScript
           case Type.Integer:
             return _integerValue;
           case Type.Float:
-            return (int) _floatValue;
+            return (int)_floatValue;
           case Type.Boolean:
             return (_booleanValue ? 1 : 0);
           default:
@@ -66,7 +66,7 @@ namespace EpsilonScript
         switch (Type)
         {
           case Type.Integer:
-            _integerValue = (int) value;
+            _integerValue = (int)value;
             break;
           case Type.Float:
             _floatValue = value;

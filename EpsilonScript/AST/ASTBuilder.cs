@@ -1,12 +1,56 @@
 using System;
 using System.Collections.Generic;
 using EpsilonScript.Function;
-using EpsilonScript.Parser;
+using EpsilonScript.Intermediate;
 
 namespace EpsilonScript.AST
 {
-  public static class ASTBuilder
+  public class AstBuilder : IElementReader
   {
+    public Node Result { get; private set; }
+
+    private readonly Stack<Node> _rpnStack = new Stack<Node>();
+
+    private Compiler.Options _options;
+    private IDictionary<string, VariableValue> _variables;
+    private readonly IDictionary<string, CustomFunctionOverload> _functions;
+
+    public AstBuilder(IDictionary<string, CustomFunctionOverload> functions)
+    {
+      _functions = functions;
+    }
+
+    public void Reset()
+    {
+      _rpnStack.Clear();
+      _options = Compiler.Options.None;
+      _variables = null;
+      Result = null;
+    }
+
+    public void Configure(Compiler.Options options, IDictionary<string, VariableValue> variables)
+    {
+      _options = options;
+      _variables = variables;
+    }
+
+    public void Push(Element element)
+    {
+      var node = CreateNode(element.Type);
+      node.Build(_rpnStack, element, _options, _variables, _functions);
+      _rpnStack.Push(node);
+    }
+
+    public void End()
+    {
+      if (_rpnStack.Count > 1)
+      {
+        throw new RuntimeException("Missing operator(s) to process all values");
+      }
+
+      Result = _rpnStack.Pop();
+    }
+
     private static Node CreateNode(ElementType type)
     {
       switch (type)
@@ -58,26 +102,6 @@ namespace EpsilonScript.AST
         default:
           throw new ArgumentOutOfRangeException();
       }
-    }
-
-    public static Node Build(List<Element> elements, Compiler.Options options,
-      IDictionary<string, VariableValue> variables,
-      IDictionary<string, CustomFunctionOverload> functions)
-    {
-      var rpnStack = new Stack<Node>();
-      foreach (var element in elements)
-      {
-        var node = CreateNode(element.Type);
-        node.Build(rpnStack, element, options, variables, functions);
-        rpnStack.Push(node);
-      }
-
-      if (rpnStack.Count > 1)
-      {
-        throw new RuntimeException("Missing operator(s) to process all values");
-      }
-
-      return rpnStack.Pop();
     }
   }
 }

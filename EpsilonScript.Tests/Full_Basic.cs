@@ -18,7 +18,7 @@ namespace EpsilonScript.Tests
     private void Full_VariableAssign_Succeeds()
     {
       var compiler = new Compiler();
-      var variables = new Dictionary<string, VariableValue> {["val"] = new VariableValue(0.0f)};
+      var variables = new Dictionary<string, VariableValue> { ["val"] = new VariableValue(0.0f) };
       var script = compiler.Compile("(val = 10 + -2 * -(20.2 - 10); val *= 2; val / 2) * 2 / 2",
         Compiler.Options.None, variables);
       script.Execute();
@@ -30,7 +30,7 @@ namespace EpsilonScript.Tests
     private void Full_FunctionOverloadInteger_Succeeds()
     {
       var compiler = new Compiler();
-      var variables = new Dictionary<string, VariableValue> {["val"] = new VariableValue(1.0f)};
+      var variables = new Dictionary<string, VariableValue> { ["val"] = new VariableValue(1.0f) };
       var script = compiler.Compile("ifelse(val <= 0, 200, 100)", Compiler.Options.None, variables);
       script.Execute();
       Assert.Equal(Type.Integer, script.ValueType);
@@ -41,7 +41,7 @@ namespace EpsilonScript.Tests
     private void Full_FunctionOverloadFloat_Succeeds()
     {
       var compiler = new Compiler();
-      var variables = new Dictionary<string, VariableValue> {["val"] = new VariableValue(1.0f)};
+      var variables = new Dictionary<string, VariableValue> { ["val"] = new VariableValue(1.0f) };
       var rootNode = compiler.Compile("ifelse(val <= 0, 1.5, 100.2)", Compiler.Options.Immutable, variables);
       rootNode.Execute();
       Assert.Equal(Type.Float, rootNode.ValueType);

@@ -1,5 +1,4 @@
 using System;
-using EpsilonScript.Parser;
 
 namespace EpsilonScript.Function
 {

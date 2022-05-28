@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using EpsilonScript.Function;
-using EpsilonScript.Parser;
+using EpsilonScript.Intermediate;
 
 namespace EpsilonScript.AST
 {
@@ -16,7 +16,7 @@ namespace EpsilonScript.AST
       IDictionary<string, VariableValue> variables,
       IDictionary<string, CustomFunctionOverload> functions)
     {
-      _variableName = element.Token.Text;
+      _variableName = element.Token.Text.ToString();
       _variables = variables;
     }
 

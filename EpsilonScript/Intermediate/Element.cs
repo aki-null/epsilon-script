@@ -1,8 +1,6 @@
-﻿using EpsilonScript.Lexer;
-
-namespace EpsilonScript.Parser
+﻿namespace EpsilonScript.Intermediate
 {
-  public struct Element
+  public readonly struct Element
   {
     public Token Token { get; }
     public ElementType Type { get; }
@@ -15,7 +13,7 @@ namespace EpsilonScript.Parser
 
     public override string ToString()
     {
-      return $"{Token}: {Type}";
+      return $"{Token.ToString()}: {Type}";
     }
   }
 }

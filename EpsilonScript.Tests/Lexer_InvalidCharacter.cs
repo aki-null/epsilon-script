@@ -18,22 +18,22 @@ namespace EpsilonScript.Tests
       {
         return new[]
         {
-          new object[] {"{"},
-          new object[] {"}"},
-          new object[] {"["},
-          new object[] {"]"},
-          new object[] {"~"},
-          new object[] {"@"},
-          new object[] {"#"},
-          new object[] {"$"},
-          new object[] {"^"},
-          new object[] {":"},
-          new object[] {"'"},
-          new object[] {"\""},
-          new object[] {"\\"},
-          new object[] {"."},
-          new object[] {"?"},
-          new object[] {"突然の日本語"},
+          new object[] { "{" },
+          new object[] { "}" },
+          new object[] { "[" },
+          new object[] { "]" },
+          new object[] { "~" },
+          new object[] { "@" },
+          new object[] { "#" },
+          new object[] { "$" },
+          new object[] { "^" },
+          new object[] { ":" },
+          new object[] { "'" },
+          new object[] { "\"" },
+          new object[] { "\\" },
+          new object[] { "." },
+          new object[] { "?" },
+          new object[] { "突然の日本語" },
         };
       }
     }
