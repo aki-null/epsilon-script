@@ -6,7 +6,7 @@ namespace EpsilonScript.Function
   {
     private CustomFunctionOverloadNode _rootNode;
 
-    public string Name { get; }
+    public uint Name { get; }
     public bool IsConstant { get; }
 
     public CustomFunctionOverload(CustomFunction function)

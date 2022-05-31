@@ -21,7 +21,7 @@ namespace EpsilonScript
       IsConstant = rootNode.IsConstant;
     }
 
-    public void Execute(IDictionary<string, VariableValue> variablesOverride = null)
+    public void Execute(IDictionary<uint, VariableValue> variablesOverride = null)
     {
       // Do not execute this again if the script is completely constant, and it has been executed at least once.
       if (IsConstant && _isResultCached)

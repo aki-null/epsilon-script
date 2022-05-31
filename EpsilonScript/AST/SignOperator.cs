@@ -13,8 +13,8 @@ namespace EpsilonScript.AST
     public override bool IsConstant => _childNode.IsConstant;
 
     public override void Build(Stack<Node> rpnStack, Element element, Compiler.Options options,
-      IDictionary<string, VariableValue> variables,
-      IDictionary<string, CustomFunctionOverload> functions)
+      IDictionary<uint, VariableValue> variables,
+      IDictionary<uint, CustomFunctionOverload> functions)
     {
       if (!rpnStack.TryPop(out _childNode))
       {
@@ -24,7 +24,7 @@ namespace EpsilonScript.AST
       _operationType = element.Type;
     }
 
-    public override void Execute(IDictionary<string, VariableValue> variablesOverride)
+    public override void Execute(IDictionary<uint, VariableValue> variablesOverride)
     {
       _childNode.Execute(variablesOverride);
 

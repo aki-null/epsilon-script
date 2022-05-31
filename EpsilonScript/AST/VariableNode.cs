@@ -1,26 +1,27 @@
 using System;
 using System.Collections.Generic;
 using EpsilonScript.Function;
+using EpsilonScript.Helper;
 using EpsilonScript.Intermediate;
 
 namespace EpsilonScript.AST
 {
   public class VariableNode : Node
   {
-    private string _variableName;
-    private IDictionary<string, VariableValue> _variables;
+    private uint _variableName;
+    private IDictionary<uint, VariableValue> _variables;
 
     public override bool IsConstant => false;
 
     public override void Build(Stack<Node> rpnStack, Element element, Compiler.Options options,
-      IDictionary<string, VariableValue> variables,
-      IDictionary<string, CustomFunctionOverload> functions)
+      IDictionary<uint, VariableValue> variables,
+      IDictionary<uint, CustomFunctionOverload> functions)
     {
-      _variableName = element.Token.Text.ToString();
+      _variableName = element.Token.Text.ToString().GetUniqueIdentifier();
       _variables = variables;
     }
 
-    public override void Execute(IDictionary<string, VariableValue> variablesOverride)
+    public override void Execute(IDictionary<uint, VariableValue> variablesOverride)
     {
       if (variablesOverride == null || !variablesOverride.TryGetValue(_variableName, out var variable))
       {

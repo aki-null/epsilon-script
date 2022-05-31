@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using EpsilonScript.AST;
+using EpsilonScript.Helper;
 
 namespace EpsilonScript.Function
 {
@@ -37,7 +38,7 @@ namespace EpsilonScript.Function
 
     private Signature Type { get; }
     private readonly CustomFunctionUnion _func;
-    public string Name { get; }
+    public uint Name { get; }
 
     // Cached list of all function parameters
     private static readonly Type[] IntParamType = { EpsilonScript.Type.Integer };
@@ -130,7 +131,7 @@ namespace EpsilonScript.Function
 
     public CustomFunction(string name, Func<int, int> func, bool isConstant = false)
     {
-      Name = name;
+      Name = name.GetUniqueIdentifier();
       Type = Signature.IntInt;
       _func.intInt = func;
       IsConstant = isConstant;
@@ -138,7 +139,7 @@ namespace EpsilonScript.Function
 
     public CustomFunction(string name, Func<float, int> func, bool isConstant = false)
     {
-      Name = name;
+      Name = name.GetUniqueIdentifier();
       Type = Signature.FloatInt;
       _func.floatInt = func;
       IsConstant = isConstant;
@@ -146,7 +147,7 @@ namespace EpsilonScript.Function
 
     public CustomFunction(string name, Func<int, float> func, bool isConstant = false)
     {
-      Name = name;
+      Name = name.GetUniqueIdentifier();
       Type = Signature.IntFloat;
       _func.intFloat = func;
       IsConstant = isConstant;
@@ -154,7 +155,7 @@ namespace EpsilonScript.Function
 
     public CustomFunction(string name, Func<float, float> func, bool isConstant = false)
     {
-      Name = name;
+      Name = name.GetUniqueIdentifier();
       Type = Signature.FloatFloat;
       _func.floatFloat = func;
       IsConstant = isConstant;
@@ -162,7 +163,7 @@ namespace EpsilonScript.Function
 
     public CustomFunction(string name, Func<int, int, int> func, bool isConstant = false)
     {
-      Name = name;
+      Name = name.GetUniqueIdentifier();
       Type = Signature.IntIntInt;
       _func.intIntInt = func;
       IsConstant = isConstant;
@@ -170,7 +171,7 @@ namespace EpsilonScript.Function
 
     public CustomFunction(string name, Func<float, float, float> func, bool isConstant = false)
     {
-      Name = name;
+      Name = name.GetUniqueIdentifier();
       Type = Signature.FloatFloatFloat;
       _func.floatFloatFloat = func;
       IsConstant = isConstant;
@@ -178,7 +179,7 @@ namespace EpsilonScript.Function
 
     public CustomFunction(string name, Func<bool, float, float, float> func, bool isConstant = false)
     {
-      Name = name;
+      Name = name.GetUniqueIdentifier();
       Type = Signature.BoolFloatFloatFloat;
       _func.boolFloatFloatFloat = func;
       IsConstant = isConstant;
@@ -186,7 +187,7 @@ namespace EpsilonScript.Function
 
     public CustomFunction(string name, Func<bool, int, int, int> func, bool isConstant = false)
     {
-      Name = name;
+      Name = name.GetUniqueIdentifier();
       Type = Signature.BoolIntIntInt;
       _func.boolIntIntInt = func;
       IsConstant = isConstant;

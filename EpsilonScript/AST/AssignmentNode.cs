@@ -14,8 +14,8 @@ namespace EpsilonScript.AST
     public override bool IsConstant => false;
 
     public override void Build(Stack<Node> rpnStack, Element element, Compiler.Options options,
-      IDictionary<string, VariableValue> variables,
-      IDictionary<string, CustomFunctionOverload> functions)
+      IDictionary<uint, VariableValue> variables,
+      IDictionary<uint, CustomFunctionOverload> functions)
     {
       if ((options & Compiler.Options.Immutable) == Compiler.Options.Immutable)
       {
@@ -30,7 +30,7 @@ namespace EpsilonScript.AST
       }
     }
 
-    public override void Execute(IDictionary<string, VariableValue> variablesOverride)
+    public override void Execute(IDictionary<uint, VariableValue> variablesOverride)
     {
       _leftNode.Execute(variablesOverride);
       _rightNode.Execute(variablesOverride);
