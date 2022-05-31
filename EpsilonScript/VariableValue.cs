@@ -4,7 +4,7 @@ namespace EpsilonScript
 {
   public class VariableValue
   {
-    public Type Type { get; }
+    public Type Type { get; private set; }
 
     private int _integerValue;
 
@@ -17,7 +17,7 @@ namespace EpsilonScript
           case Type.Integer:
             return _integerValue;
           case Type.Float:
-            return (int)_floatValue;
+            return (int) _floatValue;
           case Type.Boolean:
             return (_booleanValue ? 1 : 0);
           default:
@@ -66,7 +66,7 @@ namespace EpsilonScript
         switch (Type)
         {
           case Type.Integer:
-            _integerValue = (int)value;
+            _integerValue = (int) value;
             break;
           case Type.Float:
             _floatValue = value;
@@ -136,6 +136,27 @@ namespace EpsilonScript
     {
       Type = Type.Boolean;
       BooleanValue = value;
+    }
+
+    public void CopyFrom(VariableValue other)
+    {
+      Type = other.Type;
+      switch (Type)
+      {
+        case Type.Undefined:
+          return;
+        case Type.Integer:
+          _integerValue = other._integerValue;
+          break;
+        case Type.Float:
+          _floatValue = other._floatValue;
+          break;
+        case Type.Boolean:
+          _integerValue = other._integerValue;
+          break;
+        default:
+          throw new ArgumentOutOfRangeException();
+      }
     }
   }
 }
