@@ -17,8 +17,8 @@ namespace EpsilonScript.AST
     public override bool IsConstant => _leftNode.IsConstant && _rightNode.IsConstant;
 
     public override void Build(Stack<Node> rpnStack, Element element, Compiler.Options options,
-      IDictionary<string, VariableValue> variables,
-      IDictionary<string, CustomFunctionOverload> functions)
+      IDictionary<uint, VariableValue> variables,
+      IDictionary<uint, CustomFunctionOverload> functions)
     {
       ValueType = ValueType.Boolean;
       _operationType = element.Type;
@@ -29,7 +29,7 @@ namespace EpsilonScript.AST
       }
     }
 
-    public override void Execute(IDictionary<string, VariableValue> variablesOverride)
+    public override void Execute(IDictionary<uint, VariableValue> variablesOverride)
     {
       switch (_operationType)
       {

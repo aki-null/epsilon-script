@@ -23,8 +23,8 @@ namespace EpsilonScript.AST
     }
 
     public override void Build(Stack<Node> rpnStack, Element element, Compiler.Options options,
-      IDictionary<string, VariableValue> variables,
-      IDictionary<string, CustomFunctionOverload> functions)
+      IDictionary<uint, VariableValue> variables,
+      IDictionary<uint, CustomFunctionOverload> functions)
     {
       ValueType = ValueType.Tuple;
       TupleValue = new List<Node>();
@@ -50,7 +50,7 @@ namespace EpsilonScript.AST
       TupleValue.Add(rightNode);
     }
 
-    public override void Execute(IDictionary<string, VariableValue> variablesOverride)
+    public override void Execute(IDictionary<uint, VariableValue> variablesOverride)
     {
       foreach (var child in TupleValue)
       {
