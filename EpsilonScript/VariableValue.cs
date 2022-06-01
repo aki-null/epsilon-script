@@ -1,12 +1,17 @@
 using System;
+using System.Runtime.InteropServices;
 
 namespace EpsilonScript
 {
+  [StructLayout(LayoutKind.Explicit)]
   public class VariableValue
   {
-    public Type Type { get; private set; }
+    [FieldOffset(0)] private int _integerValue;
+    [FieldOffset(0)] private float _floatValue;
+    [FieldOffset(0)] private bool _booleanValue;
 
-    private int _integerValue;
+    [field: FieldOffset(sizeof(int))]
+    public Type Type { get; private set; }
 
     public int IntegerValue
     {
@@ -43,8 +48,6 @@ namespace EpsilonScript
       }
     }
 
-    private float _floatValue;
-
     public float FloatValue
     {
       get
@@ -78,8 +81,6 @@ namespace EpsilonScript
         }
       }
     }
-
-    private bool _booleanValue;
 
     public bool BooleanValue
     {
