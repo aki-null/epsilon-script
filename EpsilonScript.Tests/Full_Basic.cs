@@ -16,7 +16,7 @@ namespace EpsilonScript.Tests
     }
 
     [Fact]
-    private void Full_VariableAssign_Succeeds()
+    private void Full_VariableAssign_Float_Succeeds()
     {
       var compiler = new Compiler();
       var variables = new Dictionary<uint, VariableValue> { ["val".GetUniqueIdentifier()] = new VariableValue(0.0f) };
@@ -25,6 +25,32 @@ namespace EpsilonScript.Tests
       script.Execute();
       Assert.True(Math.IsNearlyEqual(30.4f, script.FloatValue));
       Assert.True(Math.IsNearlyEqual(60.8f, variables["val".GetUniqueIdentifier()].FloatValue));
+    }
+
+    [Fact]
+    private void Full_VariableAssign_Int_Succeeds()
+    {
+      var compiler = new Compiler();
+      var valId = "val".GetUniqueIdentifier();
+      var variables = new Dictionary<uint, VariableValue> { [valId] = new VariableValue(0) };
+      var script = compiler.Compile("(val = 10 + -2 * -(20 - 10); val *= 2; val / 2) * 2 / 2",
+        Compiler.Options.None, variables);
+      script.Execute();
+      Assert.Equal(30, script.IntegerValue);
+      Assert.Equal(60, variables[valId].IntegerValue);
+    }
+
+    [Fact]
+    private void Full_VariableAssign_Bool_Succeeds()
+    {
+      var compiler = new Compiler();
+      var valId = "val".GetUniqueIdentifier();
+      var variables = new Dictionary<uint, VariableValue> { [valId] = new VariableValue(false) };
+      var script = compiler.Compile("(val = 30 > 20); ifelse(val, 30, 50)",
+        Compiler.Options.None, variables);
+      script.Execute();
+      Assert.Equal(30, script.IntegerValue);
+      Assert.True(variables[valId].BooleanValue);
     }
 
     [Fact]
