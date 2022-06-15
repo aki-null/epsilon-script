@@ -24,8 +24,7 @@ namespace EpsilonScript.AST
     }
 
     public override void Build(Stack<Node> rpnStack, Element element, Compiler.Options options,
-      IDictionary<uint, VariableValue> variables,
-      IDictionary<uint, CustomFunctionOverload> functions)
+      IVariableContainer variables, IDictionary<uint, CustomFunctionOverload> functions)
     {
       Initialize(float.Parse(element.Token.Text.Span));
     }
