@@ -19,7 +19,7 @@ namespace EpsilonScript.Tests
     private void Full_VariableAssign_Float_Succeeds()
     {
       var compiler = new Compiler();
-      var variables = new Dictionary<uint, VariableValue> { ["val".GetUniqueIdentifier()] = new VariableValue(0.0f) };
+      var variables = new DictionaryVariableContainer { ["val".GetUniqueIdentifier()] = new VariableValue(0.0f) };
       var script = compiler.Compile("(val = 10 + -2 * -(20.2 - 10); val *= 2; val / 2) * 2 / 2",
         Compiler.Options.None, variables);
       script.Execute();
@@ -32,7 +32,7 @@ namespace EpsilonScript.Tests
     {
       var compiler = new Compiler();
       var valId = "val".GetUniqueIdentifier();
-      var variables = new Dictionary<uint, VariableValue> { [valId] = new VariableValue(0) };
+      var variables = new DictionaryVariableContainer { [valId] = new VariableValue(0) };
       var script = compiler.Compile("(val = 10 + -2 * -(20 - 10); val *= 2; val / 2) * 2 / 2",
         Compiler.Options.None, variables);
       script.Execute();
@@ -45,7 +45,7 @@ namespace EpsilonScript.Tests
     {
       var compiler = new Compiler();
       var valId = "val".GetUniqueIdentifier();
-      var variables = new Dictionary<uint, VariableValue> { [valId] = new VariableValue(false) };
+      var variables = new DictionaryVariableContainer { [valId] = new VariableValue(false) };
       var script = compiler.Compile("(val = 30 > 20); ifelse(val, 30, 50)",
         Compiler.Options.None, variables);
       script.Execute();
@@ -57,7 +57,7 @@ namespace EpsilonScript.Tests
     private void Full_FunctionOverloadInteger_Succeeds()
     {
       var compiler = new Compiler();
-      var variables = new Dictionary<uint, VariableValue> { ["val".GetUniqueIdentifier()] = new VariableValue(1.0f) };
+      var variables = new DictionaryVariableContainer { ["val".GetUniqueIdentifier()] = new VariableValue(1.0f) };
       var script = compiler.Compile("ifelse(val <= 0, 200, 100)", Compiler.Options.None, variables);
       script.Execute();
       Assert.Equal(Type.Integer, script.ValueType);
@@ -68,7 +68,7 @@ namespace EpsilonScript.Tests
     private void Full_FunctionOverloadFloat_Succeeds()
     {
       var compiler = new Compiler();
-      var variables = new Dictionary<uint, VariableValue> { ["v".GetUniqueIdentifier()] = new VariableValue(1.0f) };
+      var variables = new DictionaryVariableContainer { ["v".GetUniqueIdentifier()] = new VariableValue(1.0f) };
       var rootNode = compiler.Compile("ifelse(v <= 0, 1.5, 100.2)", Compiler.Options.Immutable, variables);
       rootNode.Execute();
       Assert.Equal(Type.Float, rootNode.ValueType);

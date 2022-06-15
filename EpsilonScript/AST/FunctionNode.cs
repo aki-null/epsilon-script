@@ -32,7 +32,7 @@ namespace EpsilonScript.AST
     }
 
     public override void Build(Stack<Node> rpnStack, Element element, Compiler.Options options,
-      IDictionary<uint, VariableValue> variables, IDictionary<uint, CustomFunctionOverload> functions)
+      IVariableContainer variables, IDictionary<uint, CustomFunctionOverload> functions)
     {
       // Unfortunately function name string needs to be allocated here to make a dictionary lookup
       var functionName = element.Token.Text.ToString().GetUniqueIdentifier();
@@ -70,7 +70,7 @@ namespace EpsilonScript.AST
       }
     }
 
-    public override void Execute(IDictionary<uint, VariableValue> variablesOverride)
+    public override void Execute(IVariableContainer variablesOverride)
     {
       // Execute each parameter and populate type information for function invocation
       // Parameter type is undefined until executed, due to the fact that a variable type may change after compilation
@@ -123,7 +123,7 @@ namespace EpsilonScript.AST
           break;
         case ValueType.Float:
           FloatValue = function.ExecuteFloat(_parameters);
-          IntegerValue = (int) FloatValue;
+          IntegerValue = (int)FloatValue;
           break;
         default:
           throw new ArgumentOutOfRangeException(nameof(ValueType), ValueType, "Unsupported function return type");

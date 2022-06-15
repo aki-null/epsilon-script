@@ -18,8 +18,7 @@ namespace EpsilonScript.Tests
     }
 
     public override void Build(Stack<Node> rpnStack, Element element, Compiler.Options options,
-      IDictionary<uint, VariableValue> variables,
-      IDictionary<uint, CustomFunctionOverload> functions)
+      IVariableContainer variables, IDictionary<uint, CustomFunctionOverload> functions)
     {
       throw new NotImplementedException("Fake nodes cannot be built from RPN srack");
     }

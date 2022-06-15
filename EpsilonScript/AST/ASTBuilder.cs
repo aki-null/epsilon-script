@@ -12,7 +12,7 @@ namespace EpsilonScript.AST
     private readonly Stack<Node> _rpnStack = new Stack<Node>();
 
     private Compiler.Options _options;
-    private IDictionary<uint, VariableValue> _variables;
+    private IVariableContainer _variables;
     private readonly IDictionary<uint, CustomFunctionOverload> _functions;
 
     public AstBuilder(IDictionary<uint, CustomFunctionOverload> functions)
@@ -28,7 +28,7 @@ namespace EpsilonScript.AST
       Result = null;
     }
 
-    public void Configure(Compiler.Options options, IDictionary<uint, VariableValue> variables)
+    public void Configure(Compiler.Options options, IVariableContainer variables)
     {
       _options = options;
       _variables = variables;

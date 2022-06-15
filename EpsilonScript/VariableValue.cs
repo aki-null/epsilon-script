@@ -10,8 +10,7 @@ namespace EpsilonScript
     [FieldOffset(0)] private float _floatValue;
     [FieldOffset(0)] private bool _booleanValue;
 
-    [field: FieldOffset(sizeof(int))]
-    public Type Type { get; private set; }
+    [field: FieldOffset(sizeof(int))] public Type Type { get; private set; }
 
     public int IntegerValue
     {
@@ -22,7 +21,7 @@ namespace EpsilonScript
           case Type.Integer:
             return _integerValue;
           case Type.Float:
-            return (int) _floatValue;
+            return (int)_floatValue;
           case Type.Boolean:
             return (_booleanValue ? 1 : 0);
           default:
@@ -69,7 +68,7 @@ namespace EpsilonScript
         switch (Type)
         {
           case Type.Integer:
-            _integerValue = (int) value;
+            _integerValue = (int)value;
             break;
           case Type.Float:
             _floatValue = value;

@@ -9,19 +9,18 @@ namespace EpsilonScript.AST
   public class VariableNode : Node
   {
     private uint _variableName;
-    private IDictionary<uint, VariableValue> _variables;
+    private IVariableContainer _variables;
 
     public override bool IsConstant => false;
 
     public override void Build(Stack<Node> rpnStack, Element element, Compiler.Options options,
-      IDictionary<uint, VariableValue> variables,
-      IDictionary<uint, CustomFunctionOverload> functions)
+      IVariableContainer variables, IDictionary<uint, CustomFunctionOverload> functions)
     {
       _variableName = element.Token.Text.ToString().GetUniqueIdentifier();
       _variables = variables;
     }
 
-    public override void Execute(IDictionary<uint, VariableValue> variablesOverride)
+    public override void Execute(IVariableContainer variablesOverride)
     {
       if (variablesOverride == null || !variablesOverride.TryGetValue(_variableName, out var variable))
       {
