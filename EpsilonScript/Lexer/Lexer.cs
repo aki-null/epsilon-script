@@ -107,18 +107,19 @@ namespace EpsilonScript.Lexer
       var success = false;
       while (true)
       {
-	      var next = Next();
-	      if (next == '"')
-	      {
-		      success = true;
-		      break;
-	      }
+        var next = Next();
+        if (next == '"')
+        {
+          success = true;
+          break;
+        }
 
-	      if (next == Eof)
-	      {
-		      break;
-	      }
+        if (next == Eof)
+        {
+          break;
+        }
       }
+
       Next();
 
       Backup();
@@ -216,11 +217,12 @@ namespace EpsilonScript.Lexer
 
         if (AcceptStringStart())
         {
-	        if (!AcceptRunStringBody())
-	        {
-		        throw new LexerException(_startLineNumber, "String literal does not have a closing double quotation mark");
-	        }
-	        output.Push(Emit(TokenType.String));
+          if (!AcceptRunStringBody())
+          {
+            throw new LexerException(_startLineNumber, "String literal does not have a closing double quotation mark");
+          }
+
+          output.Push(Emit(TokenType.String));
           continue;
         }
 

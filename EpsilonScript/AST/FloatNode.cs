@@ -30,6 +30,7 @@ namespace EpsilonScript.AST
     }
   }
 }
+
 namespace EpsilonScript.AST
 {
   public class StringNode : Node

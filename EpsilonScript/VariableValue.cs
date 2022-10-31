@@ -9,9 +9,11 @@ namespace EpsilonScript
     [FieldOffset(0)] private int _integerValue;
     [FieldOffset(0)] private float _floatValue;
     [FieldOffset(0)] private bool _booleanValue;
-    
+
     [field: FieldOffset(sizeof(int))] public Type Type { get; private set; }
-    [FieldOffset(sizeof(int) + sizeof(Type))] private string _stringValue;
+
+    [FieldOffset(sizeof(int) + sizeof(Type))]
+    private string _stringValue;
 
     public int IntegerValue
     {

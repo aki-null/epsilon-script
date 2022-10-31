@@ -9,18 +9,18 @@ namespace EpsilonScript.Helper
 
     public static uint GetUniqueIdentifier(this string s)
     {
-	    lock (StringIdCache)
-	    {
-				if (StringIdCache.TryGetValue(s, out var id))
-				{
-					return id;
-				}
+      lock (StringIdCache)
+      {
+        if (StringIdCache.TryGetValue(s, out var id))
+        {
+          return id;
+        }
 
-				id = _currentId;
-				StringIdCache[s] = id;
-				++_currentId;
-				return id;
-	    }
+        id = _currentId;
+        StringIdCache[s] = id;
+        ++_currentId;
+        return id;
+      }
     }
 
     public static void ResetUniqueIdentifierCache()

@@ -206,18 +206,18 @@ namespace EpsilonScript.Function
 
     public CustomFunction(string name, Func<string, int> func, bool isConstant = false)
     {
-	    Name = name.GetUniqueIdentifier();
-	    Type = Signature.StringInt;
-	    _func.stingInt = func;
-	    IsConstant = isConstant;
+      Name = name.GetUniqueIdentifier();
+      Type = Signature.StringInt;
+      _func.stingInt = func;
+      IsConstant = isConstant;
     }
 
     public CustomFunction(string name, Func<string, bool> func, bool isConstant = false)
     {
-	    Name = name.GetUniqueIdentifier();
-	    Type = Signature.StringBool;
-	    _func.stringBool = func;
-	    IsConstant = isConstant;
+      Name = name.GetUniqueIdentifier();
+      Type = Signature.StringBool;
+      _func.stringBool = func;
+      IsConstant = isConstant;
     }
 
     private void CheckParameterCount(List<Node> parameters)
