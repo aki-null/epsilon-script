@@ -49,7 +49,7 @@ namespace EpsilonScript.Function
         case Type.Boolean:
           return _booleanNode?.Find(paramTypes, index + 1);
         case Type.String:
-          return FindOverload(paramTypes, index, _stringNode, _integerNode);
+          return _stringNode?.Find(paramTypes, index + 1);
         default:
           throw new ArgumentOutOfRangeException(nameof(paramTypes), paramTypes[index], "Unsupported parameter type");
       }

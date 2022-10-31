@@ -92,5 +92,35 @@ namespace EpsilonScript.Tests
       Assert.Equal(Type.Float, script.ValueType);
       Assert.Equal(2.0f, script.IntegerValue);
     }
+
+    [Fact]
+    private void Full_FunctionLower_Succeeds()
+    {
+      var compiler = new Compiler();
+      var script = compiler.Compile("lower(\"hELLo wORld\")");
+      script.Execute();
+      Assert.Equal(Type.String, script.ValueType);
+      Assert.Equal("hello world", script.StringValue);
+    }
+
+    [Fact]
+    private void Full_FunctionUpper_Succeeds()
+    {
+      var compiler = new Compiler();
+      var script = compiler.Compile("upper(\"hELLo wORld\")");
+      script.Execute();
+      Assert.Equal(Type.String, script.ValueType);
+      Assert.Equal("HELLO WORLD", script.StringValue);
+    }
+
+    [Fact]
+    private void Full_FunctionLen_Succeeds()
+    {
+      var compiler = new Compiler();
+      var script = compiler.Compile("len(\"hELLo wORld\")");
+      script.Execute();
+      Assert.Equal(Type.Integer, script.ValueType);
+      Assert.Equal(11, script.IntegerValue);
+    }
   }
 }

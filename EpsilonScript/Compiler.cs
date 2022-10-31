@@ -48,6 +48,9 @@ namespace EpsilonScript
       AddCustomFunction(new CustomFunction("ifelse", (cond, v1, v2) => cond ? v1 : v2, true));
       AddCustomFunction(new CustomFunction("ifelse", (bool cond, float v1, float v2) => cond ? v1 : v2, true));
       AddCustomFunction(new CustomFunction("pow", (v1, v2) => (float)System.Math.Pow(v1, v2), true));
+      AddCustomFunction(new CustomFunction("lower", s => s.ToLowerInvariant(), true));
+      AddCustomFunction(new CustomFunction("upper", s => s.ToUpperInvariant(), true));
+      AddCustomFunction(new CustomFunction("len", s => s.Length, true));
 
       _astBuilder = new AstBuilder(_functions);
       _rpnConverter = new RpnConverter(_astBuilder);

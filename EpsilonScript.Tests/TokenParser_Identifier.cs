@@ -78,6 +78,19 @@ namespace EpsilonScript.Tests
             new Element(new Token("2", TokenType.Integer), ElementType.Integer),
             new Element(new Token(")", TokenType.RightParenthesis), ElementType.RightParenthesis)
           ),
+          CreateTestData(
+            new Element(new Token("var", TokenType.Identifier), ElementType.Function),
+            new Element(new Token("(", TokenType.LeftParenthesis), ElementType.FunctionStartParenthesis),
+            new Element(new Token("\"Hello World\"", TokenType.String), ElementType.String),
+            new Element(new Token(")", TokenType.RightParenthesis), ElementType.RightParenthesis)
+          ),
+          CreateTestData(
+            new Element(new Token("var", TokenType.Identifier), ElementType.Function),
+            new Element(new Token("(", TokenType.LeftParenthesis), ElementType.FunctionStartParenthesis),
+            new Element(new Token("\"Hello World\"", TokenType.String), ElementType.String),
+            new Element(new Token("\"こんにちは世界\"", TokenType.String), ElementType.String),
+            new Element(new Token(")", TokenType.RightParenthesis), ElementType.RightParenthesis)
+          ),
         };
       }
     }

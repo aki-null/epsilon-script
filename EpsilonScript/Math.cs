@@ -2,7 +2,7 @@ namespace EpsilonScript
 {
   public static class Math
   {
-    private static unsafe int UnsafeFLoatAsInt32(float f)
+    private static unsafe int UnsafeFloatAsInt32(float f)
     {
       return *((int*)&f);
     }
@@ -10,13 +10,14 @@ namespace EpsilonScript
     // https://randomascii.wordpress.com/2012/02/25/comparing-floating-point-numbers-2012-edition/
     public static bool IsNearlyEqual(float a, float b, int maxUlpsDiff = 1 << 1)
     {
-      var aInt = UnsafeFLoatAsInt32(a);
-      var bInt = UnsafeFLoatAsInt32(b);
+      var aInt = UnsafeFloatAsInt32(a);
+      var bInt = UnsafeFloatAsInt32(b);
 
       // Different signs means they do not match
       if (aInt < 0 != bInt <= 0)
       {
         // Check for equality to make sure +0==-0
+        // ReSharper disable once CompareOfFloatsByEqualityOperator
         return a == b;
       }
 

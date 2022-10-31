@@ -68,8 +68,6 @@ namespace EpsilonScript.Intermediate
     {
       switch (type)
       {
-        case ElementType.String:
-          return 9;
         case ElementType.Function:
         case ElementType.NegateOperator:
         case ElementType.PositiveOperator:
@@ -112,6 +110,7 @@ namespace EpsilonScript.Intermediate
         case ElementType.BooleanLiteralFalse:
         case ElementType.Integer:
         case ElementType.Float:
+        case ElementType.String:
           return -1;
         default:
           throw new ArgumentOutOfRangeException(nameof(type), type, null);

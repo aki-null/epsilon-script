@@ -107,22 +107,21 @@ namespace EpsilonScript.Lexer
       var success = false;
       while (true)
       {
-        var next = Next();
-        if (next == '"')
+        var current = Next();
+        if (current == '"')
         {
+          // Found closing double quotation mark
           success = true;
           break;
         }
 
-        if (next == Eof)
+        if (current == Eof)
         {
+          // Unclosed string
           break;
         }
       }
 
-      Next();
-
-      Backup();
       return success;
     }
 
@@ -215,17 +214,6 @@ namespace EpsilonScript.Lexer
       {
         SkipWhiteSpaces();
 
-        if (AcceptStringStart())
-        {
-          if (!AcceptRunStringBody())
-          {
-            throw new LexerException(_startLineNumber, "String literal does not have a closing double quotation mark");
-          }
-
-          output.Push(Emit(TokenType.String));
-          continue;
-        }
-
         if (AcceptIdentifierStart())
         {
           AcceptRunIdentifierBody();
@@ -274,6 +262,17 @@ namespace EpsilonScript.Lexer
             output.Push(Emit(TokenType.Integer));
           }
 
+          continue;
+        }
+
+        if (AcceptStringStart())
+        {
+          if (!AcceptRunStringBody())
+          {
+            throw new LexerException(_startLineNumber, "String literal does not have a closing double quotation mark");
+          }
+
+          output.Push(Emit(TokenType.String));
           continue;
         }
 

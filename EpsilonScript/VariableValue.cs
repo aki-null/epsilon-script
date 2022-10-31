@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using System.Runtime.InteropServices;
 
 namespace EpsilonScript
@@ -124,12 +125,6 @@ namespace EpsilonScript
       {
         switch (Type)
         {
-          case Type.Integer:
-            return _integerValue.ToString();
-          case Type.Float:
-            return _floatValue.ToString();
-          case Type.Boolean:
-            return _booleanValue.ToString();
           case Type.String:
             return _stringValue;
           default:
@@ -140,15 +135,6 @@ namespace EpsilonScript
       {
         switch (Type)
         {
-          case Type.Integer:
-            _integerValue = int.TryParse(value, out var i) ? i : 0;
-            break;
-          case Type.Float:
-            _floatValue = float.TryParse(value, out var f) ? f : 0f;
-            break;
-          case Type.Boolean:
-            _booleanValue = bool.TryParse(value, out var b) ? b : false;
-            break;
           case Type.String:
             _stringValue = value;
             break;
@@ -181,6 +167,12 @@ namespace EpsilonScript
       BooleanValue = value;
     }
 
+    public VariableValue(string value)
+    {
+      Type = Type.String;
+      StringValue = value;
+    }
+
     public void CopyFrom(VariableValue other)
     {
       Type = other.Type;
@@ -196,6 +188,9 @@ namespace EpsilonScript
           break;
         case Type.Boolean:
           _integerValue = other._integerValue;
+          break;
+        case Type.String:
+          _stringValue = other._stringValue;
           break;
         default:
           throw new ArgumentOutOfRangeException();

@@ -39,12 +39,13 @@ namespace EpsilonScript.AST
 
       if (!functions.TryGetValue(functionName, out _functionOverload))
       {
-        throw new ParserException(element.Token, $"Undefined function: {functionName}");
+        throw new ParserException(element.Token, $"Undefined function: {functionName.GetStringFromUniqueIdentifier()}");
       }
 
       if (!rpnStack.TryPop(out var childNode))
       {
-        throw new ParserException(element.Token, $"Cannot find parameters for calling function: {functionName}");
+        throw new ParserException(element.Token,
+          $"Cannot find parameters for calling function: {functionName.GetStringFromUniqueIdentifier()}");
       }
 
       switch (childNode.ValueType)
@@ -113,6 +114,9 @@ namespace EpsilonScript.AST
         case Type.Float:
           ValueType = ValueType.Float;
           break;
+        case Type.String:
+          ValueType = ValueType.String;
+          break;
         default:
           throw new ArgumentOutOfRangeException(nameof(function.ReturnType), function.ReturnType,
             "Unsupported function return type");
@@ -128,6 +132,9 @@ namespace EpsilonScript.AST
         case ValueType.Float:
           FloatValue = function.ExecuteFloat(_parameters);
           IntegerValue = (int)FloatValue;
+          break;
+        case ValueType.String:
+          StringValue = function.ExecuteString(_parameters);
           break;
         default:
           throw new ArgumentOutOfRangeException(nameof(ValueType), ValueType, "Unsupported function return type");
