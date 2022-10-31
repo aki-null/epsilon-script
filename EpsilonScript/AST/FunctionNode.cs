@@ -52,6 +52,7 @@ namespace EpsilonScript.AST
         case ValueType.Boolean:
         case ValueType.Float:
         case ValueType.Integer:
+        case ValueType.String:
         case ValueType.Undefined:
           _parameters = new List<Node>();
           _parameters.Add(childNode);
@@ -88,6 +89,9 @@ namespace EpsilonScript.AST
             break;
           case ValueType.Boolean:
             _parameterTypes[i] = Type.Boolean;
+            break;
+          case ValueType.String:
+            _parameterTypes[i] = Type.String;
             break;
           default:
             throw new ArgumentOutOfRangeException(nameof(_parameters), parameter.ValueType,

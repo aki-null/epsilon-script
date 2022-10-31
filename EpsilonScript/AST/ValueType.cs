@@ -8,5 +8,6 @@
     Float,
     Boolean,
     Tuple,
+    String
   }
 }

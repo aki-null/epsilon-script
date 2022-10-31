@@ -58,6 +58,17 @@ namespace EpsilonScript.Lexer
       return res;
     }
 
+    private bool AcceptStringStart()
+    {
+      if (Next() == '"')
+      {
+        return true;
+      }
+
+      Backup();
+      return false;
+    }
+
     private bool AcceptIdentifierStart()
     {
       if (IsIdentifierStart(Next()))
@@ -89,6 +100,29 @@ namespace EpsilonScript.Lexer
 
       Backup();
       return false;
+    }
+
+    private bool AcceptRunStringBody()
+    {
+      var success = false;
+      while (true)
+      {
+	      var next = Next();
+	      if (next == '"')
+	      {
+		      success = true;
+		      break;
+	      }
+
+	      if (next == Eof)
+	      {
+		      break;
+	      }
+      }
+      Next();
+
+      Backup();
+      return success;
     }
 
     private bool AcceptRunIdentifierBody()
@@ -179,6 +213,17 @@ namespace EpsilonScript.Lexer
       while (true)
       {
         SkipWhiteSpaces();
+
+        if (AcceptStringStart())
+        {
+	        if (!AcceptRunStringBody())
+	        {
+		        throw new LexerException(_startLineNumber, "String literal does not have a closing double quotation mark");
+	        }
+	        output.Push(Emit(TokenType.String));
+          continue;
+        }
+
         if (AcceptIdentifierStart())
         {
           AcceptRunIdentifierBody();

@@ -60,6 +60,9 @@ namespace EpsilonScript.AST
 
               variable.BooleanValue = _rightNode.BooleanValue;
               break;
+            case Type.String:
+              variable.StringValue = _rightNode.StringValue;
+              break;
             default:
               throw new ArgumentOutOfRangeException(nameof(variable.Type), variable.Type, "Unsupported variable type");
           }

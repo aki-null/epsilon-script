@@ -31,5 +31,6 @@ namespace EpsilonScript.Intermediate
     ModuloOperator,
     Integer,
     Float,
+    String,
   }
 }

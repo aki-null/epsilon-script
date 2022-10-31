@@ -5,6 +5,7 @@ namespace EpsilonScript
     Undefined,
     Integer,
     Float,
-    Boolean
+    Boolean,
+    String,
   }
 }

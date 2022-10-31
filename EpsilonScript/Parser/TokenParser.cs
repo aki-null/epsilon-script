@@ -128,6 +128,9 @@ namespace EpsilonScript.Parser
         case TokenType.Float:
           mappedType = ElementType.Float;
           break;
+        case TokenType.String:
+          mappedType = ElementType.String;
+          break;
         default:
           throw new ArgumentOutOfRangeException(nameof(token.Type), token.Type,
             "No direct token to element type map available");

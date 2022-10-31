@@ -11,6 +11,7 @@ namespace EpsilonScript.AST
     public int IntegerValue { get; protected set; }
     public float FloatValue { get; protected set; }
     public bool BooleanValue { get; protected set; }
+    public string StringValue { get; protected set; }
     public List<Node> TupleValue { get; protected set; }
     public VariableValue Variable { get; protected set; }
     public bool IsNumeric => ValueType == ValueType.Integer || ValueType == ValueType.Float;
