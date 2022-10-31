@@ -99,6 +99,8 @@ namespace EpsilonScript.AST
           return new IntegerNode();
         case ElementType.Float:
           return new FloatNode();
+        case ElementType.String:
+          return new StringNode();
         default:
           throw new ArgumentOutOfRangeException();
       }

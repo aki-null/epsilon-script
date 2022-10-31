@@ -37,6 +37,7 @@ namespace EpsilonScript.Intermediate
     ModuloOperator,
     Integer,
     Float,
+    String,
   }
 
   static class ElementTypeExtensionMethods
@@ -51,6 +52,7 @@ namespace EpsilonScript.Intermediate
         case ElementType.BooleanLiteralFalse:
         case ElementType.Integer:
         case ElementType.Float:
+        case ElementType.String:
           return true;
         default:
           return false;
@@ -66,6 +68,8 @@ namespace EpsilonScript.Intermediate
     {
       switch (type)
       {
+        case ElementType.String:
+          return 9;
         case ElementType.Function:
         case ElementType.NegateOperator:
         case ElementType.PositiveOperator:

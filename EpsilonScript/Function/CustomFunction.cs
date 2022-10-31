@@ -18,6 +18,8 @@ namespace EpsilonScript.Function
       FloatFloatFloat,
       BoolIntIntInt,
       BoolFloatFloatFloat,
+      StringInt,
+      StringBool
     }
 
     [StructLayout(LayoutKind.Explicit)]
@@ -34,6 +36,8 @@ namespace EpsilonScript.Function
       [FieldOffset(0)] public Func<float, float, float> floatFloatFloat;
       [FieldOffset(0)] public Func<bool, int, int, int> boolIntIntInt;
       [FieldOffset(0)] public Func<bool, float, float, float> boolFloatFloatFloat;
+      [FieldOffset(0)] public Func<string, int> stingInt;
+      [FieldOffset(0)] public Func<string, bool> stringBool;
     }
 
     private Signature Type { get; }
@@ -52,6 +56,9 @@ namespace EpsilonScript.Function
     private static readonly Type[] BoolFloatFloatParamType =
       { EpsilonScript.Type.Boolean, EpsilonScript.Type.Float, EpsilonScript.Type.Float };
 
+    private static readonly Type[] StringParamType =
+      { EpsilonScript.Type.String };
+
     public Type ReturnType
     {
       get
@@ -60,18 +67,17 @@ namespace EpsilonScript.Function
         {
           case Signature.IntInt:
           case Signature.FloatInt:
+          case Signature.IntIntInt:
+          case Signature.BoolIntIntInt:
+          case Signature.StringInt:
             return EpsilonScript.Type.Integer;
           case Signature.IntFloat:
           case Signature.FloatFloat:
-            return EpsilonScript.Type.Float;
-          case Signature.IntIntInt:
-            return EpsilonScript.Type.Integer;
           case Signature.FloatFloatFloat:
-            return EpsilonScript.Type.Float;
-          case Signature.BoolIntIntInt:
-            return EpsilonScript.Type.Integer;
           case Signature.BoolFloatFloatFloat:
             return EpsilonScript.Type.Float;
+          case Signature.StringBool:
+            return EpsilonScript.Type.Boolean;
           default:
             throw new ArgumentOutOfRangeException(nameof(Type), Type, "Unsupported function type");
         }
@@ -88,6 +94,8 @@ namespace EpsilonScript.Function
           case Signature.FloatInt:
           case Signature.IntFloat:
           case Signature.FloatFloat:
+          case Signature.StringInt:
+          case Signature.StringBool:
             return 1;
           case Signature.IntIntInt:
           case Signature.FloatFloatFloat:
@@ -121,6 +129,9 @@ namespace EpsilonScript.Function
             return BoolIntIntParamType;
           case Signature.BoolFloatFloatFloat:
             return BoolFloatFloatParamType;
+          case Signature.StringInt:
+          case Signature.StringBool:
+            return StringParamType;
           default:
             throw new ArgumentOutOfRangeException(nameof(Type), Type, "Unsupported function type");
         }
@@ -193,6 +204,22 @@ namespace EpsilonScript.Function
       IsConstant = isConstant;
     }
 
+    public CustomFunction(string name, Func<string, int> func, bool isConstant = false)
+    {
+	    Name = name.GetUniqueIdentifier();
+	    Type = Signature.StringInt;
+	    _func.stingInt = func;
+	    IsConstant = isConstant;
+    }
+
+    public CustomFunction(string name, Func<string, bool> func, bool isConstant = false)
+    {
+	    Name = name.GetUniqueIdentifier();
+	    Type = Signature.StringBool;
+	    _func.stringBool = func;
+	    IsConstant = isConstant;
+    }
+
     private void CheckParameterCount(List<Node> parameters)
     {
       if ((parameters?.Count ?? 0) != NumberOfParameters)
@@ -206,6 +233,8 @@ namespace EpsilonScript.Function
       CheckParameterCount(parameters);
       switch (Type)
       {
+        case Signature.StringInt:
+          return _func.stingInt(parameters[0].StringValue);
         case Signature.IntInt:
           return _func.intInt(parameters[0].IntegerValue);
         case Signature.FloatInt:

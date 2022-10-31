@@ -9,8 +9,9 @@ namespace EpsilonScript
     [FieldOffset(0)] private int _integerValue;
     [FieldOffset(0)] private float _floatValue;
     [FieldOffset(0)] private bool _booleanValue;
-
+    
     [field: FieldOffset(sizeof(int))] public Type Type { get; private set; }
+    [FieldOffset(sizeof(int) + sizeof(Type))] private string _stringValue;
 
     public int IntegerValue
     {
@@ -108,6 +109,46 @@ namespace EpsilonScript
             throw new InvalidCastException("A boolean value cannot be casted to a float value");
           case Type.Boolean:
             _booleanValue = value;
+            break;
+          default:
+            throw new ArgumentOutOfRangeException(nameof(Type), Type, "Unsupported variable type");
+        }
+      }
+    }
+
+    public string StringValue
+    {
+      get
+      {
+        switch (Type)
+        {
+          case Type.Integer:
+            return _integerValue.ToString();
+          case Type.Float:
+            return _floatValue.ToString();
+          case Type.Boolean:
+            return _booleanValue.ToString();
+          case Type.String:
+            return _stringValue;
+          default:
+            throw new ArgumentOutOfRangeException(nameof(Type), Type, "Unsupported variable type");
+        }
+      }
+      set
+      {
+        switch (Type)
+        {
+          case Type.Integer:
+            _integerValue = int.TryParse(value, out var i) ? i : 0;
+            break;
+          case Type.Float:
+            _floatValue = float.TryParse(value, out var f) ? f : 0f;
+            break;
+          case Type.Boolean:
+            _booleanValue = bool.TryParse(value, out var b) ? b : false;
+            break;
+          case Type.String:
+            _stringValue = value;
             break;
           default:
             throw new ArgumentOutOfRangeException(nameof(Type), Type, "Unsupported variable type");
