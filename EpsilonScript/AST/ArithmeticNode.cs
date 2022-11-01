@@ -62,14 +62,25 @@ namespace EpsilonScript.AST
       }
     }
 
+    private string CalculateStringValue()
+    {
+      switch (_operator)
+      {
+        case ElementType.AddOperator:
+          return _leftNode.ToString() + _rightNode.ToString();
+        default:
+          throw new ArgumentOutOfRangeException(nameof(_operator), _operator, "Unsupported operator type");
+      }
+    }
+
     public override void Execute(IVariableContainer variablesOverride)
     {
       _leftNode.Execute(variablesOverride);
       _rightNode.Execute(variablesOverride);
 
-      if (_leftNode.ValueType == ValueType.Boolean || _rightNode.ValueType == ValueType.Boolean)
+      if ((!_leftNode.IsNumeric || !_rightNode.IsNumeric) && _leftNode.ValueType != ValueType.String)
       {
-        throw new RuntimeException("An arithmetic operation cannot be performed on a boolean value");
+        throw new RuntimeException("An arithmetic operation can only be performed on numeric values");
       }
 
       switch (_leftNode.ValueType)
@@ -79,6 +90,9 @@ namespace EpsilonScript.AST
           break;
         case ValueType.Float:
           ValueType = ValueType.Float;
+          break;
+        case ValueType.String:
+          ValueType = ValueType.String;
           break;
         default:
           ValueType = ValueType;
@@ -94,6 +108,9 @@ namespace EpsilonScript.AST
         case ValueType.Float:
           FloatValue = CalculateFloatValue();
           IntegerValue = (int)FloatValue;
+          break;
+        case ValueType.String:
+          StringValue = CalculateStringValue();
           break;
         default:
           throw new ArgumentOutOfRangeException(nameof(ValueType), ValueType, "Unsupported value type");

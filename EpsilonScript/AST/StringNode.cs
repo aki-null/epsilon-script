@@ -9,9 +9,6 @@ namespace EpsilonScript.AST
     private void Initialize(string value)
     {
       ValueType = ValueType.String;
-      FloatValue = float.TryParse(value, out var f) ? f : 0f;
-      IntegerValue = int.TryParse(value, out var i) ? i : 0;
-      BooleanValue = IntegerValue != 0;
       StringValue = value;
     }
 

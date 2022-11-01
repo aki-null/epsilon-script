@@ -122,5 +122,15 @@ namespace EpsilonScript.Tests
       Assert.Equal(Type.Integer, script.ValueType);
       Assert.Equal(11, script.IntegerValue);
     }
+
+    [Fact]
+    private void Full_StringConcat_Succeeds()
+    {
+      var compiler = new Compiler();
+      var script = compiler.Compile("\"hello \" + \"world\"");
+      script.Execute();
+      Assert.Equal(Type.String, script.ValueType);
+      Assert.Equal("hello world", script.StringValue);
+    }
   }
 }

@@ -177,8 +177,13 @@ namespace EpsilonScript.Parser
           break;
         case TokenType.PlusSign:
           // Detect whether the current token is a positive operator or a add operator
-          PushElement(_currentToken,
-            IsCurrentTokenSignOperator ? ElementType.PositiveOperator : ElementType.AddOperator);
+          var plusElementType = ElementType.AddOperator;
+          if (IsCurrentTokenSignOperator)
+          {
+            plusElementType = ElementType.PositiveOperator;
+          }
+
+          PushElement(_currentToken, plusElementType);
           break;
         case TokenType.LeftParenthesis:
           if (_previousElementType == ElementType.Function)
