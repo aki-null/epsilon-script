@@ -104,10 +104,12 @@ namespace EpsilonScript.AST
         case ValueType.Integer:
           IntegerValue = CalculateIntegerValue();
           FloatValue = IntegerValue;
+          BooleanValue = IntegerValue != 0;
           break;
         case ValueType.Float:
           FloatValue = CalculateFloatValue();
           IntegerValue = (int)FloatValue;
+          BooleanValue = IntegerValue != 0;
           break;
         case ValueType.String:
           StringValue = CalculateStringValue();
@@ -115,8 +117,6 @@ namespace EpsilonScript.AST
         default:
           throw new ArgumentOutOfRangeException(nameof(ValueType), ValueType, "Unsupported value type");
       }
-
-      BooleanValue = IntegerValue != 0;
     }
 
     public override Node Optimize()

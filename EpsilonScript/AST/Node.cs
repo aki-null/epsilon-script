@@ -43,8 +43,7 @@ namespace EpsilonScript.AST
         case ValueType.String:
           return new StringNode(StringValue);
         default:
-          throw new ArgumentOutOfRangeException(nameof(ValueType), ValueType,
-            "Unsupported value type");
+          throw new ArgumentOutOfRangeException(nameof(ValueType), ValueType, "Unsupported value type");
       }
     }
 

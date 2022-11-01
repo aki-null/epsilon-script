@@ -124,13 +124,14 @@ namespace EpsilonScript.Tests
     }
 
     [Fact]
-    private void Full_StringConcat_Succeeds()
+    private void Full_String_Succeeds()
     {
       var compiler = new Compiler();
-      var script = compiler.Compile("\"hello \" + \"world\"");
+      var script =
+        compiler.Compile("ifelse(upper(\"hello \" + \"world\") == \"HELLO WORLD\", \"success\", \"failure\")");
       script.Execute();
       Assert.Equal(Type.String, script.ValueType);
-      Assert.Equal("hello world", script.StringValue);
+      Assert.Equal("success", script.StringValue);
     }
   }
 }
