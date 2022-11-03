@@ -67,7 +67,8 @@ namespace EpsilonScript.AST
       switch (_operator)
       {
         case ElementType.AddOperator:
-          return _leftNode.ToString() + _rightNode.ToString();
+          // The left node is guaranteed to be a string node
+          return _leftNode.StringValue + _rightNode.ToString();
         default:
           throw new ArgumentOutOfRangeException(nameof(_operator), _operator, "Unsupported operator type");
       }
