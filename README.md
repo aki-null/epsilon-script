@@ -10,7 +10,7 @@ It targets .NET Standard 2.0.
 - Variables with read/write support
 - Simple syntax without too much flexibility (yes, this is a feature)
 - Supports Unity
-- No heap allocation after compilation
+- No heap allocation after compilation (with exceptions)
 
 ## Project State
 Documentation is still lacking, but the core features are usable. There are not enough tests for some components of the software, which is being worked on now.
@@ -125,6 +125,93 @@ new CustomFunction("sin", (float v) => (float) System.Math.Sin(v), true)
 ```
 
 For example, a result of the following expression is cached on a compilation, because the built-in `sin` function is marked as constant: `sin(3.141592 / 2)`
+
+### String
+
+Strings can be used, primarily intended to be used for function parameters.
+
+#### Code
+
+```c#
+var compiler = new Compiler();
+compiler.AddCustomFunction(new CustomFunction("read_save_data", (string flag) => SaveData.Instance.GetIntegerData(flag)));
+var script = compiler.Compile(@"read_save_data(""LVL00_PLAYCOUNT"") > 5");
+script.Execute();
+Console.WriteLine(script.BooleanValue);
+```
+
+#### Result
+
+If `SaveData.Instance.GetIntegerData("LVL00_PLAYCOUNT")` returns 10:
+```
+True
+```
+
+Strings can be concatenated with strings.
+
+#### Code
+
+```
+"Hello" + "World"
+```
+
+#### Result
+
+```
+"Hello World"
+```
+
+Strings can also be concatenated with numbers.
+
+#### Code
+
+```
+"Debug: " + 128
+```
+
+#### Result
+
+```
+"Debug: 128"
+```
+
+Strings can be compared with strings.
+
+#### Code
+
+```
+"Hello" == "Hello"
+```
+
+#### Result
+
+```
+true
+```
+
+## On Heap Allocations
+
+Heap allocations (GC alloc) is typically a major concern for games.
+
+EpsilonScript prevents GC allocations as much as possible, and tries to not GC alloc after compilation.
+However, there are cases where this cannot be prevented.
+
+### String concatenations
+
+Due to how C# works, concatenating strings will result in heap allocations.
+```
+"Debug: " + i
+```
+where `i` is a variable.
+
+Please note that constant string concatenation is done on compilation, and won't produce any garbage when executed.
+```
+"Debug: " + 42 * 42
+```
+
+### User Defined Custom Functions
+
+If user defined custom functions cause heap allocations, calling that function from the script will produce garbage.
 
 ## Use Cases
 
