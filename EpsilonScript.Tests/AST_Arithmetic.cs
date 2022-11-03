@@ -47,6 +47,28 @@ namespace EpsilonScript.Tests
           new object[]
           {
             new Element(new Token("+", TokenType.PlusSign), ElementType.AddOperator),
+            new FakeIntegerNode(256),
+            new FakeIntegerNode(128),
+            ValueType.Integer,
+            384,
+            384.0f,
+            true,
+            null
+          },
+          new object[]
+          {
+            new Element(new Token("+", TokenType.PlusSign), ElementType.AddOperator),
+            new FakeIntegerNode(256),
+            new FakeIntegerNode(-128),
+            ValueType.Integer,
+            128,
+            128.0f,
+            true,
+            null
+          },
+          new object[]
+          {
+            new Element(new Token("+", TokenType.PlusSign), ElementType.AddOperator),
             new FakeFloatNode(0),
             new FakeFloatNode(0),
             ValueType.Float,
@@ -289,6 +311,17 @@ namespace EpsilonScript.Tests
           new object[]
           {
             new Element(new Token("-", TokenType.MinusSign), ElementType.SubtractOperator),
+            new FakeIntegerNode(1),
+            new FakeIntegerNode(-5),
+            ValueType.Integer,
+            6,
+            6.0f,
+            true,
+            null
+          },
+          new object[]
+          {
+            new Element(new Token("-", TokenType.MinusSign), ElementType.SubtractOperator),
             new FakeIntegerNode(-65537),
             new FakeIntegerNode(2147418111),
             ValueType.Integer,
@@ -308,7 +341,83 @@ namespace EpsilonScript.Tests
             true,
             null
           },
-          // TODO MultiplyOperator
+          new object[]
+          {
+            new Element(new Token("*", TokenType.MultiplyOperator), ElementType.MultiplyOperator),
+            new FakeIntegerNode(0),
+            new FakeIntegerNode(0),
+            ValueType.Integer,
+            0,
+            0.0f,
+            false,
+            null
+          },
+          new object[]
+          {
+            new Element(new Token("*", TokenType.MultiplyOperator), ElementType.MultiplyOperator),
+            new FakeIntegerNode(256),
+            new FakeIntegerNode(128),
+            ValueType.Integer,
+            32768,
+            32768.0f,
+            true,
+            null
+          },
+          new object[]
+          {
+            new Element(new Token("*", TokenType.MultiplyOperator), ElementType.MultiplyOperator),
+            new FakeFloatNode(0),
+            new FakeFloatNode(0),
+            ValueType.Float,
+            0,
+            0.0f,
+            false,
+            null
+          },
+          new object[]
+          {
+            new Element(new Token("*", TokenType.MultiplyOperator), ElementType.MultiplyOperator),
+            new FakeIntegerNode(0),
+            new FakeFloatNode(0),
+            ValueType.Float,
+            0,
+            0.0f,
+            false,
+            null
+          },
+          new object[]
+          {
+            new Element(new Token("*", TokenType.MultiplyOperator), ElementType.MultiplyOperator),
+            new FakeFloatNode(0),
+            new FakeIntegerNode(0),
+            ValueType.Float,
+            0,
+            0.0f,
+            false,
+            null
+          },
+          new object[]
+          {
+            new Element(new Token("*", TokenType.MultiplyOperator), ElementType.MultiplyOperator),
+            new FakeIntegerNode(2),
+            new FakeIntegerNode(-5),
+            ValueType.Integer,
+            -10,
+            -10.0f,
+            true,
+            null
+          },
+          new object[]
+          {
+            new Element(new Token("*", TokenType.MultiplyOperator), ElementType.MultiplyOperator),
+            new FakeIntegerNode(2147483647),
+            new FakeIntegerNode(2),
+            ValueType.Integer,
+            -2,
+            -2.0f,
+            true,
+            null
+          },
           // TODO DivideOperator
           // TODO ModuloOperator
         };
