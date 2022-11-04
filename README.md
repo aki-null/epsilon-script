@@ -152,7 +152,7 @@ Strings can be concatenated with strings.
 #### Code
 
 ```
-"Hello" + "World"
+"Hello " + "World"
 ```
 
 #### Result
