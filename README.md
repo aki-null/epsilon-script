@@ -191,10 +191,9 @@ true
 
 ## On Heap Allocations
 
-Heap allocations (GC alloc) is typically a major concern for games.
+Heap (GC) allocations are typically a concern for games.
 
-EpsilonScript prevents GC allocations as much as possible, and tries to not GC alloc after compilation.
-However, there are cases where this cannot be prevented.
+EpsilonScript avoids GC allocations after compilation. However, there are a few exceptions where allocations must happen.
 
 ### String concatenations
 
@@ -204,14 +203,14 @@ Due to how C# works, concatenating strings will result in heap allocations.
 ```
 where `i` is a variable.
 
-Please note that constant string concatenation is done on compilation, and won't produce any garbage when executed.
+Please note that constant string concatenation is done on a compilation, and won't produce any garbage when executed.
 ```
 "Debug: " + 42 * 42
 ```
 
 ### User Defined Custom Functions
 
-If user defined custom functions cause heap allocations, calling that function from the script will produce garbage.
+If user-defined custom functions cause heap allocations, calling that function from a script will produce garbage.
 
 ## Use Cases
 
