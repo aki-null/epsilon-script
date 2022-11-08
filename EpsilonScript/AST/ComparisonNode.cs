@@ -37,6 +37,8 @@ namespace EpsilonScript.AST
           return Math.IsNearlyEqual(_leftNode.FloatValue, _rightNode.FloatValue);
         case ValueType.Boolean:
           return _leftNode.BooleanValue == _rightNode.BooleanValue;
+        case ValueType.String:
+          return string.Equals(_leftNode.StringValue, _rightNode.StringValue, StringComparison.Ordinal);
         default:
           throw new ArgumentOutOfRangeException(nameof(_comparisonValueType), _comparisonValueType,
             "Unsupported comparison value type");
@@ -102,7 +104,16 @@ namespace EpsilonScript.AST
             "Unsupported comparision type");
       }
 
-      if (_leftNode.ValueType == ValueType.Boolean)
+      if (_leftNode.ValueType == ValueType.String)
+      {
+        if (_rightNode.ValueType != ValueType.String)
+        {
+          throw new RuntimeException("String can only be compared against a string");
+        }
+
+        _comparisonValueType = ValueType.String;
+      }
+      else if (_leftNode.ValueType == ValueType.Boolean)
       {
         _comparisonValueType = ValueType.Boolean;
       }

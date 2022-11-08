@@ -14,6 +14,7 @@ namespace EpsilonScript.Function
     private CustomFunctionOverloadNode _integerNode;
     private CustomFunctionOverloadNode _floatNode;
     private CustomFunctionOverloadNode _booleanNode;
+    private CustomFunctionOverloadNode _stringNode;
 
     private static CustomFunction FindOverload(Type[] paramTypes, int index, CustomFunctionOverloadNode primary,
       CustomFunctionOverloadNode secondary)
@@ -47,6 +48,8 @@ namespace EpsilonScript.Function
           return FindOverload(paramTypes, index, _floatNode, _integerNode);
         case Type.Boolean:
           return _booleanNode?.Find(paramTypes, index + 1);
+        case Type.String:
+          return _stringNode?.Find(paramTypes, index + 1);
         default:
           throw new ArgumentOutOfRangeException(nameof(paramTypes), paramTypes[index], "Unsupported parameter type");
       }
@@ -92,6 +95,14 @@ namespace EpsilonScript.Function
           }
 
           nextNode = _booleanNode;
+          break;
+        case Type.String:
+          if (_stringNode == null)
+          {
+            _stringNode = new CustomFunctionOverloadNode();
+          }
+
+          nextNode = _stringNode;
           break;
         default:
           throw new ArgumentOutOfRangeException(nameof(paramTypes), paramTypes[index], "Unsupported parameter type");

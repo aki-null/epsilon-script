@@ -346,6 +346,51 @@ namespace EpsilonScript.Tests
               new Element(new Token("%", TokenType.ModuloOperator), ElementType.ModuloOperator),
             }
           },
+          new object[]
+          {
+            new Element[]
+            {
+              new Element(new Token("Hello", TokenType.String), ElementType.String),
+              new Element(new Token("+", TokenType.PlusSign), ElementType.AddOperator),
+              new Element(new Token("World", TokenType.String), ElementType.String),
+            },
+            new Element[]
+            {
+              new Element(new Token("Hello", TokenType.String), ElementType.String),
+              new Element(new Token("World", TokenType.String), ElementType.String),
+              new Element(new Token("+", TokenType.PlusSign), ElementType.AddOperator),
+            }
+          },
+          new object[]
+          {
+            new Element[]
+            {
+              new Element(new Token("Hello", TokenType.String), ElementType.String),
+              new Element(new Token("+", TokenType.PlusSign), ElementType.AddOperator),
+              new Element(new Token("42", TokenType.Integer), ElementType.Integer),
+            },
+            new Element[]
+            {
+              new Element(new Token("Hello", TokenType.String), ElementType.String),
+              new Element(new Token("42", TokenType.Integer), ElementType.Integer),
+              new Element(new Token("+", TokenType.PlusSign), ElementType.AddOperator),
+            }
+          },
+          new object[]
+          {
+            new Element[]
+            {
+              new Element(new Token("Hello", TokenType.String), ElementType.String),
+              new Element(new Token("+", TokenType.PlusSign), ElementType.AddOperator),
+              new Element(new Token("42.0", TokenType.Float), ElementType.Float),
+            },
+            new Element[]
+            {
+              new Element(new Token("Hello", TokenType.String), ElementType.String),
+              new Element(new Token("42.0", TokenType.Float), ElementType.Float),
+              new Element(new Token("+", TokenType.PlusSign), ElementType.AddOperator),
+            }
+          },
         };
       }
     }

@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using System.Runtime.InteropServices;
 
 namespace EpsilonScript
@@ -11,6 +12,9 @@ namespace EpsilonScript
     [FieldOffset(0)] private bool _booleanValue;
 
     [field: FieldOffset(sizeof(int))] public Type Type { get; private set; }
+
+    [FieldOffset(sizeof(int) + sizeof(Type))]
+    private string _stringValue;
 
     public int IntegerValue
     {
@@ -115,6 +119,31 @@ namespace EpsilonScript
       }
     }
 
+    public string StringValue
+    {
+      get
+      {
+        switch (Type)
+        {
+          case Type.String:
+            return _stringValue;
+          default:
+            throw new ArgumentOutOfRangeException(nameof(Type), Type, "Unsupported variable type");
+        }
+      }
+      set
+      {
+        switch (Type)
+        {
+          case Type.String:
+            _stringValue = value;
+            break;
+          default:
+            throw new ArgumentOutOfRangeException(nameof(Type), Type, "Unsupported variable type");
+        }
+      }
+    }
+
     public VariableValue(Type type)
     {
       Type = type;
@@ -138,6 +167,12 @@ namespace EpsilonScript
       BooleanValue = value;
     }
 
+    public VariableValue(string value)
+    {
+      Type = Type.String;
+      StringValue = value;
+    }
+
     public void CopyFrom(VariableValue other)
     {
       Type = other.Type;
@@ -153,6 +188,9 @@ namespace EpsilonScript
           break;
         case Type.Boolean:
           _integerValue = other._integerValue;
+          break;
+        case Type.String:
+          _stringValue = other._stringValue;
           break;
         default:
           throw new ArgumentOutOfRangeException();

@@ -13,6 +13,7 @@ namespace EpsilonScript
     public int IntegerValue => _rootNode.IntegerValue;
     public float FloatValue => _rootNode.FloatValue;
     public bool BooleanValue => _rootNode.BooleanValue;
+    public string StringValue => _rootNode.StringValue;
 
     public CompiledScript(Node rootNode)
     {
@@ -40,6 +41,9 @@ namespace EpsilonScript
           break;
         case AST.ValueType.Boolean:
           ValueType = Type.Boolean;
+          break;
+        case AST.ValueType.String:
+          ValueType = Type.String;
           break;
         default:
           throw new RuntimeException("AST root node returned invalid value type");

@@ -37,6 +37,7 @@ namespace EpsilonScript.Intermediate
     ModuloOperator,
     Integer,
     Float,
+    String,
   }
 
   static class ElementTypeExtensionMethods
@@ -51,6 +52,7 @@ namespace EpsilonScript.Intermediate
         case ElementType.BooleanLiteralFalse:
         case ElementType.Integer:
         case ElementType.Float:
+        case ElementType.String:
           return true;
         default:
           return false;
@@ -108,6 +110,7 @@ namespace EpsilonScript.Intermediate
         case ElementType.BooleanLiteralFalse:
         case ElementType.Integer:
         case ElementType.Float:
+        case ElementType.String:
           return -1;
         default:
           throw new ArgumentOutOfRangeException(nameof(type), type, null);
