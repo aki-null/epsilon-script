@@ -83,6 +83,12 @@ namespace EpsilonScript.AST
         return CreateValueNode();
       }
 
+      if (_operationType == ElementType.PositiveOperator)
+      {
+        // Nothing to do for unary positive operator
+        return _childNode;
+      }
+
       _childNode = _childNode.Optimize();
       return this;
     }
