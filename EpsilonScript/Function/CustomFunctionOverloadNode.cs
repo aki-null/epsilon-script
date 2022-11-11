@@ -16,8 +16,8 @@ namespace EpsilonScript.Function
     private CustomFunctionOverloadNode _booleanNode;
     private CustomFunctionOverloadNode _stringNode;
 
-    private static CustomFunction FindOverload(Type[] paramTypes, int index, CustomFunctionOverloadNode primary,
-      CustomFunctionOverloadNode secondary)
+    private static CustomFunction FindOverload(Span<ConcreteValue> paramTypes, int index,
+      CustomFunctionOverloadNode primary, CustomFunctionOverloadNode secondary)
     {
       CustomFunction function = null;
       if (primary != null)
@@ -33,26 +33,21 @@ namespace EpsilonScript.Function
       return function;
     }
 
-    public CustomFunction Find(Type[] paramTypes, int index = 0)
+    public CustomFunction Find(Span<ConcreteValue> paramTypes, int index = 0)
     {
       if (index >= paramTypes.Length)
       {
         return LeafFunction;
       }
 
-      switch (paramTypes[index])
+      return paramTypes[index].Type switch
       {
-        case Type.Integer:
-          return FindOverload(paramTypes, index, _integerNode, _floatNode);
-        case Type.Float:
-          return FindOverload(paramTypes, index, _floatNode, _integerNode);
-        case Type.Boolean:
-          return _booleanNode?.Find(paramTypes, index + 1);
-        case Type.String:
-          return _stringNode?.Find(paramTypes, index + 1);
-        default:
-          throw new ArgumentOutOfRangeException(nameof(paramTypes), paramTypes[index], "Unsupported parameter type");
-      }
+        Type.Integer => FindOverload(paramTypes, index, _integerNode, _floatNode),
+        Type.Float => FindOverload(paramTypes, index, _floatNode, _integerNode),
+        Type.Boolean => _booleanNode?.Find(paramTypes, index + 1),
+        Type.String => _stringNode?.Find(paramTypes, index + 1),
+        _ => throw new ArgumentOutOfRangeException(nameof(paramTypes), paramTypes[index], "Unsupported parameter type")
+      };
     }
 
     public void Build(CustomFunction function, int index = 0)
@@ -73,35 +68,19 @@ namespace EpsilonScript.Function
       switch (paramTypes[index])
       {
         case Type.Integer:
-          if (_integerNode == null)
-          {
-            _integerNode = new CustomFunctionOverloadNode();
-          }
-
+          _integerNode ??= new CustomFunctionOverloadNode();
           nextNode = _integerNode;
           break;
         case Type.Float:
-          if (_floatNode == null)
-          {
-            _floatNode = new CustomFunctionOverloadNode();
-          }
-
+          _floatNode ??= new CustomFunctionOverloadNode();
           nextNode = _floatNode;
           break;
         case Type.Boolean:
-          if (_booleanNode == null)
-          {
-            _booleanNode = new CustomFunctionOverloadNode();
-          }
-
+          _booleanNode ??= new CustomFunctionOverloadNode();
           nextNode = _booleanNode;
           break;
         case Type.String:
-          if (_stringNode == null)
-          {
-            _stringNode = new CustomFunctionOverloadNode();
-          }
-
+          _stringNode ??= new CustomFunctionOverloadNode();
           nextNode = _stringNode;
           break;
         default:

@@ -4,7 +4,7 @@ using EpsilonScript.Intermediate;
 
 namespace EpsilonScript.Lexer
 {
-  public ref struct Lexer
+  internal ref struct Lexer
   {
     private const char Eof = (char)0;
 

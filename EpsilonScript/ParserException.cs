@@ -4,7 +4,7 @@ using EpsilonScript.Intermediate;
 namespace EpsilonScript
 {
   [Serializable]
-  public class ParserException : Exception
+  internal class ParserException : Exception
   {
     private static string FormatMessage(in Token token, string message)
     {

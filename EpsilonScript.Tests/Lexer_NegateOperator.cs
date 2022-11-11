@@ -8,7 +8,7 @@ namespace EpsilonScript.Tests
   {
     [Theory]
     [MemberData(nameof(CorrectData))]
-    public void Lexer_NegateOperator_Correctly(string input, params Token[] expected)
+    internal void Lexer_NegateOperator_Correctly(string input, params Token[] expected)
     {
       Succeeds(input, expected);
     }

@@ -1,13 +1,17 @@
+using System.Runtime.CompilerServices;
+
 namespace EpsilonScript
 {
   public static class Math
   {
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static unsafe int UnsafeFloatAsInt32(float f)
     {
       return *((int*)&f);
     }
 
     // https://randomascii.wordpress.com/2012/02/25/comparing-floating-point-numbers-2012-edition/
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool IsNearlyEqual(float a, float b, int maxUlpsDiff = 1 << 1)
     {
       var aInt = UnsafeFloatAsInt32(a);

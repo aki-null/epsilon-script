@@ -4,11 +4,11 @@ namespace EpsilonScript.Helper
 {
   public static class UniqueIdentifierExtension
   {
-    private static readonly Dictionary<string, uint> StringIdCache = new Dictionary<string, uint>();
+    private static readonly Dictionary<string, int> StringIdCache = new Dictionary<string, int>();
     private static readonly List<string> StringIdReverseLookup = new List<string>();
-    private static uint _currentId = 1;
+    private static int _currentId = 1;
 
-    public static uint GetUniqueIdentifier(this string s)
+    public static int GetUniqueIdentifier(this string s)
     {
       lock (StringIdCache)
       {
@@ -25,7 +25,7 @@ namespace EpsilonScript.Helper
       }
     }
 
-    public static string GetStringFromUniqueIdentifier(this uint s)
+    public static string GetStringFromUniqueIdentifier(this int s)
     {
       lock (StringIdCache)
       {

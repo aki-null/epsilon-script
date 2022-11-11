@@ -1,15 +1,20 @@
 using System.Collections.Generic;
+using EpsilonScript.Bytecode;
 using EpsilonScript.Function;
 using EpsilonScript.Intermediate;
 
 namespace EpsilonScript.AST
 {
-  public class NullNode : Node
+  internal class NullNode : Node
   {
     public override void Build(Stack<Node> rpnStack, Element element, Compiler.Options options,
-      IVariableContainer variables, IDictionary<uint, CustomFunctionOverload> functions)
+      CustomFunctionContainer functions)
     {
-      ValueType = ValueType.Null;
+    }
+
+    public override void Encode(MutableProgram program, ref byte nextRegisterIdx,
+      VirtualMachine.VirtualMachine constantVm)
+    {
     }
   }
 }

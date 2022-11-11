@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using EpsilonScript.AST;
 using EpsilonScript.Helper;
+using EpsilonScript.VirtualMachine;
 
 namespace EpsilonScript.Function
 {
@@ -46,7 +47,7 @@ namespace EpsilonScript.Function
 
     private Signature Type { get; }
     private readonly CustomFunctionUnion _func;
-    public uint Name { get; }
+    public int Name { get; }
 
     // Cached list of all function parameters
     private static readonly Type[] IntParamType = { EpsilonScript.Type.Integer };
@@ -251,70 +252,67 @@ namespace EpsilonScript.Function
       IsConstant = isConstant;
     }
 
-    private void CheckParameterCount(List<Node> parameters)
+    private void CheckParameterCount(Span<ConcreteValue> parameters)
     {
-      if ((parameters?.Count ?? 0) != NumberOfParameters)
+      if (parameters.Length != NumberOfParameters)
       {
         throw new RuntimeException($"Invalid number of parameters for function: {Name}");
       }
     }
 
-    public int ExecuteInt(List<Node> parameters)
+    public int ExecuteInt(Span<ConcreteValue> parameters)
     {
       CheckParameterCount(parameters);
-      switch (Type)
+      return Type switch
       {
-        case Signature.StringInt:
-          return _func.stingInt(parameters[0].StringValue);
-        case Signature.IntInt:
-          return _func.intInt(parameters[0].IntegerValue);
-        case Signature.FloatInt:
-          return _func.floatInt(parameters[0].FloatValue);
-        case Signature.IntIntInt:
-          return _func.intIntInt(parameters[0].IntegerValue, parameters[1].IntegerValue);
-        case Signature.BoolIntIntInt:
-          return _func.boolIntIntInt(parameters[0].BooleanValue, parameters[1].IntegerValue,
-            parameters[2].IntegerValue);
-        default:
-          throw new ArgumentOutOfRangeException(nameof(Type), Type,
-            "Unsupported function type (does not return integer?)");
-      }
+        Signature.StringInt => _func.stingInt(parameters[0].StringValue),
+        Signature.IntInt => _func.intInt(parameters[0].IntegerValue),
+        Signature.FloatInt => _func.floatInt(parameters[0].FloatValue),
+        Signature.IntIntInt => _func.intIntInt(parameters[0].IntegerValue, parameters[1].IntegerValue),
+        Signature.BoolIntIntInt => _func.boolIntIntInt(parameters[0].BooleanValue, parameters[1].IntegerValue,
+          parameters[2].IntegerValue),
+        _ => throw new ArgumentOutOfRangeException(nameof(Type), Type,
+          "Unsupported function type (does not return integer?)")
+      };
     }
 
-    public float ExecuteFloat(List<Node> parameters)
+    public float ExecuteFloat(Span<ConcreteValue> parameters)
     {
       CheckParameterCount(parameters);
-      switch (Type)
+      return Type switch
       {
-        case Signature.IntFloat:
-          return _func.intFloat(parameters[0].IntegerValue);
-        case Signature.FloatFloat:
-          return _func.floatFloat(parameters[0].FloatValue);
-        case Signature.FloatFloatFloat:
-          return _func.floatFloatFloat(parameters[0].FloatValue, parameters[1].FloatValue);
-        case Signature.BoolFloatFloatFloat:
-          return _func.boolFloatFloatFloat(parameters[0].BooleanValue, parameters[1].FloatValue,
-            parameters[2].FloatValue);
-        default:
-          throw new ArgumentOutOfRangeException(nameof(Type), Type,
-            "Unsupported function type (does not return float?)");
-      }
+        Signature.IntFloat => _func.intFloat(parameters[0].IntegerValue),
+        Signature.FloatFloat => _func.floatFloat(parameters[0].FloatValue),
+        Signature.FloatFloatFloat => _func.floatFloatFloat(parameters[0].FloatValue, parameters[1].FloatValue),
+        Signature.BoolFloatFloatFloat => _func.boolFloatFloatFloat(parameters[0].BooleanValue, parameters[1].FloatValue,
+          parameters[2].FloatValue),
+        _ => throw new ArgumentOutOfRangeException(nameof(Type), Type,
+          "Unsupported function type (does not return float?)")
+      };
     }
 
-    public string ExecuteString(List<Node> parameters)
+    public string ExecuteString(Span<ConcreteValue> parameters)
     {
       CheckParameterCount(parameters);
-      switch (Type)
+      return Type switch
       {
-        case Signature.StringString:
-          return _func.stringString(parameters[0].StringValue);
-        case Signature.BoolStringStringString:
-          return _func.boolStringStringString(parameters[0].BooleanValue, parameters[1].StringValue,
-            parameters[2].StringValue);
-        default:
-          throw new ArgumentOutOfRangeException(nameof(Type), Type,
-            "Unsupported function type (does not return string?)");
-      }
+        Signature.StringString => _func.stringString(parameters[0].StringValue),
+        Signature.BoolStringStringString => _func.boolStringStringString(parameters[0].BooleanValue,
+          parameters[1].StringValue, parameters[2].StringValue),
+        _ => throw new ArgumentOutOfRangeException(nameof(Type), Type,
+          "Unsupported function type (does not return string?)")
+      };
+    }
+
+    public bool ExecuteBoolean(Span<ConcreteValue> parameters)
+    {
+      CheckParameterCount(parameters);
+      return Type switch
+      {
+        Signature.StringBool => _func.stringBool(parameters[0].StringValue),
+        _ => throw new ArgumentOutOfRangeException(nameof(Type), Type,
+          "Unsupported function type (does not return bool?)")
+      };
     }
   }
 }

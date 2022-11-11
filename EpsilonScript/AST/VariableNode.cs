@@ -1,57 +1,33 @@
-using System;
 using System.Collections.Generic;
+using EpsilonScript.Bytecode;
 using EpsilonScript.Function;
 using EpsilonScript.Helper;
 using EpsilonScript.Intermediate;
 
 namespace EpsilonScript.AST
 {
-  public class VariableNode : Node
+  internal class VariableNode : Node
   {
-    private uint _variableName;
-    private IVariableContainer _variables;
+    public int VariableName { get; private set; }
 
     public override bool IsConstant => false;
 
     public override void Build(Stack<Node> rpnStack, Element element, Compiler.Options options,
-      IVariableContainer variables, IDictionary<uint, CustomFunctionOverload> functions)
+      CustomFunctionContainer functions)
     {
-      _variableName = element.Token.Text.ToString().GetUniqueIdentifier();
-      _variables = variables;
+      VariableName = element.Token.Text.ToString().GetUniqueIdentifier();
     }
 
-    public override void Execute(IVariableContainer variablesOverride)
+    public override void Encode(MutableProgram program, ref byte nextRegisterIdx,
+      VirtualMachine.VirtualMachine constantVm)
     {
-      if (variablesOverride == null || !variablesOverride.TryGetValue(_variableName, out var variable))
+      program.Instructions.Add(new Instruction
       {
-        if (_variables == null || !_variables.TryGetValue(_variableName, out variable))
-        {
-          throw new RuntimeException($"Undefined variable: {_variableName}");
-        }
-      }
-
-      Variable = variable;
-      switch (Variable.Type)
-      {
-        case Type.Integer:
-          ValueType = ValueType.Integer;
-          IntegerValue = Variable.IntegerValue;
-          FloatValue = Variable.FloatValue;
-          BooleanValue = Variable.BooleanValue;
-          break;
-        case Type.Float:
-          ValueType = ValueType.Float;
-          IntegerValue = Variable.IntegerValue;
-          FloatValue = Variable.FloatValue;
-          break;
-        case Type.Boolean:
-          ValueType = ValueType.Boolean;
-          IntegerValue = Variable.IntegerValue;
-          BooleanValue = Variable.BooleanValue;
-          break;
-        default:
-          throw new ArgumentOutOfRangeException(nameof(Variable.Type), Variable.Type, "Unsupported variable type");
-      }
+        Type = InstructionType.LoadVariableValue,
+        IntegerValue = VariableName,
+        reg0 = nextRegisterIdx
+      });
+      ++nextRegisterIdx;
     }
   }
 }

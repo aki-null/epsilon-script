@@ -8,14 +8,14 @@ namespace EpsilonScript.Tests
   {
     [Theory]
     [MemberData(nameof(CorrectData))]
-    public void Lexer_BooleanOperator_Correctly(string input, params Token[] expected)
+    internal void Lexer_BooleanOperator_Correctly(string input, params Token[] expected)
     {
       Succeeds(input, expected);
     }
 
     [Theory]
     [MemberData(nameof(IncorrectData))]
-    public void Lexer_BooleanOperator_Fails(string input)
+    internal void Lexer_BooleanOperator_Fails(string input)
     {
       Fails(input);
     }

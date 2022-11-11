@@ -1,20 +1,20 @@
-using System;
 using System.Collections.Generic;
+using EpsilonScript.Bytecode;
 using EpsilonScript.Function;
 using EpsilonScript.Intermediate;
 
 namespace EpsilonScript.AST
 {
-  public class AssignmentNode : Node
+  internal class AssignmentNode : Node
   {
-    private Node _leftNode;
+    private VariableNode _assignmentTarget;
     private Node _rightNode;
     private ElementType _assignmentType;
 
     public override bool IsConstant => false;
 
     public override void Build(Stack<Node> rpnStack, Element element, Compiler.Options options,
-      IVariableContainer variables, IDictionary<uint, CustomFunctionOverload> functions)
+      CustomFunctionContainer functions)
     {
       if ((options & Compiler.Options.Immutable) == Compiler.Options.Immutable)
       {
@@ -23,153 +23,94 @@ namespace EpsilonScript.AST
 
       _assignmentType = element.Type;
 
-      if (!rpnStack.TryPop(out _rightNode) || !rpnStack.TryPop(out _leftNode))
+      if (!rpnStack.TryPop(out _rightNode) || !rpnStack.TryPop(out var leftNode))
       {
         throw new ParserException(element.Token, "Cannot find elements to perform assignment operation on");
       }
+
+      if (leftNode is VariableNode variableNode)
+      {
+        _assignmentTarget = variableNode;
+      }
+      else
+      {
+        throw new ParserException(element.Token, "A value can only be assigned to a variable");
+      }
     }
 
-    public override void Execute(IVariableContainer variablesOverride)
+    public override void Encode(MutableProgram program, ref byte nextRegisterIdx,
+      VirtualMachine.VirtualMachine constantVm)
     {
-      _leftNode.Execute(variablesOverride);
-      _rightNode.Execute(variablesOverride);
-
-      if (_leftNode.Variable == null)
+      if (TryEncodeConstant(program, ref nextRegisterIdx, constantVm))
       {
-        throw new RuntimeException("A left hand side of an assignment operator must be a variable");
+        return;
       }
 
-      var variable = _leftNode.Variable;
+      _rightNode.Encode(program, ref nextRegisterIdx, constantVm);
 
+      // Anything that is not a simple assignment requires the variable value to be read into the stack
+      if (_assignmentType != ElementType.AssignmentOperator)
+      {
+        program.Instructions.Add(new Instruction
+        {
+          Type = InstructionType.LoadVariableValue,
+          IntegerValue = _assignmentTarget.VariableName,
+          reg0 = nextRegisterIdx
+        });
+        ++nextRegisterIdx;
+      }
+
+      // Arithmetic instructions for non-simple assignment
       switch (_assignmentType)
       {
-        case ElementType.AssignmentOperator:
-          switch (variable.Type)
-          {
-            case Type.Integer:
-              variable.IntegerValue = _rightNode.IntegerValue;
-              break;
-            case Type.Float:
-              variable.FloatValue = _rightNode.FloatValue;
-              break;
-            case Type.Boolean:
-              if (_rightNode.ValueType == ValueType.Float)
-              {
-                throw new RuntimeException("A float value cannot be assigned to a boolean variable");
-              }
-
-              variable.BooleanValue = _rightNode.BooleanValue;
-              break;
-            case Type.String:
-              variable.StringValue = _rightNode.StringValue;
-              break;
-            default:
-              throw new ArgumentOutOfRangeException(nameof(variable.Type), variable.Type, "Unsupported variable type");
-          }
-
-          break;
         case ElementType.AssignmentAddOperator:
-          if (!_rightNode.IsNumeric)
+          program.Instructions.Add(new Instruction
           {
-            throw new RuntimeException("An arithmetic operation can only be performed on a numeric value");
-          }
-
-          switch (variable.Type)
-          {
-            case Type.Integer:
-              variable.IntegerValue += _rightNode.IntegerValue;
-              break;
-            case Type.Float:
-              variable.FloatValue += _rightNode.FloatValue;
-              break;
-            default:
-              throw new ArgumentOutOfRangeException(nameof(variable.Type), variable.Type, "Unsupported variable type");
-          }
-
+            Type = InstructionType.Add,
+            reg0 = (byte)(nextRegisterIdx - 2),
+            reg1 = (byte)(nextRegisterIdx - 1),
+            reg2 = (byte)(nextRegisterIdx - 2)
+          });
+          --nextRegisterIdx;
           break;
         case ElementType.AssignmentSubtractOperator:
-          if (!_rightNode.IsNumeric)
+          program.Instructions.Add(new Instruction
           {
-            throw new RuntimeException("An arithmetic operation can only be performed on a numeric value");
-          }
-
-          switch (variable.Type)
-          {
-            case Type.Integer:
-              variable.IntegerValue -= _rightNode.IntegerValue;
-              break;
-            case Type.Float:
-              variable.FloatValue -= _rightNode.FloatValue;
-              break;
-            default:
-              throw new ArgumentOutOfRangeException(nameof(variable.Type), variable.Type, "Unsupported variable type");
-          }
-
+            Type = InstructionType.Subtract,
+            reg0 = (byte)(nextRegisterIdx - 2),
+            reg1 = (byte)(nextRegisterIdx - 1),
+            reg2 = (byte)(nextRegisterIdx - 2)
+          });
+          --nextRegisterIdx;
           break;
         case ElementType.AssignmentMultiplyOperator:
-          if (!_rightNode.IsNumeric)
+          program.Instructions.Add(new Instruction
           {
-            throw new RuntimeException("An arithmetic operation can only be performed on a numeric value");
-          }
-
-          switch (variable.Type)
-          {
-            case Type.Integer:
-              variable.IntegerValue *= _rightNode.IntegerValue;
-              break;
-            case Type.Float:
-              variable.FloatValue *= _rightNode.FloatValue;
-              break;
-            default:
-              throw new ArgumentOutOfRangeException(nameof(variable.Type), variable.Type, "Unsupported variable type");
-          }
-
+            Type = InstructionType.Multiply,
+            reg0 = (byte)(nextRegisterIdx - 2),
+            reg1 = (byte)(nextRegisterIdx - 1),
+            reg2 = (byte)(nextRegisterIdx - 2)
+          });
+          --nextRegisterIdx;
           break;
         case ElementType.AssignmentDivideOperator:
-          if (!_rightNode.IsNumeric)
+          program.Instructions.Add(new Instruction
           {
-            throw new RuntimeException("An arithmetic operation can only be performed on a numeric value");
-          }
-
-          switch (variable.Type)
-          {
-            case Type.Integer:
-              variable.IntegerValue /= _rightNode.IntegerValue;
-              break;
-            case Type.Float:
-              variable.FloatValue /= _rightNode.FloatValue;
-              break;
-            default:
-              throw new ArgumentOutOfRangeException(nameof(variable.Type), variable.Type, "Unsupported variable type");
-          }
-
+            Type = InstructionType.Divide,
+            reg0 = (byte)(nextRegisterIdx - 2),
+            reg1 = (byte)(nextRegisterIdx - 1),
+            reg2 = (byte)(nextRegisterIdx - 2)
+          });
+          --nextRegisterIdx;
           break;
-        default:
-          throw new ArgumentOutOfRangeException(nameof(_assignmentType), _assignmentType,
-            "Unsupported assignment type");
       }
 
-      switch (variable.Type)
+      program.Instructions.Add(new Instruction
       {
-        case Type.Integer:
-          ValueType = ValueType.Integer;
-          IntegerValue = variable.IntegerValue;
-          FloatValue = variable.FloatValue;
-          BooleanValue = variable.BooleanValue;
-          break;
-        case Type.Float:
-          ValueType = ValueType.Float;
-          IntegerValue = variable.IntegerValue;
-          FloatValue = variable.FloatValue;
-          break;
-        case Type.Boolean:
-          ValueType = ValueType.Boolean;
-          IntegerValue = variable.IntegerValue;
-          BooleanValue = variable.BooleanValue;
-          break;
-        default:
-          throw new ArgumentOutOfRangeException(nameof(variable.Type), variable.Type, "Unsupported variable type");
-      }
+        Type = InstructionType.AssignVariable,
+        IntegerValue = _assignmentTarget.VariableName,
+        reg0 = (byte)(nextRegisterIdx - 1)
+      });
     }
   }
 }

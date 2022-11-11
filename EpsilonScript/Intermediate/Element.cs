@@ -1,6 +1,6 @@
 ﻿namespace EpsilonScript.Intermediate
 {
-  public readonly struct Element
+  internal readonly struct Element
   {
     public Token Token { get; }
     public ElementType Type { get; }

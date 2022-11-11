@@ -1,6 +1,6 @@
 using System;
-using System.Globalization;
 using System.Runtime.InteropServices;
+using EpsilonScript.VirtualMachine;
 
 namespace EpsilonScript
 {
@@ -20,17 +20,13 @@ namespace EpsilonScript
     {
       get
       {
-        switch (Type)
+        return Type switch
         {
-          case Type.Integer:
-            return _integerValue;
-          case Type.Float:
-            return (int)_floatValue;
-          case Type.Boolean:
-            return (_booleanValue ? 1 : 0);
-          default:
-            throw new ArgumentOutOfRangeException(nameof(Type), Type, "Unsupported variable type");
-        }
+          Type.Integer => _integerValue,
+          Type.Float => (int)_floatValue,
+          Type.Boolean => _booleanValue ? 1 : 0,
+          _ => throw new ArgumentOutOfRangeException(nameof(Type), Type, "Unsupported variable type")
+        };
       }
       set
       {
@@ -55,17 +51,13 @@ namespace EpsilonScript
     {
       get
       {
-        switch (Type)
+        return Type switch
         {
-          case Type.Integer:
-            return _integerValue;
-          case Type.Float:
-            return _floatValue;
-          case Type.Boolean:
-            throw new InvalidCastException("A boolean value cannot be casted to a float value");
-          default:
-            throw new ArgumentOutOfRangeException(nameof(Type), Type, "Unsupported variable type");
-        }
+          Type.Integer => _integerValue,
+          Type.Float => _floatValue,
+          Type.Boolean => throw new InvalidCastException("A boolean value cannot be casted to a float value"),
+          _ => throw new ArgumentOutOfRangeException(nameof(Type), Type, "Unsupported variable type")
+        };
       }
       set
       {
@@ -89,17 +81,13 @@ namespace EpsilonScript
     {
       get
       {
-        switch (Type)
+        return Type switch
         {
-          case Type.Integer:
-            return _integerValue != 0;
-          case Type.Float:
-            throw new InvalidCastException("A float value cannot be casted to a boolean value");
-          case Type.Boolean:
-            return _booleanValue;
-          default:
-            throw new ArgumentOutOfRangeException(nameof(Type), Type, "Unsupported variable type");
-        }
+          Type.Integer => _integerValue != 0,
+          Type.Float => throw new InvalidCastException("A float value cannot be casted to a boolean value"),
+          Type.Boolean => _booleanValue,
+          _ => throw new ArgumentOutOfRangeException(nameof(Type), Type, "Unsupported variable type")
+        };
       }
       set
       {
@@ -123,24 +111,19 @@ namespace EpsilonScript
     {
       get
       {
-        switch (Type)
+        return Type switch
         {
-          case Type.String:
-            return _stringValue;
-          default:
-            throw new ArgumentOutOfRangeException(nameof(Type), Type, "Unsupported variable type");
-        }
+          Type.String => _stringValue,
+          _ => throw new ArgumentOutOfRangeException(nameof(Type), Type, "Unsupported variable type")
+        };
       }
       set
       {
-        switch (Type)
+        _stringValue = Type switch
         {
-          case Type.String:
-            _stringValue = value;
-            break;
-          default:
-            throw new ArgumentOutOfRangeException(nameof(Type), Type, "Unsupported variable type");
-        }
+          Type.String => value,
+          _ => throw new ArgumentOutOfRangeException(nameof(Type), Type, "Unsupported variable type")
+        };
       }
     }
 
@@ -178,7 +161,7 @@ namespace EpsilonScript
       Type = other.Type;
       switch (Type)
       {
-        case Type.Undefined:
+        case Type.Void:
           return;
         case Type.Integer:
           _integerValue = other._integerValue;
@@ -194,6 +177,44 @@ namespace EpsilonScript
           break;
         default:
           throw new ArgumentOutOfRangeException();
+      }
+    }
+
+    internal void LoadToRegister(RegisterValue[] registers, string[] stringRegisters, int index)
+    {
+      switch (Type)
+      {
+        case Type.Integer:
+          registers[index] = new RegisterValue
+          {
+            ValueType = RegisterValueType.Integer,
+            IntegerValue = _integerValue
+          };
+          break;
+        case Type.Float:
+          registers[index] = new RegisterValue
+          {
+            ValueType = RegisterValueType.Float,
+            FloatValue = _floatValue
+          };
+          break;
+        case Type.Boolean:
+          registers[index] = new RegisterValue
+          {
+            ValueType = RegisterValueType.Boolean,
+            BooleanValue = _booleanValue
+          };
+          break;
+        case Type.String:
+          stringRegisters[index] = _stringValue;
+          registers[index] = new RegisterValue
+          {
+            ValueType = RegisterValueType.StringStack
+          };
+          break;
+        case Type.Void:
+        default:
+          throw new ArgumentOutOfRangeException(nameof(Type), "Unsupported variable type");
       }
     }
   }

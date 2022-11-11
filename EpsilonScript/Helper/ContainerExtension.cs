@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace EpsilonScript.Helper
 {
-  public static class ContainerExtension
+  internal static class ContainerExtension
   {
     public static bool TryPop<T>(this Stack<T> s, out T obj)
     {

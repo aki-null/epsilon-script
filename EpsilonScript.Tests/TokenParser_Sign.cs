@@ -8,7 +8,7 @@ namespace EpsilonScript.Tests
   {
     [Theory]
     [MemberData(nameof(CorrectData))]
-    public void RPNConverter_ParsesSign_Correctly(Token[] input, Element[] expected)
+    internal void RPNConverter_ParsesSign_Correctly(Token[] input, Element[] expected)
     {
       Succeeds(input, expected);
     }

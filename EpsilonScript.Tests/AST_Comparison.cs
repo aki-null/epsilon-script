@@ -1,3 +1,4 @@
+/*
 using System.Collections.Generic;
 using EpsilonScript.AST;
 using EpsilonScript.Intermediate;
@@ -17,7 +18,7 @@ namespace EpsilonScript.Tests
       rpn.Push(leftNode);
       rpn.Push(rightNode);
       node.Build(rpn, new Element(new Token("==", TokenType.ComparisonEqual), ElementType.ComparisonEqual),
-        Compiler.Options.None, null, null);
+        Compiler.Options.None, null);
       node = node.Optimize();
       Assert.True(typeof(BooleanNode) == node.GetType());
       Assert.Equal(ValueType.Boolean, node.ValueType);
@@ -34,7 +35,7 @@ namespace EpsilonScript.Tests
       rpn.Push(leftNode);
       rpn.Push(rightNode);
       node.Build(rpn, new Element(new Token("==", TokenType.ComparisonEqual), ElementType.ComparisonEqual),
-        Compiler.Options.None, null, null);
+        Compiler.Options.None, null);
       node.Execute(null);
       Assert.Equal(ValueType.Boolean, node.ValueType);
       Assert.True(node.BooleanValue);
@@ -50,7 +51,7 @@ namespace EpsilonScript.Tests
       rpn.Push(leftNode);
       rpn.Push(rightNode);
       node.Build(rpn, new Element(new Token("==", TokenType.ComparisonEqual), ElementType.ComparisonEqual),
-        Compiler.Options.None, null, null);
+        Compiler.Options.None, null);
       node.Execute(null);
       Assert.Equal(ValueType.Boolean, node.ValueType);
       Assert.False(node.BooleanValue);
@@ -66,7 +67,7 @@ namespace EpsilonScript.Tests
       rpn.Push(leftNode);
       rpn.Push(rightNode);
       node.Build(rpn, new Element(new Token("==", TokenType.ComparisonEqual), ElementType.ComparisonEqual),
-        Compiler.Options.None, null, null);
+        Compiler.Options.None, null);
       Assert.Throws<RuntimeException>(() => { node.Execute(null); });
     }
 
@@ -80,8 +81,10 @@ namespace EpsilonScript.Tests
       rpn.Push(leftNode);
       rpn.Push(rightNode);
       node.Build(rpn, new Element(new Token("==", TokenType.ComparisonEqual), ElementType.ComparisonEqual),
-        Compiler.Options.None, null, null);
+        Compiler.Options.None, null);
       Assert.Throws<RuntimeException>(() => { node.Execute(null); });
     }
   }
 }
+*/
+

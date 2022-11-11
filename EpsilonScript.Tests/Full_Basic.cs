@@ -20,9 +20,8 @@ namespace EpsilonScript.Tests
     {
       var compiler = new Compiler();
       var variables = new DictionaryVariableContainer { ["val".GetUniqueIdentifier()] = new VariableValue(0.0f) };
-      var script = compiler.Compile("(val = 10 + -2 * -(20.2 - 10); val *= 2; val / 2) * 2 / 2",
-        Compiler.Options.None, variables);
-      script.Execute();
+      var script = compiler.Compile((string)"(val = 10 + -2 * -(20.2 - 10); val *= 2; val / 2) * 2 / 2");
+      script.Execute(variables);
       Assert.True(Math.IsNearlyEqual(30.4f, script.FloatValue));
       Assert.True(Math.IsNearlyEqual(60.8f, variables["val".GetUniqueIdentifier()].FloatValue));
     }
@@ -33,9 +32,8 @@ namespace EpsilonScript.Tests
       var compiler = new Compiler();
       var valId = "val".GetUniqueIdentifier();
       var variables = new DictionaryVariableContainer { [valId] = new VariableValue(0) };
-      var script = compiler.Compile("(val = 10 + -2 * -(20 - 10); val *= 2; val / 2) * 2 / 2",
-        Compiler.Options.None, variables);
-      script.Execute();
+      var script = compiler.Compile("(val = 10 + -2 * -(20 - 10); val *= 2; val / 2) * 2 / 2");
+      script.Execute(variables);
       Assert.Equal(30, script.IntegerValue);
       Assert.Equal(60, variables[valId].IntegerValue);
     }
@@ -46,9 +44,8 @@ namespace EpsilonScript.Tests
       var compiler = new Compiler();
       var valId = "val".GetUniqueIdentifier();
       var variables = new DictionaryVariableContainer { [valId] = new VariableValue(false) };
-      var script = compiler.Compile("(val = 30 > 20); ifelse(val, 30, 50)",
-        Compiler.Options.None, variables);
-      script.Execute();
+      var script = compiler.Compile((string)"(val = 30 > 20); ifelse(val, 30, 50)");
+      script.Execute(variables);
       Assert.Equal(30, script.IntegerValue);
       Assert.True(variables[valId].BooleanValue);
     }
@@ -58,8 +55,8 @@ namespace EpsilonScript.Tests
     {
       var compiler = new Compiler();
       var variables = new DictionaryVariableContainer { ["val".GetUniqueIdentifier()] = new VariableValue(1.0f) };
-      var script = compiler.Compile("ifelse(val <= 0, 200, 100)", Compiler.Options.None, variables);
-      script.Execute();
+      var script = compiler.Compile((string)"ifelse(val <= 0, 200, 100)");
+      script.Execute(variables);
       Assert.Equal(Type.Integer, script.ValueType);
       Assert.Equal(100, script.IntegerValue);
     }
@@ -69,8 +66,8 @@ namespace EpsilonScript.Tests
     {
       var compiler = new Compiler();
       var variables = new DictionaryVariableContainer { ["v".GetUniqueIdentifier()] = new VariableValue(1.0f) };
-      var rootNode = compiler.Compile("ifelse(v <= 0, 1.5, 100.2)", Compiler.Options.Immutable, variables);
-      rootNode.Execute();
+      var rootNode = compiler.Compile((string)"ifelse(v <= 0, 1.5, 100.2)");
+      rootNode.Execute(variables);
       Assert.Equal(Type.Float, rootNode.ValueType);
       Assert.True(Math.IsNearlyEqual(rootNode.FloatValue, 100.2f));
     }
@@ -90,7 +87,7 @@ namespace EpsilonScript.Tests
       script = compiler.Compile("2.0");
       script.Execute();
       Assert.Equal(Type.Float, script.ValueType);
-      Assert.Equal(2.0f, script.IntegerValue);
+      Assert.Equal(2.0f, script.FloatValue);
     }
 
     [Fact]

@@ -7,7 +7,7 @@ namespace EpsilonScript.Tests
 {
   public abstract class RPNConverter_Base
   {
-    protected static void Succeeds(IList<Element> input, IList<Element> expected)
+    internal static void Succeeds(IList<Element> input, IList<Element> expected)
     {
       var elementReader = new TestElementReader();
       var rpnConverter = new RpnConverter(elementReader);
@@ -28,7 +28,7 @@ namespace EpsilonScript.Tests
       }
     }
 
-    protected static void Fails(IList<Element> input)
+    internal static void Fails(IList<Element> input)
     {
       var elementReader = new TestElementReader();
       var rpnConverter = new RpnConverter(elementReader);

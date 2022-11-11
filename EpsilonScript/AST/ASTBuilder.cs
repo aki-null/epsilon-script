@@ -5,17 +5,16 @@ using EpsilonScript.Intermediate;
 
 namespace EpsilonScript.AST
 {
-  public class AstBuilder : IElementReader
+  internal class AstBuilder : IElementReader
   {
     public Node Result { get; private set; }
 
     private readonly Stack<Node> _rpnStack = new Stack<Node>();
 
     private Compiler.Options _options;
-    private IVariableContainer _variables;
-    private readonly IDictionary<uint, CustomFunctionOverload> _functions;
+    private readonly CustomFunctionContainer _functions;
 
-    public AstBuilder(IDictionary<uint, CustomFunctionOverload> functions)
+    public AstBuilder(CustomFunctionContainer functions)
     {
       _functions = functions;
     }
@@ -24,20 +23,18 @@ namespace EpsilonScript.AST
     {
       _rpnStack.Clear();
       _options = Compiler.Options.None;
-      _variables = null;
       Result = null;
     }
 
-    public void Configure(Compiler.Options options, IVariableContainer variables)
+    public void Configure(Compiler.Options options)
     {
       _options = options;
-      _variables = variables;
     }
 
     public void Push(Element element)
     {
       var node = CreateNode(element.Type);
-      node.Build(_rpnStack, element, _options, _variables, _functions);
+      node.Build(_rpnStack, element, _options, _functions);
       _rpnStack.Push(node);
     }
 

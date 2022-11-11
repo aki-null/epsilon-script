@@ -2,11 +2,11 @@ using System;
 
 namespace EpsilonScript.Function
 {
-  public class CustomFunctionOverload
+  internal class CustomFunctionOverload
   {
-    private CustomFunctionOverloadNode _rootNode;
+    private readonly CustomFunctionOverloadNode _rootNode;
 
-    public uint Name { get; }
+    private int Name { get; }
     public bool IsConstant { get; }
 
     public CustomFunctionOverload(CustomFunction function)
@@ -27,7 +27,7 @@ namespace EpsilonScript.Function
       _rootNode.Build(function);
     }
 
-    public CustomFunction Find(Type[] paramTypes)
+    public CustomFunction Find(Span<ConcreteValue> paramTypes)
     {
       return _rootNode.Find(paramTypes);
     }

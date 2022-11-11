@@ -2,6 +2,6 @@
 {
   public interface IVariableContainer
   {
-    bool TryGetValue(uint variableKey, out VariableValue variableValue);
+    bool TryGetValue(int variableKey, out VariableValue variableValue);
   }
 }

@@ -1,144 +1,68 @@
-using System;
 using System.Collections.Generic;
+using EpsilonScript.Bytecode;
 using EpsilonScript.Function;
 using EpsilonScript.Helper;
 using EpsilonScript.Intermediate;
 
 namespace EpsilonScript.AST
 {
-  public class FunctionNode : Node
+  internal class FunctionNode : Node
   {
-    public override bool IsConstant => _functionOverload.IsConstant && AreParametersConstant;
+    private Node _childNode;
+    private int _functionNameId;
+    private bool _isFunctionDefinedAndConstant;
 
-    private CustomFunctionOverload _functionOverload;
-    private Type[] _parameterTypes;
+    public override bool IsConstant => _isFunctionDefinedAndConstant && AreParametersConstant;
 
-    private List<Node> _parameters;
-
-    private bool AreParametersConstant
-    {
-      get
-      {
-        foreach (var node in _parameters)
-        {
-          if (!node.IsConstant)
-          {
-            return false;
-          }
-        }
-
-        return true;
-      }
-    }
+    private bool AreParametersConstant => _childNode.IsConstant;
 
     public override void Build(Stack<Node> rpnStack, Element element, Compiler.Options options,
-      IVariableContainer variables, IDictionary<uint, CustomFunctionOverload> functions)
+      CustomFunctionContainer functions)
     {
-      // Unfortunately function name string needs to be allocated here to make a dictionary lookup
-      var functionName = element.Token.Text.ToString().GetUniqueIdentifier();
+      // Unfortunately function name string needs to be allocated here to generate a name ID
+      var funcName = element.Token.Text.ToString();
+      _functionNameId = funcName.GetUniqueIdentifier();
 
-      if (!functions.TryGetValue(functionName, out _functionOverload))
-      {
-        throw new ParserException(element.Token, $"Undefined function: {functionName.GetStringFromUniqueIdentifier()}");
-      }
+      // Functions might already be defined and constant, which will allow for a compile time optimization to
+      // happen.
+      _isFunctionDefinedAndConstant = functions.Query(_functionNameId, out var func) && func.IsConstant;
 
-      if (!rpnStack.TryPop(out var childNode))
+      if (!rpnStack.TryPop(out _childNode))
       {
-        throw new ParserException(element.Token,
-          $"Cannot find parameters for calling function: {functionName.GetStringFromUniqueIdentifier()}");
-      }
-
-      switch (childNode.ValueType)
-      {
-        case ValueType.Boolean:
-        case ValueType.Float:
-        case ValueType.Integer:
-        case ValueType.String:
-        case ValueType.Undefined:
-          _parameters = new List<Node>();
-          _parameters.Add(childNode);
-          _parameterTypes = new Type[1];
-          break;
-        case ValueType.Tuple:
-          _parameters = childNode.TupleValue;
-          _parameterTypes = new Type[_parameters.Count];
-          break;
-        case ValueType.Null:
-          _parameterTypes = Array.Empty<Type>();
-          break;
-        default:
-          throw new ArgumentOutOfRangeException(nameof(childNode.ValueType), childNode.ValueType,
-            "Unsupported child not value type");
+        throw new ParserException(element.Token, $"Cannot find parameters for calling function: {funcName}");
       }
     }
 
-    public override void Execute(IVariableContainer variablesOverride)
+    public override void Encode(MutableProgram program, ref byte nextRegisterIdx,
+      VirtualMachine.VirtualMachine constantVm)
     {
-      // Execute each parameter and populate type information for function invocation
-      // Parameter type is undefined until executed, due to the fact that a variable type may change after compilation
-      for (var i = 0; i < _parameters.Count; ++i)
+      if (TryEncodeConstant(program, ref nextRegisterIdx, constantVm))
       {
-        var parameter = _parameters[i];
-        parameter.Execute(variablesOverride);
-        switch (parameter.ValueType)
-        {
-          case ValueType.Integer:
-            _parameterTypes[i] = Type.Integer;
-            break;
-          case ValueType.Float:
-            _parameterTypes[i] = Type.Float;
-            break;
-          case ValueType.Boolean:
-            _parameterTypes[i] = Type.Boolean;
-            break;
-          case ValueType.String:
-            _parameterTypes[i] = Type.String;
-            break;
-          default:
-            throw new ArgumentOutOfRangeException(nameof(_parameters), parameter.ValueType,
-              "Unsupported parameter value type");
-        }
+        return;
       }
 
-      var function = _functionOverload.Find(_parameterTypes);
-      if (function == null)
+      var paramCount = _childNode switch
       {
-        throw new RuntimeException("A function with given type signature is undefined");
-      }
+        NullNode _ => 0,
+        TupleNode tupleNode => tupleNode.Count,
+        _ => 1
+      };
 
-      switch (function.ReturnType)
-      {
-        case Type.Integer:
-          ValueType = ValueType.Integer;
-          break;
-        case Type.Float:
-          ValueType = ValueType.Float;
-          break;
-        case Type.String:
-          ValueType = ValueType.String;
-          break;
-        default:
-          throw new ArgumentOutOfRangeException(nameof(function.ReturnType), function.ReturnType,
-            "Unsupported function return type");
-      }
+      _childNode.Encode(program, ref nextRegisterIdx, constantVm);
 
-      switch (ValueType)
+      // reg0 = store address
+      // reg1 = function parameter count
+      // reg2 = first function parameter register index
+      program.Instructions.Add(new Instruction
       {
-        case ValueType.Integer:
-          IntegerValue = function.ExecuteInt(_parameters);
-          FloatValue = IntegerValue;
-          BooleanValue = IntegerValue != 0;
-          break;
-        case ValueType.Float:
-          FloatValue = function.ExecuteFloat(_parameters);
-          IntegerValue = (int)FloatValue;
-          break;
-        case ValueType.String:
-          StringValue = function.ExecuteString(_parameters);
-          break;
-        default:
-          throw new ArgumentOutOfRangeException(nameof(ValueType), ValueType, "Unsupported function return type");
-      }
+        Type = InstructionType.CallFunction,
+        IntegerValue = _functionNameId,
+        reg0 = (byte)(nextRegisterIdx - paramCount),
+        reg1 = (byte)paramCount,
+        reg2 = (byte)(nextRegisterIdx - paramCount)
+      });
+
+      nextRegisterIdx = (byte)(nextRegisterIdx - paramCount + 1);
     }
   }
 }

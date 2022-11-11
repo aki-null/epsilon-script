@@ -3,45 +3,45 @@ using System.Collections.Generic;
 
 namespace EpsilonScript
 {
-  public class DictionaryVariableContainer : IVariableContainer, IDictionary<uint, VariableValue>
+  public class DictionaryVariableContainer : IVariableContainer, IDictionary<int, VariableValue>
   {
-    private readonly IDictionary<uint, VariableValue> _container = new Dictionary<uint, VariableValue>();
+    private readonly IDictionary<int, VariableValue> _container = new Dictionary<int, VariableValue>();
 
-    public void Add(uint key, VariableValue value)
+    public void Add(int key, VariableValue value)
     {
       _container.Add(key, value);
     }
 
-    public bool ContainsKey(uint key)
+    public bool ContainsKey(int key)
     {
       return _container.ContainsKey(key);
     }
 
-    public bool Remove(uint key)
+    public bool Remove(int key)
     {
       return _container.Remove(key);
     }
 
-    bool IDictionary<uint, VariableValue>.TryGetValue(uint key, out VariableValue value)
+    bool IDictionary<int, VariableValue>.TryGetValue(int key, out VariableValue value)
     {
       return _container.TryGetValue(key, out value);
     }
 
-    public VariableValue this[uint key]
+    public VariableValue this[int key]
     {
       get => _container[key];
       set => _container[key] = value;
     }
 
-    public ICollection<uint> Keys => _container.Keys;
+    public ICollection<int> Keys => _container.Keys;
     public ICollection<VariableValue> Values => _container.Values;
 
-    bool IVariableContainer.TryGetValue(uint variableKey, out VariableValue variableValue)
+    public bool TryGetValue(int variableKey, out VariableValue variableValue)
     {
       return _container.TryGetValue(variableKey, out variableValue);
     }
 
-    public IEnumerator<KeyValuePair<uint, VariableValue>> GetEnumerator()
+    public IEnumerator<KeyValuePair<int, VariableValue>> GetEnumerator()
     {
       return _container.GetEnumerator();
     }
@@ -51,7 +51,7 @@ namespace EpsilonScript
       return GetEnumerator();
     }
 
-    public void Add(KeyValuePair<uint, VariableValue> item)
+    public void Add(KeyValuePair<int, VariableValue> item)
     {
       _container.Add(item);
     }
@@ -61,17 +61,17 @@ namespace EpsilonScript
       _container.Clear();
     }
 
-    public bool Contains(KeyValuePair<uint, VariableValue> item)
+    public bool Contains(KeyValuePair<int, VariableValue> item)
     {
       return _container.Contains(item);
     }
 
-    public void CopyTo(KeyValuePair<uint, VariableValue>[] array, int arrayIndex)
+    public void CopyTo(KeyValuePair<int, VariableValue>[] array, int arrayIndex)
     {
       _container.CopyTo(array, arrayIndex);
     }
 
-    public bool Remove(KeyValuePair<uint, VariableValue> item)
+    public bool Remove(KeyValuePair<int, VariableValue> item)
     {
       return _container.Remove(item);
     }

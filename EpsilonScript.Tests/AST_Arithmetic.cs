@@ -1,3 +1,4 @@
+/*
 using System;
 using System.Collections.Generic;
 using EpsilonScript.AST;
@@ -18,7 +19,7 @@ namespace EpsilonScript.Tests
       var rpn = new Stack<Node>();
       rpn.Push(leftNode);
       rpn.Push(rightNode);
-      node.Build(rpn, element, Compiler.Options.None, null, null);
+      node.Build(rpn, element, Compiler.Options.None, null);
       node.Execute(null);
       Assert.Equal(expectedNodeType, node.ValueType);
       Assert.Equal(expectedInt, node.IntegerValue);
@@ -425,3 +426,5 @@ namespace EpsilonScript.Tests
     }
   }
 }
+*/
+

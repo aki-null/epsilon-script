@@ -1,17 +1,17 @@
 using System.Collections.Generic;
+using EpsilonScript.Bytecode;
 using EpsilonScript.Function;
 using EpsilonScript.Intermediate;
 
 namespace EpsilonScript.AST
 {
-  public class FloatNode : Node
+  internal class FloatNode : Node
   {
+    private float floatValue;
+
     private void Initialize(float value)
     {
-      ValueType = ValueType.Float;
-      FloatValue = value;
-      IntegerValue = (int)FloatValue;
-      BooleanValue = IntegerValue != 0;
+      floatValue = value;
     }
 
     public FloatNode()
@@ -24,9 +24,15 @@ namespace EpsilonScript.AST
     }
 
     public override void Build(Stack<Node> rpnStack, Element element, Compiler.Options options,
-      IVariableContainer variables, IDictionary<uint, CustomFunctionOverload> functions)
+      CustomFunctionContainer functions)
     {
       Initialize(float.Parse(element.Token.Text.Span));
+    }
+
+    public override void Encode(MutableProgram program, ref byte nextRegisterIdx,
+      VirtualMachine.VirtualMachine constantVm)
+    {
+      PushValue(program, ref nextRegisterIdx, floatValue);
     }
   }
 }

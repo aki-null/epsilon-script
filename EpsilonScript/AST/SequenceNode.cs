@@ -1,10 +1,11 @@
 using System.Collections.Generic;
+using EpsilonScript.Bytecode;
 using EpsilonScript.Function;
 using EpsilonScript.Intermediate;
 
 namespace EpsilonScript.AST
 {
-  public class SequenceNode : Node
+  internal class SequenceNode : Node
   {
     private Node _leftNode;
     private Node _rightNode;
@@ -12,7 +13,7 @@ namespace EpsilonScript.AST
     public override bool IsConstant => _leftNode.IsConstant && _rightNode.IsConstant;
 
     public override void Build(Stack<Node> rpnStack, Element element, Compiler.Options options,
-      IVariableContainer variables, IDictionary<uint, CustomFunctionOverload> functions)
+      CustomFunctionContainer functions)
     {
       if (!rpnStack.TryPop(out _rightNode) || !rpnStack.TryPop(out _leftNode))
       {
@@ -20,29 +21,18 @@ namespace EpsilonScript.AST
       }
     }
 
-    public override void Execute(IVariableContainer variablesOverride)
+    public override void Encode(MutableProgram program, ref byte nextRegisterIdx,
+      VirtualMachine.VirtualMachine constantVm)
     {
-      _leftNode.Execute(variablesOverride);
-      _rightNode.Execute(variablesOverride);
-      ValueType = _rightNode.ValueType;
-
-      IntegerValue = _rightNode.IntegerValue;
-      FloatValue = _rightNode.FloatValue;
-      BooleanValue = _rightNode.BooleanValue;
-      TupleValue = _rightNode.TupleValue;
-    }
-
-    public override Node Optimize()
-    {
-      if (IsConstant)
+      if (TryEncodeConstant(program, ref nextRegisterIdx, constantVm))
       {
-        Execute(null);
-        return CreateValueNode();
+        return;
       }
 
-      _leftNode = _leftNode.Optimize();
-      _rightNode = _rightNode.Optimize();
-      return this;
+      _leftNode.Encode(program, ref nextRegisterIdx, constantVm);
+      // Discard the execution result from above
+      --nextRegisterIdx;
+      _rightNode.Encode(program, ref nextRegisterIdx, constantVm);
     }
   }
 }

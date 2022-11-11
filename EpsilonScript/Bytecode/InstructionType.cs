@@ -1,0 +1,31 @@
+namespace EpsilonScript.Bytecode
+{
+  internal enum InstructionType : byte
+  {
+    LoadInteger,
+    LoadFloat,
+    LoadBoolean,
+    LoadString,
+    LoadVariableValue,
+    Add,
+    Subtract,
+    Multiply,
+    Divide,
+    Modulo,
+    Negate,
+    Negative,
+    ComparisonEqual,
+    ComparisonNotEqual,
+    ComparisonLessThan,
+    ComparisonGreaterThan,
+    ComparisonLessThanOrEqualTo,
+    ComparisonGreaterThanOrEqualTo,
+    Jump,
+    JumpIf,
+    JumpNotIf,
+    AssignVariable,
+    PrefetchVariable,
+    CallFunction,
+    Return
+  }
+}

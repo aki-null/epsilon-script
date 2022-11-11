@@ -1,6 +1,6 @@
 namespace EpsilonScript.Intermediate
 {
-  public interface IElementReader
+  internal interface IElementReader
   {
     void Push(Element element);
     void End();

@@ -7,7 +7,7 @@ namespace EpsilonScript.Tests
 {
   public class TokenParser_Base
   {
-    protected static void Succeeds(IList<Token> input, IList<Element> expected)
+    internal static void Succeeds(IList<Token> input, IList<Element> expected)
     {
       var elementReader = new TestElementReader();
       var tokenParser = new TokenParser(elementReader);
@@ -28,7 +28,7 @@ namespace EpsilonScript.Tests
       Assert.True(elementReader.EndCalled, "Element reader not closed");
     }
 
-    protected static object[] CreateTestData(params Element[] elements)
+    internal static object[] CreateTestData(params Element[] elements)
     {
       var tokens = new Token[elements.Length];
       for (var i = 0; i < elements.Length; ++i)

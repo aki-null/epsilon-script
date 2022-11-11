@@ -2,7 +2,7 @@ namespace EpsilonScript
 {
   public enum Type
   {
-    Undefined,
+    Void,
     Integer,
     Float,
     Boolean,

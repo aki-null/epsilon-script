@@ -1,3 +1,4 @@
+/*
 using System;
 using System.Collections.Generic;
 using EpsilonScript.AST;
@@ -16,7 +17,7 @@ namespace EpsilonScript.Tests
     {
       var node = new IntegerNode();
       var rpn = new Stack<Node>();
-      node.Build(rpn, element, Compiler.Options.None, null,
+      node.Build(rpn, element, Compiler.Options.None,
         null);
       Assert.Equal(expectedNodeType, node.ValueType);
       Assert.Equal(expectedInt, node.IntegerValue);
@@ -32,7 +33,7 @@ namespace EpsilonScript.Tests
         var node = new IntegerNode();
         var rpn = new Stack<Node>();
         node.Build(rpn, new Element(new Token("2147483648", TokenType.Integer), ElementType.Integer),
-          Compiler.Options.None, null,
+          Compiler.Options.None,
           null);
       });
     }
@@ -87,3 +88,5 @@ namespace EpsilonScript.Tests
     }
   }
 }
+*/
+

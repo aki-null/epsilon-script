@@ -1,70 +1,53 @@
 using System.Collections.Generic;
+using EpsilonScript.Bytecode;
 using EpsilonScript.Function;
 using EpsilonScript.Intermediate;
 
 namespace EpsilonScript.AST
 {
-  public class TupleNode : Node
+  /// <summary>
+  /// Tuple only appears inside a function.
+  /// This is used to build a list of parameters for function invocation.
+  /// </summary>
+  internal class TupleNode : Node
   {
-    public override bool IsConstant
+    private Node _leftNode;
+    private Node _rightNode;
+
+    public override bool IsConstant => _leftNode.IsConstant && _rightNode.IsConstant;
+
+    public int Count
     {
       get
       {
-        foreach (var child in TupleValue)
+        if (_leftNode is TupleNode leftTupleNode)
         {
-          if (!child.IsConstant)
-          {
-            return false;
-          }
+          return leftTupleNode.Count + 1;
         }
 
-        return true;
+        return 2;
       }
     }
 
     public override void Build(Stack<Node> rpnStack, Element element, Compiler.Options options,
-      IVariableContainer variables, IDictionary<uint, CustomFunctionOverload> functions)
+      CustomFunctionContainer functions)
     {
-      ValueType = ValueType.Tuple;
-      TupleValue = new List<Node>();
-
-      if (!rpnStack.TryPop(out var rightNode) || !rpnStack.TryPop(out var leftNode))
+      if (!rpnStack.TryPop(out _rightNode) || !rpnStack.TryPop(out _leftNode))
       {
         throw new ParserException(element.Token, "Cannot find values to create parameter list");
       }
-
-      if (leftNode.ValueType == ValueType.Tuple)
-      {
-        // unfold tuple list
-        foreach (var parameter in leftNode.TupleValue)
-        {
-          TupleValue.Add(parameter);
-        }
-      }
-      else
-      {
-        TupleValue.Add(leftNode);
-      }
-
-      TupleValue.Add(rightNode);
     }
 
-    public override void Execute(IVariableContainer variablesOverride)
+    public override void Encode(MutableProgram program, ref byte nextRegisterIdx,
+      VirtualMachine.VirtualMachine constantVm)
     {
-      foreach (var child in TupleValue)
+      if (TryEncodeConstant(program, ref nextRegisterIdx, constantVm))
       {
-        child.Execute(variablesOverride);
-      }
-    }
-
-    public override Node Optimize()
-    {
-      for (var i = 0; i < TupleValue.Count; ++i)
-      {
-        TupleValue[i] = TupleValue[i].Optimize();
+        return;
       }
 
-      return this;
+      _leftNode.Encode(program, ref nextRegisterIdx, constantVm);
+      _rightNode.Encode(program, ref nextRegisterIdx, constantVm);
     }
   }
 }

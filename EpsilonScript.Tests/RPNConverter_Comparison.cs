@@ -8,7 +8,7 @@ namespace EpsilonScript.Tests
   {
     [Theory]
     [MemberData(nameof(CorrectData))]
-    public void RPNConverter_ParsesComparison_Correctly(Element[] input, Element[] expected)
+    internal void RPNConverter_ParsesComparison_Correctly(Element[] input, Element[] expected)
     {
       Succeeds(input, expected);
     }

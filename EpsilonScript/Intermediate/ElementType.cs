@@ -2,7 +2,7 @@ using System;
 
 namespace EpsilonScript.Intermediate
 {
-  public enum ElementType
+  internal enum ElementType
   {
     None,
     Variable,
@@ -40,7 +40,7 @@ namespace EpsilonScript.Intermediate
     String,
   }
 
-  static class ElementTypeExtensionMethods
+  internal static class ElementTypeExtensionMethods
   {
     public static bool IsValue(this ElementType type)
     {

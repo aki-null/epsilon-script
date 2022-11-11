@@ -8,7 +8,7 @@ namespace EpsilonScript.Tests
 {
   public abstract class Lexer_Base
   {
-    protected static void Succeeds(string testStr, Token[] expected)
+    internal static void Succeeds(string testStr, Token[] expected)
     {
       var lexer = new Lexer.Lexer();
       var tokenReader = new TestTokenReader();

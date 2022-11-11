@@ -9,7 +9,7 @@ namespace EpsilonScript.Tests
   {
     [Theory]
     [MemberData(nameof(CorrectData))]
-    public void RPNConverter_ParsesVariable_Correctly(Token[] input, Element[] expected)
+    internal void RPNConverter_ParsesVariable_Correctly(Token[] input, Element[] expected)
     {
       Succeeds(input, expected);
     }

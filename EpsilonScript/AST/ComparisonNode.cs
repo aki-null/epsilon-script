@@ -1,24 +1,22 @@
 using System;
 using System.Collections.Generic;
+using EpsilonScript.Bytecode;
 using EpsilonScript.Function;
 using EpsilonScript.Intermediate;
 
 namespace EpsilonScript.AST
 {
-  public class ComparisonNode : Node
+  internal class ComparisonNode : Node
   {
     private Node _leftNode;
     private Node _rightNode;
     private ElementType _comparisonType;
-    private ValueType _comparisonValueType;
 
     public override bool IsConstant => _leftNode.IsConstant && _rightNode.IsConstant;
 
     public override void Build(Stack<Node> rpnStack, Element element, Compiler.Options options,
-      IVariableContainer variables,
-      IDictionary<uint, CustomFunctionOverload> functions)
+      CustomFunctionContainer functions)
     {
-      ValueType = ValueType.Boolean;
       _comparisonType = element.Type;
 
       if (!rpnStack.TryPop(out _rightNode) || !rpnStack.TryPop(out _leftNode))
@@ -27,145 +25,78 @@ namespace EpsilonScript.AST
       }
     }
 
-    private bool EqualTo()
+    public override void Encode(MutableProgram program, ref byte nextRegisterIdx,
+      VirtualMachine.VirtualMachine constantVm)
     {
-      switch (_comparisonValueType)
+      if (TryEncodeConstant(program, ref nextRegisterIdx, constantVm))
       {
-        case ValueType.Integer:
-          return _leftNode.IntegerValue == _rightNode.IntegerValue;
-        case ValueType.Float:
-          return Math.IsNearlyEqual(_leftNode.FloatValue, _rightNode.FloatValue);
-        case ValueType.Boolean:
-          return _leftNode.BooleanValue == _rightNode.BooleanValue;
-        case ValueType.String:
-          return string.Equals(_leftNode.StringValue, _rightNode.StringValue, StringComparison.Ordinal);
-        default:
-          throw new ArgumentOutOfRangeException(nameof(_comparisonValueType), _comparisonValueType,
-            "Unsupported comparison value type");
+        return;
       }
-    }
 
-    private bool LessThan()
-    {
-      switch (_comparisonValueType)
-      {
-        case ValueType.Integer:
-          return _leftNode.IntegerValue < _rightNode.IntegerValue;
-        case ValueType.Float:
-          return _leftNode.FloatValue < _rightNode.FloatValue;
-        default:
-          throw new ArgumentOutOfRangeException(nameof(_comparisonValueType), _comparisonValueType,
-            "Unsupported comparison value type");
-      }
-    }
-
-    private bool GreaterThan()
-    {
-      switch (_comparisonValueType)
-      {
-        case ValueType.Integer:
-          return _leftNode.IntegerValue > _rightNode.IntegerValue;
-        case ValueType.Float:
-          return _leftNode.FloatValue > _rightNode.FloatValue;
-        default:
-          throw new ArgumentOutOfRangeException(nameof(_comparisonValueType), _comparisonValueType,
-            "Unsupported comparison value type");
-      }
-    }
-
-    public override void Execute(IVariableContainer variablesOverride)
-    {
-      _leftNode.Execute(variablesOverride);
-      _rightNode.Execute(variablesOverride);
+      _leftNode.Encode(program, ref nextRegisterIdx, constantVm);
+      _rightNode.Encode(program, ref nextRegisterIdx, constantVm);
 
       switch (_comparisonType)
       {
         case ElementType.ComparisonEqual:
-        case ElementType.ComparisonNotEqual:
-          if (_leftNode.ValueType == ValueType.Tuple || _rightNode.ValueType == ValueType.Tuple ||
-              _leftNode.IsNumeric != _rightNode.IsNumeric)
+          program.Instructions.Add(new Instruction
           {
-            throw new RuntimeException("Cannot perform comparison for different value types");
-          }
-
-          break;
-        case ElementType.ComparisonLessThan:
-        case ElementType.ComparisonGreaterThan:
-        case ElementType.ComparisonLessThanOrEqualTo:
-        case ElementType.ComparisonGreaterThanOrEqualTo:
-          if (!_leftNode.IsNumeric || !_rightNode.IsNumeric)
-          {
-            throw new RuntimeException("Cannot find values to perform arithmetic comparision on non numeric types");
-          }
-
-          break;
-        default:
-          throw new ArgumentOutOfRangeException(nameof(_comparisonType), _comparisonType,
-            "Unsupported comparision type");
-      }
-
-      if (_leftNode.ValueType == ValueType.String)
-      {
-        if (_rightNode.ValueType != ValueType.String)
-        {
-          throw new RuntimeException("String can only be compared against a string");
-        }
-
-        _comparisonValueType = ValueType.String;
-      }
-      else if (_leftNode.ValueType == ValueType.Boolean)
-      {
-        _comparisonValueType = ValueType.Boolean;
-      }
-      else if (_leftNode.ValueType == ValueType.Float || _rightNode.ValueType == ValueType.Float)
-      {
-        _comparisonValueType = ValueType.Float;
-      }
-      else
-      {
-        _comparisonValueType = ValueType.Integer;
-      }
-
-      switch (_comparisonType)
-      {
-        case ElementType.ComparisonEqual:
-          BooleanValue = EqualTo();
+            Type = InstructionType.ComparisonEqual,
+            reg0 = (byte)(nextRegisterIdx - 2),
+            reg1 = (byte)(nextRegisterIdx - 2),
+            reg2 = (byte)(nextRegisterIdx - 1)
+          });
           break;
         case ElementType.ComparisonNotEqual:
-          BooleanValue = !EqualTo();
+          program.Instructions.Add(new Instruction
+          {
+            Type = InstructionType.ComparisonNotEqual,
+            reg0 = (byte)(nextRegisterIdx - 2),
+            reg1 = (byte)(nextRegisterIdx - 2),
+            reg2 = (byte)(nextRegisterIdx - 1)
+          });
           break;
         case ElementType.ComparisonLessThan:
-          BooleanValue = LessThan();
+          program.Instructions.Add(new Instruction
+          {
+            Type = InstructionType.ComparisonLessThan,
+            reg0 = (byte)(nextRegisterIdx - 2),
+            reg1 = (byte)(nextRegisterIdx - 2),
+            reg2 = (byte)(nextRegisterIdx - 1)
+          });
           break;
         case ElementType.ComparisonGreaterThan:
-          BooleanValue = GreaterThan();
+          program.Instructions.Add(new Instruction
+          {
+            Type = InstructionType.ComparisonGreaterThan,
+            reg0 = (byte)(nextRegisterIdx - 2),
+            reg1 = (byte)(nextRegisterIdx - 2),
+            reg2 = (byte)(nextRegisterIdx - 1)
+          });
           break;
         case ElementType.ComparisonLessThanOrEqualTo:
-          BooleanValue = LessThan() || EqualTo();
+          program.Instructions.Add(new Instruction
+          {
+            Type = InstructionType.ComparisonLessThanOrEqualTo,
+            reg0 = (byte)(nextRegisterIdx - 2),
+            reg1 = (byte)(nextRegisterIdx - 2),
+            reg2 = (byte)(nextRegisterIdx - 1)
+          });
           break;
         case ElementType.ComparisonGreaterThanOrEqualTo:
-          BooleanValue = GreaterThan() || EqualTo();
+          program.Instructions.Add(new Instruction
+          {
+            Type = InstructionType.ComparisonGreaterThanOrEqualTo,
+            reg0 = (byte)(nextRegisterIdx - 2),
+            reg1 = (byte)(nextRegisterIdx - 2),
+            reg2 = (byte)(nextRegisterIdx - 1)
+          });
           break;
         default:
-          throw new ArgumentOutOfRangeException(nameof(_comparisonType), _comparisonType,
-            "Unsupported comparison type");
+          throw new ArgumentOutOfRangeException();
       }
 
-      IntegerValue = BooleanValue ? 1 : 0;
-      FloatValue = IntegerValue;
-    }
-
-    public override Node Optimize()
-    {
-      if (IsConstant)
-      {
-        Execute(null);
-        return CreateValueNode();
-      }
-
-      _leftNode = _leftNode.Optimize();
-      _rightNode = _rightNode.Optimize();
-      return this;
+      --nextRegisterIdx;
     }
   }
 }
