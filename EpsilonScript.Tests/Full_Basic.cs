@@ -30,12 +30,11 @@ namespace EpsilonScript.Tests
     private void Full_VariableAssign_Int_Succeeds()
     {
       var compiler = new Compiler();
-      var valId = "val".GetUniqueIdentifier();
-      var variables = new DictionaryVariableContainer { [valId] = new VariableValue(0) };
+      var variables = new DictionaryVariableContainer { ["val"] = new VariableValue(0) };
       var script = compiler.Compile("(val = 10 + -2 * -(20 - 10); val *= 2; val / 2) * 2 / 2");
       script.Execute(variables);
       Assert.Equal(30, script.IntegerValue);
-      Assert.Equal(60, variables[valId].IntegerValue);
+      Assert.Equal(60, variables["val"].IntegerValue);
     }
 
     [Fact]
