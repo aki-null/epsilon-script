@@ -36,57 +36,42 @@ namespace EpsilonScript.AST
       _leftNode.Encode(program, ref nextRegisterIdx, constantVm);
       _rightNode.Encode(program, ref nextRegisterIdx, constantVm);
 
+      InstructionType instructionType;
       switch (_operator)
       {
         case ElementType.AddOperator:
-          program.Instructions.Add(new Instruction
-          {
-            Type = InstructionType.Add,
-            reg0 = (byte)(nextRegisterIdx - 2),
-            reg1 = (byte)(nextRegisterIdx - 2),
-            reg2 = (byte)(nextRegisterIdx - 1)
-          });
+          instructionType = InstructionType.Add;
           break;
         case ElementType.SubtractOperator:
-          program.Instructions.Add(new Instruction
-          {
-            Type = InstructionType.Subtract,
-            reg0 = (byte)(nextRegisterIdx - 2),
-            reg1 = (byte)(nextRegisterIdx - 2),
-            reg2 = (byte)(nextRegisterIdx - 1)
-          });
+          instructionType = InstructionType.Subtract;
           break;
         case ElementType.MultiplyOperator:
-          program.Instructions.Add(new Instruction
-          {
-            Type = InstructionType.Multiply,
-            reg0 = (byte)(nextRegisterIdx - 2),
-            reg1 = (byte)(nextRegisterIdx - 2),
-            reg2 = (byte)(nextRegisterIdx - 1)
-          });
+          instructionType = InstructionType.Multiply;
           break;
         case ElementType.DivideOperator:
-          program.Instructions.Add(new Instruction
-          {
-            Type = InstructionType.Divide,
-            reg0 = (byte)(nextRegisterIdx - 2),
-            reg1 = (byte)(nextRegisterIdx - 2),
-            reg2 = (byte)(nextRegisterIdx - 1)
-          });
+          instructionType = InstructionType.Divide;
           break;
         case ElementType.ModuloOperator:
-          program.Instructions.Add(new Instruction
-          {
-            Type = InstructionType.Modulo,
-            reg0 = (byte)(nextRegisterIdx - 2),
-            reg1 = (byte)(nextRegisterIdx - 2),
-            reg2 = (byte)(nextRegisterIdx - 1)
-          });
+          instructionType = InstructionType.Modulo;
           break;
         default:
-          throw new ArgumentOutOfRangeException();
+          throw new ArgumentOutOfRangeException("Unsupported arithmetic operator", nameof(_operator));
       }
 
+      var leftReg = nextRegisterIdx - 2;
+      var rightReg = nextRegisterIdx - 1;
+      var writeReg = nextRegisterIdx - 2;
+
+      program.Instructions.Add(new Instruction
+      {
+        Type = instructionType,
+        reg0 = (byte)writeReg,
+        reg1 = (byte)leftReg,
+        reg2 = (byte)rightReg
+      });
+
+      // Any arithmetic instruction consumes two registers and stores the result into a single register. This results
+      // in one less register usage.
       --nextRegisterIdx;
     }
   }

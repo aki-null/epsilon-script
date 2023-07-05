@@ -1,31 +1,58 @@
-/*
-using System;
 using System.Collections.Generic;
 using EpsilonScript.AST;
 using EpsilonScript.Intermediate;
 using Xunit;
-using ValueType = EpsilonScript.AST.ValueType;
 
 namespace EpsilonScript.Tests
 {
   public class AST_Arithmetic
   {
+    private EpsilonScript.Bytecode.MutableProgram PrepareDependencyProgram(ref byte nextRegisterIdx,
+      params Node[] nodes)
+    {
+      var constantVm = new VirtualMachine.VirtualMachine();
+      var prog = new EpsilonScript.Bytecode.MutableProgram(null);
+      foreach (var node in nodes)
+      {
+        node.Encode(prog, ref nextRegisterIdx, constantVm);
+      }
+      return prog;
+    }
+
     [Theory]
     [MemberData(nameof(CorrectData))]
-    public void AST_Arithmetic_Succeeds(Element element, Node leftNode, Node rightNode, ValueType expectedNodeType,
-      int expectedInt, float expectedFloat, bool expectedBool, string expectedString)
+    private void AST_Arithmetic_Succeeds(Element element, Node leftNode, Node rightNode,
+      Bytecode.InstructionType expectedType)
     {
+      // Prep base
+      byte depNextRegisterIdx = 0;
+      var depProgram = PrepareDependencyProgram(ref depNextRegisterIdx, leftNode, rightNode);
+
       var node = new ArithmeticNode();
       var rpn = new Stack<Node>();
       rpn.Push(leftNode);
       rpn.Push(rightNode);
       node.Build(rpn, element, Compiler.Options.None, null);
-      node.Execute(null);
-      Assert.Equal(expectedNodeType, node.ValueType);
-      Assert.Equal(expectedInt, node.IntegerValue);
-      Assert.True(Math.IsNearlyEqual(expectedFloat, node.FloatValue));
-      Assert.Equal(expectedBool, node.BooleanValue);
-      Assert.Equal(expectedString, node.StringValue);
+      var prog = new EpsilonScript.Bytecode.MutableProgram(null);
+      byte nextRegisterIdx = 0;
+      node.Encode(prog, ref nextRegisterIdx, null);
+
+      Assert.Equal(depProgram.Instructions.Count + 1, prog.Instructions.Count);
+      for (var i = 0; i < depProgram.Instructions.Count; ++i)
+      {
+        var sample = depProgram.Instructions[i];
+        var actual = prog.Instructions[i];
+        Assert.Equal(sample.Type, actual.Type);
+        Assert.Equal(sample.IntegerValue, actual.IntegerValue);
+        Assert.Equal(sample.reg0, actual.reg0);
+        Assert.Equal(sample.reg1, actual.reg1);
+        Assert.Equal(sample.reg2, actual.reg2);
+      }
+      var testPos = depProgram.Instructions.Count;
+      Assert.Equal(expectedType, prog.Instructions[testPos].Type);
+      Assert.Equal(depNextRegisterIdx - 2, prog.Instructions[testPos].reg0);
+      Assert.Equal(depNextRegisterIdx - 2, prog.Instructions[testPos].reg1);
+      Assert.Equal(depNextRegisterIdx - 1, prog.Instructions[testPos].reg2);
     }
 
     public static IEnumerable<object[]> CorrectData
@@ -39,392 +66,347 @@ namespace EpsilonScript.Tests
             new Element(new Token("+", TokenType.PlusSign), ElementType.AddOperator),
             new FakeIntegerNode(0),
             new FakeIntegerNode(0),
-            ValueType.Integer,
-            0,
-            0.0f,
-            false,
-            null
+            Bytecode.InstructionType.Add
           },
           new object[]
           {
             new Element(new Token("+", TokenType.PlusSign), ElementType.AddOperator),
             new FakeIntegerNode(256),
             new FakeIntegerNode(128),
-            ValueType.Integer,
-            384,
-            384.0f,
-            true,
-            null
+            Bytecode.InstructionType.Add
           },
           new object[]
           {
             new Element(new Token("+", TokenType.PlusSign), ElementType.AddOperator),
             new FakeIntegerNode(256),
             new FakeIntegerNode(-128),
-            ValueType.Integer,
-            128,
-            128.0f,
-            true,
-            null
+            Bytecode.InstructionType.Add
           },
           new object[]
           {
             new Element(new Token("+", TokenType.PlusSign), ElementType.AddOperator),
             new FakeFloatNode(0),
             new FakeFloatNode(0),
-            ValueType.Float,
-            0,
-            0.0f,
-            false,
-            null
+            Bytecode.InstructionType.Add
           },
           new object[]
           {
             new Element(new Token("+", TokenType.PlusSign), ElementType.AddOperator),
             new FakeIntegerNode(0),
             new FakeFloatNode(0),
-            ValueType.Float,
-            0,
-            0.0f,
-            false,
-            null
+            Bytecode.InstructionType.Add
           },
           new object[]
           {
             new Element(new Token("+", TokenType.PlusSign), ElementType.AddOperator),
             new FakeFloatNode(0),
             new FakeIntegerNode(0),
-            ValueType.Float,
-            0,
-            0.0f,
-            false,
-            null
+            Bytecode.InstructionType.Add
           },
           new object[]
           {
             new Element(new Token("+", TokenType.PlusSign), ElementType.AddOperator),
             new FakeIntegerNode(1),
             new FakeIntegerNode(5),
-            ValueType.Integer,
-            6,
-            6.0f,
-            true,
-            null
+            Bytecode.InstructionType.Add
           },
           new object[]
           {
             new Element(new Token("+", TokenType.PlusSign), ElementType.AddOperator),
             new FakeIntegerNode(65536),
             new FakeIntegerNode(2147418111),
-            ValueType.Integer,
-            2147483647,
-            2147483647.0f,
-            true,
-            null
+            Bytecode.InstructionType.Add
           },
           new object[]
           {
             new Element(new Token("+", TokenType.PlusSign), ElementType.AddOperator),
             new FakeIntegerNode(65536 + 1),
             new FakeIntegerNode(2147418111),
-            ValueType.Integer,
-            -2147483648,
-            -2147483648.0f,
-            true,
-            null
+            Bytecode.InstructionType.Add
           },
           new object[]
           {
             new Element(new Token("+", TokenType.PlusSign), ElementType.AddOperator),
             new FakeStringNode(""),
             new FakeStringNode(""),
-            ValueType.String,
-            0,
-            0.0f,
-            false,
-            ""
+            Bytecode.InstructionType.Add
           },
           new object[]
           {
             new Element(new Token("+", TokenType.PlusSign), ElementType.AddOperator),
             new FakeStringNode("Hello "),
             new FakeStringNode("World"),
-            ValueType.String,
-            0,
-            0.0f,
-            false,
-            "Hello World"
+            Bytecode.InstructionType.Add
           },
           new object[]
           {
             new Element(new Token("+", TokenType.PlusSign), ElementType.AddOperator),
             new FakeStringNode("Hello"),
             new FakeStringNode(""),
-            ValueType.String,
-            0,
-            0.0f,
-            false,
-            "Hello"
+            Bytecode.InstructionType.Add
           },
           new object[]
           {
             new Element(new Token("+", TokenType.PlusSign), ElementType.AddOperator),
             new FakeStringNode(""),
             new FakeStringNode("Hello"),
-            ValueType.String,
-            0,
-            0.0f,
-            false,
-            "Hello"
+            Bytecode.InstructionType.Add
           },
           new object[]
           {
             new Element(new Token("+", TokenType.PlusSign), ElementType.AddOperator),
             new FakeStringNode("Life "),
             new FakeIntegerNode(42),
-            ValueType.String,
-            0,
-            0.0f,
-            false,
-            "Life 42"
+            Bytecode.InstructionType.Add
           },
           new object[]
           {
             new Element(new Token("+", TokenType.PlusSign), ElementType.AddOperator),
             new FakeStringNode("Life "),
             new FakeIntegerNode(-42),
-            ValueType.String,
-            0,
-            0.0f,
-            false,
-            "Life -42"
+            Bytecode.InstructionType.Add
           },
           new object[]
           {
             new Element(new Token("+", TokenType.PlusSign), ElementType.AddOperator),
             new FakeStringNode("Life "),
             new FakeFloatNode(-42.42f),
-            ValueType.String,
-            0,
-            0.0f,
-            false,
-            "Life -42.42"
+            Bytecode.InstructionType.Add
           },
           new object[]
           {
             new Element(new Token("+", TokenType.PlusSign), ElementType.AddOperator),
             new FakeStringNode("Pi "),
             new FakeFloatNode(3.14159265359f),
-            ValueType.String,
-            0,
-            0.0f,
-            false,
-            "Pi 3.1415927"
+            Bytecode.InstructionType.Add
           },
           new object[]
           {
             new Element(new Token("+", TokenType.PlusSign), ElementType.AddOperator),
             new FakeStringNode("-Pi "),
             new FakeFloatNode(-3.14159265359f),
-            ValueType.String,
-            0,
-            0.0f,
-            false,
-            "-Pi -3.1415927"
+            Bytecode.InstructionType.Add
           },
           new object[]
           {
             new Element(new Token("+", TokenType.PlusSign), ElementType.AddOperator),
             new FakeStringNode("true "),
             new FakeBooleanNode(true),
-            ValueType.String,
-            0,
-            0.0f,
-            false,
-            "true true"
+            Bytecode.InstructionType.Add
           },
           new object[]
           {
             new Element(new Token("+", TokenType.PlusSign), ElementType.AddOperator),
             new FakeStringNode("false "),
             new FakeBooleanNode(false),
-            ValueType.String,
-            0,
-            0.0f,
-            false,
-            "false false"
+            Bytecode.InstructionType.Add
           },
           new object[]
           {
             new Element(new Token("-", TokenType.MinusSign), ElementType.SubtractOperator),
             new FakeIntegerNode(0),
             new FakeIntegerNode(0),
-            ValueType.Integer,
-            0,
-            0.0f,
-            false,
-            null
+            Bytecode.InstructionType.Subtract
           },
           new object[]
           {
             new Element(new Token("-", TokenType.MinusSign), ElementType.SubtractOperator),
             new FakeFloatNode(0),
             new FakeFloatNode(0),
-            ValueType.Float,
-            0,
-            0.0f,
-            false,
-            null
+            Bytecode.InstructionType.Subtract
           },
           new object[]
           {
             new Element(new Token("-", TokenType.MinusSign), ElementType.SubtractOperator),
             new FakeIntegerNode(0),
             new FakeFloatNode(0),
-            ValueType.Float,
-            0,
-            0.0f,
-            false,
-            null
+            Bytecode.InstructionType.Subtract
           },
           new object[]
           {
             new Element(new Token("-", TokenType.MinusSign), ElementType.SubtractOperator),
             new FakeFloatNode(0),
             new FakeIntegerNode(0),
-            ValueType.Float,
-            0,
-            0.0f,
-            false,
-            null
+            Bytecode.InstructionType.Subtract
           },
           new object[]
           {
             new Element(new Token("-", TokenType.MinusSign), ElementType.SubtractOperator),
             new FakeIntegerNode(1),
             new FakeIntegerNode(5),
-            ValueType.Integer,
-            -4,
-            -4.0f,
-            true,
-            null
+            Bytecode.InstructionType.Subtract
           },
           new object[]
           {
             new Element(new Token("-", TokenType.MinusSign), ElementType.SubtractOperator),
             new FakeIntegerNode(1),
             new FakeIntegerNode(-5),
-            ValueType.Integer,
-            6,
-            6.0f,
-            true,
-            null
+            Bytecode.InstructionType.Subtract
           },
           new object[]
           {
             new Element(new Token("-", TokenType.MinusSign), ElementType.SubtractOperator),
             new FakeIntegerNode(-65537),
             new FakeIntegerNode(2147418111),
-            ValueType.Integer,
-            -2147483648,
-            -2147483648.0f,
-            true,
-            null
+            Bytecode.InstructionType.Subtract
           },
           new object[]
           {
             new Element(new Token("-", TokenType.MinusSign), ElementType.SubtractOperator),
             new FakeIntegerNode(-65537 - 1),
             new FakeIntegerNode(2147418111),
-            ValueType.Integer,
-            2147483647,
-            2147483647.0f,
-            true,
-            null
+            Bytecode.InstructionType.Subtract
           },
           new object[]
           {
             new Element(new Token("*", TokenType.MultiplyOperator), ElementType.MultiplyOperator),
             new FakeIntegerNode(0),
             new FakeIntegerNode(0),
-            ValueType.Integer,
-            0,
-            0.0f,
-            false,
-            null
+            Bytecode.InstructionType.Multiply
           },
           new object[]
           {
             new Element(new Token("*", TokenType.MultiplyOperator), ElementType.MultiplyOperator),
             new FakeIntegerNode(256),
             new FakeIntegerNode(128),
-            ValueType.Integer,
-            32768,
-            32768.0f,
-            true,
-            null
+            Bytecode.InstructionType.Multiply
           },
           new object[]
           {
             new Element(new Token("*", TokenType.MultiplyOperator), ElementType.MultiplyOperator),
             new FakeFloatNode(0),
             new FakeFloatNode(0),
-            ValueType.Float,
-            0,
-            0.0f,
-            false,
-            null
+            Bytecode.InstructionType.Multiply
           },
           new object[]
           {
             new Element(new Token("*", TokenType.MultiplyOperator), ElementType.MultiplyOperator),
             new FakeIntegerNode(0),
             new FakeFloatNode(0),
-            ValueType.Float,
-            0,
-            0.0f,
-            false,
-            null
+            Bytecode.InstructionType.Multiply
           },
           new object[]
           {
             new Element(new Token("*", TokenType.MultiplyOperator), ElementType.MultiplyOperator),
             new FakeFloatNode(0),
             new FakeIntegerNode(0),
-            ValueType.Float,
-            0,
-            0.0f,
-            false,
-            null
+            Bytecode.InstructionType.Multiply
           },
           new object[]
           {
             new Element(new Token("*", TokenType.MultiplyOperator), ElementType.MultiplyOperator),
             new FakeIntegerNode(2),
             new FakeIntegerNode(-5),
-            ValueType.Integer,
-            -10,
-            -10.0f,
-            true,
-            null
+            Bytecode.InstructionType.Multiply
           },
           new object[]
           {
             new Element(new Token("*", TokenType.MultiplyOperator), ElementType.MultiplyOperator),
             new FakeIntegerNode(2147483647),
             new FakeIntegerNode(2),
-            ValueType.Integer,
-            -2,
-            -2.0f,
-            true,
-            null
+            Bytecode.InstructionType.Multiply
           },
-          // TODO DivideOperator
-          // TODO ModuloOperator
+          new object[]
+          {
+            new Element(new Token("/", TokenType.DivideOperator), ElementType.DivideOperator),
+            new FakeIntegerNode(0),
+            new FakeIntegerNode(0),
+            Bytecode.InstructionType.Divide
+          },
+          new object[]
+          {
+            new Element(new Token("/", TokenType.DivideOperator), ElementType.DivideOperator),
+            new FakeIntegerNode(256),
+            new FakeIntegerNode(128),
+            Bytecode.InstructionType.Divide
+          },
+          new object[]
+          {
+            new Element(new Token("/", TokenType.DivideOperator), ElementType.DivideOperator),
+            new FakeFloatNode(0),
+            new FakeFloatNode(0),
+            Bytecode.InstructionType.Divide
+          },
+          new object[]
+          {
+            new Element(new Token("/", TokenType.DivideOperator), ElementType.DivideOperator),
+            new FakeIntegerNode(0),
+            new FakeFloatNode(0),
+            Bytecode.InstructionType.Divide
+          },
+          new object[]
+          {
+            new Element(new Token("/", TokenType.DivideOperator), ElementType.DivideOperator),
+            new FakeFloatNode(0),
+            new FakeIntegerNode(0),
+            Bytecode.InstructionType.Divide
+          },
+          new object[]
+          {
+            new Element(new Token("/", TokenType.DivideOperator), ElementType.DivideOperator),
+            new FakeIntegerNode(2),
+            new FakeIntegerNode(-5),
+            Bytecode.InstructionType.Divide
+          },
+          new object[]
+          {
+            new Element(new Token("/", TokenType.DivideOperator), ElementType.DivideOperator),
+            new FakeIntegerNode(2147483647),
+            new FakeIntegerNode(2),
+            Bytecode.InstructionType.Divide
+          },
+          new object[]
+          {
+            new Element(new Token("%", TokenType.ModuloOperator), ElementType.ModuloOperator),
+            new FakeIntegerNode(0),
+            new FakeIntegerNode(0),
+            Bytecode.InstructionType.Modulo
+          },
+          new object[]
+          {
+            new Element(new Token("%", TokenType.ModuloOperator), ElementType.ModuloOperator),
+            new FakeIntegerNode(256),
+            new FakeIntegerNode(128),
+            Bytecode.InstructionType.Modulo
+          },
+          new object[]
+          {
+            new Element(new Token("%", TokenType.ModuloOperator), ElementType.ModuloOperator),
+            new FakeFloatNode(0),
+            new FakeFloatNode(0),
+            Bytecode.InstructionType.Modulo
+          },
+          new object[]
+          {
+            new Element(new Token("%", TokenType.ModuloOperator), ElementType.ModuloOperator),
+            new FakeIntegerNode(0),
+            new FakeFloatNode(0),
+            Bytecode.InstructionType.Modulo
+          },
+          new object[]
+          {
+            new Element(new Token("%", TokenType.ModuloOperator), ElementType.ModuloOperator),
+            new FakeFloatNode(0),
+            new FakeIntegerNode(0),
+            Bytecode.InstructionType.Modulo
+          },
+          new object[]
+          {
+            new Element(new Token("%", TokenType.ModuloOperator), ElementType.ModuloOperator),
+            new FakeIntegerNode(2),
+            new FakeIntegerNode(-5),
+            Bytecode.InstructionType.Modulo
+          },
+          new object[]
+          {
+            new Element(new Token("%", TokenType.ModuloOperator), ElementType.ModuloOperator),
+            new FakeIntegerNode(2147483647),
+            new FakeIntegerNode(2),
+            Bytecode.InstructionType.Modulo
+          },
         };
       }
     }
   }
 }
-*/
 
