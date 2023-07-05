@@ -29,8 +29,10 @@ namespace EpsilonScript.Tests
       program.Instructions.Add(new Instruction
       {
         Type = InstructionType.LoadFloat,
-        FloatValue = _floatValue
+        FloatValue = _floatValue,
+        reg0 = nextRegisterIdx
       });
+      ++nextRegisterIdx;
     }
   }
 }

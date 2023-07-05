@@ -28,8 +28,10 @@ namespace EpsilonScript.Tests
       program.Instructions.Add(new Instruction
       {
         Type = InstructionType.LoadBoolean,
-        BooleanValue = _boolValue
+        BooleanValue = _boolValue,
+        reg0 = nextRegisterIdx
       });
+      ++nextRegisterIdx;
     }
   }
 }

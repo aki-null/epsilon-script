@@ -25,11 +25,17 @@ namespace EpsilonScript.Tests
     public override void Encode(MutableProgram program, ref byte nextRegisterIdx,
       VirtualMachine.VirtualMachine constantVm)
     {
+      var stringIndex = program.StringTable.Count;
+      program.StringTable.Add(_stringValue);
+
       program.Instructions.Add(new Instruction
       {
         Type = InstructionType.LoadString,
-        IntegerValue = program.AddString(_stringValue)
+        IntegerValue = stringIndex,
+        reg0 = nextRegisterIdx
       });
+
+      ++nextRegisterIdx;
     }
   }
 }

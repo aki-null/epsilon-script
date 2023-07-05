@@ -28,8 +28,10 @@ namespace EpsilonScript.Tests
       program.Instructions.Add(new Instruction
       {
         Type = InstructionType.LoadInteger,
-        IntegerValue = _integerValue
+        IntegerValue = _integerValue,
+        reg0 = nextRegisterIdx
       });
+      ++nextRegisterIdx;
     }
   }
 }
