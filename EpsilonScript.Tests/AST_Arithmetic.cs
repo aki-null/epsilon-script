@@ -7,27 +7,11 @@ namespace EpsilonScript.Tests
 {
   public class AST_Arithmetic
   {
-    private EpsilonScript.Bytecode.MutableProgram PrepareDependencyProgram(ref byte nextRegisterIdx,
-      params Node[] nodes)
-    {
-      var constantVm = new VirtualMachine.VirtualMachine();
-      var prog = new EpsilonScript.Bytecode.MutableProgram(null);
-      foreach (var node in nodes)
-      {
-        node.Encode(prog, ref nextRegisterIdx, constantVm);
-      }
-      return prog;
-    }
-
     [Theory]
     [MemberData(nameof(CorrectData))]
     private void AST_Arithmetic_Succeeds(Element element, Node leftNode, Node rightNode,
       Bytecode.InstructionType expectedType)
     {
-      // Prep base
-      byte depNextRegisterIdx = 0;
-      var depProgram = PrepareDependencyProgram(ref depNextRegisterIdx, leftNode, rightNode);
-
       var node = new ArithmeticNode();
       var rpn = new Stack<Node>();
       rpn.Push(leftNode);
@@ -37,22 +21,15 @@ namespace EpsilonScript.Tests
       byte nextRegisterIdx = 0;
       node.Encode(prog, ref nextRegisterIdx, null);
 
-      Assert.Equal(depProgram.Instructions.Count + 1, prog.Instructions.Count);
-      for (var i = 0; i < depProgram.Instructions.Count; ++i)
-      {
-        var sample = depProgram.Instructions[i];
-        var actual = prog.Instructions[i];
-        Assert.Equal(sample.Type, actual.Type);
-        Assert.Equal(sample.IntegerValue, actual.IntegerValue);
-        Assert.Equal(sample.reg0, actual.reg0);
-        Assert.Equal(sample.reg1, actual.reg1);
-        Assert.Equal(sample.reg2, actual.reg2);
-      }
-      var testPos = depProgram.Instructions.Count;
-      Assert.Equal(expectedType, prog.Instructions[testPos].Type);
-      Assert.Equal(depNextRegisterIdx - 2, prog.Instructions[testPos].reg0);
-      Assert.Equal(depNextRegisterIdx - 2, prog.Instructions[testPos].reg1);
-      Assert.Equal(depNextRegisterIdx - 1, prog.Instructions[testPos].reg2);
+      byte depNextRegisterIdx = 0;
+      ASTTestHelper.ValidateDependencyProgramEncode(ref depNextRegisterIdx, out var depCount, prog, leftNode,
+        rightNode);
+
+      Assert.Equal(depCount + 1, prog.Instructions.Count);
+      Assert.Equal(expectedType, prog.Instructions[depCount].Type);
+      Assert.Equal(depNextRegisterIdx - 2, prog.Instructions[depCount].reg0);
+      Assert.Equal(depNextRegisterIdx - 2, prog.Instructions[depCount].reg1);
+      Assert.Equal(depNextRegisterIdx - 1, prog.Instructions[depCount].reg2);
     }
 
     public static IEnumerable<object[]> CorrectData

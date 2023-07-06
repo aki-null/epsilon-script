@@ -1,7 +1,7 @@
-/*
 using System.Collections.Generic;
 using EpsilonScript.AST;
 using EpsilonScript.Intermediate;
+using EpsilonScript.Bytecode;
 using Xunit;
 
 namespace EpsilonScript.Tests
@@ -10,31 +10,17 @@ namespace EpsilonScript.Tests
   {
     [Theory]
     [MemberData(nameof(CorrectData))]
-    public void AST_BuildBoolean_Succeeds(Element element, ValueType expectedNodeType, int expectedInt,
-      float expectedFloat, bool expectedBool)
+    internal void AST_BuildBoolean_Succeeds(Element element, Instruction expected)
     {
       var node = new BooleanNode();
       var rpn = new Stack<Node>();
-      node.Build(rpn, element, Compiler.Options.None,
-        null);
-      Assert.Equal(expectedNodeType, node.ValueType);
-      Assert.Equal(expectedInt, node.IntegerValue);
-      Assert.True(Math.IsNearlyEqual(expectedFloat, node.FloatValue));
-      Assert.Equal(expectedBool, node.BooleanValue);
-    }
+      node.Build(rpn, element, Compiler.Options.None, null);
 
-    [Theory]
-    [InlineData(true)]
-    [InlineData(false)]
-    public void AST_CreateBoolean_Succeeds(bool value)
-    {
-      var node = new BooleanNode(value);
-      var expectedInt = value ? 1 : 0;
-      var expectedFloat = (float)expectedInt;
-      Assert.Equal(ValueType.Boolean, node.ValueType);
-      Assert.Equal(expectedInt, node.IntegerValue);
-      Assert.True(Math.IsNearlyEqual(expectedFloat, node.FloatValue));
-      Assert.Equal(value, node.BooleanValue);
+      var prog = new EpsilonScript.Bytecode.MutableProgram(null);
+      byte nextRegisterIdx = 0;
+      node.Encode(prog, ref nextRegisterIdx, null);
+
+      ASTTestHelper.AssertSingleInstructionProgram(expected, prog);
     }
 
     public static IEnumerable<object[]> CorrectData
@@ -46,23 +32,29 @@ namespace EpsilonScript.Tests
           new object[]
           {
             new Element(new Token("true", TokenType.BooleanLiteralTrue), ElementType.BooleanLiteralTrue),
-            ValueType.Boolean,
-            1,
-            1.0f,
-            true
+            new Instruction
+            {
+              BooleanValue = true,
+              Type = InstructionType.LoadBoolean,
+              reg0 = 0,
+              reg1 = 0,
+              reg2 = 0
+            }
           },
           new object[]
           {
             new Element(new Token("false", TokenType.BooleanLiteralFalse), ElementType.BooleanLiteralFalse),
-            ValueType.Boolean,
-            0,
-            0.0f,
-            false
+            new Instruction
+            {
+              BooleanValue = false,
+              Type = InstructionType.LoadBoolean,
+              reg0 = 0,
+              reg1 = 0,
+              reg2 = 0
+            }
           },
         };
       }
     }
   }
 }
-*/
-
