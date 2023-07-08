@@ -49,9 +49,18 @@ namespace EpsilonScript.AST
 
       _rightNode.Encode(program, ref nextRegisterIdx, constantVm);
 
-      // Anything that is not a simple assignment requires the variable value to be read into the stack
-      if (_assignmentType != ElementType.AssignmentOperator)
+      if (_assignmentType == ElementType.AssignmentOperator)
       {
+        program.Instructions.Add(new Instruction
+        {
+          Type = InstructionType.AssignVariable,
+          IntegerValue = _assignmentTarget.VariableName,
+          reg0 = (byte) (nextRegisterIdx - 1)
+        });
+      }
+      else
+      {
+        // Compound assignment requires the assignment target variable to be loaded into the stack
         program.Instructions.Add(new Instruction
         {
           Type = InstructionType.LoadVariableValue,
@@ -59,50 +68,52 @@ namespace EpsilonScript.AST
           reg0 = nextRegisterIdx
         });
         ++nextRegisterIdx;
+
+        InstructionType instructionType;
+        // Arithmetic instructions for non-simple assignment
+        switch (_assignmentType)
+        {
+          case ElementType.AssignmentAddOperator:
+            instructionType = InstructionType.Add;
+            break;
+          case ElementType.AssignmentSubtractOperator:
+            instructionType = InstructionType.Subtract;
+            break;
+          case ElementType.AssignmentMultiplyOperator:
+            instructionType = InstructionType.Multiply;
+            break;
+          case ElementType.AssignmentDivideOperator:
+            instructionType = InstructionType.Divide;
+            break;
+          default:
+            throw new ArgumentOutOfRangeException("Unsupported assignment operator", nameof(_assignmentType));
+        }
+
+        var leftReg = (byte)(nextRegisterIdx - 2);
+        var rightReg = (byte)(nextRegisterIdx - 1);
+        var writeReg = (byte)(nextRegisterIdx - 2);
+
+        program.Instructions.Add(new Instruction
+        {
+          Type = instructionType,
+          reg0 = writeReg,
+          reg1 = leftReg,
+          reg2 = rightReg
+        });
+
+        // Any arithmetic instruction consumes two registers and stores the result into a single register. This results
+        // in one less register usage.
+        --nextRegisterIdx;
+
+        program.Instructions.Add(new Instruction
+        {
+          Type = InstructionType.AssignVariable,
+          IntegerValue = _assignmentTarget.VariableName,
+          reg0 = (writeReg)
+        });
       }
-
-      InstructionType instructionType;
-      // Arithmetic instructions for non-simple assignment
-      switch (_assignmentType)
-      {
-        case ElementType.AssignmentAddOperator:
-          instructionType = InstructionType.Add;
-          break;
-        case ElementType.AssignmentSubtractOperator:
-          instructionType = InstructionType.Subtract;
-          break;
-        case ElementType.AssignmentMultiplyOperator:
-          instructionType = InstructionType.Multiply;
-          break;
-        case ElementType.AssignmentDivideOperator:
-          instructionType = InstructionType.Divide;
-          break;
-        default:
-          throw new ArgumentOutOfRangeException("Unsupported assignment operator", nameof(_assignmentType));
-      }
-
-      var leftReg = (byte)(nextRegisterIdx - 2);
-      var rightReg = (byte)(nextRegisterIdx - 1);
-      var writeReg = (byte)(nextRegisterIdx - 2);
-
-      program.Instructions.Add(new Instruction
-      {
-        Type = instructionType,
-        reg0 = writeReg,
-        reg1 = leftReg,
-        reg2 = rightReg
-      });
-
-      // Any arithmetic instruction consumes two registers and stores the result into a single register. This results
-      // in one less register usage.
-      --nextRegisterIdx;
-
-      program.Instructions.Add(new Instruction
-      {
-        Type = InstructionType.AssignVariable,
-        IntegerValue = _assignmentTarget.VariableName,
-        reg0 = (writeReg)
-      });
+      // Note: Assignment instruction does not require the next register index to be decremented, since the result of
+      // assignment IS the value assigned.
     }
   }
 }
