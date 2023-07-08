@@ -58,16 +58,16 @@ namespace EpsilonScript.AST
           throw new ArgumentOutOfRangeException("Unsupported arithmetic operator", nameof(_operator));
       }
 
-      var leftReg = nextRegisterIdx - 2;
-      var rightReg = nextRegisterIdx - 1;
-      var writeReg = nextRegisterIdx - 2;
+      var leftReg = (byte)(nextRegisterIdx - 2);
+      var rightReg = (byte)(nextRegisterIdx - 1);
+      var writeReg = (byte)(nextRegisterIdx - 2);
 
       program.Instructions.Add(new Instruction
       {
         Type = instructionType,
-        reg0 = (byte)writeReg,
-        reg1 = (byte)leftReg,
-        reg2 = (byte)rightReg
+        reg0 = writeReg,
+        reg1 = leftReg,
+        reg2 = rightReg
       });
 
       // Any arithmetic instruction consumes two registers and stores the result into a single register. This results

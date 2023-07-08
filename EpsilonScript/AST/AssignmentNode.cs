@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using EpsilonScript.Bytecode;
 using EpsilonScript.Function;
@@ -60,56 +61,47 @@ namespace EpsilonScript.AST
         ++nextRegisterIdx;
       }
 
+      InstructionType instructionType;
       // Arithmetic instructions for non-simple assignment
       switch (_assignmentType)
       {
         case ElementType.AssignmentAddOperator:
-          program.Instructions.Add(new Instruction
-          {
-            Type = InstructionType.Add,
-            reg0 = (byte)(nextRegisterIdx - 2),
-            reg1 = (byte)(nextRegisterIdx - 1),
-            reg2 = (byte)(nextRegisterIdx - 2)
-          });
-          --nextRegisterIdx;
+          instructionType = InstructionType.Add;
           break;
         case ElementType.AssignmentSubtractOperator:
-          program.Instructions.Add(new Instruction
-          {
-            Type = InstructionType.Subtract,
-            reg0 = (byte)(nextRegisterIdx - 2),
-            reg1 = (byte)(nextRegisterIdx - 1),
-            reg2 = (byte)(nextRegisterIdx - 2)
-          });
-          --nextRegisterIdx;
+          instructionType = InstructionType.Subtract;
           break;
         case ElementType.AssignmentMultiplyOperator:
-          program.Instructions.Add(new Instruction
-          {
-            Type = InstructionType.Multiply,
-            reg0 = (byte)(nextRegisterIdx - 2),
-            reg1 = (byte)(nextRegisterIdx - 1),
-            reg2 = (byte)(nextRegisterIdx - 2)
-          });
-          --nextRegisterIdx;
+          instructionType = InstructionType.Multiply;
           break;
         case ElementType.AssignmentDivideOperator:
-          program.Instructions.Add(new Instruction
-          {
-            Type = InstructionType.Divide,
-            reg0 = (byte)(nextRegisterIdx - 2),
-            reg1 = (byte)(nextRegisterIdx - 1),
-            reg2 = (byte)(nextRegisterIdx - 2)
-          });
-          --nextRegisterIdx;
+          instructionType = InstructionType.Divide;
           break;
+        default:
+          throw new ArgumentOutOfRangeException("Unsupported assignment operator", nameof(_assignmentType));
       }
+
+      var leftReg = (byte)(nextRegisterIdx - 2);
+      var rightReg = (byte)(nextRegisterIdx - 1);
+      var writeReg = (byte)(nextRegisterIdx - 2);
+
+      program.Instructions.Add(new Instruction
+      {
+        Type = instructionType,
+        reg0 = writeReg,
+        reg1 = leftReg,
+        reg2 = rightReg
+      });
+
+      // Any arithmetic instruction consumes two registers and stores the result into a single register. This results
+      // in one less register usage.
+      --nextRegisterIdx;
 
       program.Instructions.Add(new Instruction
       {
         Type = InstructionType.AssignVariable,
         IntegerValue = _assignmentTarget.VariableName,
-        reg0 = (byte)(nextRegisterIdx - 1)
+        reg0 = (writeReg)
       });
     }
   }
