@@ -36,66 +36,46 @@ namespace EpsilonScript.AST
       _leftNode.Encode(program, ref nextRegisterIdx, constantVm);
       _rightNode.Encode(program, ref nextRegisterIdx, constantVm);
 
+
+      InstructionType instructionType;
       switch (_comparisonType)
       {
         case ElementType.ComparisonEqual:
-          program.Instructions.Add(new Instruction
-          {
-            Type = InstructionType.ComparisonEqual,
-            reg0 = (byte)(nextRegisterIdx - 2),
-            reg1 = (byte)(nextRegisterIdx - 2),
-            reg2 = (byte)(nextRegisterIdx - 1)
-          });
+          instructionType = InstructionType.ComparisonEqual;
           break;
         case ElementType.ComparisonNotEqual:
-          program.Instructions.Add(new Instruction
-          {
-            Type = InstructionType.ComparisonNotEqual,
-            reg0 = (byte)(nextRegisterIdx - 2),
-            reg1 = (byte)(nextRegisterIdx - 2),
-            reg2 = (byte)(nextRegisterIdx - 1)
-          });
+          instructionType = InstructionType.ComparisonNotEqual;
           break;
         case ElementType.ComparisonLessThan:
-          program.Instructions.Add(new Instruction
-          {
-            Type = InstructionType.ComparisonLessThan,
-            reg0 = (byte)(nextRegisterIdx - 2),
-            reg1 = (byte)(nextRegisterIdx - 2),
-            reg2 = (byte)(nextRegisterIdx - 1)
-          });
+          instructionType = InstructionType.ComparisonLessThan;
           break;
         case ElementType.ComparisonGreaterThan:
-          program.Instructions.Add(new Instruction
-          {
-            Type = InstructionType.ComparisonGreaterThan,
-            reg0 = (byte)(nextRegisterIdx - 2),
-            reg1 = (byte)(nextRegisterIdx - 2),
-            reg2 = (byte)(nextRegisterIdx - 1)
-          });
+          instructionType = InstructionType.ComparisonGreaterThan;
           break;
         case ElementType.ComparisonLessThanOrEqualTo:
-          program.Instructions.Add(new Instruction
-          {
-            Type = InstructionType.ComparisonLessThanOrEqualTo,
-            reg0 = (byte)(nextRegisterIdx - 2),
-            reg1 = (byte)(nextRegisterIdx - 2),
-            reg2 = (byte)(nextRegisterIdx - 1)
-          });
+          instructionType = InstructionType.ComparisonLessThanOrEqualTo;
           break;
         case ElementType.ComparisonGreaterThanOrEqualTo:
-          program.Instructions.Add(new Instruction
-          {
-            Type = InstructionType.ComparisonGreaterThanOrEqualTo,
-            reg0 = (byte)(nextRegisterIdx - 2),
-            reg1 = (byte)(nextRegisterIdx - 2),
-            reg2 = (byte)(nextRegisterIdx - 1)
-          });
+          instructionType = InstructionType.ComparisonGreaterThanOrEqualTo;
           break;
         default:
-          throw new ArgumentOutOfRangeException();
+          throw new ArgumentOutOfRangeException("Unsupported comparison operator", nameof(_comparisonType));
       }
 
+      var leftReg = (byte)(nextRegisterIdx - 2);
+      var rightReg = (byte)(nextRegisterIdx - 1);
+      var writeReg = (byte)(nextRegisterIdx - 2);
+
+      program.Instructions.Add(new Instruction
+      {
+        Type = instructionType,
+        reg0 = writeReg,
+        reg1 = leftReg,
+        reg2 = rightReg
+      });
+
+      // Any comparison instruction consumes two registers and stores the result into a single register. This results in
+      // one less register usage.
       --nextRegisterIdx;
     }
   }
