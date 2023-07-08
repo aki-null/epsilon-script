@@ -62,13 +62,6 @@ namespace EpsilonScript.AST
           return new TupleNode();
         case ElementType.Semicolon:
           return new SequenceNode();
-        case ElementType.ComparisonEqual:
-        case ElementType.ComparisonNotEqual:
-        case ElementType.ComparisonLessThan:
-        case ElementType.ComparisonGreaterThan:
-        case ElementType.ComparisonLessThanOrEqualTo:
-        case ElementType.ComparisonGreaterThanOrEqualTo:
-          return new ComparisonNode();
         case ElementType.NegateOperator:
           return new NegateNode();
         case ElementType.PositiveOperator:
@@ -86,12 +79,18 @@ namespace EpsilonScript.AST
         case ElementType.AssignmentMultiplyOperator:
         case ElementType.AssignmentDivideOperator:
           return new AssignmentNode();
+        case ElementType.ComparisonEqual:
+        case ElementType.ComparisonNotEqual:
+        case ElementType.ComparisonLessThan:
+        case ElementType.ComparisonGreaterThan:
+        case ElementType.ComparisonLessThanOrEqualTo:
+        case ElementType.ComparisonGreaterThanOrEqualTo:
         case ElementType.AddOperator:
         case ElementType.SubtractOperator:
         case ElementType.MultiplyOperator:
         case ElementType.DivideOperator:
         case ElementType.ModuloOperator:
-          return new ArithmeticNode();
+          return new BinaryOperatorNode();
         case ElementType.Integer:
           return new IntegerNode();
         case ElementType.Float:

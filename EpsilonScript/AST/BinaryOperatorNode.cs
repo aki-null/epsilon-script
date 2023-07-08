@@ -6,7 +6,7 @@ using EpsilonScript.Intermediate;
 
 namespace EpsilonScript.AST
 {
-  internal class ArithmeticNode : Node
+  internal class BinaryOperatorNode : Node
   {
     private Node _leftNode;
     private Node _rightNode;
@@ -19,7 +19,7 @@ namespace EpsilonScript.AST
     {
       if (!rpnStack.TryPop(out _rightNode) || !rpnStack.TryPop(out _leftNode))
       {
-        throw new ParserException(element.Token, "Cannot find values to perform arithmetic operation on");
+        throw new ParserException(element.Token, "Cannot find values to perform binary operation on");
       }
 
       _operator = element.Type;
@@ -36,27 +36,21 @@ namespace EpsilonScript.AST
       _leftNode.Encode(program, ref nextRegisterIdx, constantVm);
       _rightNode.Encode(program, ref nextRegisterIdx, constantVm);
 
-      InstructionType instructionType;
-      switch (_operator)
+      InstructionType instructionType = _operator switch
       {
-        case ElementType.AddOperator:
-          instructionType = InstructionType.Add;
-          break;
-        case ElementType.SubtractOperator:
-          instructionType = InstructionType.Subtract;
-          break;
-        case ElementType.MultiplyOperator:
-          instructionType = InstructionType.Multiply;
-          break;
-        case ElementType.DivideOperator:
-          instructionType = InstructionType.Divide;
-          break;
-        case ElementType.ModuloOperator:
-          instructionType = InstructionType.Modulo;
-          break;
-        default:
-          throw new ArgumentOutOfRangeException("Unsupported arithmetic operator", nameof(_operator));
-      }
+        ElementType.ComparisonEqual => InstructionType.ComparisonEqual,
+        ElementType.ComparisonNotEqual => InstructionType.ComparisonNotEqual,
+        ElementType.ComparisonLessThan => InstructionType.ComparisonLessThan,
+        ElementType.ComparisonGreaterThan => InstructionType.ComparisonGreaterThan,
+        ElementType.ComparisonLessThanOrEqualTo => InstructionType.ComparisonLessThanOrEqualTo,
+        ElementType.ComparisonGreaterThanOrEqualTo => InstructionType.ComparisonGreaterThanOrEqualTo,
+        ElementType.AddOperator => InstructionType.Add,
+        ElementType.SubtractOperator => InstructionType.Subtract,
+        ElementType.MultiplyOperator => InstructionType.Multiply,
+        ElementType.DivideOperator => InstructionType.Divide,
+        ElementType.ModuloOperator => InstructionType.Modulo,
+        _ => throw new ArgumentOutOfRangeException("Unsupported binary operator", nameof(_operator))
+      };
 
       var leftReg = (byte)(nextRegisterIdx - 2);
       var rightReg = (byte)(nextRegisterIdx - 1);
@@ -70,8 +64,8 @@ namespace EpsilonScript.AST
         reg2 = rightReg
       });
 
-      // Any arithmetic instruction consumes two registers and stores the result into a single register. This results
-      // in one less register usage.
+      // Any binary operation consumes two registers and stores the result into a single register. This results in one
+      // less register usage.
       --nextRegisterIdx;
     }
   }
