@@ -1,5 +1,4 @@
 using System;
-using System.Runtime.CompilerServices;
 using EpsilonScript.Helper;
 using EpsilonScript.Bytecode;
 
@@ -38,8 +37,8 @@ namespace EpsilonScript.VirtualMachine
       Instruction instruction)
     {
       var variable = instruction.IntegerValue > 0
-        ? FindVariable(instruction.IntegerValue, globalVariables, localVariables) // Cached access
-        : _variableRegisters[instruction.reg1]; // Uncached access
+        ? FindVariable(instruction.IntegerValue, globalVariables, localVariables) // Uncached access
+        : _variableRegisters[instruction.reg1]; // Cached access
       variable.LoadToRegister(_registers, _stringRegisters, instruction.reg0);
     }
 
@@ -47,8 +46,8 @@ namespace EpsilonScript.VirtualMachine
       Instruction instruction)
     {
       var variable = instruction.IntegerValue > 0
-        ? FindVariable(instruction.IntegerValue, globalVariables, localVariables) // Cached access
-        : _variableRegisters[instruction.reg1]; // Uncached access
+        ? FindVariable(instruction.IntegerValue, globalVariables, localVariables) // Uncached access
+        : _variableRegisters[instruction.reg1]; // Cached access
       var registerValue = _registers[instruction.reg0];
       switch (registerValue.ValueType)
       {
