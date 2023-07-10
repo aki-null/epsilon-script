@@ -15,6 +15,7 @@ namespace EpsilonScript.Tests
     internal static void AssertEqualInstruction(Instruction expected, Instruction actual)
     {
       Assert.Equal(expected.Type, actual.Type);
+      // The instruction may not contain an integer data, but comparison should work fine
       Assert.Equal(expected.IntegerValue, actual.IntegerValue);
       Assert.Equal(expected.reg0, actual.reg0);
       Assert.Equal(expected.reg1, actual.reg1);
