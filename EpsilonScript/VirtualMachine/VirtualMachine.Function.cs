@@ -22,8 +22,7 @@ namespace EpsilonScript.VirtualMachine
       for (var i = 0; i < functionParameterCount; ++i)
       {
         var currentStackValue = regPtr + instruction.reg2 + i;
-        var funcParam = currentStackValue->ResolveToConcreteValue(_program.StringTable, _stringRegisters);
-        _functionParameters[i] = funcParam;
+        _functionParameters[i] = currentStackValue->ResolveToConcreteValue(_program.StringTable, _stringRegisters);
         // String reference has been created inside the parameter list. This should be cleared to allow for the garbage
         // collector to clean them, but the cleaning cost is not cheap, so it is left as is on purpose.
         // It is likely to be overwritten when an another function is executed later anyway.
@@ -36,29 +35,30 @@ namespace EpsilonScript.VirtualMachine
         throw new RuntimeException($"Function named {funcId.GetStringFromUniqueIdentifier()} is not defined");
       }
 
+      var paramSpan = _functionParameters.AsSpan(0, functionParameterCount);
+
       // Find actual function
-      var func = funcOverload.Find(_functionParameters.AsSpan(0, functionParameterCount));
+      var func = funcOverload.Find(paramSpan);
 
       var targetRegPtr = regPtr + instruction.reg0;
       switch (func.ReturnType)
       {
         case Type.Integer:
           targetRegPtr->ValueType = RegisterValueType.Integer;
-          targetRegPtr->IntegerValue = func.ExecuteInt(_functionParameters.AsSpan(0, functionParameterCount));
+          targetRegPtr->IntegerValue = func.ExecuteInt(paramSpan);
           break;
         case Type.Float:
           targetRegPtr->ValueType = RegisterValueType.Float;
-          targetRegPtr->FloatValue = func.ExecuteFloat(_functionParameters.AsSpan(0, functionParameterCount));
+          targetRegPtr->FloatValue = func.ExecuteFloat(paramSpan);
           break;
         case Type.Boolean:
           targetRegPtr->ValueType = RegisterValueType.Boolean;
-          targetRegPtr->BooleanValue = func.ExecuteBoolean(_functionParameters.AsSpan(0, functionParameterCount));
+          targetRegPtr->BooleanValue = func.ExecuteBoolean(paramSpan);
           break;
         case Type.String:
-          _stringRegisters[instruction.reg0] =
-            func.ExecuteString(_functionParameters.AsSpan(0, functionParameterCount));
           targetRegPtr->ValueType = RegisterValueType.StringStack;
           targetRegPtr->IntegerValue = instruction.reg0;
+          _stringRegisters[instruction.reg0] = func.ExecuteString(paramSpan);
           break;
         default:
           throw new ArgumentOutOfRangeException(nameof(func.ReturnType), func.ReturnType,
