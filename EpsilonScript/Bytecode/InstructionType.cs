@@ -27,6 +27,11 @@ namespace EpsilonScript.Bytecode
     // reg0 = Load target, reg1 = Unused, reg2 = Unused
     LoadVariableValue,
 
+    // Loads a prefetched variable value
+    // value = Unused
+    // reg0 = Load target, reg1 = Variable prefetch ID, reg2 = Unused
+    LoadPrefetchedVariableValue,
+
     // Adds two numbers
     // value = Unused
     // reg0 = Write target, reg1 = Left value, reg2 = Right value

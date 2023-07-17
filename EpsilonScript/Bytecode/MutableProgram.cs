@@ -95,6 +95,13 @@ namespace EpsilonScript.Bytecode
           switch (instruction.Type)
           {
             case InstructionType.LoadVariableValue:
+            {
+              instruction.Type = InstructionType.LoadPrefetchedVariableValue;
+              instruction.reg1 = (byte)_variableUsageCache[instruction.IntegerValue];
+              instruction.IntegerValue = 0;
+              Instructions[i] = instruction;
+              break;
+            }
             case InstructionType.AssignVariable:
             {
               instruction.reg1 = (byte)_variableUsageCache[instruction.IntegerValue];

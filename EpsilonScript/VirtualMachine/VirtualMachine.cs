@@ -54,7 +54,11 @@ namespace EpsilonScript.VirtualMachine
                 targetRegPtr->IntegerValue = instruction.IntegerValue;
                 break;
               case InstructionType.LoadVariableValue:
-                LoadVariableValue(globalVariables, localVariables, instruction, regPtr);
+                FindVariable(instruction.IntegerValue, globalVariables, localVariables)
+                  .LoadToRegister(regPtr, _stringRegisters, instruction.reg0);
+                break;
+              case InstructionType.LoadPrefetchedVariableValue:
+                _variableCache[instruction.reg1].LoadToRegister(regPtr, _stringRegisters, instruction.reg0);
                 break;
               case InstructionType.Add:
                 Add(instruction, regPtr);
@@ -115,8 +119,11 @@ namespace EpsilonScript.VirtualMachine
               case InstructionType.AssignVariable:
                 SetVariableValue(globalVariables, localVariables, instruction, regPtr);
                 break;
+              // Prefetch is optimal when accessing variables multiple times in a single program.
+              // This is because finding a variable usually involves a dictionary lookup.
               case InstructionType.PrefetchVariable:
-                PrefetchVariable(globalVariables, localVariables, instruction);
+                _variableCache[instruction.reg0] =
+                  FindVariable(instruction.IntegerValue, globalVariables, localVariables);
                 break;
               case InstructionType.CallFunction:
                 Function(instruction, regPtr);

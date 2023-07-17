@@ -22,26 +22,6 @@ namespace EpsilonScript.VirtualMachine
       throw new RuntimeException($"Undefined variable: {variableName.GetStringFromUniqueIdentifier()}");
     }
 
-    /// <summary>
-    /// Prefetch is optimal when accessing variables multiple times in a single program.
-    /// This is because finding a variable usually involves a dictionary lookup.
-    /// </summary>
-    private void PrefetchVariable(IVariableContainer globalVariables, IVariableContainer localVariables,
-      Instruction instruction)
-    {
-      var variable = FindVariable(instruction.IntegerValue, globalVariables, localVariables);
-      _variableCache[instruction.reg0] = variable;
-    }
-
-    private unsafe void LoadVariableValue(IVariableContainer globalVariables, IVariableContainer localVariables,
-      Instruction instruction, RegisterValue* regPtr)
-    {
-      var variable = instruction.IntegerValue > 0
-        ? FindVariable(instruction.IntegerValue, globalVariables, localVariables) // Uncached access
-        : _variableCache[instruction.reg1]; // Cached access
-      variable.LoadToRegister(regPtr, _stringRegisters, instruction.reg0);
-    }
-
     private unsafe void SetVariableValue(IVariableContainer globalVariables, IVariableContainer localVariables,
       Instruction instruction, RegisterValue* regPtr)
     {
