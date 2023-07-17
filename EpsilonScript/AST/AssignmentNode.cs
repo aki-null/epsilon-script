@@ -86,7 +86,7 @@ namespace EpsilonScript.AST
             instructionType = InstructionType.Divide;
             break;
           default:
-            throw new ArgumentOutOfRangeException("Unsupported assignment operator", nameof(_assignmentType));
+            throw new ArgumentOutOfRangeException(nameof(_assignmentType), "Unsupported assignment operator");
         }
 
         var leftReg = (byte)(nextRegisterIdx - 2);
