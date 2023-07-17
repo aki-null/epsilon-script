@@ -65,10 +65,10 @@ namespace EpsilonScript.Bytecode
             continue;
           }
 
-          if (nextVariableRegisterIndex >= VirtualMachine.VirtualMachine.MaxVariables)
+          if (nextVariableRegisterIndex >= VirtualMachine.VirtualMachine.MaxVariableCache)
           {
             throw new ArgumentException(
-              $"The current virtual machine configuration supports maximum of {VirtualMachine.VirtualMachine.MaxVariables} variables.");
+              $"The current virtual machine configuration supports maximum of {VirtualMachine.VirtualMachine.MaxVariableCache} variables.");
           }
 
           variablePrefetchInstructions ??= new List<Instruction>();
