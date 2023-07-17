@@ -7,11 +7,12 @@ namespace EpsilonScript.VirtualMachine
     // Shared VM for the main thread
     internal static VirtualMachine Main { get; } = new VirtualMachine();
 
-    internal const int MaxVariables = 32;
+    internal const int MaxVariableCache = 32;
+    internal const int RegisterCount = 32;
 
-    private readonly RegisterValue[] _registers = new RegisterValue[32];
-    private readonly string[] _stringRegisters = new string[32];
-    private readonly VariableValue[] _variableRegisters = new VariableValue[MaxVariables];
+    private readonly RegisterValue[] _registers = new RegisterValue[RegisterCount];
+    private readonly string[] _stringRegisters = new string[RegisterCount];
+    private readonly VariableValue[] _variableCache = new VariableValue[MaxVariableCache];
 
     private Program _program;
 

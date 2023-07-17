@@ -30,7 +30,7 @@ namespace EpsilonScript.VirtualMachine
       Instruction instruction)
     {
       var variable = FindVariable(instruction.IntegerValue, globalVariables, localVariables);
-      _variableRegisters[instruction.reg0] = variable;
+      _variableCache[instruction.reg0] = variable;
     }
 
     private unsafe void LoadVariableValue(IVariableContainer globalVariables, IVariableContainer localVariables,
@@ -38,7 +38,7 @@ namespace EpsilonScript.VirtualMachine
     {
       var variable = instruction.IntegerValue > 0
         ? FindVariable(instruction.IntegerValue, globalVariables, localVariables) // Uncached access
-        : _variableRegisters[instruction.reg1]; // Cached access
+        : _variableCache[instruction.reg1]; // Cached access
       variable.LoadToRegister(regPtr, _stringRegisters, instruction.reg0);
     }
 
@@ -47,7 +47,7 @@ namespace EpsilonScript.VirtualMachine
     {
       var variable = instruction.IntegerValue > 0
         ? FindVariable(instruction.IntegerValue, globalVariables, localVariables) // Uncached access
-        : _variableRegisters[instruction.reg1]; // Cached access
+        : _variableCache[instruction.reg1]; // Cached access
       var targetRegPtr = regPtr + instruction.reg0;
       switch (targetRegPtr->ValueType)
       {
