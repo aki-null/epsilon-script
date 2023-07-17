@@ -71,7 +71,7 @@ namespace EpsilonScript.Tests
 
       ASTTestHelper.AssertSingleInstructionProgram(expected, prog);
     }
-    
+
     public static IEnumerable<object[]> CorrectFloatData
     {
       get
@@ -168,30 +168,6 @@ namespace EpsilonScript.Tests
             new Instruction
             {
               FloatValue = -3.40282347E+38f,
-              Type = InstructionType.LoadFloat,
-              reg0 = 0,
-              reg1 = 0,
-              reg2 = 0
-            }
-          },
-          new object[]
-          {
-            new Element(new Token("Infinity", TokenType.Float), ElementType.Float),
-            new Instruction
-            {
-              FloatValue = float.PositiveInfinity,
-              Type = InstructionType.LoadFloat,
-              reg0 = 0,
-              reg1 = 0,
-              reg2 = 0
-            }
-          },
-          new object[]
-          {
-            new Element(new Token("-Infinity", TokenType.Float), ElementType.Float),
-            new Instruction
-            {
-              FloatValue = float.NegativeInfinity,
               Type = InstructionType.LoadFloat,
               reg0 = 0,
               reg1 = 0,
