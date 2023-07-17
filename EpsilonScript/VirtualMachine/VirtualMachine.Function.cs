@@ -58,6 +58,7 @@ namespace EpsilonScript.VirtualMachine
           _stringRegisters[instruction.reg0] =
             func.ExecuteString(_functionParameters.AsSpan(0, functionParameterCount));
           targetRegPtr->ValueType = RegisterValueType.StringStack;
+          targetRegPtr->IntegerValue = instruction.reg0;
           break;
         default:
           throw new ArgumentOutOfRangeException(nameof(func.ReturnType), func.ReturnType,

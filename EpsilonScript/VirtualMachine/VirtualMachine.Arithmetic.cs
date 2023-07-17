@@ -35,6 +35,7 @@ namespace EpsilonScript.VirtualMachine
             var rightStr = right->ResolveString(_program.StringTable, _stringRegisters);
             _stringRegisters[instruction.reg0] = leftStr + rightStr;
             targetRegPtr->ValueType = RegisterValueType.StringStack;
+            targetRegPtr->IntegerValue = instruction.reg0;
           }
           else
           {

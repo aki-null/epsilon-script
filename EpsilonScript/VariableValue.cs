@@ -200,6 +200,7 @@ namespace EpsilonScript
         case Type.String:
           stringRegisters[index] = _stringValue;
           targetPtr->ValueType = RegisterValueType.StringStack;
+          targetPtr->IntegerValue = index;
           break;
         case Type.Void:
         default:
