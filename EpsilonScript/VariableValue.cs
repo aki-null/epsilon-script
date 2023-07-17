@@ -180,37 +180,26 @@ namespace EpsilonScript
       }
     }
 
-    internal void LoadToRegister(RegisterValue[] registers, string[] stringRegisters, int index)
+    internal unsafe void LoadToRegister(RegisterValue* regPtr, string[] stringRegisters, int index)
     {
+      var targetPtr = regPtr + index;
       switch (Type)
       {
         case Type.Integer:
-          registers[index] = new RegisterValue
-          {
-            ValueType = RegisterValueType.Integer,
-            IntegerValue = _integerValue
-          };
+          targetPtr->ValueType = RegisterValueType.Integer;
+          targetPtr->IntegerValue = _integerValue;
           break;
         case Type.Float:
-          registers[index] = new RegisterValue
-          {
-            ValueType = RegisterValueType.Float,
-            FloatValue = _floatValue
-          };
+          targetPtr->ValueType = RegisterValueType.Float;
+          targetPtr->FloatValue = _floatValue;
           break;
         case Type.Boolean:
-          registers[index] = new RegisterValue
-          {
-            ValueType = RegisterValueType.Boolean,
-            BooleanValue = _booleanValue
-          };
+          targetPtr->ValueType = RegisterValueType.Boolean;
+          targetPtr->BooleanValue = _booleanValue;
           break;
         case Type.String:
           stringRegisters[index] = _stringValue;
-          registers[index] = new RegisterValue
-          {
-            ValueType = RegisterValueType.StringStack
-          };
+          targetPtr->ValueType = RegisterValueType.StringStack;
           break;
         case Type.Void:
         default:

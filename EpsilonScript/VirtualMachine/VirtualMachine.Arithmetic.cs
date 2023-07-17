@@ -4,51 +4,37 @@ namespace EpsilonScript.VirtualMachine
 {
   public partial class VirtualMachine
   {
-    private void Add(Instruction instruction)
+    private unsafe void Add(Instruction instruction, RegisterValue* regPtr)
     {
-      var left = _registers[instruction.reg1];
-      var right = _registers[instruction.reg2];
+      var targetRegPtr = regPtr + instruction.reg0;
+      var left = regPtr + instruction.reg1;
+      var right = regPtr + instruction.reg2;
 
-      switch ((int)right.ValueType | (int)left.ValueType << 1)
+      switch ((int)right->ValueType | (int)left->ValueType << 1)
       {
         case 0b00: // int, int
-          _registers[instruction.reg0] = new RegisterValue
-          {
-            ValueType = RegisterValueType.Integer,
-            IntegerValue = left.IntegerValue + right.IntegerValue
-          };
+          targetRegPtr->ValueType = RegisterValueType.Integer;
+          targetRegPtr->IntegerValue = left->IntegerValue + right->IntegerValue;
           break;
         case 0b01: // int, float
-          _registers[instruction.reg0] = new RegisterValue
-          {
-            ValueType = RegisterValueType.Float,
-            FloatValue = left.IntegerValue + right.FloatValue
-          };
+          targetRegPtr->ValueType = RegisterValueType.Float;
+          targetRegPtr->FloatValue = left->IntegerValue + right->FloatValue;
           break;
         case 0b10: // float, int
-          _registers[instruction.reg0] = new RegisterValue
-          {
-            ValueType = RegisterValueType.Float,
-            FloatValue = left.FloatValue + right.IntegerValue
-          };
+          targetRegPtr->ValueType = RegisterValueType.Float;
+          targetRegPtr->FloatValue = left->FloatValue + right->IntegerValue;
           break;
         case 0b11: // float, float
-          _registers[instruction.reg0] = new RegisterValue
-          {
-            ValueType = RegisterValueType.Float,
-            FloatValue = left.FloatValue + right.FloatValue
-          };
+          targetRegPtr->ValueType = RegisterValueType.Float;
+          targetRegPtr->FloatValue = left->FloatValue + right->FloatValue;
           break;
         default:
-          if (left.ValueType == RegisterValueType.String) // string, anything
+          if (left->ValueType == RegisterValueType.String) // string, anything
           {
-            var leftStr = left.ResolveString(_program.StringTable, _stringRegisters);
-            var rightStr = right.ResolveString(_program.StringTable, _stringRegisters);
+            var leftStr = left->ResolveString(_program.StringTable, _stringRegisters);
+            var rightStr = right->ResolveString(_program.StringTable, _stringRegisters);
             _stringRegisters[instruction.reg0] = leftStr + rightStr;
-            _registers[instruction.reg0] = new RegisterValue
-            {
-              ValueType = RegisterValueType.StringStack
-            };
+            targetRegPtr->ValueType = RegisterValueType.StringStack;
           }
           else
           {
@@ -59,125 +45,154 @@ namespace EpsilonScript.VirtualMachine
       }
     }
 
-    private void Subtract(Instruction instruction)
+    private unsafe void Subtract(Instruction instruction, RegisterValue* regPtr)
     {
-      var left = _registers[instruction.reg1];
-      var right = _registers[instruction.reg2];
+      var targetRegPtr = regPtr + instruction.reg0;
+      var left = regPtr + instruction.reg1;
+      var right = regPtr + instruction.reg2;
 
-      _registers[instruction.reg0] = ((int)right.ValueType | (int)left.ValueType << 1) switch
+      switch ((int)right->ValueType | (int)left->ValueType << 1)
       {
-        0b00 => // int, int
-          new RegisterValue
-          {
-            ValueType = RegisterValueType.Integer, IntegerValue = left.IntegerValue - right.IntegerValue
-          },
-        0b01 => // int, float
-          new RegisterValue { ValueType = RegisterValueType.Float, FloatValue = left.IntegerValue - right.FloatValue },
-        0b10 => // float, int
-          new RegisterValue { ValueType = RegisterValueType.Float, FloatValue = left.FloatValue - right.IntegerValue },
-        0b11 => // float, float
-          new RegisterValue { ValueType = RegisterValueType.Float, FloatValue = left.FloatValue - right.FloatValue },
-        _ => throw new RuntimeException("An arithmetic operation can only be performed on numeric values")
-      };
+        case 0b00: // int, int
+          targetRegPtr->ValueType = RegisterValueType.Integer;
+          targetRegPtr->IntegerValue = left->IntegerValue - right->IntegerValue;
+          break;
+        case 0b01: // int, float
+          targetRegPtr->ValueType = RegisterValueType.Float;
+          targetRegPtr->FloatValue = left->IntegerValue - right->FloatValue;
+          break;
+        case 0b10: // float, int
+          targetRegPtr->ValueType = RegisterValueType.Float;
+          targetRegPtr->FloatValue = left->FloatValue - right->IntegerValue;
+          break;
+        case 0b11: // float, float
+          targetRegPtr->ValueType = RegisterValueType.Float;
+          targetRegPtr->FloatValue = left->FloatValue - right->FloatValue;
+          break;
+        default:
+          throw new RuntimeException("An arithmetic operation can only be performed on numeric values");
+      }
     }
 
-    private void Multiply(Instruction instruction)
+    private unsafe void Multiply(Instruction instruction, RegisterValue* regPtr)
     {
-      var left = _registers[instruction.reg1];
-      var right = _registers[instruction.reg2];
+      var targetPtr = regPtr + instruction.reg0;
+      var leftPtr = regPtr + instruction.reg1;
+      var rightPtr = regPtr + instruction.reg2;
 
-      _registers[instruction.reg0] = ((int)right.ValueType | (int)left.ValueType << 1) switch
+      switch ((int)rightPtr->ValueType | (int)leftPtr->ValueType << 1)
       {
-        0b00 => // int, int
-          new RegisterValue
-          {
-            ValueType = RegisterValueType.Integer, IntegerValue = left.IntegerValue * right.IntegerValue
-          },
-        0b01 => // int, float
-          new RegisterValue { ValueType = RegisterValueType.Float, FloatValue = left.IntegerValue * right.FloatValue },
-        0b10 => // float, int
-          new RegisterValue { ValueType = RegisterValueType.Float, FloatValue = left.FloatValue * right.IntegerValue },
-        0b11 => // float, float
-          new RegisterValue { ValueType = RegisterValueType.Float, FloatValue = left.FloatValue * right.FloatValue },
-        _ => throw new RuntimeException("Only numeric values can be multiplied")
-      };
+        case 0b00: // int, int
+          targetPtr->ValueType = RegisterValueType.Integer;
+          targetPtr->IntegerValue = leftPtr->IntegerValue * rightPtr->IntegerValue;
+          break;
+        case 0b01: // int, float
+          targetPtr->ValueType = RegisterValueType.Float;
+          targetPtr->FloatValue = leftPtr->IntegerValue * rightPtr->FloatValue;
+          break;
+        case 0b10: // float, int
+          targetPtr->ValueType = RegisterValueType.Float;
+          targetPtr->FloatValue = leftPtr->FloatValue * rightPtr->IntegerValue;
+          break;
+        case 0b11: // float, float
+          targetPtr->ValueType = RegisterValueType.Float;
+          targetPtr->FloatValue = leftPtr->FloatValue * rightPtr->FloatValue;
+          break;
+        default:
+          throw new RuntimeException("An arithmetic operation can only be performed on numeric values");
+      }
     }
 
-    private void Divide(Instruction instruction)
+    private unsafe void Divide(Instruction instruction, RegisterValue* regPtr)
     {
-      var left = _registers[instruction.reg1];
-      var right = _registers[instruction.reg2];
+      var targetPtr = regPtr + instruction.reg0;
+      var leftPtr = regPtr + instruction.reg1;
+      var rightPtr = regPtr + instruction.reg2;
 
-      _registers[instruction.reg0] = ((int)right.ValueType | (int)left.ValueType << 1) switch
+      switch ((int)rightPtr->ValueType | (int)leftPtr->ValueType << 1)
       {
-        0b00 => // int, int
-          new RegisterValue
-          {
-            ValueType = RegisterValueType.Integer, IntegerValue = left.IntegerValue / right.IntegerValue
-          },
-        0b01 => // int, float
-          new RegisterValue { ValueType = RegisterValueType.Float, FloatValue = left.IntegerValue / right.FloatValue },
-        0b10 => // float, int
-          new RegisterValue { ValueType = RegisterValueType.Float, FloatValue = left.FloatValue / right.IntegerValue },
-        0b11 => // float, float
-          new RegisterValue { ValueType = RegisterValueType.Float, FloatValue = left.FloatValue / right.FloatValue },
-        _ => throw new RuntimeException("Only numeric values can be divided")
-      };
+        case 0b00: // int, int
+          targetPtr->ValueType = RegisterValueType.Integer;
+          targetPtr->IntegerValue = leftPtr->IntegerValue / rightPtr->IntegerValue;
+          break;
+        case 0b01: // int, float
+          targetPtr->ValueType = RegisterValueType.Float;
+          targetPtr->FloatValue = leftPtr->IntegerValue / rightPtr->FloatValue;
+          break;
+        case 0b10: // float, int
+          targetPtr->ValueType = RegisterValueType.Float;
+          targetPtr->FloatValue = leftPtr->FloatValue / rightPtr->IntegerValue;
+          break;
+        case 0b11: // float, float
+          targetPtr->ValueType = RegisterValueType.Float;
+          targetPtr->FloatValue = leftPtr->FloatValue / rightPtr->FloatValue;
+          break;
+        default:
+          throw new RuntimeException("An arithmetic operation can only be performed on numeric values");
+      }
     }
 
-    private void Modulo(Instruction instruction)
+    private unsafe void Modulo(Instruction instruction, RegisterValue* regPtr)
     {
-      var left = _registers[instruction.reg1];
-      var right = _registers[instruction.reg2];
+      var targetPtr = regPtr + instruction.reg0;
+      var left = regPtr + instruction.reg1;
+      var right = regPtr + instruction.reg2;
 
-      _registers[instruction.reg0] = ((int)right.ValueType | (int)left.ValueType << 1) switch
+      switch ((int)right->ValueType | (int)left->ValueType << 1)
       {
-        0b00 => // int, int
-          new RegisterValue
-          {
-            ValueType = RegisterValueType.Integer, IntegerValue = left.IntegerValue % right.IntegerValue
-          },
-        0b01 => // int, float
-          new RegisterValue { ValueType = RegisterValueType.Float, FloatValue = left.IntegerValue % right.FloatValue },
-        0b10 => // float, int
-          new RegisterValue { ValueType = RegisterValueType.Float, FloatValue = left.FloatValue % right.IntegerValue },
-        0b11 => // float, float
-          new RegisterValue { ValueType = RegisterValueType.Float, FloatValue = left.FloatValue % right.FloatValue },
-        _ => throw new RuntimeException("A modulo operation can only be executed on numeric values")
-      };
+        case 0b00: // int, int
+          targetPtr->ValueType = RegisterValueType.Integer;
+          targetPtr->IntegerValue = left->IntegerValue % right->IntegerValue;
+          break;
+        case 0b01: // int, float
+          targetPtr->ValueType = RegisterValueType.Float;
+          targetPtr->FloatValue = left->IntegerValue % right->FloatValue;
+          break;
+        case 0b10: // float, int
+          targetPtr->ValueType = RegisterValueType.Float;
+          targetPtr->FloatValue = left->FloatValue % right->IntegerValue;
+          break;
+        case 0b11: // float, float
+          targetPtr->ValueType = RegisterValueType.Float;
+          targetPtr->FloatValue = left->FloatValue % right->FloatValue;
+          break;
+        default:
+          throw new RuntimeException("An arithmetic operation can only be performed on numeric values");
+      }
     }
 
-    private void Negative(Instruction instruction)
+    private unsafe void Negative(Instruction instruction, RegisterValue* regPtr)
     {
-      var value = _registers[instruction.reg1];
+      var targetPtr = regPtr + instruction.reg0;
+      var valuePtr = regPtr + instruction.reg1;
 
-      _registers[instruction.reg0] = value.ValueType switch
+      switch (valuePtr->ValueType)
       {
-        RegisterValueType.Integer => new RegisterValue
-        {
-          ValueType = RegisterValueType.Integer, IntegerValue = -value.IntegerValue
-        },
-        RegisterValueType.Float => new RegisterValue
-        {
-          ValueType = RegisterValueType.Float, FloatValue = -value.FloatValue
-        },
-        _ => throw new RuntimeException("Only numeric value can be negative")
-      };
+        case RegisterValueType.Integer:
+          targetPtr->ValueType = RegisterValueType.Integer;
+          targetPtr->IntegerValue = -valuePtr->IntegerValue;
+          break;
+        case RegisterValueType.Float:
+          targetPtr->ValueType = RegisterValueType.Float;
+          targetPtr->FloatValue = -valuePtr->FloatValue;
+          break;
+        default:
+          throw new RuntimeException("Only numeric value can be negative");
+      }
     }
 
-    private void Negate(Instruction instruction)
+    private unsafe void Negate(Instruction instruction, RegisterValue* regPtr)
     {
-      var value = _registers[instruction.reg1];
-      if (value.ValueType != RegisterValueType.Boolean)
+      var targetPtr = regPtr + instruction.reg0;
+      var valuePtr = regPtr + instruction.reg1;
+
+      if (valuePtr->ValueType != RegisterValueType.Boolean)
       {
         throw new RuntimeException("Only boolean value can be negated");
       }
 
-      _registers[instruction.reg0] = new RegisterValue
-      {
-        ValueType = RegisterValueType.Boolean,
-        BooleanValue = !value.BooleanValue
-      };
+      targetPtr->ValueType = RegisterValueType.Boolean;
+      targetPtr->BooleanValue = !valuePtr->BooleanValue;
     }
   }
 }

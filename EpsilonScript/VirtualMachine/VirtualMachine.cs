@@ -15,121 +15,119 @@ namespace EpsilonScript.VirtualMachine
 
     private Program _program;
 
-    internal ConcreteValue Run(Program program, IVariableContainer globalVariables, IVariableContainer localVariables)
+
+    internal unsafe ConcreteValue Run(Program program, IVariableContainer globalVariables,
+      IVariableContainer localVariables)
     {
       try
       {
-        _program = program;
-        var instructionPointer = 0;
-        var instructions = program.Instructions;
-        while (instructionPointer < instructions.Length)
+        fixed (RegisterValue* regPtr = _registers)
         {
-          var instruction = instructions[instructionPointer];
-          switch (instruction.Type)
+          _program = program;
+          var instructionPointer = 0;
+          var instructions = program.Instructions;
+          while (instructionPointer < instructions.Length)
           {
-            case InstructionType.LoadInteger:
-              _registers[instruction.reg0] = new RegisterValue
-              {
-                ValueType = RegisterValueType.Integer,
-                IntegerValue = instruction.IntegerValue
-              };
-              break;
-            case InstructionType.LoadFloat:
-              _registers[instruction.reg0] = new RegisterValue
-              {
-                ValueType = RegisterValueType.Float,
-                FloatValue = instruction.FloatValue
-              };
-              break;
-            case InstructionType.LoadBoolean:
-              _registers[instruction.reg0] = new RegisterValue
-              {
-                ValueType = RegisterValueType.Boolean,
-                BooleanValue = instruction.BooleanValue
-              };
-              break;
-            case InstructionType.LoadString:
-              _registers[instruction.reg0] = new RegisterValue
-              {
-                ValueType = RegisterValueType.String,
-                IntegerValue = instruction.IntegerValue
-              };
-              break;
-            case InstructionType.LoadVariableValue:
-              LoadVariableValue(globalVariables, localVariables, instruction);
-              break;
-            case InstructionType.Add:
-              Add(instruction);
-              break;
-            case InstructionType.Subtract:
-              Subtract(instruction);
-              break;
-            case InstructionType.Multiply:
-              Multiply(instruction);
-              break;
-            case InstructionType.Divide:
-              Divide(instruction);
-              break;
-            case InstructionType.Modulo:
-              Modulo(instruction);
-              break;
-            case InstructionType.Negate:
-              Negate(instruction);
-              break;
-            case InstructionType.Negative:
-              Negative(instruction);
-              break;
-            case InstructionType.ComparisonEqual:
-              ComparisonEqualValue(instruction, false);
-              break;
-            case InstructionType.ComparisonNotEqual:
-              ComparisonEqualValue(instruction, true);
-              break;
-            case InstructionType.ComparisonLessThan:
-              ComparisonLessThanValue(instruction);
-              break;
-            case InstructionType.ComparisonGreaterThan:
-              ComparisonGreaterThanValue(instruction);
-              break;
-            case InstructionType.ComparisonLessThanOrEqualTo:
-              ComparisonLessThanOrEqualToValue(instruction);
-              break;
-            case InstructionType.ComparisonGreaterThanOrEqualTo:
-              ComparisonGreaterThanOrEqualToValue(instruction);
-              break;
-            case InstructionType.Jump:
-              instructionPointer = instruction.IntegerValue - 1;
-              break;
-            case InstructionType.JumpIf:
-              if (_registers[instruction.reg0].BooleanValue)
-              {
+            var instruction = instructions[instructionPointer];
+            RegisterValue* targetRegPtr = null;
+            switch (instruction.Type)
+            {
+              case InstructionType.LoadInteger:
+                targetRegPtr = regPtr + instruction.reg0;
+                targetRegPtr->ValueType = RegisterValueType.Integer;
+                targetRegPtr->IntegerValue = instruction.IntegerValue;
+                break;
+              case InstructionType.LoadFloat:
+                targetRegPtr = regPtr + instruction.reg0;
+                targetRegPtr->ValueType = RegisterValueType.Float;
+                targetRegPtr->FloatValue = instruction.FloatValue;
+                break;
+              case InstructionType.LoadBoolean:
+                targetRegPtr = regPtr + instruction.reg0;
+                targetRegPtr->ValueType = RegisterValueType.Boolean;
+                targetRegPtr->BooleanValue = instruction.BooleanValue;
+                break;
+              case InstructionType.LoadString:
+                targetRegPtr = regPtr + instruction.reg0;
+                targetRegPtr->ValueType = RegisterValueType.String;
+                targetRegPtr->IntegerValue = instruction.IntegerValue;
+                break;
+              case InstructionType.LoadVariableValue:
+                LoadVariableValue(globalVariables, localVariables, instruction, regPtr);
+                break;
+              case InstructionType.Add:
+                Add(instruction, regPtr);
+                break;
+              case InstructionType.Subtract:
+                Subtract(instruction, regPtr);
+                break;
+              case InstructionType.Multiply:
+                Multiply(instruction, regPtr);
+                break;
+              case InstructionType.Divide:
+                Divide(instruction, regPtr);
+                break;
+              case InstructionType.Modulo:
+                Modulo(instruction, regPtr);
+                break;
+              case InstructionType.Negate:
+                Negate(instruction, regPtr);
+                break;
+              case InstructionType.Negative:
+                Negative(instruction, regPtr);
+                break;
+              case InstructionType.ComparisonEqual:
+                ComparisonEqualValue(instruction, false, regPtr);
+                break;
+              case InstructionType.ComparisonNotEqual:
+                ComparisonEqualValue(instruction, true, regPtr);
+                break;
+              case InstructionType.ComparisonLessThan:
+                ComparisonLessThanValue(instruction, regPtr);
+                break;
+              case InstructionType.ComparisonGreaterThan:
+                ComparisonGreaterThanValue(instruction, regPtr);
+                break;
+              case InstructionType.ComparisonLessThanOrEqualTo:
+                ComparisonLessThanOrEqualToValue(instruction, regPtr);
+                break;
+              case InstructionType.ComparisonGreaterThanOrEqualTo:
+                ComparisonGreaterThanOrEqualToValue(instruction, regPtr);
+                break;
+              case InstructionType.Jump:
                 instructionPointer = instruction.IntegerValue - 1;
-              }
+                break;
+              case InstructionType.JumpIf:
+                if ((regPtr + instruction.reg0)->BooleanValue)
+                {
+                  instructionPointer = instruction.IntegerValue - 1;
+                }
 
-              break;
-            case InstructionType.JumpNotIf:
-              if (!_registers[instruction.reg0].BooleanValue)
-              {
-                instructionPointer = instruction.IntegerValue - 1;
-              }
+                break;
+              case InstructionType.JumpNotIf:
+                if (!(regPtr + instruction.reg0)->BooleanValue)
+                {
+                  instructionPointer = instruction.IntegerValue - 1;
+                }
 
-              break;
-            case InstructionType.AssignVariable:
-              SetVariableValue(globalVariables, localVariables, instruction);
-              break;
-            case InstructionType.PrefetchVariable:
-              PrefetchVariable(globalVariables, localVariables, instruction);
-              break;
-            case InstructionType.CallFunction:
-              Function(instruction);
-              break;
-            case InstructionType.Return:
-              return _registers[instruction.reg0].ResolveToConcreteValue(program.StringTable, _stringRegisters);
-            default:
-              throw new RuntimeException("Unsupported instruction");
+                break;
+              case InstructionType.AssignVariable:
+                SetVariableValue(globalVariables, localVariables, instruction, regPtr);
+                break;
+              case InstructionType.PrefetchVariable:
+                PrefetchVariable(globalVariables, localVariables, instruction);
+                break;
+              case InstructionType.CallFunction:
+                Function(instruction, regPtr);
+                break;
+              case InstructionType.Return:
+                return (regPtr + instruction.reg0)->ResolveToConcreteValue(program.StringTable, _stringRegisters);
+              default:
+                throw new RuntimeException("Unsupported instruction");
+            }
+
+            ++instructionPointer;
           }
-
-          ++instructionPointer;
         }
       }
       finally

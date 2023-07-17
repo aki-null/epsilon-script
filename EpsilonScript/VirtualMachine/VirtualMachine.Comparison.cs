@@ -61,30 +61,31 @@ namespace EpsilonScript.VirtualMachine
       throw new RuntimeException($"{left} cannot be compared against a {right}");
     }
 
-    private void ComparisonEqualValue(Instruction instruction, bool flip)
+    private unsafe void ComparisonEqualValue(Instruction instruction, bool flip, RegisterValue* regPtr)
     {
-      var left = _registers[instruction.reg1];
-      var right = _registers[instruction.reg2];
+      var targetRegPtr = regPtr + instruction.reg0;
+      var left = regPtr + instruction.reg1;
+      var right = regPtr + instruction.reg2;
 
-      var comparisonType = GetEqualityComparisonType(left.ValueType, right.ValueType);
+      var comparisonType = GetEqualityComparisonType(left->ValueType, right->ValueType);
 
       bool result;
       switch (comparisonType)
       {
         case RegisterValueType.Integer:
           // We can assume that integer comparison can only be done when both sides are integers
-          result = left.IntegerValue == right.IntegerValue;
+          result = left->IntegerValue == right->IntegerValue;
           break;
         case RegisterValueType.Float:
           // ReSharper disable once CompareOfFloatsByEqualityOperator
-          result = left.AsFloat() == right.AsFloat();
+          result = left->AsFloat() == right->AsFloat();
           break;
         case RegisterValueType.Boolean:
-          result = left.BooleanValue == right.BooleanValue;
+          result = left->BooleanValue == right->BooleanValue;
           break;
         case RegisterValueType.String:
-          var leftStr = left.ResolveString(_program.StringTable, _stringRegisters);
-          var rightStr = right.ResolveString(_program.StringTable, _stringRegisters);
+          var leftStr = left->ResolveString(_program.StringTable, _stringRegisters);
+          var rightStr = right->ResolveString(_program.StringTable, _stringRegisters);
           result = leftStr.Equals(rightStr, StringComparison.Ordinal);
           break;
         default:
@@ -96,119 +97,108 @@ namespace EpsilonScript.VirtualMachine
         result = !result;
       }
 
-      _registers[instruction.reg0] = new RegisterValue
-      {
-        ValueType = RegisterValueType.Boolean,
-        BooleanValue = result
-      };
+      targetRegPtr->ValueType = RegisterValueType.Boolean;
+      targetRegPtr->BooleanValue = result;
     }
 
-    private void ComparisonLessThanValue(Instruction instruction)
+    private unsafe void ComparisonLessThanValue(Instruction instruction, RegisterValue* regPtr)
     {
-      var left = _registers[instruction.reg1];
-      var right = _registers[instruction.reg2];
+      var targetRegPtr = regPtr + instruction.reg0;
+      var left = regPtr + instruction.reg1;
+      var right = regPtr + instruction.reg2;
 
-      var comparisonType = GetComparisonType(left.ValueType, right.ValueType);
+      var comparisonType = GetComparisonType(left->ValueType, right->ValueType);
       bool result;
       switch (comparisonType)
       {
         case RegisterValueType.Integer:
           // We can assume that integer comparison can only be done when both sides are integers
-          result = left.IntegerValue < right.IntegerValue;
+          result = left->IntegerValue < right->IntegerValue;
           break;
         case RegisterValueType.Float:
-          result = left.AsFloat() < right.AsFloat();
+          result = left->AsFloat() < right->AsFloat();
           break;
         default:
           throw new RuntimeException("Unexpected virtual machine error");
       }
 
-      _registers[instruction.reg0] = new RegisterValue
-      {
-        ValueType = RegisterValueType.Boolean,
-        BooleanValue = result
-      };
+      targetRegPtr->ValueType = RegisterValueType.Boolean;
+      targetRegPtr->BooleanValue = result;
     }
 
-    private void ComparisonGreaterThanValue(Instruction instruction)
+    private unsafe void ComparisonGreaterThanValue(Instruction instruction, RegisterValue* regPtr)
     {
-      var left = _registers[instruction.reg1];
-      var right = _registers[instruction.reg2];
+      var targetRegPtr = regPtr + instruction.reg0;
+      var left = regPtr + instruction.reg1;
+      var right = regPtr + instruction.reg2;
 
-      var comparisonType = GetComparisonType(left.ValueType, right.ValueType);
+      var comparisonType = GetComparisonType(left->ValueType, right->ValueType);
       bool result;
       switch (comparisonType)
       {
         case RegisterValueType.Integer:
           // We can assume that integer comparison can only be done when both sides are integers
-          result = left.IntegerValue > right.IntegerValue;
+          result = left->IntegerValue > right->IntegerValue;
           break;
         case RegisterValueType.Float:
-          result = left.AsFloat() > right.AsFloat();
+          result = left->AsFloat() > right->AsFloat();
           break;
         default:
           throw new RuntimeException("Unexpected virtual machine error");
       }
 
-      _registers[instruction.reg0] = new RegisterValue
-      {
-        ValueType = RegisterValueType.Boolean,
-        BooleanValue = result
-      };
+      targetRegPtr->ValueType = RegisterValueType.Boolean;
+      targetRegPtr->BooleanValue = result;
     }
 
-    private void ComparisonLessThanOrEqualToValue(Instruction instruction)
+    private unsafe void ComparisonLessThanOrEqualToValue(Instruction instruction, RegisterValue* regPtr)
     {
-      var left = _registers[instruction.reg1];
-      var right = _registers[instruction.reg2];
+      var targetRegPtr = regPtr + instruction.reg0;
+      var left = regPtr + instruction.reg1;
+      var right = regPtr + instruction.reg2;
 
-      var comparisonType = GetComparisonType(left.ValueType, right.ValueType);
+      var comparisonType = GetComparisonType(left->ValueType, right->ValueType);
       bool result;
       switch (comparisonType)
       {
         case RegisterValueType.Integer:
           // We can assume that integer comparison can only be done when both sides are integers
-          result = left.IntegerValue <= right.IntegerValue;
+          result = left->IntegerValue <= right->IntegerValue;
           break;
         case RegisterValueType.Float:
-          result = left.AsFloat() <= right.AsFloat();
+          result = left->AsFloat() <= right->AsFloat();
           break;
         default:
           throw new RuntimeException("Unexpected virtual machine error");
       }
 
-      _registers[instruction.reg0] = new RegisterValue
-      {
-        ValueType = RegisterValueType.Boolean,
-        BooleanValue = result
-      };
+      targetRegPtr->ValueType = RegisterValueType.Boolean;
+      targetRegPtr->BooleanValue = result;
     }
 
-    private void ComparisonGreaterThanOrEqualToValue(Instruction instruction)
+    private unsafe void ComparisonGreaterThanOrEqualToValue(Instruction instruction, RegisterValue* regPtr)
     {
-      var left = _registers[instruction.reg1];
-      var right = _registers[instruction.reg2];
+      var targetRegPtr = regPtr + instruction.reg0;
+      var left = regPtr + instruction.reg1;
+      var right = regPtr + instruction.reg2;
 
-      var comparisonType = GetComparisonType(left.ValueType, right.ValueType);
+      var comparisonType = GetComparisonType(left->ValueType, right->ValueType);
       bool result;
       switch (comparisonType)
       {
         case RegisterValueType.Integer:
           // We can assume that integer comparison can only be done when both sides are integers
-          result = left.IntegerValue >= right.IntegerValue;
+          result = left->IntegerValue >= right->IntegerValue;
           break;
         case RegisterValueType.Float:
-          result = left.AsFloat() >= right.AsFloat();
+          result = left->AsFloat() >= right->AsFloat();
           break;
         default:
           throw new RuntimeException("Unexpected virtual machine error");
       }
 
-      _registers[instruction.reg0] = new RegisterValue
-      {
-        ValueType = RegisterValueType.Boolean,
-        BooleanValue = result
-      };
+      targetRegPtr->ValueType = RegisterValueType.Boolean;
+      targetRegPtr->BooleanValue = result;
     }
   }
 }
