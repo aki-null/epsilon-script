@@ -7,11 +7,11 @@ namespace EpsilonScript.AST
 {
   internal class IntegerNode : Node
   {
-    private int integerValue;
+    private int _integerValue;
 
     private void Initialize(int value)
     {
-      integerValue = value;
+      _integerValue = value;
     }
 
     public IntegerNode()
@@ -32,7 +32,7 @@ namespace EpsilonScript.AST
     public override void Encode(MutableProgram program, ref byte nextRegisterIdx,
       VirtualMachine.VirtualMachine constantVm)
     {
-      PushValue(program, ref nextRegisterIdx, integerValue);
+      PushValue(program, ref nextRegisterIdx, _integerValue);
     }
   }
 }

@@ -7,11 +7,11 @@ namespace EpsilonScript.AST
 {
   internal class FloatNode : Node
   {
-    private float floatValue;
+    private float _floatValue;
 
     private void Initialize(float value)
     {
-      floatValue = value;
+      _floatValue = value;
     }
 
     public FloatNode()
@@ -32,7 +32,7 @@ namespace EpsilonScript.AST
     public override void Encode(MutableProgram program, ref byte nextRegisterIdx,
       VirtualMachine.VirtualMachine constantVm)
     {
-      PushValue(program, ref nextRegisterIdx, floatValue);
+      PushValue(program, ref nextRegisterIdx, _floatValue);
     }
   }
 }
