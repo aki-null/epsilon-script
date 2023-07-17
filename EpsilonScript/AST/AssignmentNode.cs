@@ -55,7 +55,7 @@ namespace EpsilonScript.AST
         {
           Type = InstructionType.AssignVariable,
           IntegerValue = _assignmentTarget.VariableName,
-          reg0 = (byte) (nextRegisterIdx - 1)
+          reg0 = (byte)(nextRegisterIdx - 1)
         });
       }
       else
