@@ -55,8 +55,7 @@ namespace EpsilonScript.AST
         case ValueType.Integer:
         case ValueType.String:
         case ValueType.Undefined:
-          _parameters = new List<Node>();
-          _parameters.Add(childNode);
+          _parameters = new List<Node> { childNode };
           _parameterTypes = new Type[1];
           break;
         case ValueType.Tuple:
@@ -117,6 +116,9 @@ namespace EpsilonScript.AST
         case Type.String:
           ValueType = ValueType.String;
           break;
+        case Type.Boolean:
+          ValueType = ValueType.Boolean;
+          break;
         default:
           throw new ArgumentOutOfRangeException(nameof(function.ReturnType), function.ReturnType,
             "Unsupported function return type");
@@ -135,6 +137,11 @@ namespace EpsilonScript.AST
           break;
         case ValueType.String:
           StringValue = function.ExecuteString(_parameters);
+          break;
+        case ValueType.Boolean:
+          BooleanValue = function.ExecuteBool(_parameters);
+          IntegerValue = BooleanValue ? 1 : 0;
+          FloatValue = BooleanValue ? 1.0f : 0.0f;
           break;
         default:
           throw new ArgumentOutOfRangeException(nameof(ValueType), ValueType, "Unsupported function return type");

@@ -94,7 +94,7 @@ Functions are supported in EpsilonScript. There are built-in functions, but cust
 
 ```c#
 var compiler = new Compiler();
-compiler.AddCustomFunction(new CustomFunction("rand", (float d) => Random.Range(0.0f, d)));
+compiler.AddCustomFunction(CustomFunction.Create("rand", (float d) => Random.Range(0.0f, d)));
 var script = compiler.Compile("rand(0, 10)", Compiler.Options.Immutable);
 script.Execute();
 Console.WriteLine(script.FloatValue);
@@ -121,7 +121,7 @@ A custom function can be flagged as a constant function. A constant function mus
 A constant function can be created by passing `true` to the `isConstant` constructor parameter:
 
 ```c#
-new CustomFunction("sin", (float v) => (float) System.Math.Sin(v), true)
+CustomFunction.Create("sin", (float v) => (float)System.Math.Sin(v), true)
 ```
 
 For example, a result of the following expression is cached on a compilation, because the built-in `sin` function is marked as constant: `sin(3.141592 / 2)`
@@ -134,11 +134,26 @@ Strings can be used, primarily intended to be used for function parameters.
 
 ```c#
 var compiler = new Compiler();
-compiler.AddCustomFunction(new CustomFunction("read_save_data", (string flag) => SaveData.Instance.GetIntegerData(flag)));
+compiler.AddCustomFunction(CustomFunction.Create("read_save_data",
+  (string flag) => SaveData.Instance.GetIntegerData(flag)));
 var script = compiler.Compile(@"read_save_data(""LVL00_PLAYCOUNT"") > 5");
 script.Execute();
 Console.WriteLine(script.BooleanValue);
 ```
+
+#### Upgrading Existing Code
+
+Older releases exposed a long list of concrete custom function constructors. Replace each usage with the factory helper to upgrade:
+
+```c#
+// old
+compiler.AddCustomFunction(new CustomFunction("foo", (float v) => v * 2));
+
+// new
+compiler.AddCustomFunction(CustomFunction.Create("foo", (float v) => v * 2));
+```
+
+This change was necessary to allow for any parameter types to be usable in custom functions. The factory supports delegates with one to five parameters and keeps the optional `isConstant` flag.
 
 #### Result
 
