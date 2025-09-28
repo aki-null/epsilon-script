@@ -15,6 +15,8 @@ It targets .NET Standard 2.0.
 ## Project State
 All features should be stable for production use.
 
+See [changelog](CHANGELOG.md) for release notes and version history.
+
 ## Samples
 
 ### Arithmetics
