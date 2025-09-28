@@ -91,7 +91,8 @@ namespace EpsilonScript.AST
           // The left node is guaranteed to be a string node
           return _leftNode.StringValue + _rightNode.ToString();
         default:
-          throw new RuntimeException($"String operations only support concatenation (+), not {GetOperatorName(_operator)}");
+          throw new RuntimeException(
+            $"String operations only support concatenation (+), not {GetOperatorName(_operator)}");
       }
     }
 
@@ -104,7 +105,8 @@ namespace EpsilonScript.AST
       {
         if (_leftNode.ValueType == ValueType.Boolean || _rightNode.ValueType == ValueType.Boolean)
         {
-          throw new RuntimeException($"Boolean values cannot be used in arithmetic operations ({GetOperatorName(_operator)})");
+          throw new RuntimeException(
+            $"Boolean values cannot be used in arithmetic operations ({GetOperatorName(_operator)})");
         }
         else
         {

@@ -15,7 +15,8 @@ namespace EpsilonScript.Tests.AST
     [Theory]
     [InlineData(true, false, 0, 0.0f)]
     [InlineData(false, true, 1, 1.0f)]
-    public void AST_Negate_WithBooleanValue_ReturnsNegatedValue(bool inputValue, bool expectedBool, int expectedInt, float expectedFloat)
+    public void AST_Negate_WithBooleanValue_ReturnsNegatedValue(bool inputValue, bool expectedBool, int expectedInt,
+      float expectedFloat)
     {
       var node = new NegateNode();
       var rpn = CreateStack(new FakeBooleanNode(inputValue));

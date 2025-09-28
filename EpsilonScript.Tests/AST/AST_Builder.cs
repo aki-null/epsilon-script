@@ -1,10 +1,8 @@
 using System.Collections.Generic;
 using EpsilonScript.AST;
 using EpsilonScript.Intermediate;
-using EpsilonScript.Parser;
 using Xunit;
 using EpsilonScript.Tests.TestInfrastructure;
-using EpsilonScript.Tests.TestInfrastructure.Fakes;
 
 namespace EpsilonScript.Tests.AST
 {

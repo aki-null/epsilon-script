@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using EpsilonScript.Intermediate;
 using Xunit;
@@ -21,6 +20,7 @@ namespace EpsilonScript.Tests.Parser
       {
         parser.Push(token);
       }
+
       parser.End();
 
       // Parser should handle empty input gracefully (may produce 0 or 1 elements)
@@ -44,13 +44,13 @@ namespace EpsilonScript.Tests.Parser
           // Simple addition
           new object[]
           {
-            new Token[]
+            new[]
             {
               new Token("1", TokenType.Integer),
               new Token("+", TokenType.PlusSign),
               new Token("2", TokenType.Integer),
             },
-            new Element[]
+            new[]
             {
               new Element(new Token("1", TokenType.Integer), ElementType.Integer),
               new Element(new Token("+", TokenType.PlusSign), ElementType.AddOperator),
@@ -60,13 +60,13 @@ namespace EpsilonScript.Tests.Parser
           // Simple boolean expression
           new object[]
           {
-            new Token[]
+            new[]
             {
               new Token("true", TokenType.BooleanLiteralTrue),
               new Token("&&", TokenType.BooleanAndOperator),
               new Token("false", TokenType.BooleanLiteralFalse),
             },
-            new Element[]
+            new[]
             {
               new Element(new Token("true", TokenType.BooleanLiteralTrue), ElementType.BooleanLiteralTrue),
               new Element(new Token("&&", TokenType.BooleanAndOperator), ElementType.BooleanAndOperator),

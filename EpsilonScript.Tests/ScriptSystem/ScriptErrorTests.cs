@@ -1,6 +1,4 @@
-using EpsilonScript;
 using EpsilonScript.Function;
-using EpsilonScript.Helper;
 using EpsilonScript.Tests.TestInfrastructure;
 using Xunit;
 
@@ -47,7 +45,8 @@ namespace EpsilonScript.Tests.ScriptSystem
     public void StringComparedToNumber_ThrowsRuntimeException()
     {
       var compiler = CreateCompiler();
-      ErrorTestHelper.AssertRuntimeException(() => compiler.Compile("\"hello\" == 1", Compiler.Options.Immutable), "comparison");
+      ErrorTestHelper.AssertRuntimeException(() => compiler.Compile("\"hello\" == 1", Compiler.Options.Immutable),
+        "comparison");
     }
 
     [Fact]
@@ -92,7 +91,8 @@ namespace EpsilonScript.Tests.ScriptSystem
     public void TupleComparison_ThrowsRuntimeException()
     {
       var compiler = CreateCompiler();
-      ErrorTestHelper.AssertRuntimeException(() => compiler.Compile("(1, 2) == (1, 2)", Compiler.Options.Immutable), null);
+      ErrorTestHelper.AssertRuntimeException(() => compiler.Compile("(1, 2) == (1, 2)", Compiler.Options.Immutable),
+        null);
     }
 
     [Theory]
@@ -104,7 +104,8 @@ namespace EpsilonScript.Tests.ScriptSystem
     {
       var compiler = CreateCompiler();
 
-      ErrorTestHelper.AssertRuntimeException(() => compiler.Compile(expression, Compiler.Options.Immutable), "String operations only support concatenation (+), not");
+      ErrorTestHelper.AssertRuntimeException(() => compiler.Compile(expression, Compiler.Options.Immutable),
+        "String operations only support concatenation (+), not");
     }
 
     [Theory]
@@ -116,7 +117,8 @@ namespace EpsilonScript.Tests.ScriptSystem
     {
       var compiler = CreateCompiler();
 
-      ErrorTestHelper.AssertRuntimeException(() => compiler.Compile(expression, Compiler.Options.Immutable), "Cannot find values to perform arithmetic comparision on non numeric types");
+      ErrorTestHelper.AssertRuntimeException(() => compiler.Compile(expression, Compiler.Options.Immutable),
+        "Cannot find values to perform arithmetic comparision on non numeric types");
     }
   }
 }

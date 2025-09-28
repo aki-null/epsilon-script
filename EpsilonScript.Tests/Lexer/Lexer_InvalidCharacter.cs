@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using Xunit;
 using EpsilonScript.Tests.TestInfrastructure;
-using EpsilonScript.Tests.TestInfrastructure.Fakes;
 
 namespace EpsilonScript.Tests.Lexer
 {

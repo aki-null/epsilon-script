@@ -3,7 +3,6 @@ using EpsilonScript.AST;
 using EpsilonScript.Intermediate;
 using Xunit;
 using EpsilonScript.Tests.TestInfrastructure;
-using EpsilonScript.Tests.TestInfrastructure.Fakes;
 
 namespace EpsilonScript.Tests.AST
 {

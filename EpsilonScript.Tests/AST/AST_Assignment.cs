@@ -108,7 +108,8 @@ namespace EpsilonScript.Tests.AST
       var rpn = CreateStack(leftNode, rightNode);
       var element = new Element(new Token("=", TokenType.AssignmentOperator), ElementType.AssignmentOperator);
 
-      ErrorTestHelper.BuildNodeExpectingError<ParserException>(node, rpn, element, Compiler.Options.Immutable, null, null,
+      ErrorTestHelper.BuildNodeExpectingError<ParserException>(node, rpn, element, Compiler.Options.Immutable, null,
+        null,
         ErrorMessages.AssignmentOperatorCannotBeUsedForImmutableScript);
     }
 
@@ -140,7 +141,8 @@ namespace EpsilonScript.Tests.AST
 
       node.Build(rpn, element, Compiler.Options.None, null, null);
 
-      ErrorTestHelper.ExecuteNodeExpectingError<RuntimeException>(node, null, ErrorMessages.FloatValueCannotBeAssignedToBooleanVariable);
+      ErrorTestHelper.ExecuteNodeExpectingError<RuntimeException>(node, null,
+        ErrorMessages.FloatValueCannotBeAssignedToBooleanVariable);
     }
 
     [Theory]
@@ -148,7 +150,8 @@ namespace EpsilonScript.Tests.AST
     [InlineData(ElementType.AssignmentSubtractOperator, "-=")]
     [InlineData(ElementType.AssignmentMultiplyOperator, "*=")]
     [InlineData(ElementType.AssignmentDivideOperator, "/=")]
-    public void AST_Assignment_CompoundAssignmentWithNonNumeric_ThrowsRuntimeException(ElementType operatorType, string operatorSymbol)
+    public void AST_Assignment_CompoundAssignmentWithNonNumeric_ThrowsRuntimeException(ElementType operatorType,
+      string operatorSymbol)
     {
       var variable = new VariableValue(Type.Integer);
       var leftNode = new FakeVariableNode(variable);
@@ -160,7 +163,8 @@ namespace EpsilonScript.Tests.AST
 
       node.Build(rpn, element, Compiler.Options.None, null, null);
 
-      ErrorTestHelper.ExecuteNodeExpectingError<RuntimeException>(node, null, ErrorMessages.ArithmeticOperationOnlyOnNumericValue);
+      ErrorTestHelper.ExecuteNodeExpectingError<RuntimeException>(node, null,
+        ErrorMessages.ArithmeticOperationOnlyOnNumericValue);
     }
 
     [Theory]
@@ -168,7 +172,8 @@ namespace EpsilonScript.Tests.AST
     [InlineData(ElementType.AssignmentSubtractOperator, "-=")]
     [InlineData(ElementType.AssignmentMultiplyOperator, "*=")]
     [InlineData(ElementType.AssignmentDivideOperator, "/=")]
-    public void AST_Assignment_CompoundAssignmentWithBooleanVariable_ThrowsArgumentException(ElementType operatorType, string operatorSymbol)
+    public void AST_Assignment_CompoundAssignmentWithBooleanVariable_ThrowsArgumentException(ElementType operatorType,
+      string operatorSymbol)
     {
       var variable = new VariableValue(Type.Boolean);
       var leftNode = new FakeVariableNode(variable);

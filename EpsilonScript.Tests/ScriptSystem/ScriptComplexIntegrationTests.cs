@@ -1,9 +1,6 @@
 using System.Linq;
-using EpsilonScript;
 using EpsilonScript.Function;
-using EpsilonScript.Helper;
 using Xunit;
-using ValueType = EpsilonScript.AST.ValueType;
 
 namespace EpsilonScript.Tests.ScriptSystem
 {
@@ -121,10 +118,10 @@ namespace EpsilonScript.Tests.ScriptSystem
     }
 
     [Theory]
-    [InlineData("1 + 2 * 3", 7)]           // Tests operator precedence
-    [InlineData("(1 + 2) * 3", 9)]         // Tests parentheses
-    [InlineData("10 - 5 - 2", 3)]          // Tests left associativity
-    [InlineData("2 + 3 * 4 - 1", 13)]      // Tests mixed precedence
+    [InlineData("1 + 2 * 3", 7)] // Tests operator precedence
+    [InlineData("(1 + 2) * 3", 9)] // Tests parentheses
+    [InlineData("10 - 5 - 2", 3)] // Tests left associativity
+    [InlineData("2 + 3 * 4 - 1", 13)] // Tests mixed precedence
     public void ScriptSystem_OperatorPrecedenceAndAssociativity_EvaluatesCorrectly(string expression, int expected)
     {
       var result = CompileAndExecute(expression, Compiler.Options.Immutable);

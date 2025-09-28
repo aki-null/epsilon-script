@@ -1,6 +1,5 @@
 using Xunit;
 using EpsilonScript.Helper;
-using Type = EpsilonScript.Type;
 
 namespace EpsilonScript.Tests.ScriptSystem
 {

@@ -1,14 +1,10 @@
 using System;
-using System.Collections.Generic;
 using EpsilonScript.AST;
-using EpsilonScript.Function;
 using EpsilonScript.Helper;
 using EpsilonScript.Intermediate;
 using Xunit;
 using EpsilonScript.Tests.TestInfrastructure;
-using EpsilonScript.Tests.ScriptSystem;
 using ValueType = EpsilonScript.AST.ValueType;
-using Type = EpsilonScript.Type;
 
 namespace EpsilonScript.Tests.AST
 {

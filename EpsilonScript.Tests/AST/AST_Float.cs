@@ -3,7 +3,6 @@ using EpsilonScript.AST;
 using EpsilonScript.Intermediate;
 using Xunit;
 using EpsilonScript.Tests.TestInfrastructure;
-using EpsilonScript.Tests.TestInfrastructure.Fakes;
 
 namespace EpsilonScript.Tests.AST
 {
@@ -13,7 +12,8 @@ namespace EpsilonScript.Tests.AST
   {
     [Theory]
     [MemberData(nameof(CorrectData))]
-    public void AST_FloatNode_WithValidElement_CreatesCorrectValue(Element element, ValueType expectedNodeType, int expectedInt,
+    public void AST_FloatNode_WithValidElement_CreatesCorrectValue(Element element, ValueType expectedNodeType,
+      int expectedInt,
       float expectedFloat, bool expectedBool)
     {
       var node = new FloatNode();

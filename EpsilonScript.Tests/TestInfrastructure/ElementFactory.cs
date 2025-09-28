@@ -12,6 +12,7 @@ namespace EpsilonScript.Tests.TestInfrastructure
       {
         return new Element(new Token(ReadOnlyMemory<char>.Empty, tokenType), elementType);
       }
+
       return new Element(new Token(text, tokenType), elementType);
     }
 

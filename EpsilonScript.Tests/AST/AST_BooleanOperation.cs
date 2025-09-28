@@ -92,7 +92,8 @@ namespace EpsilonScript.Tests.AST
     [Theory]
     [InlineData(ElementType.BooleanAndOperator, "&&")]
     [InlineData(ElementType.BooleanOrOperator, "||")]
-    public void AST_BooleanOperation_NonBooleanLeftOperand_ThrowsRuntimeException(ElementType operatorType, string operatorSymbol)
+    public void AST_BooleanOperation_NonBooleanLeftOperand_ThrowsRuntimeException(ElementType operatorType,
+      string operatorSymbol)
     {
       var leftNode = new FakeIntegerNode(1); // Non-boolean
       var rightNode = new FakeBooleanNode(true);
@@ -103,13 +104,15 @@ namespace EpsilonScript.Tests.AST
 
       node.Build(rpn, element, Compiler.Options.None, null, null);
 
-      ErrorTestHelper.ExecuteNodeExpectingError<RuntimeException>(node, null, "Boolean operation can only be performed on boolean values");
+      ErrorTestHelper.ExecuteNodeExpectingError<RuntimeException>(node, null,
+        "Boolean operation can only be performed on boolean values");
     }
 
     [Theory]
-    [InlineData(ElementType.BooleanAndOperator, "&&", true)]  // AND with true left needs to evaluate right
+    [InlineData(ElementType.BooleanAndOperator, "&&", true)] // AND with true left needs to evaluate right
     [InlineData(ElementType.BooleanOrOperator, "||", false)] // OR with false left needs to evaluate right
-    public void AST_BooleanOperation_NonBooleanRightOperand_ThrowsRuntimeException(ElementType operatorType, string operatorSymbol, bool leftValue)
+    public void AST_BooleanOperation_NonBooleanRightOperand_ThrowsRuntimeException(ElementType operatorType,
+      string operatorSymbol, bool leftValue)
     {
       var leftNode = new FakeBooleanNode(leftValue);
       var rightNode = new FakeIntegerNode(1); // Non-boolean
@@ -120,13 +123,15 @@ namespace EpsilonScript.Tests.AST
 
       node.Build(rpn, element, Compiler.Options.None, null, null);
 
-      ErrorTestHelper.ExecuteNodeExpectingError<RuntimeException>(node, null, "Boolean operation can only be performed on boolean values");
+      ErrorTestHelper.ExecuteNodeExpectingError<RuntimeException>(node, null,
+        "Boolean operation can only be performed on boolean values");
     }
 
     [Theory]
     [InlineData(ElementType.BooleanAndOperator, "&&")]
     [InlineData(ElementType.BooleanOrOperator, "||")]
-    public void AST_BooleanOperation_StackUnderflow_ThrowsParserException(ElementType operatorType, string operatorSymbol)
+    public void AST_BooleanOperation_StackUnderflow_ThrowsParserException(ElementType operatorType,
+      string operatorSymbol)
     {
       var node = new BooleanOperationNode();
       var rpn = CreateStack(new FakeBooleanNode(true)); // Only one node, need two

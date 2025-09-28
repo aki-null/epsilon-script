@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using EpsilonScript.Intermediate;
 using Xunit;
 using EpsilonScript.Tests.TestInfrastructure;
-using EpsilonScript.Tests.TestInfrastructure.Fakes;
 
 namespace EpsilonScript.Tests.RpnConverter
 {
@@ -30,20 +29,20 @@ namespace EpsilonScript.Tests.RpnConverter
         {
           new object[]
           {
-            new Element[]
+            new[]
             {
               new Element(new Token("(", TokenType.LeftParenthesis), ElementType.LeftParenthesis),
               new Element(new Token("1", TokenType.Integer), ElementType.Integer),
               new Element(new Token(")", TokenType.RightParenthesis), ElementType.RightParenthesis),
             },
-            new Element[]
+            new[]
             {
               new Element(new Token("1", TokenType.Integer), ElementType.Integer),
             }
           },
           new object[]
           {
-            new Element[]
+            new[]
             {
               new Element(new Token("(", TokenType.LeftParenthesis), ElementType.LeftParenthesis),
               new Element(new Token("1", TokenType.Integer), ElementType.Integer),
@@ -51,7 +50,7 @@ namespace EpsilonScript.Tests.RpnConverter
               new Element(new Token("2", TokenType.Integer), ElementType.Integer),
               new Element(new Token(")", TokenType.RightParenthesis), ElementType.RightParenthesis),
             },
-            new Element[]
+            new[]
             {
               new Element(new Token("1", TokenType.Integer), ElementType.Integer),
               new Element(new Token("2", TokenType.Integer), ElementType.Integer),
@@ -60,7 +59,7 @@ namespace EpsilonScript.Tests.RpnConverter
           },
           new object[]
           {
-            new Element[]
+            new[]
             {
               new Element(new Token("(", TokenType.LeftParenthesis), ElementType.LeftParenthesis),
               new Element(new Token("1", TokenType.Integer), ElementType.Integer),
@@ -70,7 +69,7 @@ namespace EpsilonScript.Tests.RpnConverter
               new Element(new Token("*", TokenType.MultiplyOperator), ElementType.MultiplyOperator),
               new Element(new Token("3", TokenType.Integer), ElementType.Integer),
             },
-            new Element[]
+            new[]
             {
               new Element(new Token("1", TokenType.Integer), ElementType.Integer),
               new Element(new Token("2", TokenType.Integer), ElementType.Integer),
@@ -81,7 +80,7 @@ namespace EpsilonScript.Tests.RpnConverter
           },
           new object[]
           {
-            new Element[]
+            new[]
             {
               new Element(new Token("(", TokenType.LeftParenthesis), ElementType.LeftParenthesis),
               new Element(new Token("1", TokenType.Integer), ElementType.Integer),
@@ -95,7 +94,7 @@ namespace EpsilonScript.Tests.RpnConverter
               new Element(new Token("4", TokenType.Integer), ElementType.Integer),
               new Element(new Token(")", TokenType.RightParenthesis), ElementType.RightParenthesis),
             },
-            new Element[]
+            new[]
             {
               new Element(new Token("1", TokenType.Integer), ElementType.Integer),
               new Element(new Token("2", TokenType.Integer), ElementType.Integer),
@@ -118,21 +117,21 @@ namespace EpsilonScript.Tests.RpnConverter
         {
           new object[]
           {
-            new Element[]
+            new[]
             {
               new Element(new Token(")", TokenType.RightParenthesis), ElementType.RightParenthesis),
             }
           },
           new object[]
           {
-            new Element[]
+            new[]
             {
               new Element(new Token("(", TokenType.LeftParenthesis), ElementType.LeftParenthesis),
             }
           },
           new object[]
           {
-            new Element[]
+            new[]
             {
               new Element(new Token("(", TokenType.LeftParenthesis), ElementType.LeftParenthesis),
               new Element(new Token(")", TokenType.RightParenthesis), ElementType.RightParenthesis),
@@ -141,7 +140,7 @@ namespace EpsilonScript.Tests.RpnConverter
           },
           new object[]
           {
-            new Element[]
+            new[]
             {
               new Element(new Token("(", TokenType.LeftParenthesis), ElementType.LeftParenthesis),
               new Element(new Token(")", TokenType.RightParenthesis), ElementType.RightParenthesis),

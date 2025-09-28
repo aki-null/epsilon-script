@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using EpsilonScript.Intermediate;
 using Xunit;
 using EpsilonScript.Tests.TestInfrastructure;
-using EpsilonScript.Tests.TestInfrastructure.Fakes;
 
 namespace EpsilonScript.Tests.Parser
 {
@@ -42,13 +41,13 @@ namespace EpsilonScript.Tests.Parser
           ),
           new object[]
           {
-            new Token[]
+            new[]
             {
               new Token("var", TokenType.Identifier),
               new Token("(", TokenType.LeftParenthesis),
               new Token(")", TokenType.RightParenthesis),
             },
-            new Element[]
+            new[]
             {
               new Element(new Token("var", TokenType.Identifier), ElementType.Function),
               new Element(new Token("(", TokenType.LeftParenthesis), ElementType.FunctionStartParenthesis),

@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using EpsilonScript.AST;
 using EpsilonScript.Intermediate;
 using Xunit;
@@ -32,9 +31,9 @@ namespace EpsilonScript.Tests.AST
     }
 
     [Theory]
-    [InlineData("2147483648")]  // int.MaxValue + 1
+    [InlineData("2147483648")] // int.MaxValue + 1
     [InlineData("-2147483649")] // int.MinValue - 1
-    [InlineData("9999999999")]  // Way beyond int range
+    [InlineData("9999999999")] // Way beyond int range
     public void AST_Integer_OverflowValues_ThrowsOverflowException(string value)
     {
       var node = new IntegerNode();
@@ -46,9 +45,9 @@ namespace EpsilonScript.Tests.AST
     }
 
     [Theory]
-    [InlineData("3.4028235E+38")]   // float.MaxValue
-    [InlineData("-3.4028235E+38")]  // -float.MaxValue (most negative float)
-    [InlineData("1.401298E-45")]    // float.Epsilon
+    [InlineData("3.4028235E+38")] // float.MaxValue
+    [InlineData("-3.4028235E+38")] // -float.MaxValue (most negative float)
+    [InlineData("1.401298E-45")] // float.Epsilon
     [InlineData("0.0")]
     [InlineData("1.0")]
     [InlineData("-1.0")]
@@ -66,11 +65,12 @@ namespace EpsilonScript.Tests.AST
 
       // FloatNode uses safe conversion - clamps to int.MaxValue/int.MinValue instead of unsafe overflow
       var expectedInt = float.IsNaN(expectedFloat) || float.IsInfinity(expectedFloat) ? 0 :
-                        expectedFloat > int.MaxValue ? int.MaxValue :
-                        expectedFloat < int.MinValue ? int.MinValue :
-                        (int)expectedFloat;
+        expectedFloat > int.MaxValue ? int.MaxValue :
+        expectedFloat < int.MinValue ? int.MinValue :
+        (int)expectedFloat;
       Assert.Equal(expectedInt, node.IntegerValue);
-      Assert.Equal(expectedFloat != 0.0f && !float.IsInfinity(expectedFloat) && !float.IsNaN(expectedFloat), node.BooleanValue);
+      Assert.Equal(expectedFloat != 0.0f && !float.IsInfinity(expectedFloat) && !float.IsNaN(expectedFloat),
+        node.BooleanValue);
     }
 
     [Fact]
@@ -273,10 +273,10 @@ namespace EpsilonScript.Tests.AST
     }
 
     [Theory]
-    [InlineData("")]                    // Empty string
-    [InlineData("a")]                   // Single character
-    [InlineData("Hello World")]         // Normal string
-    [InlineData("こんにちは世界")]          // Unicode string
+    [InlineData("")] // Empty string
+    [InlineData("a")] // Single character
+    [InlineData("Hello World")] // Normal string
+    [InlineData("こんにちは世界")] // Unicode string
     [InlineData("String with\nnewlines")] // String with control characters
     public void AST_String_VariousLengths_Succeeds(string value)
     {

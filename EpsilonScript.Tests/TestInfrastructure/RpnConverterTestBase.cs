@@ -30,12 +30,6 @@ namespace EpsilonScript.Tests.TestInfrastructure
       }
     }
 
-
-    protected static Element[] Elements(params (string text, TokenType token, ElementType element)[] specification)
-    {
-      return ElementFactory.Create(specification);
-    }
-
     protected static void AssertRpnFails(IList<Element> input)
     {
       var elementReader = new TestElementReader();
@@ -159,8 +153,10 @@ namespace EpsilonScript.Tests.TestInfrastructure
         // Assignment operators
         "=" => new Element(new Token("=", TokenType.AssignmentOperator), ElementType.AssignmentOperator),
         "+=" => new Element(new Token("+=", TokenType.AssignmentAddOperator), ElementType.AssignmentAddOperator),
-        "-=" => new Element(new Token("-=", TokenType.AssignmentSubtractOperator), ElementType.AssignmentSubtractOperator),
-        "*=" => new Element(new Token("*=", TokenType.AssignmentMultiplyOperator), ElementType.AssignmentMultiplyOperator),
+        "-=" => new Element(new Token("-=", TokenType.AssignmentSubtractOperator),
+          ElementType.AssignmentSubtractOperator),
+        "*=" => new Element(new Token("*=", TokenType.AssignmentMultiplyOperator),
+          ElementType.AssignmentMultiplyOperator),
         "/=" => new Element(new Token("/=", TokenType.AssignmentDivideOperator), ElementType.AssignmentDivideOperator),
 
         // Comparison operators
@@ -168,8 +164,10 @@ namespace EpsilonScript.Tests.TestInfrastructure
         "!=" => new Element(new Token("!=", TokenType.ComparisonNotEqual), ElementType.ComparisonNotEqual),
         "<" => new Element(new Token("<", TokenType.ComparisonLessThan), ElementType.ComparisonLessThan),
         ">" => new Element(new Token(">", TokenType.ComparisonGreaterThan), ElementType.ComparisonGreaterThan),
-        "<=" => new Element(new Token("<=", TokenType.ComparisonLessThanOrEqualTo), ElementType.ComparisonLessThanOrEqualTo),
-        ">=" => new Element(new Token(">=", TokenType.ComparisonGreaterThanOrEqualTo), ElementType.ComparisonGreaterThanOrEqualTo),
+        "<=" => new Element(new Token("<=", TokenType.ComparisonLessThanOrEqualTo),
+          ElementType.ComparisonLessThanOrEqualTo),
+        ">=" => new Element(new Token(">=", TokenType.ComparisonGreaterThanOrEqualTo),
+          ElementType.ComparisonGreaterThanOrEqualTo),
 
         // Boolean operators
         "&&" => new Element(new Token("&&", TokenType.BooleanAndOperator), ElementType.BooleanAndOperator),

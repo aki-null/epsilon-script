@@ -93,7 +93,8 @@ namespace EpsilonScript.Tests.Parser
         {
           // Function calls - precedence 8 (identifier followed by parentheses becomes function)
           CreateTestCase(
-            new[] {
+            new[]
+            {
               new Token("func", TokenType.Identifier),
               new Token("(", TokenType.LeftParenthesis),
               new Token("1", TokenType.Integer),
@@ -128,19 +129,31 @@ namespace EpsilonScript.Tests.Parser
         {
           // Multiplication, Division, Modulo - precedence 7
           CreateTestCase(
-            new[] { new Token("2", TokenType.Integer), new Token("3", TokenType.Integer), new Token("*", TokenType.MultiplyOperator) },
+            new[]
+            {
+              new Token("2", TokenType.Integer), new Token("3", TokenType.Integer),
+              new Token("*", TokenType.MultiplyOperator)
+            },
             Create("2", TokenType.Integer, ElementType.Integer),
             Create("3", TokenType.Integer, ElementType.Integer),
             Create("*", TokenType.MultiplyOperator, ElementType.MultiplyOperator)
           ),
           CreateTestCase(
-            new[] { new Token("8", TokenType.Integer), new Token("2", TokenType.Integer), new Token("/", TokenType.DivideOperator) },
+            new[]
+            {
+              new Token("8", TokenType.Integer), new Token("2", TokenType.Integer),
+              new Token("/", TokenType.DivideOperator)
+            },
             Create("8", TokenType.Integer, ElementType.Integer),
             Create("2", TokenType.Integer, ElementType.Integer),
             Create("/", TokenType.DivideOperator, ElementType.DivideOperator)
           ),
           CreateTestCase(
-            new[] { new Token("7", TokenType.Integer), new Token("3", TokenType.Integer), new Token("%", TokenType.ModuloOperator) },
+            new[]
+            {
+              new Token("7", TokenType.Integer), new Token("3", TokenType.Integer),
+              new Token("%", TokenType.ModuloOperator)
+            },
             Create("7", TokenType.Integer, ElementType.Integer),
             Create("3", TokenType.Integer, ElementType.Integer),
             Create("%", TokenType.ModuloOperator, ElementType.ModuloOperator)
@@ -157,13 +170,19 @@ namespace EpsilonScript.Tests.Parser
         {
           // Addition, Subtraction - precedence 6
           CreateTestCase(
-            new[] { new Token("1", TokenType.Integer), new Token("2", TokenType.Integer), new Token("+", TokenType.PlusSign) },
+            new[]
+            {
+              new Token("1", TokenType.Integer), new Token("2", TokenType.Integer), new Token("+", TokenType.PlusSign)
+            },
             Create("1", TokenType.Integer, ElementType.Integer),
             Create("2", TokenType.Integer, ElementType.Integer),
             Create("+", TokenType.PlusSign, ElementType.AddOperator)
           ),
           CreateTestCase(
-            new[] { new Token("5", TokenType.Integer), new Token("3", TokenType.Integer), new Token("-", TokenType.MinusSign) },
+            new[]
+            {
+              new Token("5", TokenType.Integer), new Token("3", TokenType.Integer), new Token("-", TokenType.MinusSign)
+            },
             Create("5", TokenType.Integer, ElementType.Integer),
             Create("3", TokenType.Integer, ElementType.Integer),
             Create("-", TokenType.MinusSign, ElementType.SubtractOperator)
@@ -180,19 +199,31 @@ namespace EpsilonScript.Tests.Parser
         {
           // Comparison operators - precedence 5
           CreateTestCase(
-            new[] { new Token("1", TokenType.Integer), new Token("2", TokenType.Integer), new Token("==", TokenType.ComparisonEqual) },
+            new[]
+            {
+              new Token("1", TokenType.Integer), new Token("2", TokenType.Integer),
+              new Token("==", TokenType.ComparisonEqual)
+            },
             Create("1", TokenType.Integer, ElementType.Integer),
             Create("2", TokenType.Integer, ElementType.Integer),
             Create("==", TokenType.ComparisonEqual, ElementType.ComparisonEqual)
           ),
           CreateTestCase(
-            new[] { new Token("1", TokenType.Integer), new Token("2", TokenType.Integer), new Token("!=", TokenType.ComparisonNotEqual) },
+            new[]
+            {
+              new Token("1", TokenType.Integer), new Token("2", TokenType.Integer),
+              new Token("!=", TokenType.ComparisonNotEqual)
+            },
             Create("1", TokenType.Integer, ElementType.Integer),
             Create("2", TokenType.Integer, ElementType.Integer),
             Create("!=", TokenType.ComparisonNotEqual, ElementType.ComparisonNotEqual)
           ),
           CreateTestCase(
-            new[] { new Token("1", TokenType.Integer), new Token("2", TokenType.Integer), new Token("<", TokenType.ComparisonLessThan) },
+            new[]
+            {
+              new Token("1", TokenType.Integer), new Token("2", TokenType.Integer),
+              new Token("<", TokenType.ComparisonLessThan)
+            },
             Create("1", TokenType.Integer, ElementType.Integer),
             Create("2", TokenType.Integer, ElementType.Integer),
             Create("<", TokenType.ComparisonLessThan, ElementType.ComparisonLessThan)
@@ -209,7 +240,11 @@ namespace EpsilonScript.Tests.Parser
         {
           // Boolean AND - precedence 4
           CreateTestCase(
-            new[] { new Token("true", TokenType.BooleanLiteralTrue), new Token("false", TokenType.BooleanLiteralFalse), new Token("&&", TokenType.BooleanAndOperator) },
+            new[]
+            {
+              new Token("true", TokenType.BooleanLiteralTrue), new Token("false", TokenType.BooleanLiteralFalse),
+              new Token("&&", TokenType.BooleanAndOperator)
+            },
             Create("true", TokenType.BooleanLiteralTrue, ElementType.BooleanLiteralTrue),
             Create("false", TokenType.BooleanLiteralFalse, ElementType.BooleanLiteralFalse),
             Create("&&", TokenType.BooleanAndOperator, ElementType.BooleanAndOperator)
@@ -226,7 +261,11 @@ namespace EpsilonScript.Tests.Parser
         {
           // Boolean OR - precedence 3
           CreateTestCase(
-            new[] { new Token("true", TokenType.BooleanLiteralTrue), new Token("false", TokenType.BooleanLiteralFalse), new Token("||", TokenType.BooleanOrOperator) },
+            new[]
+            {
+              new Token("true", TokenType.BooleanLiteralTrue), new Token("false", TokenType.BooleanLiteralFalse),
+              new Token("||", TokenType.BooleanOrOperator)
+            },
             Create("true", TokenType.BooleanLiteralTrue, ElementType.BooleanLiteralTrue),
             Create("false", TokenType.BooleanLiteralFalse, ElementType.BooleanLiteralFalse),
             Create("||", TokenType.BooleanOrOperator, ElementType.BooleanOrOperator)
@@ -243,13 +282,21 @@ namespace EpsilonScript.Tests.Parser
         {
           // Assignment operators - precedence 2
           CreateTestCase(
-            new[] { new Token("x", TokenType.Identifier), new Token("1", TokenType.Integer), new Token("=", TokenType.AssignmentOperator) },
+            new[]
+            {
+              new Token("x", TokenType.Identifier), new Token("1", TokenType.Integer),
+              new Token("=", TokenType.AssignmentOperator)
+            },
             Create("x", TokenType.Identifier, ElementType.Variable),
             Create("1", TokenType.Integer, ElementType.Integer),
             Create("=", TokenType.AssignmentOperator, ElementType.AssignmentOperator)
           ),
           CreateTestCase(
-            new[] { new Token("x", TokenType.Identifier), new Token("1", TokenType.Integer), new Token("+=", TokenType.AssignmentAddOperator) },
+            new[]
+            {
+              new Token("x", TokenType.Identifier), new Token("1", TokenType.Integer),
+              new Token("+=", TokenType.AssignmentAddOperator)
+            },
             Create("x", TokenType.Identifier, ElementType.Variable),
             Create("1", TokenType.Integer, ElementType.Integer),
             Create("+=", TokenType.AssignmentAddOperator, ElementType.AssignmentAddOperator)
@@ -266,7 +313,10 @@ namespace EpsilonScript.Tests.Parser
         {
           // Comma - precedence 1
           CreateTestCase(
-            new[] { new Token("1", TokenType.Integer), new Token("2", TokenType.Integer), new Token(",", TokenType.Comma) },
+            new[]
+            {
+              new Token("1", TokenType.Integer), new Token("2", TokenType.Integer), new Token(",", TokenType.Comma)
+            },
             Create("1", TokenType.Integer, ElementType.Integer),
             Create("2", TokenType.Integer, ElementType.Integer),
             Create(",", TokenType.Comma, ElementType.Comma)
@@ -283,7 +333,10 @@ namespace EpsilonScript.Tests.Parser
         {
           // Semicolon - precedence 0
           CreateTestCase(
-            new[] { new Token("1", TokenType.Integer), new Token("2", TokenType.Integer), new Token(";", TokenType.Semicolon) },
+            new[]
+            {
+              new Token("1", TokenType.Integer), new Token("2", TokenType.Integer), new Token(";", TokenType.Semicolon)
+            },
             Create("1", TokenType.Integer, ElementType.Integer),
             Create("2", TokenType.Integer, ElementType.Integer),
             Create(";", TokenType.Semicolon, ElementType.Semicolon)
@@ -300,7 +353,8 @@ namespace EpsilonScript.Tests.Parser
         {
           // Test mixed precedence: 2 + 3 * 4 (parser should correctly identify operators)
           CreateTestCase(
-            new[] {
+            new[]
+            {
               new Token("2", TokenType.Integer),
               new Token("+", TokenType.PlusSign),
               new Token("3", TokenType.Integer),
@@ -325,7 +379,8 @@ namespace EpsilonScript.Tests.Parser
         {
           // Left-to-right associativity: 1 - 2 - 3 (parser should identify both as subtract)
           CreateTestCase(
-            new[] {
+            new[]
+            {
               new Token("1", TokenType.Integer),
               new Token("-", TokenType.MinusSign),
               new Token("2", TokenType.Integer),

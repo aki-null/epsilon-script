@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using EpsilonScript.AST;
-using EpsilonScript.Intermediate;
 
 namespace EpsilonScript.Tests.TestInfrastructure
 {
@@ -15,11 +14,6 @@ namespace EpsilonScript.Tests.TestInfrastructure
       }
 
       return stack;
-    }
-
-    protected static Element CreateElement(string text, TokenType tokenType, ElementType elementType)
-    {
-      return ElementFactory.Create(text, tokenType, elementType);
     }
   }
 }

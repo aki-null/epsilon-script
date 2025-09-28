@@ -570,7 +570,8 @@ namespace EpsilonScript.Tests.AST
     [Theory]
     [InlineData(ElementType.DivideOperator, "/")]
     [InlineData(ElementType.ModuloOperator, "%")]
-    public void AST_Arithmetic_IntegerByZero_ThrowsDivideByZeroException(ElementType operatorType, string operatorSymbol)
+    public void AST_Arithmetic_IntegerByZero_ThrowsDivideByZeroException(ElementType operatorType,
+      string operatorSymbol)
     {
       var node = new ArithmeticNode();
       var rpn = CreateStack(new FakeIntegerNode(5), new FakeIntegerNode(0));

@@ -51,7 +51,8 @@ namespace EpsilonScript.Tests.Parser
         {
           // ((1 + 2) * (3 + 4))
           CreateTestCase(
-            new[] {
+            new[]
+            {
               new Token("(", TokenType.LeftParenthesis),
               new Token("(", TokenType.LeftParenthesis),
               new Token("1", TokenType.Integer),
@@ -83,7 +84,8 @@ namespace EpsilonScript.Tests.Parser
 
           // (((1)))
           CreateTestCase(
-            new[] {
+            new[]
+            {
               new Token("(", TokenType.LeftParenthesis),
               new Token("(", TokenType.LeftParenthesis),
               new Token("(", TokenType.LeftParenthesis),
@@ -112,7 +114,8 @@ namespace EpsilonScript.Tests.Parser
         {
           // 1 + 2 * 3 - 4 / 5 % 6
           CreateTestCase(
-            new[] {
+            new[]
+            {
               new Token("1", TokenType.Integer),
               new Token("+", TokenType.PlusSign),
               new Token("2", TokenType.Integer),
@@ -140,7 +143,8 @@ namespace EpsilonScript.Tests.Parser
 
           // -(-(-1))
           CreateTestCase(
-            new[] {
+            new[]
+            {
               new Token("-", TokenType.MinusSign),
               new Token("(", TokenType.LeftParenthesis),
               new Token("-", TokenType.MinusSign),
@@ -171,7 +175,8 @@ namespace EpsilonScript.Tests.Parser
         {
           // true && (false || true) && !false
           CreateTestCase(
-            new[] {
+            new[]
+            {
               new Token("true", TokenType.BooleanLiteralTrue),
               new Token("&&", TokenType.BooleanAndOperator),
               new Token("(", TokenType.LeftParenthesis),
@@ -197,7 +202,8 @@ namespace EpsilonScript.Tests.Parser
 
           // 1 < 2 && 3 >= 4 || 5 != 6
           CreateTestCase(
-            new[] {
+            new[]
+            {
               new Token("1", TokenType.Integer),
               new Token("<", TokenType.ComparisonLessThan),
               new Token("2", TokenType.Integer),
@@ -234,7 +240,8 @@ namespace EpsilonScript.Tests.Parser
         {
           // func1(func2(1, 2), func3())
           CreateTestCase(
-            new[] {
+            new[]
+            {
               new Token("func1", TokenType.Identifier),
               new Token("(", TokenType.LeftParenthesis),
               new Token("func2", TokenType.Identifier),
@@ -267,7 +274,8 @@ namespace EpsilonScript.Tests.Parser
 
           // func(1 + 2, 3 * 4, func2(5))
           CreateTestCase(
-            new[] {
+            new[]
+            {
               new Token("func", TokenType.Identifier),
               new Token("(", TokenType.LeftParenthesis),
               new Token("1", TokenType.Integer),
@@ -312,7 +320,8 @@ namespace EpsilonScript.Tests.Parser
         {
           // "Hello " + (1 + 2) + " World"
           CreateTestCase(
-            new[] {
+            new[]
+            {
               new Token("\"Hello \"", TokenType.String),
               new Token("+", TokenType.PlusSign),
               new Token("(", TokenType.LeftParenthesis),
@@ -336,7 +345,8 @@ namespace EpsilonScript.Tests.Parser
 
           // x = func(1.5 + 2) * 3; y = x > 5
           CreateTestCase(
-            new[] {
+            new[]
+            {
               new Token("x", TokenType.Identifier),
               new Token("=", TokenType.AssignmentOperator),
               new Token("func", TokenType.Identifier),

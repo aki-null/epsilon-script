@@ -1,7 +1,5 @@
 using System;
-using System.Collections.Generic;
 using EpsilonScript.Function;
-using EpsilonScript.Helper;
 using Xunit;
 
 namespace EpsilonScript.Tests.ScriptSystem

@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using EpsilonScript.AST;
 using EpsilonScript.Intermediate;
 using Xunit;
@@ -111,7 +110,8 @@ namespace EpsilonScript.Tests.AST
       var leftNode = new FakeIntegerNode(10);
       var rightNode = new FakeIntegerNode(10);
       var rpn = CreateStack(leftNode, rightNode);
-      node.Build(rpn, new Element(new Token("<=", TokenType.ComparisonLessThanOrEqualTo), ElementType.ComparisonLessThanOrEqualTo),
+      node.Build(rpn,
+        new Element(new Token("<=", TokenType.ComparisonLessThanOrEqualTo), ElementType.ComparisonLessThanOrEqualTo),
         Compiler.Options.None, null, null);
       node.Execute(null);
       Assert.Equal(ValueType.Boolean, node.ValueType);
@@ -139,7 +139,9 @@ namespace EpsilonScript.Tests.AST
       var leftNode = new FakeIntegerNode(10);
       var rightNode = new FakeIntegerNode(10);
       var rpn = CreateStack(leftNode, rightNode);
-      node.Build(rpn, new Element(new Token(">=", TokenType.ComparisonGreaterThanOrEqualTo), ElementType.ComparisonGreaterThanOrEqualTo),
+      node.Build(rpn,
+        new Element(new Token(">=", TokenType.ComparisonGreaterThanOrEqualTo),
+          ElementType.ComparisonGreaterThanOrEqualTo),
         Compiler.Options.None, null, null);
       node.Execute(null);
       Assert.Equal(ValueType.Boolean, node.ValueType);

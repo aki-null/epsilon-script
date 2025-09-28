@@ -92,6 +92,7 @@ namespace EpsilonScript.Tests.Math
       {
         sum += baseValue;
       }
+
       // After many operations, accumulated error is significant
       Assert.False(EpsilonScript.Math.IsNearlyEqual(baseValue, sum));
     }

@@ -1,8 +1,6 @@
 using System;
-using EpsilonScript;
 using EpsilonScript.Helper;
 using Xunit;
-using Type = EpsilonScript.Type;
 
 namespace EpsilonScript.Tests.ScriptSystem
 {

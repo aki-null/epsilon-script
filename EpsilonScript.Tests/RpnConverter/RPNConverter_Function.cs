@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using EpsilonScript.Intermediate;
 using Xunit;
 using EpsilonScript.Tests.TestInfrastructure;
-using EpsilonScript.Tests.TestInfrastructure.Fakes;
 
 namespace EpsilonScript.Tests.RpnConverter
 {
@@ -23,25 +22,25 @@ namespace EpsilonScript.Tests.RpnConverter
         {
           new object[]
           {
-            new Element[]
+            new[]
             {
               new Element(new Token("func", TokenType.Identifier), ElementType.Function),
             },
-            new Element[]
+            new[]
             {
               new Element(new Token("func", TokenType.Identifier), ElementType.Function),
             }
           },
           new object[]
           {
-            new Element[]
+            new[]
             {
               new Element(new Token("func", TokenType.Identifier), ElementType.Function),
               new Element(new Token("(", TokenType.LeftParenthesis), ElementType.FunctionStartParenthesis),
               new Element(new Token("", TokenType.None), ElementType.None),
               new Element(new Token(")", TokenType.RightParenthesis), ElementType.RightParenthesis),
             },
-            new Element[]
+            new[]
             {
               new Element(new Token("", TokenType.None), ElementType.None),
               new Element(new Token("func", TokenType.Identifier), ElementType.Function),
@@ -49,14 +48,14 @@ namespace EpsilonScript.Tests.RpnConverter
           },
           new object[]
           {
-            new Element[]
+            new[]
             {
               new Element(new Token("func", TokenType.Identifier), ElementType.Function),
               new Element(new Token("(", TokenType.LeftParenthesis), ElementType.FunctionStartParenthesis),
               new Element(new Token("1", TokenType.Integer), ElementType.Integer),
               new Element(new Token(")", TokenType.RightParenthesis), ElementType.RightParenthesis),
             },
-            new Element[]
+            new[]
             {
               new Element(new Token("1", TokenType.Integer), ElementType.Integer),
               new Element(new Token("func", TokenType.Identifier), ElementType.Function),
@@ -64,7 +63,7 @@ namespace EpsilonScript.Tests.RpnConverter
           },
           new object[]
           {
-            new Element[]
+            new[]
             {
               new Element(new Token("func", TokenType.Identifier), ElementType.Function),
               new Element(new Token("(", TokenType.LeftParenthesis), ElementType.FunctionStartParenthesis),
@@ -73,7 +72,7 @@ namespace EpsilonScript.Tests.RpnConverter
               new Element(new Token("2", TokenType.Integer), ElementType.Integer),
               new Element(new Token(")", TokenType.RightParenthesis), ElementType.RightParenthesis),
             },
-            new Element[]
+            new[]
             {
               new Element(new Token("1", TokenType.Integer), ElementType.Integer),
               new Element(new Token("2", TokenType.Integer), ElementType.Integer),
@@ -83,7 +82,7 @@ namespace EpsilonScript.Tests.RpnConverter
           },
           new object[]
           {
-            new Element[]
+            new[]
             {
               new Element(new Token("func", TokenType.Identifier), ElementType.Function),
               new Element(new Token("(", TokenType.LeftParenthesis), ElementType.FunctionStartParenthesis),
@@ -94,7 +93,7 @@ namespace EpsilonScript.Tests.RpnConverter
               new Element(new Token("3", TokenType.Integer), ElementType.Integer),
               new Element(new Token(")", TokenType.RightParenthesis), ElementType.RightParenthesis),
             },
-            new Element[]
+            new[]
             {
               new Element(new Token("1", TokenType.Integer), ElementType.Integer),
               new Element(new Token("2", TokenType.Integer), ElementType.Integer),
@@ -106,7 +105,7 @@ namespace EpsilonScript.Tests.RpnConverter
           },
           new object[]
           {
-            new Element[]
+            new[]
             {
               new Element(new Token("1", TokenType.Integer), ElementType.Integer),
               new Element(new Token("+", TokenType.PlusSign), ElementType.AddOperator),
@@ -115,7 +114,7 @@ namespace EpsilonScript.Tests.RpnConverter
               new Element(new Token("", TokenType.None), ElementType.None),
               new Element(new Token(")", TokenType.RightParenthesis), ElementType.RightParenthesis),
             },
-            new Element[]
+            new[]
             {
               new Element(new Token("1", TokenType.Integer), ElementType.Integer),
               new Element(new Token("", TokenType.None), ElementType.None),
