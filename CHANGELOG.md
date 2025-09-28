@@ -1,5 +1,33 @@
 # Changelog
 
+## [1.2.0] - 2025-09-28
+
+### Added
+- **VariableId struct**: Strongly-typed variable identifier that replaces direct `uint` usage
+  - Provides implicit conversions to/from `uint` and `string` for backwards compatibility
+  - Maintains internal unique identifier mapping through extension methods
+  - Improves type safety and encapsulates identifier management
+
+### Changed
+- **BREAKING CHANGE**: `IVariableContainer.TryGetValue()` now takes `VariableId` instead of `uint`
+  - Existing implementations must be updated to use `VariableId` parameter
+  - Most calling code continues to work due to implicit `uint` → `VariableId` conversion
+- Internal function dictionaries now use `VariableId` keys instead of `uint`
+- AST Node `Build()` method signatures updated to use `IDictionary<VariableId, CustomFunctionOverload>`
+- Eliminated direct calls to `GetUniqueIdentifier()` and `GetStringFromUniqueIdentifier()` in favor of VariableId implicit conversions
+
+### Migration Guide
+For custom `IVariableContainer` implementations:
+```csharp
+// Before
+public bool TryGetValue(uint variableKey, out VariableValue variableValue)
+
+// After
+public bool TryGetValue(VariableId variableKey, out VariableValue variableValue)
+```
+
+Most existing code using `uint` variable identifiers will continue to work due to implicit conversions.
+
 ## [1.1.0] - 2025-09-28
 
 ### Added
