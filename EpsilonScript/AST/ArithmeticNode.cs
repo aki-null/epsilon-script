@@ -13,6 +13,19 @@ namespace EpsilonScript.AST
 
     public override bool IsConstant => _leftNode.IsConstant && _rightNode.IsConstant;
 
+    private string GetOperatorName(ElementType op)
+    {
+      return op switch
+      {
+        ElementType.AddOperator => "addition",
+        ElementType.SubtractOperator => "subtraction",
+        ElementType.MultiplyOperator => "multiplication",
+        ElementType.DivideOperator => "division",
+        ElementType.ModuloOperator => "modulo",
+        _ => "unknown operation"
+      };
+    }
+
     public override void Build(Stack<Node> rpnStack, Element element, Compiler.Options options,
       IVariableContainer variables, IDictionary<uint, CustomFunctionOverload> functions)
     {
@@ -29,14 +42,18 @@ namespace EpsilonScript.AST
       switch (_operator)
       {
         case ElementType.AddOperator:
-          return _leftNode.IntegerValue + _rightNode.IntegerValue;
+          return checked(_leftNode.IntegerValue + _rightNode.IntegerValue);
         case ElementType.SubtractOperator:
-          return _leftNode.IntegerValue - _rightNode.IntegerValue;
+          return checked(_leftNode.IntegerValue - _rightNode.IntegerValue);
         case ElementType.MultiplyOperator:
-          return _leftNode.IntegerValue * _rightNode.IntegerValue;
+          return checked(_leftNode.IntegerValue * _rightNode.IntegerValue);
         case ElementType.DivideOperator:
+          if (_rightNode.IntegerValue == 0)
+            throw new DivideByZeroException("Division by zero");
           return _leftNode.IntegerValue / _rightNode.IntegerValue;
         case ElementType.ModuloOperator:
+          if (_rightNode.IntegerValue == 0)
+            throw new DivideByZeroException("Modulo by zero");
           return _leftNode.IntegerValue % _rightNode.IntegerValue;
         default:
           throw new ArgumentOutOfRangeException(nameof(_operator), _operator, "Unsupported operator type");
@@ -54,8 +71,12 @@ namespace EpsilonScript.AST
         case ElementType.MultiplyOperator:
           return _leftNode.FloatValue * _rightNode.FloatValue;
         case ElementType.DivideOperator:
+          if (_rightNode.FloatValue == 0.0f)
+            throw new DivideByZeroException("Division by zero");
           return _leftNode.FloatValue / _rightNode.FloatValue;
         case ElementType.ModuloOperator:
+          if (_rightNode.FloatValue == 0.0f)
+            throw new DivideByZeroException("Modulo by zero");
           return _leftNode.FloatValue % _rightNode.FloatValue;
         default:
           throw new ArgumentOutOfRangeException(nameof(_operator), _operator, "Unsupported operator type");
@@ -70,7 +91,7 @@ namespace EpsilonScript.AST
           // The left node is guaranteed to be a string node
           return _leftNode.StringValue + _rightNode.ToString();
         default:
-          throw new ArgumentOutOfRangeException(nameof(_operator), _operator, "Unsupported operator type");
+          throw new RuntimeException($"String operations only support concatenation (+), not {GetOperatorName(_operator)}");
       }
     }
 
@@ -81,7 +102,14 @@ namespace EpsilonScript.AST
 
       if ((!_leftNode.IsNumeric || !_rightNode.IsNumeric) && _leftNode.ValueType != ValueType.String)
       {
-        throw new RuntimeException("An arithmetic operation can only be performed on numeric values");
+        if (_leftNode.ValueType == ValueType.Boolean || _rightNode.ValueType == ValueType.Boolean)
+        {
+          throw new RuntimeException($"Boolean values cannot be used in arithmetic operations ({GetOperatorName(_operator)})");
+        }
+        else
+        {
+          throw new RuntimeException("An arithmetic operation can only be performed on numeric values");
+        }
       }
 
       switch (_leftNode.ValueType)

@@ -10,8 +10,26 @@ namespace EpsilonScript.AST
     {
       ValueType = ValueType.Float;
       FloatValue = value;
-      IntegerValue = (int)FloatValue;
-      BooleanValue = IntegerValue != 0;
+
+      // Safer float-to-int conversion with overflow handling
+      if (float.IsNaN(value) || float.IsInfinity(value))
+      {
+        IntegerValue = 0;
+      }
+      else if (value > int.MaxValue)
+      {
+        IntegerValue = int.MaxValue;
+      }
+      else if (value < int.MinValue)
+      {
+        IntegerValue = int.MinValue;
+      }
+      else
+      {
+        IntegerValue = (int)value;
+      }
+
+      BooleanValue = FloatValue != 0.0f && !float.IsInfinity(FloatValue) && !float.IsNaN(FloatValue);
     }
 
     public FloatNode()
