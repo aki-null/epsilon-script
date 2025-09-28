@@ -8,7 +8,7 @@ namespace EpsilonScript
     }
 
     // https://randomascii.wordpress.com/2012/02/25/comparing-floating-point-numbers-2012-edition/
-    public static bool IsNearlyEqual(float a, float b, int maxUlpsDiff = 3)
+    public static bool IsNearlyEqual(float a, float b, int maxUlpsDiff = 2)
     {
       var aInt = UnsafeFloatAsInt32(a);
       var bInt = UnsafeFloatAsInt32(b);
