@@ -8,13 +8,13 @@ namespace EpsilonScript
     }
 
     // https://randomascii.wordpress.com/2012/02/25/comparing-floating-point-numbers-2012-edition/
-    public static bool IsNearlyEqual(float a, float b, int maxUlpsDiff = 1 << 1)
+    public static bool IsNearlyEqual(float a, float b, int maxUlpsDiff = 2)
     {
       var aInt = UnsafeFloatAsInt32(a);
       var bInt = UnsafeFloatAsInt32(b);
 
       // Different signs means they do not match
-      if (aInt < 0 != bInt <= 0)
+      if (aInt < 0 != bInt < 0)
       {
         // Check for equality to make sure +0==-0
         // ReSharper disable once CompareOfFloatsByEqualityOperator

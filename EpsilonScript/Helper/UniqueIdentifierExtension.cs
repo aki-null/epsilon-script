@@ -1,43 +1,44 @@
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace EpsilonScript.Helper
 {
   public static class UniqueIdentifierExtension
   {
-    private static readonly Dictionary<string, uint> StringIdCache = new Dictionary<string, uint>();
-    private static readonly List<string> StringIdReverseLookup = new List<string>();
-    private static uint _currentId = 1;
+    private static readonly ConcurrentDictionary<string, uint> StringIdCache = new ConcurrentDictionary<string, uint>();
+    private static readonly ConcurrentDictionary<uint, string> IdStringCache = new ConcurrentDictionary<uint, string>();
+    private static int _currentId = 0;
 
     public static uint GetUniqueIdentifier(this string s)
     {
-      lock (StringIdCache)
+      if (StringIdCache.TryGetValue(s, out var existingId))
       {
-        if (StringIdCache.TryGetValue(s, out var id))
-        {
-          return id;
-        }
-
-        id = _currentId;
-        StringIdCache[s] = id;
-        StringIdReverseLookup.Add(s);
-        ++_currentId;
-        return id;
+        return existingId;
       }
+
+      var newId = (uint)Interlocked.Increment(ref _currentId);
+      var actualId = StringIdCache.GetOrAdd(s, newId);
+
+      if (actualId == newId)
+      {
+        // We won the race, add to reverse lookup
+        IdStringCache.TryAdd(newId, s);
+      }
+
+      return actualId;
     }
 
-    public static string GetStringFromUniqueIdentifier(this uint s)
+    public static string GetStringFromUniqueIdentifier(this uint id)
     {
-      lock (StringIdCache)
-      {
-        var lookupPos = s - 1;
-        return StringIdReverseLookup[(int)lookupPos];
-      }
+      return IdStringCache.TryGetValue(id, out var value) ? value : null;
     }
 
     public static void ResetUniqueIdentifierCache()
     {
       StringIdCache.Clear();
-      _currentId = 1;
+      IdStringCache.Clear();
+      _currentId = 0;
     }
   }
 }
