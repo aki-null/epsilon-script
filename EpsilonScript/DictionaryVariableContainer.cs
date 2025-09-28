@@ -3,45 +3,45 @@ using System.Collections.Generic;
 
 namespace EpsilonScript
 {
-  public class DictionaryVariableContainer : IVariableContainer, IDictionary<uint, VariableValue>
+  public class DictionaryVariableContainer : IVariableContainer, IDictionary<VariableId, VariableValue>
   {
-    private readonly IDictionary<uint, VariableValue> _container = new Dictionary<uint, VariableValue>();
+    private readonly IDictionary<VariableId, VariableValue> _container = new Dictionary<VariableId, VariableValue>();
 
-    public void Add(uint key, VariableValue value)
+    public void Add(VariableId key, VariableValue value)
     {
       _container.Add(key, value);
     }
 
-    public bool ContainsKey(uint key)
+    public bool ContainsKey(VariableId key)
     {
       return _container.ContainsKey(key);
     }
 
-    public bool Remove(uint key)
+    public bool Remove(VariableId key)
     {
       return _container.Remove(key);
     }
 
-    bool IDictionary<uint, VariableValue>.TryGetValue(uint key, out VariableValue value)
+    bool IDictionary<VariableId, VariableValue>.TryGetValue(VariableId key, out VariableValue value)
     {
       return _container.TryGetValue(key, out value);
     }
 
-    public VariableValue this[uint key]
+    public VariableValue this[VariableId key]
     {
       get => _container[key];
       set => _container[key] = value;
     }
 
-    public ICollection<uint> Keys => _container.Keys;
+    public ICollection<VariableId> Keys => _container.Keys;
     public ICollection<VariableValue> Values => _container.Values;
 
-    bool IVariableContainer.TryGetValue(uint variableKey, out VariableValue variableValue)
+    bool IVariableContainer.TryGetValue(VariableId variableKey, out VariableValue variableValue)
     {
       return _container.TryGetValue(variableKey, out variableValue);
     }
 
-    public IEnumerator<KeyValuePair<uint, VariableValue>> GetEnumerator()
+    public IEnumerator<KeyValuePair<VariableId, VariableValue>> GetEnumerator()
     {
       return _container.GetEnumerator();
     }
@@ -51,7 +51,7 @@ namespace EpsilonScript
       return GetEnumerator();
     }
 
-    public void Add(KeyValuePair<uint, VariableValue> item)
+    public void Add(KeyValuePair<VariableId, VariableValue> item)
     {
       _container.Add(item);
     }
@@ -61,17 +61,17 @@ namespace EpsilonScript
       _container.Clear();
     }
 
-    public bool Contains(KeyValuePair<uint, VariableValue> item)
+    public bool Contains(KeyValuePair<VariableId, VariableValue> item)
     {
       return _container.Contains(item);
     }
 
-    public void CopyTo(KeyValuePair<uint, VariableValue>[] array, int arrayIndex)
+    public void CopyTo(KeyValuePair<VariableId, VariableValue>[] array, int arrayIndex)
     {
       _container.CopyTo(array, arrayIndex);
     }
 
-    public bool Remove(KeyValuePair<uint, VariableValue> item)
+    public bool Remove(KeyValuePair<VariableId, VariableValue> item)
     {
       return _container.Remove(item);
     }
