@@ -126,6 +126,21 @@ CustomFunction.Create("sin", (float v) => (float)System.Math.Sin(v), true)
 
 For example, a result of the following expression is cached on a compilation, because the built-in `sin` function is marked as constant: `sin(3.141592 / 2)`
 
+#### Upgrading Existing Code
+
+Older releases exposed a long list of concrete custom function constructors. Replace each usage with the factory helper to upgrade:
+
+```c#
+// old
+compiler.AddCustomFunction(new CustomFunction("foo", (float v) => v * 2));
+
+// new
+compiler.AddCustomFunction(CustomFunction.Create("foo", (float v) => v * 2));
+```
+
+This change was necessary to allow for any parameter types to be usable in custom functions. The factory supports delegates with one to five parameters and keeps the optional `isConstant` flag.
+
+
 ### String
 
 Strings can be used, primarily intended to be used for function parameters.
@@ -140,20 +155,6 @@ var script = compiler.Compile(@"read_save_data(""LVL00_PLAYCOUNT"") > 5");
 script.Execute();
 Console.WriteLine(script.BooleanValue);
 ```
-
-#### Upgrading Existing Code
-
-Older releases exposed a long list of concrete custom function constructors. Replace each usage with the factory helper to upgrade:
-
-```c#
-// old
-compiler.AddCustomFunction(new CustomFunction("foo", (float v) => v * 2));
-
-// new
-compiler.AddCustomFunction(CustomFunction.Create("foo", (float v) => v * 2));
-```
-
-This change was necessary to allow for any parameter types to be usable in custom functions. The factory supports delegates with one to five parameters and keeps the optional `isConstant` flag.
 
 #### Result
 
