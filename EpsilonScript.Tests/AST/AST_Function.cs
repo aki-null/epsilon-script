@@ -20,7 +20,7 @@ namespace EpsilonScript.Tests.AST
     {
       var functions = new Dictionary<uint, CustomFunctionOverload>();
       var functionName = "testFunc";
-      var functionId = functionName.GetUniqueIdentifier();
+      var functionId = (VariableId)functionName;
 
       var customFunction = CustomFunction.Create(functionName, (int x) => x * 2);
       var overload = new CustomFunctionOverload(customFunction);
@@ -45,7 +45,7 @@ namespace EpsilonScript.Tests.AST
     {
       var functions = new Dictionary<uint, CustomFunctionOverload>();
       var functionName = "testFunc";
-      var functionId = functionName.GetUniqueIdentifier();
+      var functionId = (VariableId)functionName;
 
       var customFunction = CustomFunction.Create(functionName, (float x) => x * 2.5f);
       var overload = new CustomFunctionOverload(customFunction);
@@ -69,7 +69,7 @@ namespace EpsilonScript.Tests.AST
     {
       var functions = new Dictionary<uint, CustomFunctionOverload>();
       var functionName = "testFunc";
-      var functionId = functionName.GetUniqueIdentifier();
+      var functionId = (VariableId)functionName;
 
       var customFunction = CustomFunction.Create(functionName, (bool x) => !x);
       var overload = new CustomFunctionOverload(customFunction);
@@ -94,7 +94,7 @@ namespace EpsilonScript.Tests.AST
     {
       var functions = new Dictionary<uint, CustomFunctionOverload>();
       var functionName = "testFunc";
-      var functionId = functionName.GetUniqueIdentifier();
+      var functionId = (VariableId)functionName;
 
       var customFunction = CustomFunction.Create(functionName, (string x) => x.ToUpperInvariant());
       var overload = new CustomFunctionOverload(customFunction);
@@ -117,7 +117,7 @@ namespace EpsilonScript.Tests.AST
     {
       var functions = new Dictionary<uint, CustomFunctionOverload>();
       var functionName = "add";
-      var functionId = functionName.GetUniqueIdentifier();
+      var functionId = (VariableId)functionName;
 
       var customFunction = CustomFunction.Create(functionName, (int x, int y) => x + y);
       var overload = new CustomFunctionOverload(customFunction);
@@ -164,7 +164,7 @@ namespace EpsilonScript.Tests.AST
     {
       var functions = new Dictionary<uint, CustomFunctionOverload>();
       var functionName = "testFunc";
-      var functionId = functionName.GetUniqueIdentifier();
+      var functionId = (VariableId)functionName;
 
       var customFunction = CustomFunction.Create(functionName, (int x) => x);
       var overload = new CustomFunctionOverload(customFunction);
@@ -186,7 +186,7 @@ namespace EpsilonScript.Tests.AST
     {
       var functions = new Dictionary<uint, CustomFunctionOverload>();
       var functionName = "testFunc";
-      var functionId = functionName.GetUniqueIdentifier();
+      var functionId = (VariableId)functionName;
 
       // Function expects int but we'll pass string
       var customFunction = CustomFunction.Create(functionName, (int x) => x * 2);
@@ -209,7 +209,7 @@ namespace EpsilonScript.Tests.AST
     {
       var functions = new Dictionary<uint, CustomFunctionOverload>();
       var functionName = "constFunc";
-      var functionId = functionName.GetUniqueIdentifier();
+      var functionId = (VariableId)functionName;
 
       var customFunction = CustomFunction.Create(functionName, (int x) => x * 2, true); // isConstant = true
       var overload = new CustomFunctionOverload(customFunction);
@@ -230,7 +230,7 @@ namespace EpsilonScript.Tests.AST
     {
       var functions = new Dictionary<uint, CustomFunctionOverload>();
       var functionName = "nonConstFunc";
-      var functionId = functionName.GetUniqueIdentifier();
+      var functionId = (VariableId)functionName;
 
       var customFunction = CustomFunction.Create(functionName, (int x) => x * 2, false); // isConstant = false
       var overload = new CustomFunctionOverload(customFunction);
@@ -251,7 +251,7 @@ namespace EpsilonScript.Tests.AST
     {
       var functions = new Dictionary<uint, CustomFunctionOverload>();
       var functionName = "constFunc";
-      var functionId = functionName.GetUniqueIdentifier();
+      var functionId = (VariableId)functionName;
 
       var customFunction = CustomFunction.Create(functionName, (int x) => x * 2, true); // isConstant = true
       var overload = new CustomFunctionOverload(customFunction);
@@ -274,7 +274,7 @@ namespace EpsilonScript.Tests.AST
     {
       var functions = new Dictionary<uint, CustomFunctionOverload>();
       var functionName = "testFunc";
-      var functionId = functionName.GetUniqueIdentifier();
+      var functionId = (VariableId)functionName;
 
       var customFunction = CustomFunction.Create(functionName, (int x) => x + 1);
       var overload = new CustomFunctionOverload(customFunction);

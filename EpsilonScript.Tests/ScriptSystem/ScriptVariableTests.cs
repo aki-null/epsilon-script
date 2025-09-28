@@ -39,7 +39,7 @@ namespace EpsilonScript.Tests.ScriptSystem
       var result = CompileAndExecute(expression, Compiler.Options.None, variables);
       Assert.Equal(Type.Integer, result.ValueType);
       Assert.Equal(expected, result.IntegerValue);
-      Assert.Equal(expected, variables["val".GetUniqueIdentifier()].IntegerValue);
+      Assert.Equal(expected, variables["val"].IntegerValue);
     }
 
     [Theory]
@@ -54,7 +54,7 @@ namespace EpsilonScript.Tests.ScriptSystem
       var result = CompileAndExecute(expression, Compiler.Options.None, variables);
       Assert.Equal(Type.Float, result.ValueType);
       AssertNearlyEqual(expected, result.FloatValue);
-      AssertNearlyEqual(expected, variables["val".GetUniqueIdentifier()].FloatValue);
+      AssertNearlyEqual(expected, variables["val"].FloatValue);
     }
 
     [Fact]
@@ -64,7 +64,7 @@ namespace EpsilonScript.Tests.ScriptSystem
       var result = CompileAndExecute("flag = 30 > 20", Compiler.Options.None, variables);
       Assert.Equal(Type.Boolean, result.ValueType);
       Assert.True(result.BooleanValue);
-      Assert.True(variables["flag".GetUniqueIdentifier()].BooleanValue);
+      Assert.True(variables["flag"].BooleanValue);
     }
 
     [Fact]
@@ -74,7 +74,7 @@ namespace EpsilonScript.Tests.ScriptSystem
       var result = CompileAndExecute("(val = 1; val *= 5; val + 2)", Compiler.Options.None, variables);
       Assert.Equal(Type.Integer, result.ValueType);
       Assert.Equal(7, result.IntegerValue);
-      Assert.Equal(5, variables["val".GetUniqueIdentifier()].IntegerValue);
+      Assert.Equal(5, variables["val"].IntegerValue);
     }
   }
 }

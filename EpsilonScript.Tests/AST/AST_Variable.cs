@@ -19,7 +19,7 @@ namespace EpsilonScript.Tests.AST
     public void AST_Variable_WithValidVariable_ReturnsCorrectValue(Type variableType, object value)
     {
       var variableName = "testVar";
-      var variableId = variableName.GetUniqueIdentifier();
+      var variableId = (VariableId)variableName;
       var variableValue = CreateVariableValue(variableType, value);
       var variables = new DictionaryVariableContainer { [variableId] = variableValue };
 
@@ -59,7 +59,7 @@ namespace EpsilonScript.Tests.AST
     public void AST_Variable_WithVariableOverride_UsesOverrideValue(Type variableType, object overrideValue)
     {
       var variableName = "testVar";
-      var variableId = variableName.GetUniqueIdentifier();
+      var variableId = (VariableId)variableName;
       var originalValue = CreateVariableValue(variableType, GetDefaultValue(variableType));
       var overrideVariableValue = CreateVariableValue(variableType, overrideValue);
 
@@ -104,7 +104,7 @@ namespace EpsilonScript.Tests.AST
     [InlineData("snake_case")]
     public void AST_Variable_WithValidIdentifierNames_Works(string variableName)
     {
-      var variableId = variableName.GetUniqueIdentifier();
+      var variableId = (VariableId)variableName;
       var variableValue = new VariableValue(42);
       var variables = new DictionaryVariableContainer { [variableId] = variableValue };
 
@@ -124,7 +124,7 @@ namespace EpsilonScript.Tests.AST
     public void AST_Variable_IsConstant_ReturnsFalse()
     {
       var variableName = "testVar";
-      var variableId = variableName.GetUniqueIdentifier();
+      var variableId = (VariableId)variableName;
       var variableValue = new VariableValue(42);
       var variables = new DictionaryVariableContainer { [variableId] = variableValue };
 
@@ -145,7 +145,7 @@ namespace EpsilonScript.Tests.AST
     public void AST_Variable_MultipleExecutions_ReflectsVariableChanges(Type variableType, object newValue)
     {
       var variableName = "testVar";
-      var variableId = variableName.GetUniqueIdentifier();
+      var variableId = (VariableId)variableName;
       var variableValue = CreateVariableValue(variableType, GetDefaultValue(variableType));
       var variables = new DictionaryVariableContainer { [variableId] = variableValue };
 
@@ -172,7 +172,7 @@ namespace EpsilonScript.Tests.AST
     public void AST_Variable_UnsupportedVariableType_ThrowsArgumentOutOfRangeException()
     {
       var variableName = "testVar";
-      var variableId = variableName.GetUniqueIdentifier();
+      var variableId = (VariableId)variableName;
       var variableValue = new VariableValue(Type.Undefined); // Unsupported type
       var variables = new DictionaryVariableContainer { [variableId] = variableValue };
 

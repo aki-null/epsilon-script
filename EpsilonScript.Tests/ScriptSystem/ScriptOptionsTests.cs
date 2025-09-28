@@ -58,7 +58,7 @@ namespace EpsilonScript.Tests.ScriptSystem
       script.Execute();
       AssertNearlyEqual(1.0f, script.FloatValue);
 
-      variables["val".GetUniqueIdentifier()].FloatValue = 2.0f;
+      variables["val"].FloatValue = 2.0f;
       script.Execute();
       AssertNearlyEqual(2.0f, script.FloatValue);
       Assert.Equal(2, counter.Count);
