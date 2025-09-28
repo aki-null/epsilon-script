@@ -74,42 +74,49 @@ namespace EpsilonScript.Tests.AST
     }
 
     [Fact]
-    public void AST_Arithmetic_IntegerMaxValue_Addition_ThrowsOverflowException()
+    public void AST_Arithmetic_IntegerMaxValue_Addition_AllowsOverflow()
     {
-      // Test int.MaxValue + 1 should throw OverflowException
+      // Test int.MaxValue + 1 should wrap to int.MinValue (overflow behavior)
       var node = new ArithmeticNode();
       var rpn = CreateStack(new FakeIntegerNode(int.MaxValue), new FakeIntegerNode(1));
       var element = new Element(new Token("+", TokenType.PlusSign), ElementType.AddOperator);
 
       node.Build(rpn, element, Compiler.Options.None, null, null);
+      node.Execute(null);
 
-      ErrorTestHelper.ExecuteNodeExpectingError<OverflowException>(node);
+      Assert.Equal(ValueType.Integer, node.ValueType);
+      Assert.Equal(int.MinValue, node.IntegerValue);
     }
 
     [Fact]
-    public void AST_Arithmetic_IntegerMinValue_Subtraction_ThrowsOverflowException()
+    public void AST_Arithmetic_IntegerMinValue_Subtraction_AllowsOverflow()
     {
-      // Test int.MinValue - 1 should throw OverflowException
+      // Test int.MinValue - 1 should wrap to int.MaxValue (overflow behavior)
       var node = new ArithmeticNode();
       var rpn = CreateStack(new FakeIntegerNode(int.MinValue), new FakeIntegerNode(1));
       var element = new Element(new Token("-", TokenType.MinusSign), ElementType.SubtractOperator);
 
       node.Build(rpn, element, Compiler.Options.None, null, null);
+      node.Execute(null);
 
-      ErrorTestHelper.ExecuteNodeExpectingError<OverflowException>(node);
+      Assert.Equal(ValueType.Integer, node.ValueType);
+      Assert.Equal(int.MaxValue, node.IntegerValue);
     }
 
     [Fact]
-    public void AST_Arithmetic_IntegerMaxValue_Multiplication_ThrowsOverflowException()
+    public void AST_Arithmetic_IntegerMaxValue_Multiplication_AllowsOverflow()
     {
-      // Test int.MaxValue * 2 should throw OverflowException
+      // Test int.MaxValue * 2 should overflow (wraparound behavior)
       var node = new ArithmeticNode();
       var rpn = CreateStack(new FakeIntegerNode(int.MaxValue), new FakeIntegerNode(2));
       var element = new Element(new Token("*", TokenType.MultiplyOperator), ElementType.MultiplyOperator);
 
       node.Build(rpn, element, Compiler.Options.None, null, null);
+      node.Execute(null);
 
-      ErrorTestHelper.ExecuteNodeExpectingError<OverflowException>(node);
+      Assert.Equal(ValueType.Integer, node.ValueType);
+      // int.MaxValue * 2 = 2147483647 * 2 = 4294967294, which wraps to -2
+      Assert.Equal(-2, node.IntegerValue);
     }
 
     [Fact]

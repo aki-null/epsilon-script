@@ -42,11 +42,11 @@ namespace EpsilonScript.AST
       switch (_operator)
       {
         case ElementType.AddOperator:
-          return checked(_leftNode.IntegerValue + _rightNode.IntegerValue);
+          return _leftNode.IntegerValue + _rightNode.IntegerValue;
         case ElementType.SubtractOperator:
-          return checked(_leftNode.IntegerValue - _rightNode.IntegerValue);
+          return _leftNode.IntegerValue - _rightNode.IntegerValue;
         case ElementType.MultiplyOperator:
-          return checked(_leftNode.IntegerValue * _rightNode.IntegerValue);
+          return _leftNode.IntegerValue * _rightNode.IntegerValue;
         case ElementType.DivideOperator:
           if (_rightNode.IntegerValue == 0)
             throw new DivideByZeroException("Division by zero");

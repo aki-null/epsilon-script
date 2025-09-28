@@ -130,6 +130,7 @@ This document provides a specification for the EpsilonScript language.
    - String + Number → String (string conversion via ToString)
    - String + Boolean → String (converts to "true"/"false")
    - String with -, *, /, % → Runtime error (only + supported for strings)
+   - Integer arithmetic operations allow overflow (wraparound behavior)
 
 2. **Comparison Operations**:
    - == and !=: Work with all types but cannot mix different types
