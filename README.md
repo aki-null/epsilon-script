@@ -108,7 +108,14 @@ Console.WriteLine(script.FloatValue);
 3.1
 ```
 
-The list of default built-in functions can be found [here](https://github.com/aki-null/epsilon-script/blob/master/EpsilonScript/Compiler.cs).
+Built-in functions include:
+
+- Trigonometric: `sin`, `cos`, `tan`, `asin`, `acos`, `atan`, `atan2`, `sinh`, `cosh`, `tanh`
+- Math: `sqrt`, `abs`, `floor`, `ceil`, `trunc`, `pow`, `min`, `max`
+- String: `lower`, `upper`, `len`
+- Utility: `ifelse` (ternary operator alternative)
+
+The complete list can be found in [Compiler.cs](https://github.com/aki-null/epsilon-script/blob/master/EpsilonScript/Compiler.cs).
 
 #### Overloading
 
@@ -207,13 +214,37 @@ Strings can be compared with strings.
 true
 ```
 
-## On Heap Allocations
+### Expression Sequencing
+
+Multiple expressions can be sequenced using the semicolon operator (`;`). The result is the value of the last expression.
+
+#### Code
+
+```c#
+var compiler = new Compiler();
+var variables = new DictionaryVariableContainer
+{
+  ["x".GetUniqueIdentifier()] = new VariableValue(5),
+  ["y".GetUniqueIdentifier()] = new VariableValue(10)
+};
+var script = compiler.Compile("x = x + 1; y = y * 2; x + y", Compiler.Options.None, variables);
+script.Execute();
+Console.WriteLine(script.IntegerValue); // 26 (x is 6, y is 20)
+```
+
+#### Result
+
+```
+26
+```
+
+## Heap Allocations
 
 Heap (GC) allocations are typically a concern for games.
 
 EpsilonScript avoids GC allocations after compilation. However, there are a few exceptions where allocations must happen.
 
-### String concatenations
+### String Concatenations
 
 Due to how C# works, concatenating strings will result in heap allocations.
 ```
