@@ -13,7 +13,7 @@ It targets .NET Standard 2.0.
 - No heap allocation after compilation (with exceptions)
 
 ## Project State
-Documentation is still lacking, but the core features are usable. There are not enough tests for some components of the software, which is being worked on now.
+All features should be stable for production use.
 
 ## Samples
 

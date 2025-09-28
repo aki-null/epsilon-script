@@ -1,0 +1,191 @@
+using System.Collections.Generic;
+using EpsilonScript.AST;
+using EpsilonScript.Intermediate;
+using EpsilonScript.Parser;
+using Xunit;
+using EpsilonScript.Tests.TestInfrastructure;
+using EpsilonScript.Tests.TestInfrastructure.Fakes;
+
+namespace EpsilonScript.Tests.AST
+{
+  public class AST_Builder : AstTestBase
+  {
+    [Theory]
+    [MemberData(nameof(SuccessData))]
+    public void AST_Build_Succeeds(List<Element> elements, ValueType expectedType)
+    {
+      var builder = new AstBuilder(null);
+      builder.Configure(Compiler.Options.Immutable, null);
+      foreach (var element in elements)
+      {
+        builder.Push(element);
+      }
+
+      builder.End();
+      var result = builder.Result;
+      Assert.NotNull(result);
+
+      // Execute the node to determine its value type
+      result.Execute(null);
+      Assert.Equal(expectedType, result.ValueType);
+    }
+
+    [Theory]
+    [MemberData(nameof(FailData))]
+    public void AST_Build_Fails(List<Element> elements)
+    {
+      Assert.Throws<RuntimeException>(() =>
+      {
+        var builder = new AstBuilder(null);
+        builder.Configure(Compiler.Options.Immutable, null);
+        foreach (var element in elements)
+        {
+          builder.Push(element);
+        }
+
+        builder.End();
+      });
+    }
+
+    public static IEnumerable<object[]> SuccessData
+    {
+      get
+      {
+        return new[]
+        {
+          // Simple integer literal
+          new object[]
+          {
+            new List<Element>
+            {
+              new Element(new Token("42", TokenType.Integer), ElementType.Integer)
+            },
+            ValueType.Integer
+          },
+          // Simple float literal
+          new object[]
+          {
+            new List<Element>
+            {
+              new Element(new Token("3.14", TokenType.Float), ElementType.Float)
+            },
+            ValueType.Float
+          },
+          // Simple boolean literal
+          new object[]
+          {
+            new List<Element>
+            {
+              new Element(new Token("true", TokenType.BooleanLiteralTrue), ElementType.BooleanLiteralTrue)
+            },
+            ValueType.Boolean
+          },
+          // Simple string literal
+          new object[]
+          {
+            new List<Element>
+            {
+              new Element(new Token("\"hello\"", TokenType.String), ElementType.String)
+            },
+            ValueType.String
+          },
+          // Simple arithmetic: 2 + 3 (in RPN: 2 3 +)
+          new object[]
+          {
+            new List<Element>
+            {
+              new Element(new Token("2", TokenType.Integer), ElementType.Integer),
+              new Element(new Token("3", TokenType.Integer), ElementType.Integer),
+              new Element(new Token("+", TokenType.PlusSign), ElementType.AddOperator)
+            },
+            ValueType.Integer
+          },
+          // Mixed arithmetic: 2.5 * 4 (in RPN: 2.5 4 *)
+          new object[]
+          {
+            new List<Element>
+            {
+              new Element(new Token("2.5", TokenType.Float), ElementType.Float),
+              new Element(new Token("4", TokenType.Integer), ElementType.Integer),
+              new Element(new Token("*", TokenType.MultiplyOperator), ElementType.MultiplyOperator)
+            },
+            ValueType.Float
+          },
+          // Comparison: 5 > 3 (in RPN: 5 3 >)
+          new object[]
+          {
+            new List<Element>
+            {
+              new Element(new Token("5", TokenType.Integer), ElementType.Integer),
+              new Element(new Token("3", TokenType.Integer), ElementType.Integer),
+              new Element(new Token(">", TokenType.ComparisonGreaterThan), ElementType.ComparisonGreaterThan)
+            },
+            ValueType.Boolean
+          },
+          // Boolean operation: true && false (in RPN: true false &&)
+          new object[]
+          {
+            new List<Element>
+            {
+              new Element(new Token("true", TokenType.BooleanLiteralTrue), ElementType.BooleanLiteralTrue),
+              new Element(new Token("false", TokenType.BooleanLiteralFalse), ElementType.BooleanLiteralFalse),
+              new Element(new Token("&&", TokenType.BooleanAndOperator), ElementType.BooleanAndOperator)
+            },
+            ValueType.Boolean
+          },
+          // Unary negation: !true (in RPN: true !)
+          new object[]
+          {
+            new List<Element>
+            {
+              new Element(new Token("true", TokenType.BooleanLiteralTrue), ElementType.BooleanLiteralTrue),
+              new Element(new Token("!", TokenType.NegateOperator), ElementType.NegateOperator)
+            },
+            ValueType.Boolean
+          },
+          // String concatenation: "hello" + "world" (in RPN: "hello" "world" +)
+          new object[]
+          {
+            new List<Element>
+            {
+              new Element(new Token("\"hello\"", TokenType.String), ElementType.String),
+              new Element(new Token("\"world\"", TokenType.String), ElementType.String),
+              new Element(new Token("+", TokenType.PlusSign), ElementType.AddOperator)
+            },
+            ValueType.String
+          }
+        };
+      }
+    }
+
+    public static IEnumerable<object[]> FailData
+    {
+      get
+      {
+        return new[]
+        {
+          new object[]
+          {
+            new List<Element>
+            {
+              new Element(new Token("1", TokenType.Integer), ElementType.Integer),
+              new Element(new Token("1", TokenType.Integer), ElementType.Integer)
+            }
+          },
+          new object[]
+          {
+            new List<Element>
+            {
+              new Element(new Token("ifelse", TokenType.Identifier), ElementType.Variable),
+              new Element(new Token("count", TokenType.Identifier), ElementType.Variable),
+              new Element(new Token("0", TokenType.Integer), ElementType.Integer),
+              new Element(new Token("100", TokenType.Integer), ElementType.Integer),
+              new Element(new Token("200", TokenType.Integer), ElementType.Integer),
+              new Element(new Token(">", TokenType.ComparisonGreaterThan), ElementType.ComparisonGreaterThan),
+            }
+          },
+        };
+      }
+    }
+  }
+}
