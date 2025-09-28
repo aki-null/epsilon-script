@@ -31,7 +31,7 @@ This document provides a specification for the EpsilonScript language.
 <number>           ::= <integer> | <float>
 ```
 **Important Notes**:
-- Integers cannot have exponents directly (e.g., "2e10" is invalid)
+- Integer literals cannot contain exponent notation during tokenization (e.g., "2e10" is invalid)
 - Floats MUST start with digits (e.g., ".5" is invalid, must be "0.5")
 - Float fractional part is optional (e.g., "10." is valid)
 
@@ -116,8 +116,10 @@ This document provides a specification for the EpsilonScript language.
 
 ### Value Types
 ```bnf
-<type>             ::= "Integer" | "Float" | "Boolean" | "String" | "Tuple"
+<type>             ::= "Integer" | "Float" | "Boolean" | "String"
 ```
+
+**Note**: Tuples exist as expression constructs for multi-value results (comma-separated expressions) but are not distinct value types in the type system.
 
 ### Type Coercion Rules
 1. **Arithmetic Operations**:
@@ -132,6 +134,7 @@ This document provides a specification for the EpsilonScript language.
 2. **Comparison Operations**:
    - == and !=: Work with all types but cannot mix different types
      - Numbers can be compared with numbers (int/float mixing allowed)
+     - Float equality uses ULP-based comparison for precision handling
      - Strings can only be compared with strings
      - Booleans can only be compared with booleans
    - <, <=, >, >=: ONLY work with numeric types (int/float)
