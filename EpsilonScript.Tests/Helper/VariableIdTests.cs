@@ -212,9 +212,9 @@ namespace EpsilonScript.Tests.Helper
       const string originalName = "roundTripTest";
 
       // Act
-      VariableId variableId = originalName;           // string -> VariableId
-      uint uintValue = variableId;                     // VariableId -> uint
-      VariableId backToVariableId = uintValue;         // uint -> VariableId
+      VariableId variableId = originalName; // string -> VariableId
+      uint uintValue = variableId; // VariableId -> uint
+      VariableId backToVariableId = uintValue; // uint -> VariableId
 
       // Assert
       Assert.Equal(variableId, backToVariableId);

@@ -27,7 +27,7 @@ namespace EpsilonScript.AST
     }
 
     public override void Build(Stack<Node> rpnStack, Element element, Compiler.Options options,
-      IVariableContainer variables, IDictionary<uint, CustomFunctionOverload> functions)
+      IVariableContainer variables, IDictionary<VariableId, CustomFunctionOverload> functions)
     {
       if (!rpnStack.TryPop(out _rightNode) || !rpnStack.TryPop(out _leftNode))
       {

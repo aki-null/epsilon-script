@@ -19,8 +19,8 @@ namespace EpsilonScript
     private readonly RpnConverter _rpnConverter;
     private readonly AstBuilder _astBuilder;
 
-    private readonly Dictionary<uint, CustomFunctionOverload> _functions =
-      new Dictionary<uint, CustomFunctionOverload>();
+    private readonly Dictionary<VariableId, CustomFunctionOverload> _functions =
+      new Dictionary<VariableId, CustomFunctionOverload>();
 
     public Compiler()
     {

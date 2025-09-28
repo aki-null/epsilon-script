@@ -18,7 +18,7 @@ namespace EpsilonScript.Tests.AST
     [Fact]
     public void AST_Function_WithIntegerFunction_ReturnsCorrectValue()
     {
-      var functions = new Dictionary<uint, CustomFunctionOverload>();
+      var functions = new Dictionary<VariableId, CustomFunctionOverload>();
       var functionName = "testFunc";
       var functionId = (VariableId)functionName;
 
@@ -43,7 +43,7 @@ namespace EpsilonScript.Tests.AST
     [Fact]
     public void AST_Function_WithFloatFunction_ReturnsCorrectValue()
     {
-      var functions = new Dictionary<uint, CustomFunctionOverload>();
+      var functions = new Dictionary<VariableId, CustomFunctionOverload>();
       var functionName = "testFunc";
       var functionId = (VariableId)functionName;
 
@@ -67,7 +67,7 @@ namespace EpsilonScript.Tests.AST
     [Fact]
     public void AST_Function_WithBooleanFunction_ReturnsCorrectValue()
     {
-      var functions = new Dictionary<uint, CustomFunctionOverload>();
+      var functions = new Dictionary<VariableId, CustomFunctionOverload>();
       var functionName = "testFunc";
       var functionId = (VariableId)functionName;
 
@@ -92,7 +92,7 @@ namespace EpsilonScript.Tests.AST
     [Fact]
     public void AST_Function_WithStringFunction_ReturnsCorrectValue()
     {
-      var functions = new Dictionary<uint, CustomFunctionOverload>();
+      var functions = new Dictionary<VariableId, CustomFunctionOverload>();
       var functionName = "testFunc";
       var functionId = (VariableId)functionName;
 
@@ -115,7 +115,7 @@ namespace EpsilonScript.Tests.AST
     [Fact]
     public void AST_Function_WithTwoParameters_ReturnsCorrectValue()
     {
-      var functions = new Dictionary<uint, CustomFunctionOverload>();
+      var functions = new Dictionary<VariableId, CustomFunctionOverload>();
       var functionName = "add";
       var functionId = (VariableId)functionName;
 
@@ -144,7 +144,7 @@ namespace EpsilonScript.Tests.AST
     [Fact]
     public void AST_Function_UndefinedFunction_ThrowsParserException()
     {
-      var functions = new Dictionary<uint, CustomFunctionOverload>();
+      var functions = new Dictionary<VariableId, CustomFunctionOverload>();
       var functionName = "undefinedFunc";
 
       var node = new FunctionNode();
@@ -162,7 +162,7 @@ namespace EpsilonScript.Tests.AST
     [Fact]
     public void AST_Function_WithoutParameters_ThrowsParserException()
     {
-      var functions = new Dictionary<uint, CustomFunctionOverload>();
+      var functions = new Dictionary<VariableId, CustomFunctionOverload>();
       var functionName = "testFunc";
       var functionId = (VariableId)functionName;
 
@@ -184,7 +184,7 @@ namespace EpsilonScript.Tests.AST
     [Fact]
     public void AST_Function_WithWrongParameterType_ThrowsRuntimeException()
     {
-      var functions = new Dictionary<uint, CustomFunctionOverload>();
+      var functions = new Dictionary<VariableId, CustomFunctionOverload>();
       var functionName = "testFunc";
       var functionId = (VariableId)functionName;
 
@@ -207,7 +207,7 @@ namespace EpsilonScript.Tests.AST
     [Fact]
     public void AST_Function_IsConstant_WithConstantFunction_ReturnsTrue()
     {
-      var functions = new Dictionary<uint, CustomFunctionOverload>();
+      var functions = new Dictionary<VariableId, CustomFunctionOverload>();
       var functionName = "constFunc";
       var functionId = (VariableId)functionName;
 
@@ -228,7 +228,7 @@ namespace EpsilonScript.Tests.AST
     [Fact]
     public void AST_Function_IsConstant_WithNonConstantFunction_ReturnsFalse()
     {
-      var functions = new Dictionary<uint, CustomFunctionOverload>();
+      var functions = new Dictionary<VariableId, CustomFunctionOverload>();
       var functionName = "nonConstFunc";
       var functionId = (VariableId)functionName;
 
@@ -249,7 +249,7 @@ namespace EpsilonScript.Tests.AST
     [Fact]
     public void AST_Function_IsConstant_WithVariableParameter_ReturnsFalse()
     {
-      var functions = new Dictionary<uint, CustomFunctionOverload>();
+      var functions = new Dictionary<VariableId, CustomFunctionOverload>();
       var functionName = "constFunc";
       var functionId = (VariableId)functionName;
 
@@ -272,7 +272,7 @@ namespace EpsilonScript.Tests.AST
     [InlineData(Compiler.Options.Immutable)]
     public void AST_Function_WorksWithAllCompilerOptions(Compiler.Options options)
     {
-      var functions = new Dictionary<uint, CustomFunctionOverload>();
+      var functions = new Dictionary<VariableId, CustomFunctionOverload>();
       var functionName = "testFunc";
       var functionId = (VariableId)functionName;
 
@@ -306,7 +306,7 @@ namespace EpsilonScript.Tests.AST
       }
 
       public override void Build(Stack<Node> rpnStack, Element element, Compiler.Options options,
-        IVariableContainer variables, IDictionary<uint, CustomFunctionOverload> functions)
+        IVariableContainer variables, IDictionary<VariableId, CustomFunctionOverload> functions)
       {
         throw new NotImplementedException("Test node should not be built from RPN");
       }

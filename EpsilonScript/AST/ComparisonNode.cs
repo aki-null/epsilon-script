@@ -16,7 +16,7 @@ namespace EpsilonScript.AST
 
     public override void Build(Stack<Node> rpnStack, Element element, Compiler.Options options,
       IVariableContainer variables,
-      IDictionary<uint, CustomFunctionOverload> functions)
+      IDictionary<VariableId, CustomFunctionOverload> functions)
     {
       ValueType = ValueType.Boolean;
       _comparisonType = element.Type;

@@ -41,7 +41,7 @@ namespace EpsilonScript.Tests.TestInfrastructure
     /// </summary>
     public static void BuildNodeExpectingError<TException>(Node node, Stack<Node> rpnStack, Element element,
       Compiler.Options options, IVariableContainer variables,
-      IDictionary<uint, CustomFunctionOverload> functions, string expectedMessageFragment = null)
+      IDictionary<VariableId, CustomFunctionOverload> functions, string expectedMessageFragment = null)
       where TException : Exception
     {
       var exception = Assert.Throws<TException>(() =>

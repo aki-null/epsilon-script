@@ -8,15 +8,15 @@ namespace EpsilonScript.AST
 {
   public class VariableNode : Node
   {
-    private uint _variableName;
+    private VariableId _variableName;
     private IVariableContainer _variables;
 
     public override bool IsConstant => false;
 
     public override void Build(Stack<Node> rpnStack, Element element, Compiler.Options options,
-      IVariableContainer variables, IDictionary<uint, CustomFunctionOverload> functions)
+      IVariableContainer variables, IDictionary<VariableId, CustomFunctionOverload> functions)
     {
-      _variableName = element.Token.Text.ToString().GetUniqueIdentifier();
+      _variableName = element.Token.Text.ToString();
       _variables = variables;
     }
 

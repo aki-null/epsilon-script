@@ -13,9 +13,9 @@ namespace EpsilonScript.AST
 
     private Compiler.Options _options;
     private IVariableContainer _variables;
-    private readonly IDictionary<uint, CustomFunctionOverload> _functions;
+    private readonly IDictionary<VariableId, CustomFunctionOverload> _functions;
 
-    public AstBuilder(IDictionary<uint, CustomFunctionOverload> functions)
+    public AstBuilder(IDictionary<VariableId, CustomFunctionOverload> functions)
     {
       _functions = functions;
     }

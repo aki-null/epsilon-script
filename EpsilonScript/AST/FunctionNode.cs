@@ -32,20 +32,20 @@ namespace EpsilonScript.AST
     }
 
     public override void Build(Stack<Node> rpnStack, Element element, Compiler.Options options,
-      IVariableContainer variables, IDictionary<uint, CustomFunctionOverload> functions)
+      IVariableContainer variables, IDictionary<VariableId, CustomFunctionOverload> functions)
     {
       // Unfortunately function name string needs to be allocated here to make a dictionary lookup
-      var functionName = element.Token.Text.ToString().GetUniqueIdentifier();
+      VariableId functionName = element.Token.Text.ToString();
 
       if (!functions.TryGetValue(functionName, out _functionOverload))
       {
-        throw new ParserException(element.Token, $"Undefined function: {functionName.GetStringFromUniqueIdentifier()}");
+        throw new ParserException(element.Token, $"Undefined function: {functionName}");
       }
 
       if (!rpnStack.TryPop(out var childNode))
       {
         throw new ParserException(element.Token,
-          $"Cannot find parameters for calling function: {functionName.GetStringFromUniqueIdentifier()}");
+          $"Cannot find parameters for calling function: {functionName}");
       }
 
       switch (childNode.ValueType)
