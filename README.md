@@ -4,6 +4,21 @@ EpsilonScript is an interpreter for evaluating simple expressions, written in C#
 
 It targets .NET Standard 2.0.
 
+## Table of Contents
+
+- [Features](#features)
+- [Project State](#project-state)
+- [Samples](#samples)
+  - [Arithmetic](#arithmetic)
+  - [Variables](#variables)
+  - [Comparison](#comparison)
+  - [Functions](#functions)
+  - [Strings](#strings)
+  - [Expression Sequencing](#expression-sequencing)
+- [Heap Allocations](#heap-allocations)
+- [Use Cases](#use-cases)
+- [Context](#context)
+
 ## Features
 - Mathematical expressions
 - Boolean expressions
