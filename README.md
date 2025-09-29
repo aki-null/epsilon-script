@@ -162,6 +162,26 @@ CustomFunction.Create("sin", (float v) => (float)System.Math.Sin(v), true)
 
 For example, `sin(3.141592 / 2)` is cached at compilation because `sin` is marked as constant.
 
+#### Method Groups
+
+You can use method groups instead of lambdas:
+
+```c#
+public int GetScore(string level) => CalculateScore(level);
+
+// Method group instead of lambda
+compiler.AddCustomFunction(CustomFunction.Create<string, int>("score", GetScore));
+```
+
+**Note:** Method groups with parameters require explicit generic type parameters. However, zero-parameter method groups work without explicit generics:
+
+```c#
+public int GetConstant() => 42;
+
+// Zero-parameter method group - no explicit generics needed
+compiler.AddCustomFunction(CustomFunction.Create("constant", GetConstant));
+```
+
 #### Upgrading Existing Code
 
 Older releases used concrete custom function constructors. Use the factory helper instead:
