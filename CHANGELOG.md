@@ -3,6 +3,7 @@
 ## [1.2.0] - 2025-09-29
 
 ### Added
+- **Period characters in identifiers**: Variable names and function names can now contain periods (e.g., `user.name`, `math.square()`)
 - **VariableId struct**: Strongly-typed variable identifier that replaces direct `uint` usage
   - Provides implicit conversions to/from `uint` and `string` for backwards compatibility
   - Maintains internal unique identifier mapping through extension methods

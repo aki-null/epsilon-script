@@ -62,6 +62,31 @@ namespace EpsilonScript.Tests.Lexer
             "_hello10",
             new Token("_hello10", TokenType.Identifier)
           },
+          new object[]
+          {
+            "variable.name",
+            new Token("variable.name", TokenType.Identifier)
+          },
+          new object[]
+          {
+            "my.function.call",
+            new Token("my.function.call", TokenType.Identifier)
+          },
+          new object[]
+          {
+            "obj.prop.value",
+            new Token("obj.prop.value", TokenType.Identifier)
+          },
+          new object[]
+          {
+            "_internal.helper.func",
+            new Token("_internal.helper.func", TokenType.Identifier)
+          },
+          new object[]
+          {
+            "test123.var456.item",
+            new Token("test123.var456.item", TokenType.Identifier)
+          },
         };
       }
     }

@@ -15,7 +15,7 @@ This document provides a specification for the EpsilonScript language.
 ### Identifiers and Keywords
 ```bnf
 <identifier_start> ::= <letter> | "_"
-<identifier_body>  ::= <identifier_start> | <digit>
+<identifier_body>  ::= <identifier_start> | <digit> | "."
 <identifier>       ::= <identifier_start> {<identifier_body>}
 
 <boolean_literal>  ::= "true" | "false"

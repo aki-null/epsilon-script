@@ -39,7 +39,7 @@ namespace EpsilonScript.Lexer
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static bool IsIdentifierBody(char c)
     {
-      return IsIdentifierStart(c) || IsNumber(c);
+      return IsIdentifierStart(c) || IsNumber(c) || c == '.';
     }
 
     private bool Backup()
