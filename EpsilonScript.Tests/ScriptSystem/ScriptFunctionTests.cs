@@ -181,5 +181,52 @@ namespace EpsilonScript.Tests.ScriptSystem
       AssertNearlyEqual(15.0f, script.FloatValue);
       Assert.Equal(1, counter.Count);
     }
+
+    [Fact]
+    public void ZeroParameterFunction_WithParentheses_ExecutesCorrectly()
+    {
+      var getAnswer = CustomFunction.Create("getAnswer", () => 42);
+      var getPi = CustomFunction.Create("getPi", () => 3.14159f);
+      var getGreeting = CustomFunction.Create("getGreeting", () => "Hello");
+      var isReady = CustomFunction.Create("isReady", () => true);
+
+      // Test integer return
+      var intResult = CompileAndExecute("getAnswer()", Compiler.Options.None, null, null, getAnswer);
+      Assert.Equal(Type.Integer, intResult.ValueType);
+      Assert.Equal(42, intResult.IntegerValue);
+
+      // Test float return
+      var floatResult = CompileAndExecute("getPi()", Compiler.Options.None, null, null, getPi);
+      Assert.Equal(Type.Float, floatResult.ValueType);
+      AssertNearlyEqual(3.14159f, floatResult.FloatValue);
+
+      // Test string return
+      var stringResult = CompileAndExecute("getGreeting()", Compiler.Options.None, null, null, getGreeting);
+      Assert.Equal(Type.String, stringResult.ValueType);
+      Assert.Equal("Hello", stringResult.StringValue);
+
+      // Test boolean return
+      var boolResult = CompileAndExecute("isReady()", Compiler.Options.None, null, null, isReady);
+      Assert.Equal(Type.Boolean, boolResult.ValueType);
+      Assert.True(boolResult.BooleanValue);
+    }
+
+    [Fact]
+    public void ZeroParameterFunction_InExpression_ExecutesCorrectly()
+    {
+      var getTwo = CustomFunction.Create("getTwo", () => 2);
+      var getThree = CustomFunction.Create("getThree", () => 3);
+
+      // Test zero-parameter functions in arithmetic expressions
+      var result1 = CompileAndExecute("getTwo() + getThree()", Compiler.Options.None, null, null, getTwo, getThree);
+      Assert.Equal(Type.Integer, result1.ValueType);
+      Assert.Equal(5, result1.IntegerValue);
+
+      // Test zero-parameter function with regular parameter function
+      var doubleFunc = CustomFunction.Create("double", (int x) => x * 2);
+      var result2 = CompileAndExecute("double(getTwo())", Compiler.Options.None, null, null, getTwo, doubleFunc);
+      Assert.Equal(Type.Integer, result2.ValueType);
+      Assert.Equal(4, result2.IntegerValue);
+    }
   }
 }

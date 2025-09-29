@@ -63,6 +63,7 @@ namespace EpsilonScript.AST
           _parameterTypes = new Type[_parameters.Count];
           break;
         case ValueType.Null:
+          _parameters = new List<Node>();
           _parameterTypes = Array.Empty<Type>();
           break;
         default:
@@ -134,6 +135,7 @@ namespace EpsilonScript.AST
         case ValueType.Float:
           FloatValue = function.ExecuteFloat(_parameters);
           IntegerValue = (int)FloatValue;
+          BooleanValue = FloatValue != 0.0f;
           break;
         case ValueType.String:
           StringValue = function.ExecuteString(_parameters);

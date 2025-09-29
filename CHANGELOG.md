@@ -1,12 +1,13 @@
 # Changelog
 
-## [1.2.0] - 2025-09-28
+## [1.2.0] - 2025-09-29
 
 ### Added
 - **VariableId struct**: Strongly-typed variable identifier that replaces direct `uint` usage
   - Provides implicit conversions to/from `uint` and `string` for backwards compatibility
   - Maintains internal unique identifier mapping through extension methods
   - Improves type safety and encapsulates identifier management
+- Support for `CustomFunction.Create` with zero-parameter functions that have return values (`Func<TResult>`)
 
 ### Changed
 - **BREAKING CHANGE**: `IVariableContainer.TryGetValue()` now takes `VariableId` instead of `uint`
