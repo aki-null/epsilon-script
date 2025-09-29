@@ -64,6 +64,11 @@ namespace EpsilonScript.Function
       throw new InvalidOperationException("Function does not return boolean");
     }
 
+    public static CustomFunction Create<TResult>(string name, Func<TResult> func, bool isConstant = false)
+    {
+      return new CustomFunction<TResult>(name, func, isConstant);
+    }
+
     public static CustomFunction Create<T1, TResult>(string name, Func<T1, TResult> func, bool isConstant = false)
     {
       return new CustomFunction<T1, TResult>(name, func, isConstant);
@@ -91,6 +96,47 @@ namespace EpsilonScript.Function
       Func<T1, T2, T3, T4, T5, TResult> func, bool isConstant = false)
     {
       return new CustomFunction<T1, T2, T3, T4, T5, TResult>(name, func, isConstant);
+    }
+  }
+
+  public sealed class CustomFunction<TResult> : CustomFunction
+  {
+    private readonly Func<TResult> _func;
+
+    public CustomFunction(string name, Func<TResult> func, bool isConstant = false)
+      : base(name, isConstant, Array.Empty<ScriptType>(), TypeTraits<TResult>.ScriptType)
+    {
+      _func = func ?? throw new ArgumentNullException(nameof(func));
+    }
+
+    private TResult Invoke(List<Node> parameters)
+    {
+      EnsureParameterCount(parameters);
+      return _func();
+    }
+
+    public override int ExecuteInt(List<Node> parameters)
+    {
+      EnsureReturnType(Type.Integer);
+      return TypeTraits<TResult>.ToInt(Invoke(parameters));
+    }
+
+    public override float ExecuteFloat(List<Node> parameters)
+    {
+      EnsureReturnType(Type.Float);
+      return TypeTraits<TResult>.ToFloat(Invoke(parameters));
+    }
+
+    public override string ExecuteString(List<Node> parameters)
+    {
+      EnsureReturnType(Type.String);
+      return TypeTraits<TResult>.ToStringValue(Invoke(parameters));
+    }
+
+    public override bool ExecuteBool(List<Node> parameters)
+    {
+      EnsureReturnType(Type.Boolean);
+      return TypeTraits<TResult>.ToBool(Invoke(parameters));
     }
   }
 
