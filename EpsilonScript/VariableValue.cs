@@ -27,6 +27,13 @@ namespace EpsilonScript
             return (int)_floatValue;
           case Type.Boolean:
             return (_booleanValue ? 1 : 0);
+          case Type.String:
+            if (int.TryParse(_stringValue, out int result))
+            {
+              return result;
+            }
+
+            throw new InvalidCastException($"String value '{_stringValue}' cannot be parsed to an integer");
           default:
             throw new ArgumentOutOfRangeException(nameof(Type), Type, "Unsupported variable type");
         }
@@ -43,6 +50,9 @@ namespace EpsilonScript
             break;
           case Type.Boolean:
             _booleanValue = value != 0;
+            break;
+          case Type.String:
+            _stringValue = value.ToString();
             break;
           default:
             throw new ArgumentOutOfRangeException(nameof(Type), Type, "Unsupported variable type");

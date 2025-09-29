@@ -1,3 +1,4 @@
+using System;
 using Xunit;
 
 namespace EpsilonScript.Tests.ScriptSystem
@@ -74,6 +75,89 @@ namespace EpsilonScript.Tests.ScriptSystem
       Assert.Equal(Type.Integer, result.ValueType);
       Assert.Equal(7, result.IntegerValue);
       Assert.Equal(5, variables["val"].IntegerValue);
+    }
+
+    [Fact]
+    public void StringVariableRead_UsesCompilationContainer()
+    {
+      var variables = Variables().WithString("message", "Hello World").Build();
+      var result = CompileAndExecute("message", Compiler.Options.None, variables);
+      Assert.Equal(Type.String, result.ValueType);
+      Assert.Equal("Hello World", result.StringValue);
+    }
+
+    [Fact]
+    public void StringVariableRead_UsesOverrideContainerWhenProvided()
+    {
+      var compileTimeVariables = Variables().WithString("message", "Compile Time").Build();
+      var overrideVariables = Variables().WithString("message", "Runtime Override").Build();
+      var script = Compile("message", Compiler.Options.None, compileTimeVariables);
+      script.Execute(overrideVariables);
+      Assert.Equal(Type.String, script.ValueType);
+      Assert.Equal("Runtime Override", script.StringValue);
+    }
+
+    [Fact]
+    public void StringAssignment_UpdatesVariable()
+    {
+      var variables = Variables().WithString("text", "original").Build();
+      var result = CompileAndExecute("text = \"updated\"", Compiler.Options.None, variables);
+      Assert.Equal(Type.String, result.ValueType);
+      Assert.Equal("updated", result.StringValue);
+      Assert.Equal("updated", variables["text"].StringValue);
+    }
+
+    [Fact]
+    public void StringVariableWithEmptyString_Works()
+    {
+      var variables = Variables().WithString("empty", "").Build();
+      var result = CompileAndExecute("empty", Compiler.Options.None, variables);
+      Assert.Equal(Type.String, result.ValueType);
+      Assert.Equal("", result.StringValue);
+    }
+
+    [Fact]
+    public void StringVariableWithSpecialCharacters_Works()
+    {
+      var variables = Variables().WithString("special", "Hello\nWorld\t!").Build();
+      var result = CompileAndExecute("special", Compiler.Options.None, variables);
+      Assert.Equal(Type.String, result.ValueType);
+      Assert.Equal("Hello\nWorld\t!", result.StringValue);
+    }
+
+    [Theory]
+    [InlineData("123", 123)]
+    [InlineData("0", 0)]
+    [InlineData("-456", -456)]
+    [InlineData("  789  ", 789)]
+    [InlineData("+42", 42)]
+    public void StringVariableAsInteger_ParsesCorrectly(string stringValue, int expected)
+    {
+      var variable = new VariableValue(stringValue);
+      Assert.Equal(Type.String, variable.Type);
+      Assert.Equal(expected, variable.IntegerValue);
+    }
+
+    [Theory]
+    [InlineData("abc")]
+    [InlineData("12.34")]
+    [InlineData("")]
+    [InlineData("123abc")]
+    [InlineData("2147483648")] // int.MaxValue + 1
+    public void StringVariableAsInteger_ThrowsWhenInvalid(string stringValue)
+    {
+      var variable = new VariableValue(stringValue);
+      Assert.Equal(Type.String, variable.Type);
+      Assert.Throws<InvalidCastException>(() => variable.IntegerValue);
+    }
+
+    [Fact]
+    public void StringVariableIntegerSetter_ConvertsToString()
+    {
+      var variable = new VariableValue("original");
+      variable.IntegerValue = 42;
+      Assert.Equal(Type.String, variable.Type);
+      Assert.Equal("42", variable.StringValue);
     }
   }
 }

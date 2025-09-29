@@ -48,6 +48,10 @@ namespace EpsilonScript.AST
           IntegerValue = Variable.IntegerValue;
           BooleanValue = Variable.BooleanValue;
           break;
+        case Type.String:
+          ValueType = ValueType.String;
+          StringValue = Variable.StringValue;
+          break;
         default:
           throw new ArgumentOutOfRangeException(nameof(Variable.Type), Variable.Type, "Unsupported variable type");
       }

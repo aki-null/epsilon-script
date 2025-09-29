@@ -9,6 +9,7 @@
   - Improves type safety and encapsulates identifier management
 - Support for `CustomFunction.Create` with zero-parameter functions that have return values (`Func<TResult>`)
 - `AddCustomFunctionRange(IEnumerable<CustomFunction> functions)` method for adding multiple custom functions at once
+- String variable support with integer parsing
 
 ### Changed
 - **BREAKING CHANGE**: `IVariableContainer.TryGetValue()` now takes `VariableId` instead of `uint`
