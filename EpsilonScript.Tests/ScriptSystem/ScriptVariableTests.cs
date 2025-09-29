@@ -159,5 +159,58 @@ namespace EpsilonScript.Tests.ScriptSystem
       Assert.Equal(Type.String, variable.Type);
       Assert.Equal("42", variable.StringValue);
     }
+
+    [Fact]
+    public void PeriodInStringVariableNames_EvaluatesCorrectly()
+    {
+      var variables = Variables()
+        .WithString("user.name", "John")
+        .Build();
+
+      var result = CompileAndExecute("user.name", variables: variables);
+
+      Assert.Equal(Type.String, result.ValueType);
+      Assert.Equal("John", result.StringValue);
+    }
+
+    [Fact]
+    public void PeriodInIntegerVariableNames_EvaluatesCorrectly()
+    {
+      var variables = Variables()
+        .WithInteger("config.server.port", 8080)
+        .Build();
+
+      var result = CompileAndExecute("config.server.port", variables: variables);
+
+      Assert.Equal(Type.Integer, result.ValueType);
+      Assert.Equal(8080, result.IntegerValue);
+    }
+
+    [Fact]
+    public void PeriodInFloatVariableNames_EvaluatesCorrectly()
+    {
+      var variables = Variables()
+        .WithFloat("math.pi.value", 3.14159f)
+        .Build();
+
+      var result = CompileAndExecute("math.pi.value", variables: variables);
+
+      Assert.Equal(Type.Float, result.ValueType);
+      AssertNearlyEqual(3.14159f, result.FloatValue);
+    }
+
+    [Fact]
+    public void PeriodInVariableAssignment_WorksCorrectly()
+    {
+      var variables = Variables()
+        .WithString("user.name", "John")
+        .Build();
+
+      var result = CompileAndExecute("user.name = \"Jane\"; user.name", variables: variables);
+
+      Assert.Equal(Type.String, result.ValueType);
+      // Check in the variables container since assignment modifies the variable
+      Assert.Equal("Jane", result.Variables["user.name"].StringValue);
+    }
   }
 }

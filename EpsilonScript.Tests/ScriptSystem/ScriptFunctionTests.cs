@@ -334,5 +334,35 @@ namespace EpsilonScript.Tests.ScriptSystem
       afterScript.Execute();
       Assert.Equal("TEST", afterScript.StringValue);
     }
+
+    [Fact]
+    public void PeriodInFunctionNames_EvaluatesCorrectly()
+    {
+      var utilDouble = CustomFunction.Create("util.double", (int x) => x * 2);
+      var stringConcat = CustomFunction.Create("string.concat", (string a, string b) => a + b);
+
+      var result1 = CompileAndExecute("util.double(5)", extraFunctions: utilDouble);
+      Assert.Equal(Type.Integer, result1.ValueType);
+      Assert.Equal(10, result1.IntegerValue);
+
+      var result2 = CompileAndExecute("string.concat(\"Hello\", \" World\")", extraFunctions: stringConcat);
+      Assert.Equal(Type.String, result2.ValueType);
+      Assert.Equal("Hello World", result2.StringValue);
+    }
+
+    [Fact]
+    public void ComplexPeriodIdentifiers_WorkCorrectly()
+    {
+      var mathSquare = CustomFunction.Create("math.square", (float x) => x * x);
+      var variables = Variables()
+        .WithFloat("math.pi.value", 3.14159f)
+        .Build();
+
+      var result = CompileAndExecute("math.square(math.pi.value)", variables: variables, extraFunctions: mathSquare);
+
+      Assert.Equal(Type.Float, result.ValueType);
+      // Calculate the expected value precisely: 3.14159f * 3.14159f = 9.869589f
+      AssertNearlyEqual(9.869589f, result.FloatValue);
+    }
   }
 }
