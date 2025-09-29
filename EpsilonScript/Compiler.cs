@@ -93,5 +93,18 @@ namespace EpsilonScript
         _functions[func.Name] = new CustomFunctionOverload(func);
       }
     }
+
+    public void AddCustomFunctionRange(IEnumerable<CustomFunction> functions)
+    {
+      if (functions == null)
+      {
+        throw new ArgumentNullException(nameof(functions));
+      }
+
+      foreach (var func in functions)
+      {
+        AddCustomFunction(func);
+      }
+    }
   }
 }

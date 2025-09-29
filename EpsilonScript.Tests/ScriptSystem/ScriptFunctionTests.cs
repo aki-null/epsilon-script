@@ -228,5 +228,111 @@ namespace EpsilonScript.Tests.ScriptSystem
       Assert.Equal(Type.Integer, result2.ValueType);
       Assert.Equal(4, result2.IntegerValue);
     }
+
+    [Fact]
+    public void AddCustomFunctionRange_WithNullCollection_ThrowsArgumentNullException()
+    {
+      var compiler = CreateCompiler();
+      Assert.Throws<ArgumentNullException>(() => compiler.AddCustomFunctionRange(null));
+    }
+
+    [Fact]
+    public void AddCustomFunctionRange_WithEmptyCollection_DoesNotThrow()
+    {
+      var compiler = CreateCompiler();
+      var emptyFunctions = new CustomFunction[] { };
+      compiler.AddCustomFunctionRange(emptyFunctions);
+    }
+
+    [Fact]
+    public void AddCustomFunctionRange_WithMultipleFunctions_AddsAllFunctions()
+    {
+      var compiler = CreateCompiler();
+      var functions = new[]
+      {
+        CustomFunction.Create("add10", (int x) => x + 10),
+        CustomFunction.Create("multiply2", (int x) => x * 2),
+        CustomFunction.Create("square", (float x) => x * x)
+      };
+
+      compiler.AddCustomFunctionRange(functions);
+
+      var addScript = compiler.Compile("add10(5)");
+      addScript.Execute();
+      Assert.Equal(Type.Integer, addScript.ValueType);
+      Assert.Equal(15, addScript.IntegerValue);
+
+      var multiplyScript = compiler.Compile("multiply2(7)");
+      multiplyScript.Execute();
+      Assert.Equal(Type.Integer, multiplyScript.ValueType);
+      Assert.Equal(14, multiplyScript.IntegerValue);
+
+      var squareScript = compiler.Compile("square(3.0)");
+      squareScript.Execute();
+      Assert.Equal(Type.Float, squareScript.ValueType);
+      AssertNearlyEqual(9.0f, squareScript.FloatValue);
+    }
+
+    [Fact]
+    public void AddCustomFunctionRange_WithOverloads_CreatesProperOverloads()
+    {
+      var compiler = CreateCompiler();
+      var functions = new[]
+      {
+        CustomFunction.Create("test", (int x) => x + 1),
+        CustomFunction.Create("test", (float x) => x + 0.5f),
+        CustomFunction.Create("test", (string x) => x + "!")
+      };
+
+      compiler.AddCustomFunctionRange(functions);
+
+      var intScript = compiler.Compile("test(5)");
+      intScript.Execute();
+      Assert.Equal(Type.Integer, intScript.ValueType);
+      Assert.Equal(6, intScript.IntegerValue);
+
+      var floatScript = compiler.Compile("test(5.0)");
+      floatScript.Execute();
+      Assert.Equal(Type.Float, floatScript.ValueType);
+      AssertNearlyEqual(5.5f, floatScript.FloatValue);
+
+      var stringScript = compiler.Compile("test(\"hello\")");
+      stringScript.Execute();
+      Assert.Equal(Type.String, stringScript.ValueType);
+      Assert.Equal("hello!", stringScript.StringValue);
+    }
+
+    [Fact]
+    public void AddCustomFunctionRange_MixedWithIndividualAdditions_WorksCorrectly()
+    {
+      var compiler = CreateCompiler();
+
+      compiler.AddCustomFunction(CustomFunction.Create("existing", (int x) => x * 100));
+
+      var rangeFunctions = new[]
+      {
+        CustomFunction.Create("range1", (int x) => x + 1),
+        CustomFunction.Create("range2", (float x) => x * 2.0f)
+      };
+      compiler.AddCustomFunctionRange(rangeFunctions);
+
+      compiler.AddCustomFunction(CustomFunction.Create("added_after", (string s) => s.ToUpper()));
+
+      var existingScript = compiler.Compile("existing(3)");
+      existingScript.Execute();
+      Assert.Equal(300, existingScript.IntegerValue);
+
+      var range1Script = compiler.Compile("range1(5)");
+      range1Script.Execute();
+      Assert.Equal(6, range1Script.IntegerValue);
+
+      var range2Script = compiler.Compile("range2(3.5)");
+      range2Script.Execute();
+      AssertNearlyEqual(7.0f, range2Script.FloatValue);
+
+      var afterScript = compiler.Compile("added_after(\"test\")");
+      afterScript.Execute();
+      Assert.Equal("TEST", afterScript.StringValue);
+    }
   }
 }
