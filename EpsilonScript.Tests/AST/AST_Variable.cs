@@ -1,6 +1,5 @@
 using System;
 using EpsilonScript.AST;
-using EpsilonScript.Helper;
 using EpsilonScript.Intermediate;
 using Xunit;
 using EpsilonScript.Tests.TestInfrastructure;

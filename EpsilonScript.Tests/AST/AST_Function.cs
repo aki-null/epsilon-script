@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using EpsilonScript.AST;
 using EpsilonScript.Function;
-using EpsilonScript.Helper;
 using EpsilonScript.Intermediate;
 using Xunit;
 using EpsilonScript.Tests.TestInfrastructure;

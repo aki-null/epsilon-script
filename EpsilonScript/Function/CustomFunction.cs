@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using EpsilonScript.AST;
-using EpsilonScript.Helper;
 using ScriptType = EpsilonScript.Type;
 
 namespace EpsilonScript.Function

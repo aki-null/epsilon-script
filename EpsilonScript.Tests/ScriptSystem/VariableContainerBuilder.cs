@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using EpsilonScript.Helper;
 
 namespace EpsilonScript.Tests.ScriptSystem
 {
