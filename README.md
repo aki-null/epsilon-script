@@ -57,19 +57,17 @@ Console.WriteLine(script.IntegerValue);
 
 Variables can be read and assigned (`=`). Compound assignment operators (`+=`, `-=`, `*=`, `/=`) are also supported.
 
-Variable names are converted to unique integers using the `GetUniqueIdentifier` extension method for performance. Cache the identifier for reuse.
-
 Variables are stored in an `IVariableContainer`. Use `DictionaryVariableContainer` for a simple implementation.
 
 #### Code
 
 ```c#
 var compiler = new Compiler();
-var valIdentifier = "val".GetUniqueIdentifier();
-var variables = new DictionaryVariableContainer {[valIdentifier] = new VariableValue(43.0f)};
+VariableId valId = "val"; // Implicit conversion from string
+var variables = new DictionaryVariableContainer { [valId] = new VariableValue(43.0f) };
 var script = compiler.Compile("val = val * 10.0", Compiler.Options.None, variables);
 script.Execute();
-Console.WriteLine(variables[valIdentifier].FloatValue);
+Console.WriteLine(variables[valId].FloatValue);
 ```
 
 #### Result
@@ -78,9 +76,23 @@ Console.WriteLine(variables[valIdentifier].FloatValue);
 430.0
 ```
 
+The `VariableId` struct provides type safety and optimal performance by using unique integer identifiers internally while maintaining a simple string-based interface.
+
 The `Compiler.Options.Immutable` flag prevents expressions that modify variables from compiling.
 
 Variables cannot be defined within scripts. This prevents expressions from becoming too complex.
+
+#### Alternative: Direct String Usage
+
+For simpler code, you can use strings directly:
+
+```c#
+var compiler = new Compiler();
+var variables = new DictionaryVariableContainer { ["val"] = new VariableValue(43.0f) };
+var script = compiler.Compile("val = val * 10.0", Compiler.Options.None, variables);
+script.Execute();
+Console.WriteLine(variables["val"].FloatValue);
+```
 
 ### Comparison
 
@@ -90,8 +102,8 @@ Comparison operators (`==`, `!=`, `<`, `<=`, `>`, `>=`) and logical operators (`
 
 ```c#
 var compiler = new Compiler();
-var valIdentifier = "val".GetUniqueIdentifier();
-var variables = new DictionaryVariableContainer {[valIdentifier] = new VariableValue(43.0f)};
+VariableId valId = "val";
+var variables = new DictionaryVariableContainer { [valId] = new VariableValue(43.0f) };
 var script = compiler.Compile("val >= 0.0 && val < 50.0", Compiler.Options.Immutable, variables);
 script.Execute();
 Console.WriteLine(script.BooleanValue);
@@ -237,10 +249,12 @@ The semicolon operator (`;`) sequences multiple expressions. The result is the l
 
 ```c#
 var compiler = new Compiler();
+VariableId xId = "x";
+VariableId yId = "y";
 var variables = new DictionaryVariableContainer
 {
-  ["x".GetUniqueIdentifier()] = new VariableValue(5),
-  ["y".GetUniqueIdentifier()] = new VariableValue(10)
+  [xId] = new VariableValue(5),
+  [yId] = new VariableValue(10)
 };
 var script = compiler.Compile("x = x + 1; y = y * 2; x + y", Compiler.Options.None, variables);
 script.Execute();

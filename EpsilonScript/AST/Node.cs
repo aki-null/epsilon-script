@@ -19,7 +19,7 @@ namespace EpsilonScript.AST
     public virtual bool IsConstant => true;
 
     public abstract void Build(Stack<Node> rpnStack, Element element, Compiler.Options options,
-      IVariableContainer variables, IDictionary<uint, CustomFunctionOverload> functions);
+      IVariableContainer variables, IDictionary<VariableId, CustomFunctionOverload> functions);
 
     public virtual void Execute(IVariableContainer variablesOverride)
     {

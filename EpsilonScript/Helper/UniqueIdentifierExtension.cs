@@ -31,7 +31,7 @@ namespace EpsilonScript.Helper
 
     public static string GetStringFromUniqueIdentifier(this uint id)
     {
-      return IdStringCache.TryGetValue(id, out var value) ? value : null;
+      return IdStringCache.GetValueOrDefault(id);
     }
 
     public static void ResetUniqueIdentifierCache()

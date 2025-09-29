@@ -1,7 +1,7 @@
-﻿namespace EpsilonScript
+namespace EpsilonScript
 {
   public interface IVariableContainer
   {
-    bool TryGetValue(uint variableKey, out VariableValue variableValue);
+    bool TryGetValue(VariableId variableKey, out VariableValue variableValue);
   }
 }

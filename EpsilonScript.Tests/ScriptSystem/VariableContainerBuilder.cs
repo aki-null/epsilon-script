@@ -5,35 +5,29 @@ namespace EpsilonScript.Tests.ScriptSystem
 {
   public class VariableContainerBuilder
   {
-    private readonly Dictionary<uint, VariableValue> _variables = new Dictionary<uint, VariableValue>();
+    private readonly Dictionary<VariableId, VariableValue> _variables = new Dictionary<VariableId, VariableValue>();
 
     public VariableContainerBuilder WithInteger(string name, int value)
     {
-      _variables[name.GetUniqueIdentifier()] = new VariableValue(value);
+      _variables[name] = new VariableValue(value);
       return this;
     }
 
     public VariableContainerBuilder WithFloat(string name, float value)
     {
-      _variables[name.GetUniqueIdentifier()] = new VariableValue(value);
+      _variables[name] = new VariableValue(value);
       return this;
     }
 
     public VariableContainerBuilder WithBoolean(string name, bool value)
     {
-      _variables[name.GetUniqueIdentifier()] = new VariableValue(value);
+      _variables[name] = new VariableValue(value);
       return this;
     }
 
     public VariableContainerBuilder WithString(string name, string value)
     {
-      _variables[name.GetUniqueIdentifier()] = new VariableValue(value);
-      return this;
-    }
-
-    public VariableContainerBuilder WithValue(string name, VariableValue value)
-    {
-      _variables[name.GetUniqueIdentifier()] = value;
+      _variables[name] = new VariableValue(value);
       return this;
     }
 

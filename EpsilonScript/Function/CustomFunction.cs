@@ -17,13 +17,13 @@ namespace EpsilonScript.Function
         throw new ArgumentException("Function name cannot be null or empty", nameof(name));
       }
 
-      Name = name.GetUniqueIdentifier();
+      Name = name;
       IsConstant = isConstant;
       _parameterTypes = parameterTypes ?? Array.Empty<ScriptType>();
       ReturnType = returnType;
     }
 
-    public uint Name { get; }
+    public VariableId Name { get; }
     public bool IsConstant { get; }
     public ScriptType ReturnType { get; }
     public ScriptType[] ParameterTypes => _parameterTypes;

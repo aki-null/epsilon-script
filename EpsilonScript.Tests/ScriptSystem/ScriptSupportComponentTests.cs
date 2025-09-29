@@ -52,7 +52,7 @@ namespace EpsilonScript.Tests.ScriptSystem
     public void DictionaryVariableContainer_TryGetValueReturnsStoredVariable()
     {
       var container = new DictionaryVariableContainer();
-      var id = "val".GetUniqueIdentifier();
+      var id = (VariableId)"val";
       container[id] = new VariableValue(5);
       Assert.True(container.ContainsKey(id));
       Assert.Equal(5, container[id].IntegerValue);
@@ -62,7 +62,7 @@ namespace EpsilonScript.Tests.ScriptSystem
     public void DictionaryVariableContainer_IndexerUpdatesExistingEntry()
     {
       var container = new DictionaryVariableContainer();
-      var id = "val".GetUniqueIdentifier();
+      var id = (VariableId)"val";
       container[id] = new VariableValue(1);
       container[id] = new VariableValue(2);
       Assert.Equal(2, container[id].IntegerValue);
