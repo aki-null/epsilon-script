@@ -2,6 +2,9 @@ using System;
 using System.Runtime.CompilerServices;
 using EpsilonScript.AST;
 using ScriptType = EpsilonScript.Type;
+#if UNITY_2018_1_OR_NEWER
+using Unity.Collections.LowLevel.Unsafe;
+#endif
 
 namespace EpsilonScript.Function
 {
@@ -116,37 +119,61 @@ namespace EpsilonScript.Function
     private static T ReadInt(Node node)
     {
       var value = node.IntegerValue;
+#if UNITY_2018_1_OR_NEWER
+      return UnsafeUtility.As<int, T>(ref value);
+#else
       return Unsafe.As<int, T>(ref value);
+#endif
     }
 
     private static int ToIntIdentity(T value)
     {
       var temp = value;
+#if UNITY_2018_1_OR_NEWER
+      return UnsafeUtility.As<T, int>(ref temp);
+#else
       return Unsafe.As<T, int>(ref temp);
+#endif
     }
 
     private static T ReadFloat(Node node)
     {
       var value = node.FloatValue;
+#if UNITY_2018_1_OR_NEWER
+      return UnsafeUtility.As<float, T>(ref value);
+#else
       return Unsafe.As<float, T>(ref value);
+#endif
     }
 
     private static float ToFloatIdentity(T value)
     {
       var temp = value;
+#if UNITY_2018_1_OR_NEWER
+      return UnsafeUtility.As<T, float>(ref temp);
+#else
       return Unsafe.As<T, float>(ref temp);
+#endif
     }
 
     private static T ReadBool(Node node)
     {
       var value = node.BooleanValue;
+#if UNITY_2018_1_OR_NEWER
+      return UnsafeUtility.As<bool, T>(ref value);
+#else
       return Unsafe.As<bool, T>(ref value);
+#endif
     }
 
     private static bool ToBoolIdentity(T value)
     {
       var temp = value;
+#if UNITY_2018_1_OR_NEWER
+      return UnsafeUtility.As<T, bool>(ref temp);
+#else
       return Unsafe.As<T, bool>(ref temp);
+#endif
     }
 
     private static T ReadString(Node node)
