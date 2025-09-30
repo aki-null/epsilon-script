@@ -107,11 +107,13 @@ namespace EpsilonScript.AST
           {
             return new BooleanNode(false);
           }
+
           // anything && false => false (don't need to optimize left side)
           if (_rightNode.IsConstant && _rightNode.ValueType == ValueType.Boolean && !_rightNode.BooleanValue)
           {
             return new BooleanNode(false);
           }
+
           break;
 
         case ElementType.BooleanOrOperator:
@@ -120,11 +122,13 @@ namespace EpsilonScript.AST
           {
             return new BooleanNode(true);
           }
+
           // anything || true => true (don't need to optimize left side)
           if (_rightNode.IsConstant && _rightNode.ValueType == ValueType.Boolean && _rightNode.BooleanValue)
           {
             return new BooleanNode(true);
           }
+
           break;
       }
 
@@ -152,11 +156,13 @@ namespace EpsilonScript.AST
           {
             return _rightNode;
           }
+
           // expression && true => expression
           if (_rightNode.IsConstant && _rightNode.ValueType == ValueType.Boolean && _rightNode.BooleanValue)
           {
             return _leftNode;
           }
+
           break;
 
         case ElementType.BooleanOrOperator:
@@ -165,11 +171,13 @@ namespace EpsilonScript.AST
           {
             return _rightNode;
           }
+
           // expression || false => expression
           if (_rightNode.IsConstant && _rightNode.ValueType == ValueType.Boolean && !_rightNode.BooleanValue)
           {
             return _leftNode;
           }
+
           break;
       }
 

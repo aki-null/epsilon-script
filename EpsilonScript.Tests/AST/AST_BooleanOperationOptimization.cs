@@ -388,7 +388,6 @@ namespace EpsilonScript.Tests.AST
     {
       private readonly int _left, _right;
       private readonly bool _expectedResult;
-      private bool _executed = false;
 
       public FakeComparisonNode(int left, int right, bool expectedResult)
       {
@@ -403,7 +402,6 @@ namespace EpsilonScript.Tests.AST
 
       public override void Execute(IVariableContainer variablesOverride)
       {
-        _executed = true;
         // Simulate comparison execution
         BooleanValue = _expectedResult;
         IntegerValue = BooleanValue ? 1 : 0;

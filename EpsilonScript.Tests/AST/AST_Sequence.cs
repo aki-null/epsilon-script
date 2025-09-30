@@ -99,16 +99,17 @@ namespace EpsilonScript.Tests.AST
     }
 
     [Fact]
-    public void AST_Sequence_WithMissingNodes_ThrowsParserException()
+    public void AST_Sequence_WithSingleNode_ActsAsNoOp()
     {
       var node = new SequenceNode();
-      var rpn = CreateStack(new FakeIntegerNode(5)); // Only one node
+      var rpn = CreateStack(new FakeIntegerNode(5)); // Only one node (trailing semicolon case)
       var element = new Element(new Token(";", TokenType.Semicolon), ElementType.Semicolon);
 
-      var exception = Assert.Throws<ParserException>(() =>
-        node.Build(rpn, element, Compiler.Options.None, null, null));
+      node.Build(rpn, element, Compiler.Options.None, null, null);
+      node.Execute(null);
 
-      Assert.Contains("Cannot find tokens to sequence", exception.Message);
+      Assert.Equal(ValueType.Integer, node.ValueType);
+      Assert.Equal(5, node.IntegerValue);
     }
 
     [Fact]
@@ -202,6 +203,82 @@ namespace EpsilonScript.Tests.AST
       Assert.Equal(ValueType.Tuple, node.ValueType);
       Assert.NotNull(node.TupleValue);
       Assert.Equal(2, node.TupleValue.Count);
+    }
+
+    [Fact]
+    public void AST_Sequence_WithMultipleSemicolons_ReturnsRightmostValue()
+    {
+      // Test: 1; 2; 3 should return 3
+      var node1 = new SequenceNode();
+      var rpn1 = CreateStack(new FakeIntegerNode(1), new FakeIntegerNode(2));
+      var element1 = new Element(new Token(";", TokenType.Semicolon), ElementType.Semicolon);
+      node1.Build(rpn1, element1, Compiler.Options.None, null, null);
+
+      var node2 = new SequenceNode();
+      var rpn2 = CreateStack(node1, new FakeIntegerNode(3));
+      var element2 = new Element(new Token(";", TokenType.Semicolon), ElementType.Semicolon);
+      node2.Build(rpn2, element2, Compiler.Options.None, null, null);
+      node2.Execute(null);
+
+      Assert.Equal(ValueType.Integer, node2.ValueType);
+      Assert.Equal(3, node2.IntegerValue);
+    }
+
+    [Fact]
+    public void AST_Sequence_WithMultipleSemicolons_ExecutesAllNodes()
+    {
+      // Test: node1; node2; node3 - all should execute
+      var node1 = new TrackingIntegerNode(10);
+      var node2 = new TrackingIntegerNode(20);
+      var node3 = new TrackingIntegerNode(30);
+
+      var seqNode1 = new SequenceNode();
+      var rpn1 = CreateStack(node1, node2);
+      var element1 = new Element(new Token(";", TokenType.Semicolon), ElementType.Semicolon);
+      seqNode1.Build(rpn1, element1, Compiler.Options.None, null, null);
+
+      var seqNode2 = new SequenceNode();
+      var rpn2 = CreateStack(seqNode1, node3);
+      var element2 = new Element(new Token(";", TokenType.Semicolon), ElementType.Semicolon);
+      seqNode2.Build(rpn2, element2, Compiler.Options.None, null, null);
+      seqNode2.Execute(null);
+
+      Assert.True(node1.WasExecuted);
+      Assert.True(node2.WasExecuted);
+      Assert.True(node3.WasExecuted);
+      Assert.Equal(30, seqNode2.IntegerValue);
+    }
+
+    [Fact]
+    public void AST_Sequence_WithConsecutiveSemicolons_HandlesEmptyStatements()
+    {
+      // Test: value;;;; (multiple trailing semicolons)
+      var baseNode = new FakeIntegerNode(42);
+
+      // Build: value;
+      var seq1 = new SequenceNode();
+      var rpn1 = CreateStack(baseNode);
+      var element = new Element(new Token(";", TokenType.Semicolon), ElementType.Semicolon);
+      seq1.Build(rpn1, element, Compiler.Options.None, null, null);
+
+      // Build: (value;);
+      var seq2 = new SequenceNode();
+      var rpn2 = CreateStack(seq1);
+      seq2.Build(rpn2, element, Compiler.Options.None, null, null);
+
+      // Build: ((value;););
+      var seq3 = new SequenceNode();
+      var rpn3 = CreateStack(seq2);
+      seq3.Build(rpn3, element, Compiler.Options.None, null, null);
+
+      // Build: (((value;);););
+      var seq4 = new SequenceNode();
+      var rpn4 = CreateStack(seq3);
+      seq4.Build(rpn4, element, Compiler.Options.None, null, null);
+      seq4.Execute(null);
+
+      Assert.Equal(ValueType.Integer, seq4.ValueType);
+      Assert.Equal(42, seq4.IntegerValue);
     }
 
     // Helper classes for testing

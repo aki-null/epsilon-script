@@ -17,6 +17,7 @@
 ### Fixed
 - **AST Optimization Bug**: Fixed `Compiler.cs` optimization pipeline where `rootNode.Optimize()` result was being discarded instead of captured, causing some AST optimizations to be ignored
 - **Sign Operator Optimization Bug**: Fixed unary positive operator (`+expr`) returning unoptimized child node instead of optimized result
+- **Trailing Semicolon Support**: Trailing semicolons are now allowed and treated as no-op instead of throwing "Cannot find tokens to sequence" error
 
 ### Changed
 - **BREAKING CHANGE**: `IVariableContainer.TryGetValue()` now takes `VariableId` instead of `uint`
