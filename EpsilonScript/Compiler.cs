@@ -74,7 +74,7 @@ namespace EpsilonScript
 
       new Lexer.Lexer().Execute(source, _tokenParser);
       var rootNode = _astBuilder.Result;
-      rootNode.Optimize();
+      rootNode = rootNode.Optimize();
 
       _astBuilder.Reset();
       _rpnConverter.Reset();

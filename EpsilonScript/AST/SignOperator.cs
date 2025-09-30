@@ -85,8 +85,8 @@ namespace EpsilonScript.AST
 
       if (_operationType == ElementType.PositiveOperator)
       {
-        // Nothing to do for unary positive operator
-        return _childNode;
+        // Unary positive operator is a no-op, just return the optimized child
+        return _childNode.Optimize();
       }
 
       _childNode = _childNode.Optimize();

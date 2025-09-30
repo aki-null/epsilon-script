@@ -3,6 +3,7 @@
 ## [1.2.0] - 2025-09-29
 
 ### Added
+- **Boolean Short-Circuit Optimization**: Compile-time optimization for boolean expressions
 - **Period characters in identifiers**: Variable names and function names can now contain periods (e.g., `user.name`, `math.square()`)
 - **VariableId struct**: Strongly-typed variable identifier that replaces direct `uint` usage
   - Provides implicit conversions to/from `uint` and `string` for backwards compatibility
@@ -11,6 +12,11 @@
 - Support for `CustomFunction.Create` with zero-parameter functions that have return values (`Func<TResult>`)
 - `AddCustomFunctionRange(IEnumerable<CustomFunction> functions)` method for adding multiple custom functions at once
 - String variable support with integer parsing
+- Documentation clarification on function purity requirements
+
+### Fixed
+- **AST Optimization Bug**: Fixed `Compiler.cs` optimization pipeline where `rootNode.Optimize()` result was being discarded instead of captured, causing some AST optimizations to be ignored
+- **Sign Operator Optimization Bug**: Fixed unary positive operator (`+expr`) returning unoptimized child node instead of optimized result
 
 ### Changed
 - **BREAKING CHANGE**: `IVariableContainer.TryGetValue()` now takes `VariableId` instead of `uint`

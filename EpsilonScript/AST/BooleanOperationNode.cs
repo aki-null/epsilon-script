@@ -85,14 +85,101 @@ namespace EpsilonScript.AST
 
     public override Node Optimize()
     {
-      if (IsConstant)
+      // Helper to ensure constant boolean node is executed
+      void EnsureExecuted(Node node)
+      {
+        if (node.IsConstant && node.ValueType == ValueType.Boolean)
+        {
+          node.Execute(null);
+        }
+      }
+
+      // Check for early short-circuit opportunities before optimizing children
+      // This prevents unnecessary work when we can already determine the result
+      EnsureExecuted(_rightNode);
+      EnsureExecuted(_leftNode);
+
+      switch (_operationType)
+      {
+        case ElementType.BooleanAndOperator:
+          // false && anything => false (don't need to optimize right side)
+          if (_leftNode.IsConstant && _leftNode.ValueType == ValueType.Boolean && !_leftNode.BooleanValue)
+          {
+            return new BooleanNode(false);
+          }
+          // anything && false => false (don't need to optimize left side)
+          if (_rightNode.IsConstant && _rightNode.ValueType == ValueType.Boolean && !_rightNode.BooleanValue)
+          {
+            return new BooleanNode(false);
+          }
+          break;
+
+        case ElementType.BooleanOrOperator:
+          // true || anything => true (don't need to optimize right side)
+          if (_leftNode.IsConstant && _leftNode.ValueType == ValueType.Boolean && _leftNode.BooleanValue)
+          {
+            return new BooleanNode(true);
+          }
+          // anything || true => true (don't need to optimize left side)
+          if (_rightNode.IsConstant && _rightNode.ValueType == ValueType.Boolean && _rightNode.BooleanValue)
+          {
+            return new BooleanNode(true);
+          }
+          break;
+      }
+
+      // Optimize child nodes
+      _leftNode = _leftNode.Optimize();
+      _rightNode = _rightNode.Optimize();
+
+      // Handle type errors for constant expressions
+      if (IsConstant && (_leftNode.ValueType != ValueType.Boolean || _rightNode.ValueType != ValueType.Boolean))
+      {
+        Execute(null); // This will throw RuntimeException for type mismatches
+        return CreateValueNode();
+      }
+
+      // Ensure optimized constant nodes are executed
+      EnsureExecuted(_leftNode);
+      EnsureExecuted(_rightNode);
+
+      // Short-circuit optimizations after child optimization
+      switch (_operationType)
+      {
+        case ElementType.BooleanAndOperator:
+          // true && expression => expression
+          if (_leftNode.IsConstant && _leftNode.ValueType == ValueType.Boolean && _leftNode.BooleanValue)
+          {
+            return _rightNode;
+          }
+          // expression && true => expression
+          if (_rightNode.IsConstant && _rightNode.ValueType == ValueType.Boolean && _rightNode.BooleanValue)
+          {
+            return _leftNode;
+          }
+          break;
+
+        case ElementType.BooleanOrOperator:
+          // false || expression => expression
+          if (_leftNode.IsConstant && _leftNode.ValueType == ValueType.Boolean && !_leftNode.BooleanValue)
+          {
+            return _rightNode;
+          }
+          // expression || false => expression
+          if (_rightNode.IsConstant && _rightNode.ValueType == ValueType.Boolean && !_rightNode.BooleanValue)
+          {
+            return _leftNode;
+          }
+          break;
+      }
+
+      // Constant folding: if both operands are constant boolean, evaluate at compile time
+      if (IsConstant && _leftNode.ValueType == ValueType.Boolean && _rightNode.ValueType == ValueType.Boolean)
       {
         Execute(null);
         return CreateValueNode();
       }
 
-      _leftNode = _leftNode.Optimize();
-      _rightNode = _rightNode.Optimize();
       return this;
     }
   }
