@@ -41,9 +41,8 @@ int damage = (int)damageFormula.FloatValue; // 82 at level 10
 ```
 
 - Game designers can write expressions directly
-- No compilation delays
-- Zero GC alloc after setup
-- Useful for conditions, formulas, and dynamic behavior
+- Zero GC alloc after compilation
+- Embeds into programs with strong integration through variables and custom functions
 
 ## Table of Contents
 
