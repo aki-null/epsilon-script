@@ -1,6 +1,6 @@
 # Changelog
 
-## [1.2.0] - 2025-09-29
+## [1.2.0] - 2025-10-01
 
 ### Added
 - **Period characters in identifiers**: Variable names and function names can now contain periods (e.g., `user.name`, `math.square()`)
@@ -15,10 +15,10 @@
 - Documentation clarification on function purity requirements
 
 ### Fixed
-- **AST Optimization Bug**: Fixed `Compiler.cs` optimization pipeline where `rootNode.Optimize()` result was being discarded instead of captured, causing some AST optimizations to be ignored
 - **Unity Compatibility**: Added conditional compilation support for Unity's `UnsafeUtility.As` API in `TypeTraits.cs`
+- **AST Optimization**: Fixed `Compiler.cs` optimization pipeline where `rootNode.Optimize()` result was being discarded instead of captured, causing some AST optimizations to be ignored
 - **Constant Function Folding**: `FunctionNode.Optimize()` now evaluates constant functions with constant parameters at compile time
-- **Sign Operator Optimization Bug**: Fixed unary positive operator (`+expr`) returning unoptimized child node instead of optimized result
+- **Sign Operator Optimization**: Fixed unary positive operator (`+expr`) returning unoptimized child node instead of optimized result
 - **Trailing Semicolon Support**: Trailing semicolons are now allowed and treated as no-op instead of throwing "Cannot find tokens to sequence" error
 
 ### Changed
