@@ -4,8 +4,6 @@ EpsilonScript is an interpreter for evaluating simple expressions, written in C#
 
 It targets .NET Standard 2.1.
 
-## Showcase
-
 ```c#
 // Setup: Add custom functions to access game state
 var compiler = new Compiler();
