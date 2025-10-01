@@ -59,6 +59,20 @@ namespace EpsilonScript.AST
       }
     }
 
+    private bool LessThanOrEqualTo()
+    {
+      switch (_comparisonValueType)
+      {
+        case ValueType.Integer:
+          return _leftNode.IntegerValue <= _rightNode.IntegerValue;
+        case ValueType.Float:
+          return _leftNode.FloatValue <= _rightNode.FloatValue;
+        default:
+          throw new ArgumentOutOfRangeException(nameof(_comparisonValueType), _comparisonValueType,
+            "Unsupported comparison value type");
+      }
+    }
+
     private bool GreaterThan()
     {
       switch (_comparisonValueType)
@@ -67,6 +81,20 @@ namespace EpsilonScript.AST
           return _leftNode.IntegerValue > _rightNode.IntegerValue;
         case ValueType.Float:
           return _leftNode.FloatValue > _rightNode.FloatValue;
+        default:
+          throw new ArgumentOutOfRangeException(nameof(_comparisonValueType), _comparisonValueType,
+            "Unsupported comparison value type");
+      }
+    }
+
+    private bool GreaterThanOrEqualTo()
+    {
+      switch (_comparisonValueType)
+      {
+        case ValueType.Integer:
+          return _leftNode.IntegerValue >= _rightNode.IntegerValue;
+        case ValueType.Float:
+          return _leftNode.FloatValue >= _rightNode.FloatValue;
         default:
           throw new ArgumentOutOfRangeException(nameof(_comparisonValueType), _comparisonValueType,
             "Unsupported comparison value type");
@@ -141,10 +169,10 @@ namespace EpsilonScript.AST
           BooleanValue = GreaterThan();
           break;
         case ElementType.ComparisonLessThanOrEqualTo:
-          BooleanValue = LessThan() || EqualTo();
+          BooleanValue = LessThanOrEqualTo();
           break;
         case ElementType.ComparisonGreaterThanOrEqualTo:
-          BooleanValue = GreaterThan() || EqualTo();
+          BooleanValue = GreaterThanOrEqualTo();
           break;
         default:
           throw new ArgumentOutOfRangeException(nameof(_comparisonType), _comparisonType,

@@ -487,6 +487,186 @@ namespace EpsilonScript.Tests.AST
       Assert.Equal(105, node2.IntegerValue); // One-parameter version (5 + 100)
     }
 
+    [Fact]
+    public void AST_Function_Optimize_WithConstantFunctionAndParameters_ReturnsValueNode()
+    {
+      var functions = new Dictionary<VariableId, CustomFunctionOverload>();
+      var functionName = "square";
+      var functionId = (VariableId)functionName;
+
+      var customFunction = CustomFunction.Create(functionName, (int x) => x * x, true); // Constant function
+      var overload = new CustomFunctionOverload(customFunction);
+      functions[functionId] = overload;
+
+      var node = new FunctionNode();
+      var rpn = CreateStack(new FakeIntegerNode(5)); // Constant parameter
+      var token = new Token(functionName, TokenType.Identifier);
+      var element = new Element(token, ElementType.Function);
+
+      node.Build(rpn, element, Compiler.Options.None, null, functions);
+
+      // Optimize should evaluate the constant function and return a value node
+      var optimized = node.Optimize();
+
+      Assert.NotSame(node, optimized); // Should return a different node
+      Assert.IsType<IntegerNode>(optimized);
+      Assert.Equal(25, optimized.IntegerValue);
+    }
+
+    [Fact]
+    public void AST_Function_Optimize_WithNonConstantFunction_ReturnsSelf()
+    {
+      var functions = new Dictionary<VariableId, CustomFunctionOverload>();
+      var functionName = "random";
+      var functionId = (VariableId)functionName;
+
+      var customFunction = CustomFunction.Create(functionName, (int x) => x * 2, false); // Non-constant function
+      var overload = new CustomFunctionOverload(customFunction);
+      functions[functionId] = overload;
+
+      var node = new FunctionNode();
+      var rpn = CreateStack(new FakeIntegerNode(5)); // Constant parameter
+      var token = new Token(functionName, TokenType.Identifier);
+      var element = new Element(token, ElementType.Function);
+
+      node.Build(rpn, element, Compiler.Options.None, null, functions);
+
+      // Optimize should not fold non-constant functions
+      var optimized = node.Optimize();
+
+      Assert.Same(node, optimized); // Should return the same node
+    }
+
+    [Fact]
+    public void AST_Function_Optimize_WithNonConstantParameter_ReturnsSelf()
+    {
+      var functions = new Dictionary<VariableId, CustomFunctionOverload>();
+      var functionName = "double";
+      var functionId = (VariableId)functionName;
+
+      var customFunction = CustomFunction.Create(functionName, (int x) => x * 2, true); // Constant function
+      var overload = new CustomFunctionOverload(customFunction);
+      functions[functionId] = overload;
+
+      var node = new FunctionNode();
+      var rpn = CreateStack(new TestVariableNode()); // Non-constant parameter
+      var token = new Token(functionName, TokenType.Identifier);
+      var element = new Element(token, ElementType.Function);
+
+      node.Build(rpn, element, Compiler.Options.None, null, functions);
+
+      // Optimize should not fold if parameters are not constant
+      var optimized = node.Optimize();
+
+      Assert.Same(node, optimized); // Should return the same node
+    }
+
+    [Fact]
+    public void AST_Function_Optimize_WithConstantFloatFunction_ReturnsFloatNode()
+    {
+      var functions = new Dictionary<VariableId, CustomFunctionOverload>();
+      var functionName = "half";
+      var functionId = (VariableId)functionName;
+
+      var customFunction = CustomFunction.Create(functionName, (float x) => x / 2.0f, true); // Constant function
+      var overload = new CustomFunctionOverload(customFunction);
+      functions[functionId] = overload;
+
+      var node = new FunctionNode();
+      var rpn = CreateStack(new FakeFloatNode(10.0f)); // Constant parameter
+      var token = new Token(functionName, TokenType.Identifier);
+      var element = new Element(token, ElementType.Function);
+
+      node.Build(rpn, element, Compiler.Options.None, null, functions);
+
+      // Optimize should evaluate and return a float node
+      var optimized = node.Optimize();
+
+      Assert.IsType<FloatNode>(optimized);
+      Assert.Equal(5.0f, optimized.FloatValue, 6);
+    }
+
+    [Fact]
+    public void AST_Function_Optimize_WithConstantBooleanFunction_ReturnsBooleanNode()
+    {
+      var functions = new Dictionary<VariableId, CustomFunctionOverload>();
+      var functionName = "not";
+      var functionId = (VariableId)functionName;
+
+      var customFunction = CustomFunction.Create(functionName, (bool x) => !x, true); // Constant function
+      var overload = new CustomFunctionOverload(customFunction);
+      functions[functionId] = overload;
+
+      var node = new FunctionNode();
+      var rpn = CreateStack(new FakeBooleanNode(true)); // Constant parameter
+      var token = new Token(functionName, TokenType.Identifier);
+      var element = new Element(token, ElementType.Function);
+
+      node.Build(rpn, element, Compiler.Options.None, null, functions);
+
+      // Optimize should evaluate and return a boolean node
+      var optimized = node.Optimize();
+
+      Assert.IsType<BooleanNode>(optimized);
+      Assert.False(optimized.BooleanValue);
+    }
+
+    [Fact]
+    public void AST_Function_Optimize_WithConstantStringFunction_ReturnsStringNode()
+    {
+      var functions = new Dictionary<VariableId, CustomFunctionOverload>();
+      var functionName = "upper";
+      var functionId = (VariableId)functionName;
+
+      var customFunction = CustomFunction.Create(functionName, (string x) => x.ToUpperInvariant(), true); // Constant function
+      var overload = new CustomFunctionOverload(customFunction);
+      functions[functionId] = overload;
+
+      var node = new FunctionNode();
+      var rpn = CreateStack(new FakeStringNode("hello")); // Constant parameter
+      var token = new Token(functionName, TokenType.Identifier);
+      var element = new Element(token, ElementType.Function);
+
+      node.Build(rpn, element, Compiler.Options.None, null, functions);
+
+      // Optimize should evaluate and return a string node
+      var optimized = node.Optimize();
+
+      Assert.IsType<StringNode>(optimized);
+      Assert.Equal("HELLO", optimized.StringValue);
+    }
+
+    [Fact]
+    public void AST_Function_Optimize_WithMultipleParameters_EvaluatesCorrectly()
+    {
+      var functions = new Dictionary<VariableId, CustomFunctionOverload>();
+      var functionName = "add";
+      var functionId = (VariableId)functionName;
+
+      var customFunction = CustomFunction.Create(functionName, (int x, int y) => x + y, true); // Constant function
+      var overload = new CustomFunctionOverload(customFunction);
+      functions[functionId] = overload;
+
+      // Create tuple parameter node
+      var tupleNode = new TupleNode();
+      var tupleRpn = CreateStack(new FakeIntegerNode(3), new FakeIntegerNode(7));
+      var tupleElement = new Element(new Token(",", TokenType.Comma), ElementType.Comma);
+      tupleNode.Build(tupleRpn, tupleElement, Compiler.Options.None, null, null);
+
+      var node = new FunctionNode();
+      var rpn = CreateStack(tupleNode);
+      var token = new Token(functionName, TokenType.Identifier);
+      var element = new Element(token, ElementType.Function);
+
+      node.Build(rpn, element, Compiler.Options.None, null, functions);
+
+      // Optimize should evaluate and return an integer node
+      var optimized = node.Optimize();
+
+      Assert.IsType<IntegerNode>(optimized);
+      Assert.Equal(10, optimized.IntegerValue);
+    }
+
     // Helper class for testing non-constant parameters
     private class TestVariableNode : Node
     {

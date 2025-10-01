@@ -19,8 +19,10 @@
 - **Sign Operator Optimization Bug**: Fixed unary positive operator (`+expr`) returning unoptimized child node instead of optimized result
 - **Trailing Semicolon Support**: Trailing semicolons are now allowed and treated as no-op instead of throwing "Cannot find tokens to sequence" error
 - **Unity Compatibility**: Added conditional compilation support for Unity's `UnsafeUtility.As` API in `TypeTraits.cs`
+- **Constant Function Folding**: `FunctionNode.Optimize()` now evaluates constant functions with constant parameters at compile time
 
 ### Changed
+- Comparison operators `<=` and `>=` now use direct operations instead of `< || ==` and `> || ==`
 - **BREAKING CHANGE**: `IVariableContainer.TryGetValue()` now takes `VariableId` instead of `uint`
   - Existing implementations must be updated to use `VariableId` parameter
   - Most calling code continues to work due to implicit `uint` → `VariableId` conversion

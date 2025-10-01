@@ -148,5 +148,23 @@ namespace EpsilonScript.AST
           throw new ArgumentOutOfRangeException(nameof(ValueType), ValueType, "Unsupported function return type");
       }
     }
+
+    public override Node Optimize()
+    {
+      // Optimize child parameter nodes first
+      for (var i = 0; i < _parameters.Count; ++i)
+      {
+        _parameters[i] = _parameters[i].Optimize();
+      }
+
+      // If function is constant and all parameters are constant, evaluate at compile time
+      if (IsConstant)
+      {
+        Execute(null);
+        return CreateValueNode();
+      }
+
+      return this;
+    }
   }
 }
