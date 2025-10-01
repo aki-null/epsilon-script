@@ -4,6 +4,44 @@ EpsilonScript is an interpreter for evaluating simple expressions, written in C#
 
 It targets .NET Standard 2.0.
 
+## Showcase
+
+```c#
+// Setup: Add custom functions to access game state
+var compiler = new Compiler();
+compiler.AddCustomFunction(CustomFunction.Create("player_level", () => Player.Level));
+compiler.AddCustomFunction(CustomFunction.Create("has_item", (string item) => Inventory.Contains(item)));
+
+// Compile expressions once, execute many times with zero allocations
+var unlockCondition = compiler.Compile(
+    "player_level() >= 10 && has_item(\"ancient_key\")",
+    Compiler.Options.Immutable);
+
+// Execute instantly - perfect for real-time game logic
+unlockCondition.Execute();
+if (unlockCondition.BooleanValue)
+{
+    UnlockSecretArea();
+}
+
+// Dynamic damage calculation with variables
+var variables = new DictionaryVariableContainer
+{
+    ["base_damage"] = new VariableValue(50),
+    ["critical_multiplier"] = new VariableValue(1.5f)
+};
+
+var damageFormula = compiler.Compile(
+    "base_damage * critical_multiplier * (1.0 + player_level() / 100.0)",
+    Compiler.Options.Immutable,
+    variables);
+
+damageFormula.Execute();
+int damage = (int)damageFormula.FloatValue; // 82 at level 10
+```
+
+Game designers can write expressions directly. No compilation delays. Zero GC alloc after setup. Useful for conditions, formulas, and dynamic behavior.
+
 ## Table of Contents
 
 - [Features](#features)
