@@ -3,31 +3,31 @@
 ## [1.2.0] - 2025-09-29
 
 ### Added
-- **Boolean Short-Circuit Optimization**: Compile-time optimization for boolean expressions
 - **Period characters in identifiers**: Variable names and function names can now contain periods (e.g., `user.name`, `math.square()`)
 - **VariableId struct**: Strongly-typed variable identifier that replaces direct `uint` usage
   - Provides implicit conversions to/from `uint` and `string` for backwards compatibility
   - Maintains internal unique identifier mapping through extension methods
   - Improves type safety and encapsulates identifier management
+- **Boolean Short-Circuit Optimization**: Compile-time optimization for boolean expressions
+- String variable support with integer parsing
 - Support for `CustomFunction.Create` with zero-parameter functions that have return values (`Func<TResult>`)
 - `AddCustomFunctionRange(IEnumerable<CustomFunction> functions)` method for adding multiple custom functions at once
-- String variable support with integer parsing
 - Documentation clarification on function purity requirements
 
 ### Fixed
 - **AST Optimization Bug**: Fixed `Compiler.cs` optimization pipeline where `rootNode.Optimize()` result was being discarded instead of captured, causing some AST optimizations to be ignored
-- **Sign Operator Optimization Bug**: Fixed unary positive operator (`+expr`) returning unoptimized child node instead of optimized result
-- **Trailing Semicolon Support**: Trailing semicolons are now allowed and treated as no-op instead of throwing "Cannot find tokens to sequence" error
 - **Unity Compatibility**: Added conditional compilation support for Unity's `UnsafeUtility.As` API in `TypeTraits.cs`
 - **Constant Function Folding**: `FunctionNode.Optimize()` now evaluates constant functions with constant parameters at compile time
+- **Sign Operator Optimization Bug**: Fixed unary positive operator (`+expr`) returning unoptimized child node instead of optimized result
+- **Trailing Semicolon Support**: Trailing semicolons are now allowed and treated as no-op instead of throwing "Cannot find tokens to sequence" error
 
 ### Changed
-- Comparison operators `<=` and `>=` now use direct operations instead of `< || ==` and `> || ==`
 - **BREAKING CHANGE**: `IVariableContainer.TryGetValue()` now takes `VariableId` instead of `uint`
   - Existing implementations must be updated to use `VariableId` parameter
   - Most calling code continues to work due to implicit `uint` → `VariableId` conversion
-- Internal function dictionaries now use `VariableId` keys instead of `uint`
 - AST Node `Build()` method signatures updated to use `IDictionary<VariableId, CustomFunctionOverload>`
+- Internal function dictionaries now use `VariableId` keys instead of `uint`
+- Comparison operators `<=` and `>=` now use direct operations instead of `< || ==` and `> || ==`
 - Eliminated direct calls to `GetUniqueIdentifier()` and `GetStringFromUniqueIdentifier()` in favor of VariableId implicit conversions
 
 ### Migration Guide
