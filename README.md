@@ -17,7 +17,7 @@ var unlockCondition = compiler.Compile(
     "player_level() >= 10 && has_item(\"ancient_key\")",
     Compiler.Options.Immutable);
 
-// Execute instantly - perfect for real-time game logic
+// Execute expression
 unlockCondition.Execute();
 if (unlockCondition.BooleanValue)
 {
@@ -40,7 +40,10 @@ damageFormula.Execute();
 int damage = (int)damageFormula.FloatValue; // 82 at level 10
 ```
 
-Game designers can write expressions directly. No compilation delays. Zero GC alloc after setup. Useful for conditions, formulas, and dynamic behavior.
+- Game designers can write expressions directly
+- No compilation delays
+- Zero GC alloc after setup
+- Useful for conditions, formulas, and dynamic behavior
 
 ## Table of Contents
 
