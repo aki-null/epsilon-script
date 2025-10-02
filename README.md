@@ -45,6 +45,8 @@ int damage = (int)damageFormula.FloatValue; // 82 at level 10
 ## Table of Contents
 
 - [Features](#features)
+- [Installation](#installation)
+  - [Unity](#unity)
 - [Project State](#project-state)
 - [Samples](#samples)
   - [Arithmetic](#arithmetic)
@@ -64,6 +66,27 @@ int damage = (int)damageFormula.FloatValue; // 82 at level 10
 - Intentionally simple syntax
 - Unity support
 - No heap allocation after compilation (with exceptions)
+
+## Installation
+
+### Unity
+
+Add the package via Unity Package Manager:
+
+1. Open **Window > Package Manager**
+2. Click the **+** button in the top-left corner
+3. Select **Add package from git URL**
+4. Enter: `https://github.com/aki-null/epsilon-script-unity.git`
+
+Alternatively, add it to your `Packages/manifest.json`:
+
+```json
+{
+  "dependencies": {
+    "com.akinull.epsilonscript": "https://github.com/aki-null/epsilon-script-unity.git"
+  }
+}
+```
 
 ## Project State
 All features should be stable for production use.
