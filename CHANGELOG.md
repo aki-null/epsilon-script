@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.2.1] - 2025-10-02
+
+This is a maintenance purpose release for Unity package. No change to a program has been made.
+
 ## [1.2.0] - 2025-10-01
 
 ### Added
