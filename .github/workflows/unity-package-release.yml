@@ -1,0 +1,140 @@
+name: Sync Unity Package
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  sync-unity-package:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Extract version from tag
+        id: version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+
+      - name: Checkout unity package repo
+        uses: actions/checkout@v4
+        with:
+          repository: aki-null/epsilon-script-unity
+          token: ${{ secrets.UNITY_PACKAGE_PAT }}
+          path: unity-package
+
+      - name: Sync source files
+        run: |
+          # Remove old source files but keep .meta files
+          find unity-package/Runtime -type f ! -name '*.meta' ! -name '*.asmdef' -delete
+
+          # Copy new source files
+          rsync -av --exclude='bin' --exclude='obj' --exclude='*.csproj' --exclude='.DS_Store' \
+            EpsilonScript/ unity-package/Runtime/
+
+      - name: Update package.json
+        run: |
+          cd unity-package
+          # Install jq if needed
+          if ! command -v jq &> /dev/null; then
+            sudo apt-get update && sudo apt-get install -y jq
+          fi
+          jq --arg version "${{ steps.version.outputs.VERSION }}" \
+             '.version = $version' package.json > package.json.tmp
+          mv package.json.tmp package.json
+
+      - name: Copy documentation
+        run: |
+          cp CHANGELOG.md unity-package/CHANGELOG.md
+          cp LICENSE.txt unity-package/LICENSE.txt
+
+      - name: Detect new files needing .meta
+        id: check_meta
+        run: |
+          cd unity-package
+          NEW_FILES=""
+          NEW_DIRS=""
+
+          # Check for files without .meta
+          while IFS= read -r file; do
+            if [ ! -f "$file.meta" ]; then
+              NEW_FILES="${NEW_FILES}${file}"$'\n'
+            fi
+          done < <(find Runtime -type f ! -name '*.meta' ! -path '*/.*')
+
+          # Check for directories without .meta
+          while IFS= read -r dir; do
+            if [ ! -f "$dir.meta" ]; then
+              NEW_DIRS="${NEW_DIRS}${dir}"$'\n'
+            fi
+          done < <(find Runtime -type d ! -path '*/.*' ! -path 'Runtime')
+
+          if [ -n "$NEW_FILES" ] || [ -n "$NEW_DIRS" ]; then
+            echo "NEW_FILES<<EOF" >> $GITHUB_OUTPUT
+            echo "$NEW_FILES" >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
+            echo "NEW_DIRS<<EOF" >> $GITHUB_OUTPUT
+            echo "$NEW_DIRS" >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
+            echo "has_new=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_new=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Generate .meta for new files
+        if: steps.check_meta.outputs.has_new == 'true'
+        run: |
+          cd unity-package
+
+          # Generate GUIDs using Python (more reliable than uuidgen)
+          generate_guid() {
+            python3 -c "import uuid; print(uuid.uuid4().hex)"
+          }
+
+          # Generate .meta for new directories
+          while IFS= read -r dir; do
+            [ -z "$dir" ] && continue
+            guid=$(generate_guid)
+            cat > "$dir.meta" <<EOF
+          fileFormatVersion: 2
+          guid: $guid
+          folderAsset: yes
+          DefaultImporter:
+            externalObjects: {}
+            userData: 
+            assetBundleName: 
+            assetBundleVariant: 
+          EOF
+          done <<< "${{ steps.check_meta.outputs.NEW_DIRS }}"
+
+          # Generate .meta for new files
+          while IFS= read -r file; do
+            [ -z "$file" ] && continue
+            guid=$(generate_guid)
+            cat > "$file.meta" <<EOF
+          fileFormatVersion: 2
+          guid: $guid
+          MonoImporter:
+            externalObjects: {}
+            serializedVersion: 2
+            defaultReferences: []
+            executionOrder: 0
+            icon: {instanceID: 0}
+            userData: 
+            assetBundleName: 
+            assetBundleVariant: 
+          EOF
+          done <<< "${{ steps.check_meta.outputs.NEW_FILES }}"
+
+      - name: Commit and push
+        run: |
+          cd unity-package
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add .
+          git commit -m "Sync with epsilon-script v${{ steps.version.outputs.VERSION }}" || exit 0
+          git tag "v${{ steps.version.outputs.VERSION }}"
+          git push origin main
+          git push origin "v${{ steps.version.outputs.VERSION }}"
