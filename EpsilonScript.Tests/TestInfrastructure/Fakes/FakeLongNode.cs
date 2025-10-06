@@ -1,26 +1,24 @@
+using System;
 using System.Collections.Generic;
+using EpsilonScript.AST;
 using EpsilonScript.Function;
 using EpsilonScript.Intermediate;
+using ValueType = EpsilonScript.AST.ValueType;
 
-namespace EpsilonScript.AST
+namespace EpsilonScript.Tests.TestInfrastructure.Fakes
 {
-  public class StringNode : Node
+  public class FakeLongNode : Node
   {
-    public StringNode()
+    public FakeLongNode(long value)
     {
-    }
-
-    public StringNode(string value)
-    {
-      StringValue = value;
+      LongValue = value;
     }
 
     public override void Build(Stack<Node> rpnStack, Element element, Compiler.Options options,
       IVariableContainer variables, IDictionary<VariableId, CustomFunctionOverload> functions,
       Compiler.IntegerPrecision intPrecision, Compiler.FloatPrecision floatPrecision)
     {
-      var span = element.Token.Text;
-      StringValue = span.Slice(1, span.Length - 2).ToString();
+      throw new NotImplementedException("Fake nodes cannot be built from RPN stack");
     }
   }
 }

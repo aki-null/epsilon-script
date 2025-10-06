@@ -11,12 +11,15 @@ namespace EpsilonScript.AST
     private Node _rightNode;
     private ElementType _comparisonType;
     private ValueType _comparisonValueType;
+    private ValueType _configuredIntegerType;
+    private ValueType _configuredFloatType;
 
     public override bool IsConstant => _leftNode.IsConstant && _rightNode.IsConstant;
 
     public override void Build(Stack<Node> rpnStack, Element element, Compiler.Options options,
       IVariableContainer variables,
-      IDictionary<VariableId, CustomFunctionOverload> functions)
+      IDictionary<VariableId, CustomFunctionOverload> functions,
+      Compiler.IntegerPrecision intPrecision, Compiler.FloatPrecision floatPrecision)
     {
       ValueType = ValueType.Boolean;
       _comparisonType = element.Type;
@@ -25,80 +28,34 @@ namespace EpsilonScript.AST
       {
         throw new ParserException(element.Token, "Cannot find values to perform comparison operation on");
       }
+
+      // Store configured types for optimized type promotion
+      _configuredIntegerType = intPrecision == Compiler.IntegerPrecision.Integer
+        ? ValueType.Integer
+        : ValueType.Long;
+      _configuredFloatType = floatPrecision switch
+      {
+        Compiler.FloatPrecision.Float => ValueType.Float,
+        Compiler.FloatPrecision.Double => ValueType.Double,
+        Compiler.FloatPrecision.Decimal => ValueType.Decimal,
+        _ => ValueType.Float
+      };
     }
 
-    private bool EqualTo()
+    private ValueType PromoteType(ValueType left, ValueType right)
     {
-      switch (_comparisonValueType)
-      {
-        case ValueType.Integer:
-          return _leftNode.IntegerValue == _rightNode.IntegerValue;
-        case ValueType.Float:
-          return Math.IsNearlyEqual(_leftNode.FloatValue, _rightNode.FloatValue);
-        case ValueType.Boolean:
-          return _leftNode.BooleanValue == _rightNode.BooleanValue;
-        case ValueType.String:
-          return string.Equals(_leftNode.StringValue, _rightNode.StringValue, StringComparison.Ordinal);
-        default:
-          throw new ArgumentOutOfRangeException(nameof(_comparisonValueType), _comparisonValueType,
-            "Unsupported comparison value type");
-      }
-    }
+      if (left == ValueType.String || right == ValueType.String)
+        return ValueType.String;
 
-    private bool LessThan()
-    {
-      switch (_comparisonValueType)
-      {
-        case ValueType.Integer:
-          return _leftNode.IntegerValue < _rightNode.IntegerValue;
-        case ValueType.Float:
-          return _leftNode.FloatValue < _rightNode.FloatValue;
-        default:
-          throw new ArgumentOutOfRangeException(nameof(_comparisonValueType), _comparisonValueType,
-            "Unsupported comparison value type");
-      }
-    }
+      if (left == ValueType.Boolean || right == ValueType.Boolean)
+        return ValueType.Boolean;
 
-    private bool LessThanOrEqualTo()
-    {
-      switch (_comparisonValueType)
-      {
-        case ValueType.Integer:
-          return _leftNode.IntegerValue <= _rightNode.IntegerValue;
-        case ValueType.Float:
-          return _leftNode.FloatValue <= _rightNode.FloatValue;
-        default:
-          throw new ArgumentOutOfRangeException(nameof(_comparisonValueType), _comparisonValueType,
-            "Unsupported comparison value type");
-      }
-    }
+      // Since precision is fixed per compiler, only two numeric types exist:
+      // the configured integer type and the configured float type
+      if (left == _configuredFloatType || right == _configuredFloatType)
+        return _configuredFloatType;
 
-    private bool GreaterThan()
-    {
-      switch (_comparisonValueType)
-      {
-        case ValueType.Integer:
-          return _leftNode.IntegerValue > _rightNode.IntegerValue;
-        case ValueType.Float:
-          return _leftNode.FloatValue > _rightNode.FloatValue;
-        default:
-          throw new ArgumentOutOfRangeException(nameof(_comparisonValueType), _comparisonValueType,
-            "Unsupported comparison value type");
-      }
-    }
-
-    private bool GreaterThanOrEqualTo()
-    {
-      switch (_comparisonValueType)
-      {
-        case ValueType.Integer:
-          return _leftNode.IntegerValue >= _rightNode.IntegerValue;
-        case ValueType.Float:
-          return _leftNode.FloatValue >= _rightNode.FloatValue;
-        default:
-          throw new ArgumentOutOfRangeException(nameof(_comparisonValueType), _comparisonValueType,
-            "Unsupported comparison value type");
-      }
+      return _configuredIntegerType;
     }
 
     public override void Execute(IVariableContainer variablesOverride)
@@ -132,55 +89,99 @@ namespace EpsilonScript.AST
             "Unsupported comparision type");
       }
 
-      if (_leftNode.ValueType == ValueType.String)
+      if (_leftNode.ValueType == ValueType.String && _rightNode.ValueType != ValueType.String)
       {
-        if (_rightNode.ValueType != ValueType.String)
-        {
-          throw new RuntimeException("String can only be compared against a string");
-        }
-
-        _comparisonValueType = ValueType.String;
-      }
-      else if (_leftNode.ValueType == ValueType.Boolean)
-      {
-        _comparisonValueType = ValueType.Boolean;
-      }
-      else if (_leftNode.ValueType == ValueType.Float || _rightNode.ValueType == ValueType.Float)
-      {
-        _comparisonValueType = ValueType.Float;
-      }
-      else
-      {
-        _comparisonValueType = ValueType.Integer;
+        throw new RuntimeException("String can only be compared against a string");
       }
 
-      switch (_comparisonType)
-      {
-        case ElementType.ComparisonEqual:
-          BooleanValue = EqualTo();
-          break;
-        case ElementType.ComparisonNotEqual:
-          BooleanValue = !EqualTo();
-          break;
-        case ElementType.ComparisonLessThan:
-          BooleanValue = LessThan();
-          break;
-        case ElementType.ComparisonGreaterThan:
-          BooleanValue = GreaterThan();
-          break;
-        case ElementType.ComparisonLessThanOrEqualTo:
-          BooleanValue = LessThanOrEqualTo();
-          break;
-        case ElementType.ComparisonGreaterThanOrEqualTo:
-          BooleanValue = GreaterThanOrEqualTo();
-          break;
-        default:
-          throw new ArgumentOutOfRangeException(nameof(_comparisonType), _comparisonType,
-            "Unsupported comparison type");
-      }
+      _comparisonValueType = PromoteType(_leftNode.ValueType, _rightNode.ValueType);
 
-      IntegerValue = BooleanValue ? 1 : 0;
-      FloatValue = IntegerValue;
+      BooleanValue = (_comparisonType, _comparisonValueType) switch
+      {
+        // Equal comparisons
+        (ElementType.ComparisonEqual, ValueType.Integer) =>
+          _leftNode.IntegerValue == _rightNode.IntegerValue,
+        (ElementType.ComparisonEqual, ValueType.Long) =>
+          _leftNode.LongValue == _rightNode.LongValue,
+        (ElementType.ComparisonEqual, ValueType.Float) =>
+          Math.IsNearlyEqual(_leftNode.FloatValue, _rightNode.FloatValue),
+        (ElementType.ComparisonEqual, ValueType.Double) =>
+          Math.IsNearlyEqual(_leftNode.DoubleValue, _rightNode.DoubleValue),
+        (ElementType.ComparisonEqual, ValueType.Decimal) =>
+          _leftNode.DecimalValue == _rightNode.DecimalValue,
+        (ElementType.ComparisonEqual, ValueType.Boolean) =>
+          _leftNode.BooleanValue == _rightNode.BooleanValue,
+        (ElementType.ComparisonEqual, ValueType.String) =>
+          string.Equals(_leftNode.StringValue, _rightNode.StringValue, StringComparison.Ordinal),
+
+        // Not equal comparisons
+        (ElementType.ComparisonNotEqual, ValueType.Integer) =>
+          _leftNode.IntegerValue != _rightNode.IntegerValue,
+        (ElementType.ComparisonNotEqual, ValueType.Long) =>
+          _leftNode.LongValue != _rightNode.LongValue,
+        (ElementType.ComparisonNotEqual, ValueType.Float) =>
+          !Math.IsNearlyEqual(_leftNode.FloatValue, _rightNode.FloatValue),
+        (ElementType.ComparisonNotEqual, ValueType.Double) =>
+          !Math.IsNearlyEqual(_leftNode.DoubleValue, _rightNode.DoubleValue),
+        (ElementType.ComparisonNotEqual, ValueType.Decimal) =>
+          _leftNode.DecimalValue != _rightNode.DecimalValue,
+        (ElementType.ComparisonNotEqual, ValueType.Boolean) =>
+          _leftNode.BooleanValue != _rightNode.BooleanValue,
+        (ElementType.ComparisonNotEqual, ValueType.String) =>
+          !string.Equals(_leftNode.StringValue, _rightNode.StringValue, StringComparison.Ordinal),
+
+        // Less than comparisons
+        (ElementType.ComparisonLessThan, ValueType.Integer) =>
+          _leftNode.IntegerValue < _rightNode.IntegerValue,
+        (ElementType.ComparisonLessThan, ValueType.Long) =>
+          _leftNode.LongValue < _rightNode.LongValue,
+        (ElementType.ComparisonLessThan, ValueType.Float) =>
+          _leftNode.FloatValue < _rightNode.FloatValue,
+        (ElementType.ComparisonLessThan, ValueType.Double) =>
+          _leftNode.DoubleValue < _rightNode.DoubleValue,
+        (ElementType.ComparisonLessThan, ValueType.Decimal) =>
+          _leftNode.DecimalValue < _rightNode.DecimalValue,
+
+        // Less than or equal comparisons
+        (ElementType.ComparisonLessThanOrEqualTo, ValueType.Integer) =>
+          _leftNode.IntegerValue <= _rightNode.IntegerValue,
+        (ElementType.ComparisonLessThanOrEqualTo, ValueType.Long) =>
+          _leftNode.LongValue <= _rightNode.LongValue,
+        (ElementType.ComparisonLessThanOrEqualTo, ValueType.Float) =>
+          _leftNode.FloatValue <= _rightNode.FloatValue,
+        (ElementType.ComparisonLessThanOrEqualTo, ValueType.Double) =>
+          _leftNode.DoubleValue <= _rightNode.DoubleValue,
+        (ElementType.ComparisonLessThanOrEqualTo, ValueType.Decimal) =>
+          _leftNode.DecimalValue <= _rightNode.DecimalValue,
+
+        // Greater than comparisons
+        (ElementType.ComparisonGreaterThan, ValueType.Integer) =>
+          _leftNode.IntegerValue > _rightNode.IntegerValue,
+        (ElementType.ComparisonGreaterThan, ValueType.Long) =>
+          _leftNode.LongValue > _rightNode.LongValue,
+        (ElementType.ComparisonGreaterThan, ValueType.Float) =>
+          _leftNode.FloatValue > _rightNode.FloatValue,
+        (ElementType.ComparisonGreaterThan, ValueType.Double) =>
+          _leftNode.DoubleValue > _rightNode.DoubleValue,
+        (ElementType.ComparisonGreaterThan, ValueType.Decimal) =>
+          _leftNode.DecimalValue > _rightNode.DecimalValue,
+
+        // Greater than or equal comparisons
+        (ElementType.ComparisonGreaterThanOrEqualTo, ValueType.Integer) =>
+          _leftNode.IntegerValue >= _rightNode.IntegerValue,
+        (ElementType.ComparisonGreaterThanOrEqualTo, ValueType.Long) =>
+          _leftNode.LongValue >= _rightNode.LongValue,
+        (ElementType.ComparisonGreaterThanOrEqualTo, ValueType.Float) =>
+          _leftNode.FloatValue >= _rightNode.FloatValue,
+        (ElementType.ComparisonGreaterThanOrEqualTo, ValueType.Double) =>
+          _leftNode.DoubleValue >= _rightNode.DoubleValue,
+        (ElementType.ComparisonGreaterThanOrEqualTo, ValueType.Decimal) =>
+          _leftNode.DecimalValue >= _rightNode.DecimalValue,
+
+        _ => throw new ArgumentOutOfRangeException(
+          nameof(_comparisonType),
+          $"Unsupported comparison: {_comparisonType} on {_comparisonValueType}")
+      };
     }
 
     public override Node Optimize()

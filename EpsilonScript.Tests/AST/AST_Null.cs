@@ -16,7 +16,8 @@ namespace EpsilonScript.Tests.AST
       var rpn = CreateStack();
       var element = new Element(new Token("null", TokenType.Identifier), ElementType.None);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null);
+      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
+        Compiler.FloatPrecision.Float);
 
       Assert.Equal(ValueType.Null, node.ValueType);
     }
@@ -36,7 +37,8 @@ namespace EpsilonScript.Tests.AST
       var rpn = CreateStack();
       var element = new Element(new Token("null", TokenType.Identifier), ElementType.None);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null);
+      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
+        Compiler.FloatPrecision.Float);
 
       // Execute should not throw or change anything
       node.Execute(null);
@@ -53,7 +55,7 @@ namespace EpsilonScript.Tests.AST
       var rpn = CreateStack();
       var element = new Element(new Token("null", TokenType.Identifier), ElementType.None);
 
-      node.Build(rpn, element, options, null, null);
+      node.Build(rpn, element, options, null, null, Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float);
       node.Execute(null);
 
       Assert.Equal(ValueType.Null, node.ValueType);
@@ -66,7 +68,8 @@ namespace EpsilonScript.Tests.AST
       var rpn = CreateStack();
       var element = new Element(new Token("null", TokenType.Identifier), ElementType.None);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null);
+      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
+        Compiler.FloatPrecision.Float);
 
       var optimizedNode = node.Optimize();
 
@@ -83,7 +86,8 @@ namespace EpsilonScript.Tests.AST
       var element = new Element(new Token("null", TokenType.Identifier), ElementType.None);
 
       // Should not throw an exception
-      node.Build(rpn, element, Compiler.Options.None, null, null);
+      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
+        Compiler.FloatPrecision.Float);
 
       Assert.Equal(ValueType.Null, node.ValueType);
     }
@@ -96,7 +100,8 @@ namespace EpsilonScript.Tests.AST
       var element = new Element(new Token("null", TokenType.Identifier), ElementType.None);
 
       // Should not consume from stack or throw an exception
-      node.Build(rpn, element, Compiler.Options.None, null, null);
+      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
+        Compiler.FloatPrecision.Float);
 
       Assert.Equal(ValueType.Null, node.ValueType);
       // Stack should still contain the integer node since null doesn't consume it
@@ -111,7 +116,8 @@ namespace EpsilonScript.Tests.AST
       var rpn = CreateStack();
       var element = new Element(new Token("null", TokenType.Identifier), ElementType.None);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null);
+      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
+        Compiler.FloatPrecision.Float);
 
       Assert.Equal(ValueType.Null, node.ValueType);
       Assert.Equal(0, node.IntegerValue);
@@ -129,7 +135,8 @@ namespace EpsilonScript.Tests.AST
       var rpn = CreateStack();
       var element = new Element(new Token("null", TokenType.Identifier), ElementType.None);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null);
+      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
+        Compiler.FloatPrecision.Float);
 
       // Execute multiple times
       node.Execute(null);
@@ -147,7 +154,8 @@ namespace EpsilonScript.Tests.AST
       var rpn = CreateStack();
       var element = new Element(new Token("null", TokenType.Identifier), ElementType.None);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null);
+      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
+        Compiler.FloatPrecision.Float);
       node.Execute(null); // null variable container should be fine
 
       Assert.Equal(ValueType.Null, node.ValueType);

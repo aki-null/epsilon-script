@@ -19,7 +19,8 @@ namespace EpsilonScript.Tests.AST
       var rpn = CreateStack(new FakeIntegerNode(5), new FakeIntegerNode(10));
       var element = new Element(new Token(",", TokenType.Comma), ElementType.Comma);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null);
+      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
+        Compiler.FloatPrecision.Float);
 
       Assert.Equal(ValueType.Tuple, node.ValueType);
       Assert.NotNull(node.TupleValue);
@@ -35,7 +36,8 @@ namespace EpsilonScript.Tests.AST
       var rpn = CreateStack(new FakeIntegerNode(42), new FakeFloatNode(3.14f));
       var element = new Element(new Token(",", TokenType.Comma), ElementType.Comma);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null);
+      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
+        Compiler.FloatPrecision.Float);
       node.Execute(null);
 
       Assert.Equal(ValueType.Tuple, node.ValueType);
@@ -51,13 +53,15 @@ namespace EpsilonScript.Tests.AST
       var innerTuple = new TupleNode();
       var innerRpn = CreateStack(new FakeIntegerNode(1), new FakeIntegerNode(2));
       var innerElement = new Element(new Token(",", TokenType.Comma), ElementType.Comma);
-      innerTuple.Build(innerRpn, innerElement, Compiler.Options.None, null, null);
+      innerTuple.Build(innerRpn, innerElement, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
+        Compiler.FloatPrecision.Float);
 
       // Create outer tuple ((1, 2), 3) which should unfold to (1, 2, 3)
       var outerTuple = new TupleNode();
       var outerRpn = CreateStack(innerTuple, new FakeIntegerNode(3));
       var outerElement = new Element(new Token(",", TokenType.Comma), ElementType.Comma);
-      outerTuple.Build(outerRpn, outerElement, Compiler.Options.None, null, null);
+      outerTuple.Build(outerRpn, outerElement, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
+        Compiler.FloatPrecision.Float);
       outerTuple.Execute(null);
 
       Assert.Equal(ValueType.Tuple, outerTuple.ValueType);
@@ -74,13 +78,15 @@ namespace EpsilonScript.Tests.AST
       var rightTuple = new TupleNode();
       var rightRpn = CreateStack(new FakeIntegerNode(2), new FakeIntegerNode(3));
       var rightElement = new Element(new Token(",", TokenType.Comma), ElementType.Comma);
-      rightTuple.Build(rightRpn, rightElement, Compiler.Options.None, null, null);
+      rightTuple.Build(rightRpn, rightElement, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
+        Compiler.FloatPrecision.Float);
 
       // Create outer tuple (1, (2, 3)) - right side is not unfolded
       var outerTuple = new TupleNode();
       var outerRpn = CreateStack(new FakeIntegerNode(1), rightTuple);
       var outerElement = new Element(new Token(",", TokenType.Comma), ElementType.Comma);
-      outerTuple.Build(outerRpn, outerElement, Compiler.Options.None, null, null);
+      outerTuple.Build(outerRpn, outerElement, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
+        Compiler.FloatPrecision.Float);
       outerTuple.Execute(null);
 
       Assert.Equal(ValueType.Tuple, outerTuple.ValueType);
@@ -99,7 +105,8 @@ namespace EpsilonScript.Tests.AST
       var rpn = CreateStack(leftNode, rightNode);
       var element = new Element(new Token(",", TokenType.Comma), ElementType.Comma);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null);
+      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
+        Compiler.FloatPrecision.Float);
       node.Execute(null);
 
       Assert.True(leftNode.WasExecuted);
@@ -114,7 +121,8 @@ namespace EpsilonScript.Tests.AST
       var element = new Element(new Token(",", TokenType.Comma), ElementType.Comma);
 
       var exception = Assert.Throws<ParserException>(() =>
-        node.Build(rpn, element, Compiler.Options.None, null, null));
+        node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
+          Compiler.FloatPrecision.Float));
 
       Assert.Contains("Cannot find values to create parameter list", exception.Message);
     }
@@ -126,7 +134,8 @@ namespace EpsilonScript.Tests.AST
       var rpn = CreateStack(new FakeIntegerNode(5), new FakeIntegerNode(10)); // Both constant
       var element = new Element(new Token(",", TokenType.Comma), ElementType.Comma);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null);
+      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
+        Compiler.FloatPrecision.Float);
 
       Assert.True(node.IsConstant); // All children are constant
     }
@@ -138,7 +147,8 @@ namespace EpsilonScript.Tests.AST
       var rpn = CreateStack(new TestVariableNode(), new FakeIntegerNode(10)); // Left is variable
       var element = new Element(new Token(",", TokenType.Comma), ElementType.Comma);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null);
+      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
+        Compiler.FloatPrecision.Float);
 
       Assert.False(node.IsConstant); // One child is not constant
     }
@@ -153,7 +163,8 @@ namespace EpsilonScript.Tests.AST
       var rpn = CreateStack(leftNode, rightNode);
       var element = new Element(new Token(",", TokenType.Comma), ElementType.Comma);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null);
+      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
+        Compiler.FloatPrecision.Float);
 
       var optimizedNode = node.Optimize();
 
@@ -171,7 +182,7 @@ namespace EpsilonScript.Tests.AST
       var rpn = CreateStack(new FakeIntegerNode(1), new FakeIntegerNode(2));
       var element = new Element(new Token(",", TokenType.Comma), ElementType.Comma);
 
-      node.Build(rpn, element, options, null, null);
+      node.Build(rpn, element, options, null, null, Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float);
       node.Execute(null);
 
       Assert.Equal(ValueType.Tuple, node.ValueType);
@@ -185,13 +196,15 @@ namespace EpsilonScript.Tests.AST
       var firstTuple = new TupleNode();
       var firstRpn = CreateStack(new FakeIntegerNode(1), new FakeIntegerNode(2));
       var firstElement = new Element(new Token(",", TokenType.Comma), ElementType.Comma);
-      firstTuple.Build(firstRpn, firstElement, Compiler.Options.None, null, null);
+      firstTuple.Build(firstRpn, firstElement, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
+        Compiler.FloatPrecision.Float);
 
       // Create ((1, 2), 3) which unfolds to (1, 2, 3)
       var finalTuple = new TupleNode();
       var finalRpn = CreateStack(firstTuple, new FakeIntegerNode(3));
       var finalElement = new Element(new Token(",", TokenType.Comma), ElementType.Comma);
-      finalTuple.Build(finalRpn, finalElement, Compiler.Options.None, null, null);
+      finalTuple.Build(finalRpn, finalElement, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
+        Compiler.FloatPrecision.Float);
       finalTuple.Execute(null);
 
       Assert.Equal(ValueType.Tuple, finalTuple.ValueType);
@@ -219,7 +232,8 @@ namespace EpsilonScript.Tests.AST
       var rpn = CreateStack(leftNode, new FakeIntegerNode(2));
       var element = new Element(new Token(",", TokenType.Comma), ElementType.Comma);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null);
+      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
+        Compiler.FloatPrecision.Float);
       node.Execute(null);
 
       Assert.Equal(ValueType.Tuple, node.ValueType);
@@ -237,14 +251,12 @@ namespace EpsilonScript.Tests.AST
       public TrackingIntegerNode(int value)
       {
         _value = value;
-        ValueType = ValueType.Integer;
         IntegerValue = value;
-        FloatValue = value;
-        BooleanValue = value != 0;
       }
 
       public override void Build(Stack<Node> rpnStack, Element element, Compiler.Options options,
-        IVariableContainer variables, IDictionary<VariableId, CustomFunctionOverload> functions)
+        IVariableContainer variables, IDictionary<VariableId, CustomFunctionOverload> functions,
+        Compiler.IntegerPrecision intPrecision, Compiler.FloatPrecision floatPrecision)
       {
         throw new NotImplementedException("Test node should not be built from RPN");
       }
@@ -268,7 +280,8 @@ namespace EpsilonScript.Tests.AST
       }
 
       public override void Build(Stack<Node> rpnStack, Element element, Compiler.Options options,
-        IVariableContainer variables, IDictionary<VariableId, CustomFunctionOverload> functions)
+        IVariableContainer variables, IDictionary<VariableId, CustomFunctionOverload> functions,
+        Compiler.IntegerPrecision intPrecision, Compiler.FloatPrecision floatPrecision)
       {
         throw new NotImplementedException("Test node should not be built from RPN");
       }
@@ -296,7 +309,8 @@ namespace EpsilonScript.Tests.AST
       }
 
       public override void Build(Stack<Node> rpnStack, Element element, Compiler.Options options,
-        IVariableContainer variables, IDictionary<VariableId, CustomFunctionOverload> functions)
+        IVariableContainer variables, IDictionary<VariableId, CustomFunctionOverload> functions,
+        Compiler.IntegerPrecision intPrecision, Compiler.FloatPrecision floatPrecision)
       {
         throw new NotImplementedException("Test node should not be built from RPN");
       }

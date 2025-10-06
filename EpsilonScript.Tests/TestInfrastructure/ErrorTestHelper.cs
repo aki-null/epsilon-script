@@ -45,7 +45,8 @@ namespace EpsilonScript.Tests.TestInfrastructure
       where TException : Exception
     {
       var exception = Assert.Throws<TException>(() =>
-        node.Build(rpnStack, element, options, variables, functions));
+        node.Build(rpnStack, element, options, variables, functions, Compiler.IntegerPrecision.Integer,
+          Compiler.FloatPrecision.Float));
 
       if (!string.IsNullOrEmpty(expectedMessageFragment))
       {

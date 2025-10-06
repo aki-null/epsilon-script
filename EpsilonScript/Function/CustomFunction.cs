@@ -48,9 +48,24 @@ namespace EpsilonScript.Function
       throw new InvalidOperationException("Function does not return integer");
     }
 
+    public virtual long ExecuteLong(List<Node> parameters)
+    {
+      throw new InvalidOperationException("Function does not return long");
+    }
+
     public virtual float ExecuteFloat(List<Node> parameters)
     {
       throw new InvalidOperationException("Function does not return float");
+    }
+
+    public virtual double ExecuteDouble(List<Node> parameters)
+    {
+      throw new InvalidOperationException("Function does not return double");
+    }
+
+    public virtual decimal ExecuteDecimal(List<Node> parameters)
+    {
+      throw new InvalidOperationException("Function does not return decimal");
     }
 
     public virtual string ExecuteString(List<Node> parameters)
@@ -120,10 +135,28 @@ namespace EpsilonScript.Function
       return TypeTraits<TResult>.ToInt(Invoke(parameters));
     }
 
+    public override long ExecuteLong(List<Node> parameters)
+    {
+      EnsureReturnType(Type.Long);
+      return TypeTraits<TResult>.ToLong(Invoke(parameters));
+    }
+
     public override float ExecuteFloat(List<Node> parameters)
     {
       EnsureReturnType(Type.Float);
       return TypeTraits<TResult>.ToFloat(Invoke(parameters));
+    }
+
+    public override double ExecuteDouble(List<Node> parameters)
+    {
+      EnsureReturnType(Type.Double);
+      return TypeTraits<TResult>.ToDouble(Invoke(parameters));
+    }
+
+    public override decimal ExecuteDecimal(List<Node> parameters)
+    {
+      EnsureReturnType(Type.Decimal);
+      return TypeTraits<TResult>.ToDecimal(Invoke(parameters));
     }
 
     public override string ExecuteString(List<Node> parameters)
@@ -162,10 +195,28 @@ namespace EpsilonScript.Function
       return TypeTraits<TResult>.ToInt(Invoke(parameters));
     }
 
+    public override long ExecuteLong(List<Node> parameters)
+    {
+      EnsureReturnType(Type.Long);
+      return TypeTraits<TResult>.ToLong(Invoke(parameters));
+    }
+
     public override float ExecuteFloat(List<Node> parameters)
     {
       EnsureReturnType(Type.Float);
       return TypeTraits<TResult>.ToFloat(Invoke(parameters));
+    }
+
+    public override double ExecuteDouble(List<Node> parameters)
+    {
+      EnsureReturnType(Type.Double);
+      return TypeTraits<TResult>.ToDouble(Invoke(parameters));
+    }
+
+    public override decimal ExecuteDecimal(List<Node> parameters)
+    {
+      EnsureReturnType(Type.Decimal);
+      return TypeTraits<TResult>.ToDecimal(Invoke(parameters));
     }
 
     public override string ExecuteString(List<Node> parameters)
@@ -209,10 +260,28 @@ namespace EpsilonScript.Function
       return TypeTraits<TResult>.ToInt(Invoke(parameters));
     }
 
+    public override long ExecuteLong(List<Node> parameters)
+    {
+      EnsureReturnType(Type.Long);
+      return TypeTraits<TResult>.ToLong(Invoke(parameters));
+    }
+
     public override float ExecuteFloat(List<Node> parameters)
     {
       EnsureReturnType(Type.Float);
       return TypeTraits<TResult>.ToFloat(Invoke(parameters));
+    }
+
+    public override double ExecuteDouble(List<Node> parameters)
+    {
+      EnsureReturnType(Type.Double);
+      return TypeTraits<TResult>.ToDouble(Invoke(parameters));
+    }
+
+    public override decimal ExecuteDecimal(List<Node> parameters)
+    {
+      EnsureReturnType(Type.Decimal);
+      return TypeTraits<TResult>.ToDecimal(Invoke(parameters));
     }
 
     public override string ExecuteString(List<Node> parameters)
@@ -258,10 +327,28 @@ namespace EpsilonScript.Function
       return TypeTraits<TResult>.ToInt(Invoke(parameters));
     }
 
+    public override long ExecuteLong(List<Node> parameters)
+    {
+      EnsureReturnType(Type.Long);
+      return TypeTraits<TResult>.ToLong(Invoke(parameters));
+    }
+
     public override float ExecuteFloat(List<Node> parameters)
     {
       EnsureReturnType(Type.Float);
       return TypeTraits<TResult>.ToFloat(Invoke(parameters));
+    }
+
+    public override double ExecuteDouble(List<Node> parameters)
+    {
+      EnsureReturnType(Type.Double);
+      return TypeTraits<TResult>.ToDouble(Invoke(parameters));
+    }
+
+    public override decimal ExecuteDecimal(List<Node> parameters)
+    {
+      EnsureReturnType(Type.Decimal);
+      return TypeTraits<TResult>.ToDecimal(Invoke(parameters));
     }
 
     public override string ExecuteString(List<Node> parameters)
@@ -311,10 +398,28 @@ namespace EpsilonScript.Function
       return TypeTraits<TResult>.ToInt(Invoke(parameters));
     }
 
+    public override long ExecuteLong(List<Node> parameters)
+    {
+      EnsureReturnType(Type.Long);
+      return TypeTraits<TResult>.ToLong(Invoke(parameters));
+    }
+
     public override float ExecuteFloat(List<Node> parameters)
     {
       EnsureReturnType(Type.Float);
       return TypeTraits<TResult>.ToFloat(Invoke(parameters));
+    }
+
+    public override double ExecuteDouble(List<Node> parameters)
+    {
+      EnsureReturnType(Type.Double);
+      return TypeTraits<TResult>.ToDouble(Invoke(parameters));
+    }
+
+    public override decimal ExecuteDecimal(List<Node> parameters)
+    {
+      EnsureReturnType(Type.Decimal);
+      return TypeTraits<TResult>.ToDecimal(Invoke(parameters));
     }
 
     public override string ExecuteString(List<Node> parameters)
@@ -366,10 +471,28 @@ namespace EpsilonScript.Function
       return TypeTraits<TResult>.ToInt(Invoke(parameters));
     }
 
+    public override long ExecuteLong(List<Node> parameters)
+    {
+      EnsureReturnType(Type.Long);
+      return TypeTraits<TResult>.ToLong(Invoke(parameters));
+    }
+
     public override float ExecuteFloat(List<Node> parameters)
     {
       EnsureReturnType(Type.Float);
       return TypeTraits<TResult>.ToFloat(Invoke(parameters));
+    }
+
+    public override double ExecuteDouble(List<Node> parameters)
+    {
+      EnsureReturnType(Type.Double);
+      return TypeTraits<TResult>.ToDouble(Invoke(parameters));
+    }
+
+    public override decimal ExecuteDecimal(List<Node> parameters)
+    {
+      EnsureReturnType(Type.Decimal);
+      return TypeTraits<TResult>.ToDecimal(Invoke(parameters));
     }
 
     public override string ExecuteString(List<Node> parameters)

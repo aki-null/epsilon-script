@@ -1,5 +1,28 @@
 # Changelog
 
+## [1.3.0] - 2025-10-06
+
+### Added
+- **Configurable Numeric Precision**: New `Compiler(IntegerPrecision, FloatPrecision)` constructor
+  - Integer: `Integer` (32-bit, default) or `Long` (64-bit)
+  - Float: `Float` (32-bit, default), `Double` (64-bit), or `Decimal` (128-bit)
+- **CompiledScript API Expansion**: New properties for accessing values at different precisions
+  - Added `LongValue`, `DoubleValue`, `DecimalValue` properties
+  - Added `IntegerPrecision` and `FloatPrecision` properties to query compiler configuration
+- **VariableValue API Expansion**: Support for all numeric precision types
+  - New constructors: `VariableValue(long)`, `VariableValue(double)`, `VariableValue(decimal)`
+  - New properties: `LongValue`, `DoubleValue`, `DecimalValue` with automatic type conversion
+- **Precision-Aware Operations**: Variables and expressions automatically adapt to compiler precision
+  - Variables auto-convert to match compiler precision during evaluation
+  - Assignment operators correctly handle cross-precision conversions
+  - Original variable types preserved; conversion happens only during expression evaluation
+
+### Changed
+- **Performance Improvements**: Float precision operations optimized
+  - Built-in float functions now use `MathF` instead of casting `System.Math`
+  - Aggressive inlining on hot-path value property accessors
+  - Switch expressions used for type dispatch, reducing branching overhead
+
 ## [1.2.1] - 2025-10-02
 
 This is a maintenance purpose release for Unity package. No change to a program has been made.

@@ -31,7 +31,8 @@ namespace EpsilonScript.AST
     }
 
     public override void Build(Stack<Node> rpnStack, Element element, Compiler.Options options,
-      IVariableContainer variables, IDictionary<VariableId, CustomFunctionOverload> functions)
+      IVariableContainer variables, IDictionary<VariableId, CustomFunctionOverload> functions,
+      Compiler.IntegerPrecision intPrecision, Compiler.FloatPrecision floatPrecision)
     {
       // Unfortunately function name string needs to be allocated here to make a dictionary lookup
       VariableId functionName = element.Token.Text.ToString();
@@ -50,8 +51,11 @@ namespace EpsilonScript.AST
       switch (childNode.ValueType)
       {
         case ValueType.Boolean:
-        case ValueType.Float:
         case ValueType.Integer:
+        case ValueType.Long:
+        case ValueType.Float:
+        case ValueType.Double:
+        case ValueType.Decimal:
         case ValueType.String:
         case ValueType.Undefined:
           _parameters = new List<Node> { childNode };
@@ -79,24 +83,18 @@ namespace EpsilonScript.AST
       {
         var parameter = _parameters[i];
         parameter.Execute(variablesOverride);
-        switch (parameter.ValueType)
+        _parameterTypes[i] = parameter.ValueType switch
         {
-          case ValueType.Integer:
-            _parameterTypes[i] = Type.Integer;
-            break;
-          case ValueType.Float:
-            _parameterTypes[i] = Type.Float;
-            break;
-          case ValueType.Boolean:
-            _parameterTypes[i] = Type.Boolean;
-            break;
-          case ValueType.String:
-            _parameterTypes[i] = Type.String;
-            break;
-          default:
-            throw new ArgumentOutOfRangeException(nameof(_parameters), parameter.ValueType,
-              "Unsupported parameter value type");
-        }
+          ValueType.Integer => Type.Integer,
+          ValueType.Long => Type.Long,
+          ValueType.Float => Type.Float,
+          ValueType.Double => Type.Double,
+          ValueType.Decimal => Type.Decimal,
+          ValueType.Boolean => Type.Boolean,
+          ValueType.String => Type.String,
+          _ => throw new ArgumentOutOfRangeException(nameof(_parameters), parameter.ValueType,
+            "Unsupported parameter value type")
+        };
       }
 
       var function = _functionOverload.Find(_parameterTypes);
@@ -105,44 +103,41 @@ namespace EpsilonScript.AST
         throw new RuntimeException("A function with given type signature is undefined");
       }
 
-      switch (function.ReturnType)
+      ValueType = function.ReturnType switch
       {
-        case Type.Integer:
-          ValueType = ValueType.Integer;
-          break;
-        case Type.Float:
-          ValueType = ValueType.Float;
-          break;
-        case Type.String:
-          ValueType = ValueType.String;
-          break;
-        case Type.Boolean:
-          ValueType = ValueType.Boolean;
-          break;
-        default:
-          throw new ArgumentOutOfRangeException(nameof(function.ReturnType), function.ReturnType,
-            "Unsupported function return type");
-      }
+        Type.Integer => ValueType.Integer,
+        Type.Long => ValueType.Long,
+        Type.Float => ValueType.Float,
+        Type.Double => ValueType.Double,
+        Type.Decimal => ValueType.Decimal,
+        Type.Boolean => ValueType.Boolean,
+        Type.String => ValueType.String,
+        _ => throw new ArgumentOutOfRangeException(nameof(function.ReturnType), function.ReturnType,
+          "Unsupported function return type")
+      };
 
       switch (ValueType)
       {
         case ValueType.Integer:
           IntegerValue = function.ExecuteInt(_parameters);
-          FloatValue = IntegerValue;
-          BooleanValue = IntegerValue != 0;
+          break;
+        case ValueType.Long:
+          LongValue = function.ExecuteLong(_parameters);
           break;
         case ValueType.Float:
           FloatValue = function.ExecuteFloat(_parameters);
-          IntegerValue = (int)FloatValue;
-          BooleanValue = FloatValue != 0.0f;
+          break;
+        case ValueType.Double:
+          DoubleValue = function.ExecuteDouble(_parameters);
+          break;
+        case ValueType.Decimal:
+          DecimalValue = function.ExecuteDecimal(_parameters);
           break;
         case ValueType.String:
           StringValue = function.ExecuteString(_parameters);
           break;
         case ValueType.Boolean:
           BooleanValue = function.ExecuteBool(_parameters);
-          IntegerValue = BooleanValue ? 1 : 0;
-          FloatValue = BooleanValue ? 1.0f : 0.0f;
           break;
         default:
           throw new ArgumentOutOfRangeException(nameof(ValueType), ValueType, "Unsupported function return type");

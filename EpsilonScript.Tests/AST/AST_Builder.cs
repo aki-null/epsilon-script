@@ -13,7 +13,8 @@ namespace EpsilonScript.Tests.AST
     public void AST_Build_Succeeds(List<Element> elements, ValueType expectedType)
     {
       var builder = new AstBuilder(null);
-      builder.Configure(Compiler.Options.Immutable, null);
+      builder.Configure(Compiler.Options.Immutable, null, Compiler.IntegerPrecision.Integer,
+        Compiler.FloatPrecision.Float);
       foreach (var element in elements)
       {
         builder.Push(element);
@@ -35,7 +36,8 @@ namespace EpsilonScript.Tests.AST
       Assert.Throws<RuntimeException>(() =>
       {
         var builder = new AstBuilder(null);
-        builder.Configure(Compiler.Options.Immutable, null);
+        builder.Configure(Compiler.Options.Immutable, null, Compiler.IntegerPrecision.Integer,
+          Compiler.FloatPrecision.Float);
         foreach (var element in elements)
         {
           builder.Push(element);

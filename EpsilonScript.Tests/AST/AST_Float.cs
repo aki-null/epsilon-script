@@ -19,7 +19,7 @@ namespace EpsilonScript.Tests.AST
       var node = new FloatNode();
       var rpn = CreateStack();
       node.Build(rpn, element, Compiler.Options.None, null,
-        null);
+        null, Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float);
       Assert.Equal(expectedNodeType, node.ValueType);
       Assert.Equal(expectedInt, node.IntegerValue);
       Assert.True(EpsilonScript.Math.IsNearlyEqual(expectedFloat, node.FloatValue));

@@ -22,7 +22,8 @@ namespace EpsilonScript.Tests.AST
       var rpn = CreateStack();
       var element = new Element(new Token(value, TokenType.Integer), ElementType.Integer);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null);
+      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
+        Compiler.FloatPrecision.Float);
 
       Assert.Equal(ValueType.Integer, node.ValueType);
       Assert.Equal(int.Parse(value), node.IntegerValue);
@@ -57,17 +58,17 @@ namespace EpsilonScript.Tests.AST
       var rpn = CreateStack();
       var element = new Element(new Token(value, TokenType.Float), ElementType.Float);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null);
+      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
+        Compiler.FloatPrecision.Float);
 
       Assert.Equal(ValueType.Float, node.ValueType);
       var expectedFloat = float.Parse(value);
       Assert.True(EpsilonScript.Math.IsNearlyEqual(expectedFloat, node.FloatValue));
 
-      // FloatNode uses safe conversion - clamps to int.MaxValue/int.MinValue instead of unsafe overflow
-      var expectedInt = float.IsNaN(expectedFloat) || float.IsInfinity(expectedFloat) ? 0 :
-        expectedFloat > int.MaxValue ? int.MaxValue :
-        expectedFloat < int.MinValue ? int.MinValue :
-        (int)expectedFloat;
+      // FloatNode uses unchecked cast - matches C# default behavior for float to int conversion
+      var expectedInt = float.IsNaN(expectedFloat) || float.IsInfinity(expectedFloat)
+        ? 0
+        : unchecked((int)expectedFloat);
       Assert.Equal(expectedInt, node.IntegerValue);
       Assert.Equal(expectedFloat != 0.0f && !float.IsInfinity(expectedFloat) && !float.IsNaN(expectedFloat),
         node.BooleanValue);
@@ -81,7 +82,8 @@ namespace EpsilonScript.Tests.AST
       var rpn = CreateStack(new FakeIntegerNode(int.MaxValue), new FakeIntegerNode(1));
       var element = new Element(new Token("+", TokenType.PlusSign), ElementType.AddOperator);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null);
+      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
+        Compiler.FloatPrecision.Float);
       node.Execute(null);
 
       Assert.Equal(ValueType.Integer, node.ValueType);
@@ -96,7 +98,8 @@ namespace EpsilonScript.Tests.AST
       var rpn = CreateStack(new FakeIntegerNode(int.MinValue), new FakeIntegerNode(1));
       var element = new Element(new Token("-", TokenType.MinusSign), ElementType.SubtractOperator);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null);
+      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
+        Compiler.FloatPrecision.Float);
       node.Execute(null);
 
       Assert.Equal(ValueType.Integer, node.ValueType);
@@ -111,7 +114,8 @@ namespace EpsilonScript.Tests.AST
       var rpn = CreateStack(new FakeIntegerNode(int.MaxValue), new FakeIntegerNode(2));
       var element = new Element(new Token("*", TokenType.MultiplyOperator), ElementType.MultiplyOperator);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null);
+      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
+        Compiler.FloatPrecision.Float);
       node.Execute(null);
 
       Assert.Equal(ValueType.Integer, node.ValueType);
@@ -127,7 +131,8 @@ namespace EpsilonScript.Tests.AST
       var rpn = CreateStack(new FakeFloatNode(float.MaxValue), new FakeFloatNode(float.MaxValue));
       var element = new Element(new Token("+", TokenType.PlusSign), ElementType.AddOperator);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null);
+      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
+        Compiler.FloatPrecision.Float);
       node.Execute(null);
 
       Assert.Equal(ValueType.Float, node.ValueType);
@@ -142,7 +147,8 @@ namespace EpsilonScript.Tests.AST
       var rpn = CreateStack(new FakeFloatNode(-float.MaxValue), new FakeFloatNode(float.MaxValue));
       var element = new Element(new Token("-", TokenType.MinusSign), ElementType.SubtractOperator);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null);
+      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
+        Compiler.FloatPrecision.Float);
       node.Execute(null);
 
       Assert.Equal(ValueType.Float, node.ValueType);
@@ -157,7 +163,8 @@ namespace EpsilonScript.Tests.AST
       var rpn = CreateStack(new FakeFloatNode(float.MaxValue), new FakeFloatNode(2.0f));
       var element = new Element(new Token("*", TokenType.MultiplyOperator), ElementType.MultiplyOperator);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null);
+      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
+        Compiler.FloatPrecision.Float);
       node.Execute(null);
 
       Assert.Equal(ValueType.Float, node.ValueType);
@@ -172,7 +179,8 @@ namespace EpsilonScript.Tests.AST
       var rpn = CreateStack(new FakeFloatNode(1.0f), new FakeFloatNode(float.Epsilon));
       var element = new Element(new Token("+", TokenType.PlusSign), ElementType.AddOperator);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null);
+      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
+        Compiler.FloatPrecision.Float);
       node.Execute(null);
 
       Assert.Equal(ValueType.Float, node.ValueType);
@@ -193,7 +201,8 @@ namespace EpsilonScript.Tests.AST
       var rpn = CreateStack(new FakeIntegerNode(dividend), new FakeIntegerNode(divisor));
       var element = new Element(new Token("/", TokenType.DivideOperator), ElementType.DivideOperator);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null);
+      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
+        Compiler.FloatPrecision.Float);
       node.Execute(null);
 
       Assert.Equal(ValueType.Integer, node.ValueType);
@@ -213,7 +222,8 @@ namespace EpsilonScript.Tests.AST
       var rpn = CreateStack(new FakeIntegerNode(dividend), new FakeIntegerNode(divisor));
       var element = new Element(new Token("%", TokenType.ModuloOperator), ElementType.ModuloOperator);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null);
+      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
+        Compiler.FloatPrecision.Float);
       node.Execute(null);
 
       Assert.Equal(ValueType.Integer, node.ValueType);
@@ -231,7 +241,8 @@ namespace EpsilonScript.Tests.AST
       var rpn = CreateStack(new FakeFloatNode(dividend), new FakeFloatNode(divisor));
       var element = new Element(new Token("/", TokenType.DivideOperator), ElementType.DivideOperator);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null);
+      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
+        Compiler.FloatPrecision.Float);
       node.Execute(null);
 
       Assert.Equal(ValueType.Float, node.ValueType);
@@ -257,7 +268,8 @@ namespace EpsilonScript.Tests.AST
       var rpn = CreateStack(new FakeIntegerNode(int.MaxValue), new FakeIntegerNode(int.MaxValue));
       var element = new Element(new Token("==", TokenType.ComparisonEqual), ElementType.ComparisonEqual);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null);
+      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
+        Compiler.FloatPrecision.Float);
       node.Execute(null);
 
       Assert.Equal(ValueType.Boolean, node.ValueType);
@@ -272,7 +284,8 @@ namespace EpsilonScript.Tests.AST
       var rpn = CreateStack(new FakeFloatNode(float.MaxValue), new FakeFloatNode(float.MaxValue));
       var element = new Element(new Token("==", TokenType.ComparisonEqual), ElementType.ComparisonEqual);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null);
+      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
+        Compiler.FloatPrecision.Float);
       node.Execute(null);
 
       Assert.Equal(ValueType.Boolean, node.ValueType);
@@ -292,7 +305,8 @@ namespace EpsilonScript.Tests.AST
       var rpn = CreateStack();
       var element = new Element(new Token(quotedValue, TokenType.String), ElementType.String);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null);
+      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
+        Compiler.FloatPrecision.Float);
 
       Assert.Equal(ValueType.String, node.ValueType);
       Assert.Equal(value, node.StringValue);

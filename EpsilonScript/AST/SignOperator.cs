@@ -13,7 +13,8 @@ namespace EpsilonScript.AST
     public override bool IsConstant => _childNode.IsConstant;
 
     public override void Build(Stack<Node> rpnStack, Element element, Compiler.Options options,
-      IVariableContainer variables, IDictionary<VariableId, CustomFunctionOverload> functions)
+      IVariableContainer variables, IDictionary<VariableId, CustomFunctionOverload> functions,
+      Compiler.IntegerPrecision intPrecision, Compiler.FloatPrecision floatPrecision)
     {
       if (!rpnStack.TryPop(out _childNode))
       {
@@ -27,13 +28,12 @@ namespace EpsilonScript.AST
     {
       _childNode.Execute(variablesOverride);
 
-      ValueType = _childNode.ValueType;
-      if (ValueType != ValueType.Integer && ValueType != ValueType.Float)
+      if (!_childNode.IsNumeric)
       {
         throw new RuntimeException("Sign of a non-numeric value cannot be changed");
       }
 
-      switch (ValueType)
+      switch (_childNode.ValueType)
       {
         case ValueType.Integer:
           switch (_operationType)
@@ -49,8 +49,21 @@ namespace EpsilonScript.AST
                 "Unsupported operation type for sign change");
           }
 
-          FloatValue = IntegerValue;
-          BooleanValue = IntegerValue != 0;
+          break;
+        case ValueType.Long:
+          switch (_operationType)
+          {
+            case ElementType.PositiveOperator:
+              LongValue = _childNode.LongValue;
+              break;
+            case ElementType.NegativeOperator:
+              LongValue = -_childNode.LongValue;
+              break;
+            default:
+              throw new ArgumentOutOfRangeException(nameof(_operationType), _operationType,
+                "Unsupported operation type for sign change");
+          }
+
           break;
         case ValueType.Float:
           switch (_operationType)
@@ -66,11 +79,39 @@ namespace EpsilonScript.AST
                 "Unsupported operation type for sign change");
           }
 
-          IntegerValue = (int)FloatValue;
-          BooleanValue = IntegerValue != 0;
+          break;
+        case ValueType.Double:
+          switch (_operationType)
+          {
+            case ElementType.PositiveOperator:
+              DoubleValue = _childNode.DoubleValue;
+              break;
+            case ElementType.NegativeOperator:
+              DoubleValue = -_childNode.DoubleValue;
+              break;
+            default:
+              throw new ArgumentOutOfRangeException(nameof(_operationType), _operationType,
+                "Unsupported operation type for sign change");
+          }
+
+          break;
+        case ValueType.Decimal:
+          switch (_operationType)
+          {
+            case ElementType.PositiveOperator:
+              DecimalValue = _childNode.DecimalValue;
+              break;
+            case ElementType.NegativeOperator:
+              DecimalValue = -_childNode.DecimalValue;
+              break;
+            default:
+              throw new ArgumentOutOfRangeException(nameof(_operationType), _operationType,
+                "Unsupported operation type for sign change");
+          }
+
           break;
         default:
-          throw new ArgumentOutOfRangeException(nameof(ValueType), ValueType,
+          throw new ArgumentOutOfRangeException(nameof(_childNode.ValueType), _childNode.ValueType,
             "Unsupported value type for sign change");
       }
     }

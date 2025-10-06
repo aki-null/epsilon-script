@@ -24,7 +24,8 @@ namespace EpsilonScript.Tests.AST
       var rpn = CreateStack(leftNode, rightNode);
       var element = new Element(new Token("&&", TokenType.BooleanAndOperator), ElementType.BooleanAndOperator);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null);
+      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
+        Compiler.FloatPrecision.Float);
       var optimized = node.Optimize();
 
       // Should be optimized to a constant false BooleanNode
@@ -44,7 +45,8 @@ namespace EpsilonScript.Tests.AST
       var rpn = CreateStack(leftNode, rightNode);
       var element = new Element(new Token("&&", TokenType.BooleanAndOperator), ElementType.BooleanAndOperator);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null);
+      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
+        Compiler.FloatPrecision.Float);
       var optimized = node.Optimize();
 
       // Should be optimized to the right node itself
@@ -61,7 +63,8 @@ namespace EpsilonScript.Tests.AST
       var rpn = CreateStack(leftNode, rightNode);
       var element = new Element(new Token("||", TokenType.BooleanOrOperator), ElementType.BooleanOrOperator);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null);
+      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
+        Compiler.FloatPrecision.Float);
       var optimized = node.Optimize();
 
       // Should be optimized to a constant true BooleanNode
@@ -81,7 +84,8 @@ namespace EpsilonScript.Tests.AST
       var rpn = CreateStack(leftNode, rightNode);
       var element = new Element(new Token("||", TokenType.BooleanOrOperator), ElementType.BooleanOrOperator);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null);
+      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
+        Compiler.FloatPrecision.Float);
       var optimized = node.Optimize();
 
       // Should be optimized to the right node itself
@@ -98,7 +102,8 @@ namespace EpsilonScript.Tests.AST
       var rpn = CreateStack(leftNode, rightNode);
       var element = new Element(new Token("&&", TokenType.BooleanAndOperator), ElementType.BooleanAndOperator);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null);
+      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
+        Compiler.FloatPrecision.Float);
       var optimized = node.Optimize();
 
       // Should be optimized to false since EpsilonScript functions have no side effects
@@ -118,7 +123,8 @@ namespace EpsilonScript.Tests.AST
       var rpn = CreateStack(leftNode, rightNode);
       var element = new Element(new Token("&&", TokenType.BooleanAndOperator), ElementType.BooleanAndOperator);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null);
+      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
+        Compiler.FloatPrecision.Float);
       var optimized = node.Optimize();
 
       // Should be optimized to the left node itself
@@ -135,7 +141,8 @@ namespace EpsilonScript.Tests.AST
       var rpn = CreateStack(leftNode, rightNode);
       var element = new Element(new Token("||", TokenType.BooleanOrOperator), ElementType.BooleanOrOperator);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null);
+      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
+        Compiler.FloatPrecision.Float);
       var optimized = node.Optimize();
 
       // Should be optimized to true since EpsilonScript functions have no side effects
@@ -155,7 +162,8 @@ namespace EpsilonScript.Tests.AST
       var rpn = CreateStack(leftNode, rightNode);
       var element = new Element(new Token("||", TokenType.BooleanOrOperator), ElementType.BooleanOrOperator);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null);
+      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
+        Compiler.FloatPrecision.Float);
       var optimized = node.Optimize();
 
       // Should be optimized to the left node itself
@@ -172,7 +180,8 @@ namespace EpsilonScript.Tests.AST
       var rpn = CreateStack(leftNode, rightNode);
       var element = new Element(new Token("&&", TokenType.BooleanAndOperator), ElementType.BooleanAndOperator);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null);
+      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
+        Compiler.FloatPrecision.Float);
       var optimized = node.Optimize();
 
       // Should be optimized to a constant boolean value
@@ -192,7 +201,8 @@ namespace EpsilonScript.Tests.AST
       var rpn = CreateStack(leftNode, rightNode);
       var element = new Element(new Token("||", TokenType.BooleanOrOperator), ElementType.BooleanOrOperator);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null);
+      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
+        Compiler.FloatPrecision.Float);
       var optimized = node.Optimize();
 
       // Should be optimized to a constant boolean value
@@ -212,7 +222,8 @@ namespace EpsilonScript.Tests.AST
       var rpn = CreateStack(leftNode, rightNode);
       var element = new Element(new Token("&&", TokenType.BooleanAndOperator), ElementType.BooleanAndOperator);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null);
+      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
+        Compiler.FloatPrecision.Float);
       var optimized = node.Optimize();
 
       // Should not be optimized, returns the same node
@@ -229,7 +240,8 @@ namespace EpsilonScript.Tests.AST
       var rpn = CreateStack(leftNode, rightNode);
       var element = new Element(new Token("||", TokenType.BooleanOrOperator), ElementType.BooleanOrOperator);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null);
+      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
+        Compiler.FloatPrecision.Float);
       var optimized = node.Optimize();
 
       // Should not be optimized, returns the same node
@@ -246,7 +258,8 @@ namespace EpsilonScript.Tests.AST
       var rpn = CreateStack(leftNode, rightNode);
       var element = new Element(new Token("&&", TokenType.BooleanAndOperator), ElementType.BooleanAndOperator);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null);
+      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
+        Compiler.FloatPrecision.Float);
       var optimized = node.Optimize();
 
       // Should be optimized to constant false since both are constant
@@ -266,7 +279,8 @@ namespace EpsilonScript.Tests.AST
       var rpn = CreateStack(leftNode, rightNode);
       var element = new Element(new Token("||", TokenType.BooleanOrOperator), ElementType.BooleanOrOperator);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null);
+      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
+        Compiler.FloatPrecision.Float);
       var optimized = node.Optimize();
 
       // Should be optimized to constant true since both are constant
@@ -291,7 +305,8 @@ namespace EpsilonScript.Tests.AST
       var rpn1 = CreateStack(leftNode1, rightNode1);
       var element1 = new Element(new Token("&&", TokenType.BooleanAndOperator), ElementType.BooleanAndOperator);
 
-      node1.Build(rpn1, element1, Compiler.Options.None, null, null);
+      node1.Build(rpn1, element1, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
+        Compiler.FloatPrecision.Float);
       var optimized1 = node1.Optimize();
 
       Assert.True(optimized1.IsConstant);
@@ -305,7 +320,8 @@ namespace EpsilonScript.Tests.AST
       var rpn2 = CreateStack(leftNode2, rightNode2);
       var element2 = new Element(new Token("||", TokenType.BooleanOrOperator), ElementType.BooleanOrOperator);
 
-      node2.Build(rpn2, element2, Compiler.Options.None, null, null);
+      node2.Build(rpn2, element2, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
+        Compiler.FloatPrecision.Float);
       var optimized2 = node2.Optimize();
 
       Assert.True(optimized2.IsConstant);
@@ -324,7 +340,8 @@ namespace EpsilonScript.Tests.AST
       var rpn = CreateStack(leftNode, rightNode);
       var element = new Element(new Token("&&", TokenType.BooleanAndOperator), ElementType.BooleanAndOperator);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null);
+      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
+        Compiler.FloatPrecision.Float);
       var optimized = node.Optimize();
 
       Assert.True(optimized.IsConstant);
@@ -350,7 +367,8 @@ namespace EpsilonScript.Tests.AST
       var rpn = CreateStack(leftNode, rightNode);
       var element = new Element(new Token("&&", TokenType.BooleanAndOperator), ElementType.BooleanAndOperator);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null);
+      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
+        Compiler.FloatPrecision.Float);
       var optimized = node.Optimize();
 
       // Should simplify to just the right node since left is constant true
@@ -378,7 +396,8 @@ namespace EpsilonScript.Tests.AST
       }
 
       public override void Build(Stack<Node> rpnStack, Element element, Compiler.Options options,
-        IVariableContainer variables, IDictionary<VariableId, CustomFunctionOverload> functions)
+        IVariableContainer variables, IDictionary<VariableId, CustomFunctionOverload> functions,
+        Compiler.IntegerPrecision intPrecision, Compiler.FloatPrecision floatPrecision)
       {
         throw new NotImplementedException();
       }
@@ -404,12 +423,11 @@ namespace EpsilonScript.Tests.AST
       {
         // Simulate comparison execution
         BooleanValue = _expectedResult;
-        IntegerValue = BooleanValue ? 1 : 0;
-        FloatValue = IntegerValue;
       }
 
       public override void Build(Stack<Node> rpnStack, Element element, Compiler.Options options,
-        IVariableContainer variables, IDictionary<VariableId, CustomFunctionOverload> functions)
+        IVariableContainer variables, IDictionary<VariableId, CustomFunctionOverload> functions,
+        Compiler.IntegerPrecision intPrecision, Compiler.FloatPrecision floatPrecision)
       {
         throw new NotImplementedException("Fake nodes cannot be built from RPN stack");
       }
@@ -429,7 +447,8 @@ namespace EpsilonScript.Tests.AST
       public override bool IsConstant => false; // This makes it non-constant
 
       public override void Build(Stack<Node> rpnStack, Element element, Compiler.Options options,
-        IVariableContainer variables, IDictionary<VariableId, CustomFunctionOverload> functions)
+        IVariableContainer variables, IDictionary<VariableId, CustomFunctionOverload> functions,
+        Compiler.IntegerPrecision intPrecision, Compiler.FloatPrecision floatPrecision)
       {
         throw new NotImplementedException("Fake nodes cannot be built from RPN stack");
       }

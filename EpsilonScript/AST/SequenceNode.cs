@@ -14,7 +14,8 @@ namespace EpsilonScript.AST
       _isSingleNode ? _rightNode.IsConstant : (_leftNode.IsConstant && _rightNode.IsConstant);
 
     public override void Build(Stack<Node> rpnStack, Element element, Compiler.Options options,
-      IVariableContainer variables, IDictionary<VariableId, CustomFunctionOverload> functions)
+      IVariableContainer variables, IDictionary<VariableId, CustomFunctionOverload> functions,
+      Compiler.IntegerPrecision intPrecision, Compiler.FloatPrecision floatPrecision)
     {
       if (!rpnStack.TryPop(out _rightNode))
       {
@@ -37,12 +38,41 @@ namespace EpsilonScript.AST
       }
 
       _rightNode.Execute(variablesOverride);
-      ValueType = _rightNode.ValueType;
 
-      IntegerValue = _rightNode.IntegerValue;
-      FloatValue = _rightNode.FloatValue;
-      BooleanValue = _rightNode.BooleanValue;
-      TupleValue = _rightNode.TupleValue;
+      switch (_rightNode.ValueType)
+      {
+        case ValueType.Integer:
+          IntegerValue = _rightNode.IntegerValue;
+          break;
+        case ValueType.Long:
+          LongValue = _rightNode.LongValue;
+          break;
+        case ValueType.Float:
+          FloatValue = _rightNode.FloatValue;
+          break;
+        case ValueType.Double:
+          DoubleValue = _rightNode.DoubleValue;
+          break;
+        case ValueType.Decimal:
+          DecimalValue = _rightNode.DecimalValue;
+          break;
+        case ValueType.Boolean:
+          BooleanValue = _rightNode.BooleanValue;
+          break;
+        case ValueType.String:
+          StringValue = _rightNode.StringValue;
+          break;
+        case ValueType.Tuple:
+          TupleValue = _rightNode.TupleValue;
+          ValueType = ValueType.Tuple;
+          break;
+        case ValueType.Null:
+          ValueType = ValueType.Null;
+          break;
+        default:
+          ValueType = _rightNode.ValueType;
+          break;
+      }
     }
 
     public override Node Optimize()

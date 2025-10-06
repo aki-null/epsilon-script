@@ -20,7 +20,8 @@ namespace EpsilonScript.Tests.AST
     {
       var node = new ArithmeticNode();
       var rpn = CreateStack(leftNode, rightNode);
-      node.Build(rpn, element, Compiler.Options.None, null, null);
+      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
+        Compiler.FloatPrecision.Float);
       node.Execute(null);
       Assert.Equal(expectedNodeType, node.ValueType);
       Assert.Equal(expectedInt, node.IntegerValue);
@@ -577,7 +578,8 @@ namespace EpsilonScript.Tests.AST
       var rpn = CreateStack(new FakeIntegerNode(5), new FakeIntegerNode(0));
       var element = new Element(new Token(operatorSymbol, GetTokenType(operatorType)), operatorType);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null);
+      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
+        Compiler.FloatPrecision.Float);
 
       Assert.Throws<DivideByZeroException>(() => node.Execute(null));
     }
@@ -589,7 +591,8 @@ namespace EpsilonScript.Tests.AST
       var rpn = CreateStack(new FakeFloatNode(5.0f), new FakeFloatNode(0.0f));
       var element = new Element(new Token("/", TokenType.DivideOperator), ElementType.DivideOperator);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null);
+      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
+        Compiler.FloatPrecision.Float);
 
       ErrorTestHelper.ExecuteNodeExpectingError<DivideByZeroException>(node);
     }
@@ -601,7 +604,8 @@ namespace EpsilonScript.Tests.AST
       var rpn = CreateStack(new FakeFloatNode(5.0f), new FakeFloatNode(0.0f));
       var element = new Element(new Token("%", TokenType.ModuloOperator), ElementType.ModuloOperator);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null);
+      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
+        Compiler.FloatPrecision.Float);
 
       Assert.Throws<DivideByZeroException>(() => node.Execute(null));
     }
@@ -615,7 +619,8 @@ namespace EpsilonScript.Tests.AST
       var rpn = CreateStack(new FakeIntegerNode(5), new FakeFloatNode(0.0f));
       var element = new Element(new Token(operatorSymbol, GetTokenType(operatorType)), operatorType);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null);
+      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
+        Compiler.FloatPrecision.Float);
 
       Assert.Throws<DivideByZeroException>(() => node.Execute(null));
     }

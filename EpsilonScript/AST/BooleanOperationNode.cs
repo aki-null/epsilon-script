@@ -17,7 +17,8 @@ namespace EpsilonScript.AST
     public override bool IsConstant => _leftNode.IsConstant && _rightNode.IsConstant;
 
     public override void Build(Stack<Node> rpnStack, Element element, Compiler.Options options,
-      IVariableContainer variables, IDictionary<VariableId, CustomFunctionOverload> functions)
+      IVariableContainer variables, IDictionary<VariableId, CustomFunctionOverload> functions,
+      Compiler.IntegerPrecision intPrecision, Compiler.FloatPrecision floatPrecision)
     {
       ValueType = ValueType.Boolean;
       _operationType = element.Type;
@@ -78,9 +79,6 @@ namespace EpsilonScript.AST
           throw new ArgumentOutOfRangeException(nameof(_operationType), _operationType,
             "Unsupported boolean operation type");
       }
-
-      IntegerValue = BooleanValue ? 1 : 0;
-      FloatValue = IntegerValue;
     }
 
     public override Node Optimize()

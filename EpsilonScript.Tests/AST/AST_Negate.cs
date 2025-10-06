@@ -22,7 +22,8 @@ namespace EpsilonScript.Tests.AST
       var rpn = CreateStack(new FakeBooleanNode(inputValue));
       var element = new Element(new Token("!", TokenType.NegateOperator), ElementType.NegateOperator);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null);
+      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
+        Compiler.FloatPrecision.Float);
       node.Execute(null);
 
       Assert.Equal(ValueType.Boolean, node.ValueType);
@@ -42,7 +43,8 @@ namespace EpsilonScript.Tests.AST
       var rpn = CreateStack(new FakeIntegerNode(value));
       var element = new Element(new Token("!", TokenType.NegateOperator), ElementType.NegateOperator);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null);
+      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
+        Compiler.FloatPrecision.Float);
 
       ErrorTestHelper.ExecuteNodeExpectingError<RuntimeException>(node, null, "Cannot negate a non-boolean value");
     }
@@ -57,7 +59,8 @@ namespace EpsilonScript.Tests.AST
       var rpn = CreateStack(new FakeFloatNode(value));
       var element = new Element(new Token("!", TokenType.NegateOperator), ElementType.NegateOperator);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null);
+      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
+        Compiler.FloatPrecision.Float);
 
       ErrorTestHelper.ExecuteNodeExpectingError<RuntimeException>(node, null, "Cannot negate a non-boolean value");
     }
@@ -73,7 +76,8 @@ namespace EpsilonScript.Tests.AST
       var rpn = CreateStack(new FakeStringNode(value));
       var element = new Element(new Token("!", TokenType.NegateOperator), ElementType.NegateOperator);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null);
+      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
+        Compiler.FloatPrecision.Float);
 
       ErrorTestHelper.ExecuteNodeExpectingError<RuntimeException>(node, null, "Cannot negate a non-boolean value");
     }
@@ -99,7 +103,8 @@ namespace EpsilonScript.Tests.AST
       var rpn = CreateStack(childNode);
       var element = new Element(new Token("!", TokenType.NegateOperator), ElementType.NegateOperator);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null);
+      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
+        Compiler.FloatPrecision.Float);
 
       Assert.True(node.IsConstant); // Child is constant, so negate should be constant
     }
@@ -112,7 +117,8 @@ namespace EpsilonScript.Tests.AST
       var rpn = CreateStack(childNode);
       var element = new Element(new Token("!", TokenType.NegateOperator), ElementType.NegateOperator);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null);
+      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
+        Compiler.FloatPrecision.Float);
 
       Assert.False(node.IsConstant); // Child is not constant, so negate should not be constant
     }
@@ -126,7 +132,8 @@ namespace EpsilonScript.Tests.AST
       var rpn = CreateStack(new FakeBooleanNode(inputValue));
       var element = new Element(new Token("!", TokenType.NegateOperator), ElementType.NegateOperator);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null);
+      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
+        Compiler.FloatPrecision.Float);
 
       var optimizedNode = node.Optimize();
 
@@ -144,7 +151,8 @@ namespace EpsilonScript.Tests.AST
       var rpn = CreateStack(childNode);
       var element = new Element(new Token("!", TokenType.NegateOperator), ElementType.NegateOperator);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null);
+      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
+        Compiler.FloatPrecision.Float);
 
       var optimizedNode = node.Optimize();
 
@@ -161,7 +169,7 @@ namespace EpsilonScript.Tests.AST
       var rpn = CreateStack(new FakeBooleanNode(true));
       var element = new Element(new Token("!", TokenType.NegateOperator), ElementType.NegateOperator);
 
-      node.Build(rpn, element, options, null, null);
+      node.Build(rpn, element, options, null, null, Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float);
       node.Execute(null);
 
       Assert.Equal(ValueType.Boolean, node.ValueType);
@@ -175,12 +183,14 @@ namespace EpsilonScript.Tests.AST
       var innerNegate = new NegateNode();
       var innerRpn = CreateStack(new FakeBooleanNode(true));
       var innerElement = new Element(new Token("!", TokenType.NegateOperator), ElementType.NegateOperator);
-      innerNegate.Build(innerRpn, innerElement, Compiler.Options.None, null, null);
+      innerNegate.Build(innerRpn, innerElement, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
+        Compiler.FloatPrecision.Float);
 
       var outerNegate = new NegateNode();
       var outerRpn = CreateStack(innerNegate);
       var outerElement = new Element(new Token("!", TokenType.NegateOperator), ElementType.NegateOperator);
-      outerNegate.Build(outerRpn, outerElement, Compiler.Options.None, null, null);
+      outerNegate.Build(outerRpn, outerElement, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
+        Compiler.FloatPrecision.Float);
 
       outerNegate.Execute(null);
 
@@ -202,7 +212,8 @@ namespace EpsilonScript.Tests.AST
       }
 
       public override void Build(Stack<Node> rpnStack, Element element, Compiler.Options options,
-        IVariableContainer variables, IDictionary<VariableId, CustomFunctionOverload> functions)
+        IVariableContainer variables, IDictionary<VariableId, CustomFunctionOverload> functions,
+        Compiler.IntegerPrecision intPrecision, Compiler.FloatPrecision floatPrecision)
       {
         throw new NotImplementedException("Test node should not be built from RPN");
       }
