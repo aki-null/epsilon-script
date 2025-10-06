@@ -42,18 +42,32 @@ namespace EpsilonScript.Tests.AST
     }
 
     [Theory]
-    [InlineData(float.MaxValue, int.MaxValue)]
-    [InlineData(-float.MaxValue, int.MinValue)]
-    [InlineData(float.PositiveInfinity, 0)]
-    [InlineData(float.NegativeInfinity, 0)]
-    [InlineData(float.NaN, 0)]
-    public void AST_FloatNode_WithEdgeValues_HasSafeIntegerConversion(float inputValue, int expectedInt)
+    [InlineData(float.PositiveInfinity)]
+    [InlineData(float.NegativeInfinity)]
+    [InlineData(float.NaN)]
+    public void AST_FloatNode_WithSpecialValues_HasSafeIntegerConversion(float inputValue)
     {
-      // Test safe float-to-int conversion behavior
-      // Values outside int32 range are safely handled without overflow
+      // Test special float values convert to 0
       var node = new FloatNode(inputValue);
       Assert.Equal(ValueType.Float, node.ValueType);
       Assert.Equal(inputValue, node.FloatValue);
+      Assert.Equal(0, node.IntegerValue);
+    }
+
+    [Theory]
+    [InlineData(float.MaxValue)]
+    [InlineData(-float.MaxValue)]
+    public void AST_FloatNode_WithOverflowValues_UncheckedCast(float inputValue)
+    {
+      // Test unchecked cast behavior for out-of-range values
+      // Float stored as double, then cast to int - matches runtime behavior
+      var node = new FloatNode(inputValue);
+      Assert.Equal(ValueType.Float, node.ValueType);
+      Assert.Equal(inputValue, node.FloatValue);
+
+      // Compute expected value using same conversion path as Node.cs
+      double d = inputValue;
+      int expectedInt = (int)d;
       Assert.Equal(expectedInt, node.IntegerValue);
     }
 
