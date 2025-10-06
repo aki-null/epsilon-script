@@ -65,10 +65,10 @@ namespace EpsilonScript.Tests.AST
       var expectedFloat = float.Parse(value);
       Assert.True(EpsilonScript.Math.IsNearlyEqual(expectedFloat, node.FloatValue));
 
-      // FloatNode uses unchecked cast - matches C# default behavior for float to int conversion
+      // FloatNode uses unchecked cast - float stored as double, then cast to int
       var expectedInt = float.IsNaN(expectedFloat) || float.IsInfinity(expectedFloat)
         ? 0
-        : unchecked((int)expectedFloat);
+        : unchecked((int)(double)expectedFloat);
       Assert.Equal(expectedInt, node.IntegerValue);
       Assert.Equal(expectedFloat != 0.0f && !float.IsInfinity(expectedFloat) && !float.IsNaN(expectedFloat),
         node.BooleanValue);
