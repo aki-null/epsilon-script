@@ -20,6 +20,7 @@ namespace EpsilonScript.AST
       Compiler.IntegerPrecision intPrecision, Compiler.FloatPrecision floatPrecision)
     {
       var span = element.Token.Text;
+      // Slicing accounts for quotation marks
       StringValue = span.Slice(1, span.Length - 2).ToString();
     }
   }

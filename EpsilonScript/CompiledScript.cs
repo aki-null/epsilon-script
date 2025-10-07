@@ -41,7 +41,7 @@ namespace EpsilonScript
 
       _rootNode.Execute(variablesOverride);
 
-      // Direct cast is safe because AST.ValueType and Type enums have identical values
+      // Direct cast from ExtendedType to Type is safe, because they have identical values.
       ValueType = (Type)_rootNode.ValueType;
 
       _isResultCached = true;
