@@ -157,27 +157,6 @@ script.Execute();
 Console.WriteLine(variables["val"].FloatValue);
 ```
 
-### Comparison
-
-Comparison operators (`==`, `!=`, `<`, `<=`, `>`, `>=`) and logical operators (`!`, `&&`, `||`) are supported.
-
-#### Code
-
-```c#
-var compiler = new Compiler();
-VariableId valId = "val";
-var variables = new DictionaryVariableContainer { [valId] = new VariableValue(43.0f) };
-var script = compiler.Compile("val >= 0.0 && val < 50.0", Compiler.Options.Immutable, variables);
-script.Execute();
-Console.WriteLine(script.BooleanValue);
-```
-
-#### Result
-
-```
-True
-```
-
 #### Variable Container Override
 
 Scripts can override variables at execution time by passing an `IVariableContainer` to `Execute()`. The override container is checked first; if a variable isn't found, it falls back to the compile-time container.
@@ -231,6 +210,27 @@ var stringVars = new DictionaryVariableContainer
 };
 script.Execute(stringVars);
 Console.WriteLine(script.StringValue);  // "Hello World"
+```
+
+### Comparison
+
+Comparison operators (`==`, `!=`, `<`, `<=`, `>`, `>=`) and logical operators (`!`, `&&`, `||`) are supported.
+
+#### Code
+
+```c#
+var compiler = new Compiler();
+VariableId valId = "val";
+var variables = new DictionaryVariableContainer { [valId] = new VariableValue(43.0f) };
+var script = compiler.Compile("val >= 0.0 && val < 50.0", Compiler.Options.Immutable, variables);
+script.Execute();
+Console.WriteLine(script.BooleanValue);
+```
+
+#### Result
+
+```
+True
 ```
 
 ### Functions
