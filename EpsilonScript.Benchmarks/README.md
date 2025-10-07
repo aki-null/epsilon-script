@@ -22,6 +22,9 @@ dotnet run -c Release
 dotnet run -c Release --filter "*SimpleMathBenchmark*"
 dotnet run -c Release --filter "*ComplexMathBenchmark*"
 
+# Run without JIT (using NativeAOT)
+dotnet run -c Release -- --runtimes nativeaot9.0
+
 # Export results
 dotnet run -c Release --exporters json html csv
 ```
