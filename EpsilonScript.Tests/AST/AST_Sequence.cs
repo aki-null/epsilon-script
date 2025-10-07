@@ -6,16 +6,15 @@ using EpsilonScript.Intermediate;
 using Xunit;
 using EpsilonScript.Tests.TestInfrastructure;
 using EpsilonScript.Tests.TestInfrastructure.Fakes;
-using ValueType = EpsilonScript.AST.ValueType;
 
 namespace EpsilonScript.Tests.AST
 {
   public class AST_Sequence : AstTestBase
   {
     [Theory]
-    [InlineData(5, 10, ValueType.Integer)]
-    [InlineData(-3, 42, ValueType.Integer)]
-    public void AST_Sequence_WithTwoIntegers_ReturnsRightValue(int leftValue, int rightValue, ValueType expectedType)
+    [InlineData(5, 10, Type.Integer)]
+    [InlineData(-3, 42, Type.Integer)]
+    public void AST_Sequence_WithTwoIntegers_ReturnsRightValue(int leftValue, int rightValue, Type expectedType)
     {
       var node = new SequenceNode();
       var rpn = CreateStack(new FakeIntegerNode(leftValue), new FakeIntegerNode(rightValue));
@@ -32,9 +31,9 @@ namespace EpsilonScript.Tests.AST
     }
 
     [Theory]
-    [InlineData(1.5f, 3.7f, ValueType.Float)]
-    [InlineData(-2.1f, 0.0f, ValueType.Float)]
-    public void AST_Sequence_WithTwoFloats_ReturnsRightValue(float leftValue, float rightValue, ValueType expectedType)
+    [InlineData(1.5f, 3.7f, Type.Float)]
+    [InlineData(-2.1f, 0.0f, Type.Float)]
+    public void AST_Sequence_WithTwoFloats_ReturnsRightValue(float leftValue, float rightValue, Type expectedType)
     {
       var node = new SequenceNode();
       var rpn = CreateStack(new FakeFloatNode(leftValue), new FakeFloatNode(rightValue));
@@ -50,9 +49,9 @@ namespace EpsilonScript.Tests.AST
     }
 
     [Theory]
-    [InlineData(true, false, ValueType.Boolean)]
-    [InlineData(false, true, ValueType.Boolean)]
-    public void AST_Sequence_WithTwoBooleans_ReturnsRightValue(bool leftValue, bool rightValue, ValueType expectedType)
+    [InlineData(true, false, Type.Boolean)]
+    [InlineData(false, true, Type.Boolean)]
+    public void AST_Sequence_WithTwoBooleans_ReturnsRightValue(bool leftValue, bool rightValue, Type expectedType)
     {
       var node = new SequenceNode();
       var rpn = CreateStack(new FakeBooleanNode(leftValue), new FakeBooleanNode(rightValue));
@@ -79,7 +78,7 @@ namespace EpsilonScript.Tests.AST
         Compiler.FloatPrecision.Float);
       node.Execute(null);
 
-      Assert.Equal(ValueType.Float, node.ValueType);
+      Assert.Equal(Type.Float, node.ValueType);
       Assert.Equal(3.14f, node.FloatValue, 6);
     }
 
@@ -99,7 +98,7 @@ namespace EpsilonScript.Tests.AST
 
       Assert.True(leftNode.WasExecuted);
       Assert.True(rightNode.WasExecuted);
-      Assert.Equal(ValueType.Integer, node.ValueType);
+      Assert.Equal(Type.Integer, node.ValueType);
       Assert.Equal(20, node.IntegerValue); // Returns right value
     }
 
@@ -114,7 +113,7 @@ namespace EpsilonScript.Tests.AST
         Compiler.FloatPrecision.Float);
       node.Execute(null);
 
-      Assert.Equal(ValueType.Integer, node.ValueType);
+      Assert.Equal(Type.Integer, node.ValueType);
       Assert.Equal(5, node.IntegerValue);
     }
 
@@ -158,7 +157,7 @@ namespace EpsilonScript.Tests.AST
 
       // Should return a value node since both children are constant
       Assert.IsAssignableFrom<Node>(optimizedNode);
-      Assert.Equal(ValueType.Integer, optimizedNode.ValueType);
+      Assert.Equal(Type.Integer, optimizedNode.ValueType);
       Assert.Equal(10, optimizedNode.IntegerValue); // Right value
     }
 
@@ -190,7 +189,7 @@ namespace EpsilonScript.Tests.AST
       node.Build(rpn, element, options, null, null, Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float);
       node.Execute(null);
 
-      Assert.Equal(ValueType.Integer, node.ValueType);
+      Assert.Equal(Type.Integer, node.ValueType);
       Assert.Equal(2, node.IntegerValue);
     }
 
@@ -212,7 +211,7 @@ namespace EpsilonScript.Tests.AST
         Compiler.FloatPrecision.Float);
       node.Execute(null);
 
-      Assert.Equal(ValueType.Tuple, node.ValueType);
+      Assert.Equal(Type.Tuple, node.ValueType);
       Assert.NotNull(node.TupleValue);
       Assert.Equal(2, node.TupleValue.Count);
     }
@@ -234,7 +233,7 @@ namespace EpsilonScript.Tests.AST
         Compiler.FloatPrecision.Float);
       node2.Execute(null);
 
-      Assert.Equal(ValueType.Integer, node2.ValueType);
+      Assert.Equal(Type.Integer, node2.ValueType);
       Assert.Equal(3, node2.IntegerValue);
     }
 
@@ -297,7 +296,7 @@ namespace EpsilonScript.Tests.AST
         Compiler.FloatPrecision.Float);
       seq4.Execute(null);
 
-      Assert.Equal(ValueType.Integer, seq4.ValueType);
+      Assert.Equal(Type.Integer, seq4.ValueType);
       Assert.Equal(42, seq4.IntegerValue);
     }
 
@@ -332,7 +331,7 @@ namespace EpsilonScript.Tests.AST
 
       public TestVariableNode()
       {
-        ValueType = ValueType.Integer;
+        ValueType = Type.Integer;
         IntegerValue = 5;
         FloatValue = 5.0f;
         BooleanValue = true;

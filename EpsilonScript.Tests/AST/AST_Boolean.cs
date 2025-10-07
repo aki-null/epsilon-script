@@ -12,7 +12,7 @@ namespace EpsilonScript.Tests.AST
   {
     [Theory]
     [MemberData(nameof(CorrectData))]
-    public void AST_BuildBoolean_Succeeds(Element element, ValueType expectedNodeType, int expectedInt,
+    public void AST_BuildBoolean_Succeeds(Element element, Type expectedNodeType, int expectedInt,
       float expectedFloat, bool expectedBool)
     {
       var node = new BooleanNode();
@@ -33,7 +33,7 @@ namespace EpsilonScript.Tests.AST
       var node = new BooleanNode(value);
       var expectedInt = value ? 1 : 0;
       var expectedFloat = (float)expectedInt;
-      Assert.Equal(ValueType.Boolean, node.ValueType);
+      Assert.Equal(Type.Boolean, node.ValueType);
       Assert.Equal(expectedInt, node.IntegerValue);
       Assert.True(EpsilonScript.Math.IsNearlyEqual(expectedFloat, node.FloatValue));
       Assert.Equal(value, node.BooleanValue);
@@ -48,7 +48,7 @@ namespace EpsilonScript.Tests.AST
           new object[]
           {
             new Element(new Token("true", TokenType.BooleanLiteralTrue), ElementType.BooleanLiteralTrue),
-            ValueType.Boolean,
+            Type.Boolean,
             1,
             1.0f,
             true
@@ -56,7 +56,7 @@ namespace EpsilonScript.Tests.AST
           new object[]
           {
             new Element(new Token("false", TokenType.BooleanLiteralFalse), ElementType.BooleanLiteralFalse),
-            ValueType.Boolean,
+            Type.Boolean,
             0,
             0.0f,
             false

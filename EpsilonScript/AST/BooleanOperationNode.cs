@@ -20,7 +20,7 @@ namespace EpsilonScript.AST
       IVariableContainer variables, IDictionary<VariableId, CustomFunctionOverload> functions,
       Compiler.IntegerPrecision intPrecision, Compiler.FloatPrecision floatPrecision)
     {
-      ValueType = ValueType.Boolean;
+      ValueType = Type.Boolean;
       _operationType = element.Type;
 
       if (!rpnStack.TryPop(out _rightNode) || !rpnStack.TryPop(out _leftNode))
@@ -35,7 +35,7 @@ namespace EpsilonScript.AST
       {
         case ElementType.BooleanOrOperator:
           _leftNode.Execute(variablesOverride);
-          if (_leftNode.ValueType != ValueType.Boolean)
+          if (_leftNode.ValueType != Type.Boolean)
           {
             throw new RuntimeException(OperationTypeErrorMessage);
           }
@@ -47,7 +47,7 @@ namespace EpsilonScript.AST
           }
 
           _rightNode.Execute(variablesOverride);
-          if (_rightNode.ValueType != ValueType.Boolean)
+          if (_rightNode.ValueType != Type.Boolean)
           {
             throw new RuntimeException(OperationTypeErrorMessage);
           }
@@ -56,7 +56,7 @@ namespace EpsilonScript.AST
           break;
         case ElementType.BooleanAndOperator:
           _leftNode.Execute(variablesOverride);
-          if (_leftNode.ValueType != ValueType.Boolean)
+          if (_leftNode.ValueType != Type.Boolean)
           {
             throw new RuntimeException(OperationTypeErrorMessage);
           }
@@ -68,7 +68,7 @@ namespace EpsilonScript.AST
           }
 
           _rightNode.Execute(variablesOverride);
-          if (_rightNode.ValueType != ValueType.Boolean)
+          if (_rightNode.ValueType != Type.Boolean)
           {
             throw new RuntimeException(OperationTypeErrorMessage);
           }
@@ -86,7 +86,7 @@ namespace EpsilonScript.AST
       // Helper to ensure constant boolean node is executed
       void EnsureExecuted(Node node)
       {
-        if (node.IsConstant && node.ValueType == ValueType.Boolean)
+        if (node.IsConstant && node.ValueType == Type.Boolean)
         {
           node.Execute(null);
         }
@@ -101,13 +101,13 @@ namespace EpsilonScript.AST
       {
         case ElementType.BooleanAndOperator:
           // false && anything => false (don't need to optimize right side)
-          if (_leftNode.IsConstant && _leftNode.ValueType == ValueType.Boolean && !_leftNode.BooleanValue)
+          if (_leftNode.IsConstant && _leftNode.ValueType == Type.Boolean && !_leftNode.BooleanValue)
           {
             return new BooleanNode(false);
           }
 
           // anything && false => false (don't need to optimize left side)
-          if (_rightNode.IsConstant && _rightNode.ValueType == ValueType.Boolean && !_rightNode.BooleanValue)
+          if (_rightNode.IsConstant && _rightNode.ValueType == Type.Boolean && !_rightNode.BooleanValue)
           {
             return new BooleanNode(false);
           }
@@ -116,13 +116,13 @@ namespace EpsilonScript.AST
 
         case ElementType.BooleanOrOperator:
           // true || anything => true (don't need to optimize right side)
-          if (_leftNode.IsConstant && _leftNode.ValueType == ValueType.Boolean && _leftNode.BooleanValue)
+          if (_leftNode.IsConstant && _leftNode.ValueType == Type.Boolean && _leftNode.BooleanValue)
           {
             return new BooleanNode(true);
           }
 
           // anything || true => true (don't need to optimize left side)
-          if (_rightNode.IsConstant && _rightNode.ValueType == ValueType.Boolean && _rightNode.BooleanValue)
+          if (_rightNode.IsConstant && _rightNode.ValueType == Type.Boolean && _rightNode.BooleanValue)
           {
             return new BooleanNode(true);
           }
@@ -135,7 +135,7 @@ namespace EpsilonScript.AST
       _rightNode = _rightNode.Optimize();
 
       // Handle type errors for constant expressions
-      if (IsConstant && (_leftNode.ValueType != ValueType.Boolean || _rightNode.ValueType != ValueType.Boolean))
+      if (IsConstant && (_leftNode.ValueType != Type.Boolean || _rightNode.ValueType != Type.Boolean))
       {
         Execute(null); // This will throw RuntimeException for type mismatches
         return CreateValueNode();
@@ -150,13 +150,13 @@ namespace EpsilonScript.AST
       {
         case ElementType.BooleanAndOperator:
           // true && expression => expression
-          if (_leftNode.IsConstant && _leftNode.ValueType == ValueType.Boolean && _leftNode.BooleanValue)
+          if (_leftNode.IsConstant && _leftNode.ValueType == Type.Boolean && _leftNode.BooleanValue)
           {
             return _rightNode;
           }
 
           // expression && true => expression
-          if (_rightNode.IsConstant && _rightNode.ValueType == ValueType.Boolean && _rightNode.BooleanValue)
+          if (_rightNode.IsConstant && _rightNode.ValueType == Type.Boolean && _rightNode.BooleanValue)
           {
             return _leftNode;
           }
@@ -165,13 +165,13 @@ namespace EpsilonScript.AST
 
         case ElementType.BooleanOrOperator:
           // false || expression => expression
-          if (_leftNode.IsConstant && _leftNode.ValueType == ValueType.Boolean && !_leftNode.BooleanValue)
+          if (_leftNode.IsConstant && _leftNode.ValueType == Type.Boolean && !_leftNode.BooleanValue)
           {
             return _rightNode;
           }
 
           // expression || false => expression
-          if (_rightNode.IsConstant && _rightNode.ValueType == ValueType.Boolean && !_rightNode.BooleanValue)
+          if (_rightNode.IsConstant && _rightNode.ValueType == Type.Boolean && !_rightNode.BooleanValue)
           {
             return _leftNode;
           }
@@ -180,7 +180,7 @@ namespace EpsilonScript.AST
       }
 
       // Constant folding: if both operands are constant boolean, evaluate at compile time
-      if (IsConstant && _leftNode.ValueType == ValueType.Boolean && _rightNode.ValueType == ValueType.Boolean)
+      if (IsConstant && _leftNode.ValueType == Type.Boolean && _rightNode.ValueType == Type.Boolean)
       {
         Execute(null);
         return CreateValueNode();

@@ -2,7 +2,6 @@ using EpsilonScript.AST;
 using EpsilonScript.Intermediate;
 using Xunit;
 using EpsilonScript.Tests.TestInfrastructure;
-using ValueType = EpsilonScript.AST.ValueType;
 
 namespace EpsilonScript.Tests.AST
 {
@@ -26,7 +25,7 @@ namespace EpsilonScript.Tests.AST
     {
       var node = new StringNode(value);
 
-      Assert.Equal(ValueType.String, node.ValueType);
+      Assert.Equal(Type.String, node.ValueType);
       Assert.Equal(value, node.StringValue);
       Assert.True(node.IsConstant);
     }
@@ -37,7 +36,7 @@ namespace EpsilonScript.Tests.AST
       var node = new StringNode();
 
       // Default constructor doesn't initialize the value
-      Assert.Equal(ValueType.Undefined, node.ValueType);
+      Assert.Equal(Type.Undefined, node.ValueType);
       Assert.Null(node.StringValue);
       Assert.True(node.IsConstant);
     }
@@ -64,7 +63,7 @@ namespace EpsilonScript.Tests.AST
       node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
         Compiler.FloatPrecision.Float);
 
-      Assert.Equal(ValueType.String, node.ValueType);
+      Assert.Equal(Type.String, node.ValueType);
       Assert.Equal(expectedValue, node.StringValue);
     }
 
@@ -82,7 +81,7 @@ namespace EpsilonScript.Tests.AST
       node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
         Compiler.FloatPrecision.Float);
 
-      Assert.Equal(ValueType.String, node.ValueType);
+      Assert.Equal(Type.String, node.ValueType);
       Assert.Equal(expectedValue, node.StringValue);
     }
 
@@ -105,7 +104,7 @@ namespace EpsilonScript.Tests.AST
 
       node.Build(rpn, element, options, null, null, Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float);
 
-      Assert.Equal(ValueType.String, node.ValueType);
+      Assert.Equal(Type.String, node.ValueType);
       Assert.Equal("test value", node.StringValue);
     }
 
@@ -118,7 +117,7 @@ namespace EpsilonScript.Tests.AST
       // Execute should not change anything for string nodes
       node.Execute(null);
 
-      Assert.Equal(ValueType.String, node.ValueType);
+      Assert.Equal(Type.String, node.ValueType);
       Assert.Equal(originalValue, node.StringValue);
     }
 
@@ -132,7 +131,7 @@ namespace EpsilonScript.Tests.AST
     {
       var node = new StringNode(value);
 
-      Assert.Equal(ValueType.String, node.ValueType);
+      Assert.Equal(Type.String, node.ValueType);
       Assert.Equal(value, node.StringValue);
     }
 
@@ -150,7 +149,7 @@ namespace EpsilonScript.Tests.AST
       node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
         Compiler.FloatPrecision.Float);
 
-      Assert.Equal(ValueType.String, node.ValueType);
+      Assert.Equal(Type.String, node.ValueType);
       Assert.Equal(expectedValue, node.StringValue);
     }
 
@@ -163,7 +162,7 @@ namespace EpsilonScript.Tests.AST
 
       // StringNode is constant, so optimization should return a value node
       Assert.IsAssignableFrom<Node>(optimizedNode);
-      Assert.Equal(ValueType.String, optimizedNode.ValueType);
+      Assert.Equal(Type.String, optimizedNode.ValueType);
       Assert.Equal("test", optimizedNode.StringValue);
     }
   }

@@ -5,7 +5,6 @@ using EpsilonScript.Intermediate;
 using Xunit;
 using EpsilonScript.Tests.TestInfrastructure;
 using EpsilonScript.Tests.TestInfrastructure.Fakes;
-using ValueType = EpsilonScript.AST.ValueType;
 
 namespace EpsilonScript.Tests.AST
 {
@@ -43,7 +42,7 @@ namespace EpsilonScript.Tests.AST
         Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float);
       node.Execute(null);
 
-      Assert.Equal(ValueType.Boolean, node.ValueType);
+      Assert.Equal(Type.Boolean, node.ValueType);
       Assert.Equal(expectedResult, node.BooleanValue);
     }
 
@@ -59,7 +58,7 @@ namespace EpsilonScript.Tests.AST
       node = node.Optimize();
 
       Assert.IsType<BooleanNode>(node);
-      Assert.Equal(ValueType.Boolean, node.ValueType);
+      Assert.Equal(Type.Boolean, node.ValueType);
       Assert.True(node.BooleanValue);
     }
 
@@ -90,7 +89,7 @@ namespace EpsilonScript.Tests.AST
         Compiler.IntegerPrecision.Long, Compiler.FloatPrecision.Float);
       node.Execute(null);
 
-      Assert.Equal(ValueType.Boolean, node.ValueType);
+      Assert.Equal(Type.Boolean, node.ValueType);
       Assert.Equal(expectedResult, node.BooleanValue);
     }
 
@@ -107,7 +106,7 @@ namespace EpsilonScript.Tests.AST
         Compiler.IntegerPrecision.Long, Compiler.FloatPrecision.Float);
       node.Execute(null);
 
-      Assert.Equal(ValueType.Boolean, node.ValueType);
+      Assert.Equal(Type.Boolean, node.ValueType);
       Assert.True(node.BooleanValue);
     }
 
@@ -126,7 +125,7 @@ namespace EpsilonScript.Tests.AST
         Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float);
       node.Execute(null);
 
-      Assert.Equal(ValueType.Boolean, node.ValueType);
+      Assert.Equal(Type.Boolean, node.ValueType);
       Assert.True(node.BooleanValue);
     }
 
@@ -150,7 +149,7 @@ namespace EpsilonScript.Tests.AST
         Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Double);
       node.Execute(null);
 
-      Assert.Equal(ValueType.Boolean, node.ValueType);
+      Assert.Equal(Type.Boolean, node.ValueType);
       Assert.Equal(expectedResult, node.BooleanValue);
     }
 
@@ -168,7 +167,7 @@ namespace EpsilonScript.Tests.AST
         Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Double);
       node.Execute(null);
 
-      Assert.Equal(ValueType.Boolean, node.ValueType);
+      Assert.Equal(Type.Boolean, node.ValueType);
       Assert.True(node.BooleanValue); // Equal within 2 ULPs
     }
 
@@ -185,7 +184,7 @@ namespace EpsilonScript.Tests.AST
         Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Double);
       node.Execute(null);
 
-      Assert.Equal(ValueType.Boolean, node.ValueType);
+      Assert.Equal(Type.Boolean, node.ValueType);
       Assert.False(node.BooleanValue); // Not equal
     }
 
@@ -210,7 +209,7 @@ namespace EpsilonScript.Tests.AST
         Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Decimal);
       node.Execute(null);
 
-      Assert.Equal(ValueType.Boolean, node.ValueType);
+      Assert.Equal(Type.Boolean, node.ValueType);
       Assert.Equal(expectedResult, node.BooleanValue);
     }
 
@@ -239,7 +238,7 @@ namespace EpsilonScript.Tests.AST
         Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Decimal);
       node.Execute(null);
 
-      Assert.Equal(ValueType.Boolean, node.ValueType);
+      Assert.Equal(Type.Boolean, node.ValueType);
       Assert.False(node.BooleanValue); // Not equal - exact comparison
     }
 
@@ -260,7 +259,7 @@ namespace EpsilonScript.Tests.AST
         Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Decimal);
       node.Execute(null);
 
-      Assert.Equal(ValueType.Boolean, node.ValueType);
+      Assert.Equal(Type.Boolean, node.ValueType);
       Assert.False(node.BooleanValue); // Not equal due to rounding
     }
 
@@ -281,7 +280,7 @@ namespace EpsilonScript.Tests.AST
         Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Decimal);
       node.Execute(null);
 
-      Assert.Equal(ValueType.Boolean, node.ValueType);
+      Assert.Equal(Type.Boolean, node.ValueType);
       Assert.True(node.BooleanValue); // Equal - no rounding
     }
 
@@ -302,7 +301,7 @@ namespace EpsilonScript.Tests.AST
         Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Decimal);
       node.Execute(null);
 
-      Assert.Equal(ValueType.Boolean, node.ValueType);
+      Assert.Equal(Type.Boolean, node.ValueType);
       Assert.True(node.BooleanValue); // Equal - no rounding in add/subtract
     }
 
@@ -322,7 +321,7 @@ namespace EpsilonScript.Tests.AST
         Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Decimal);
       node.Execute(null);
 
-      Assert.Equal(ValueType.Boolean, node.ValueType);
+      Assert.Equal(Type.Boolean, node.ValueType);
       Assert.True(node.BooleanValue); // Equal - precision maintained
     }
 
@@ -343,7 +342,7 @@ namespace EpsilonScript.Tests.AST
         Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Decimal);
       node.Execute(null);
 
-      Assert.Equal(ValueType.Boolean, node.ValueType);
+      Assert.Equal(Type.Boolean, node.ValueType);
       Assert.False(node.BooleanValue); // Not equal due to rounding
     }
 
@@ -362,7 +361,7 @@ namespace EpsilonScript.Tests.AST
         Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float);
       node.Execute(null);
 
-      Assert.Equal(ValueType.Boolean, node.ValueType);
+      Assert.Equal(Type.Boolean, node.ValueType);
       Assert.True(node.BooleanValue);
     }
 
@@ -377,7 +376,7 @@ namespace EpsilonScript.Tests.AST
         Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float);
       node.Execute(null);
 
-      Assert.Equal(ValueType.Boolean, node.ValueType);
+      Assert.Equal(Type.Boolean, node.ValueType);
       Assert.False(node.BooleanValue);
     }
 
@@ -409,7 +408,7 @@ namespace EpsilonScript.Tests.AST
         Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float);
       node.Execute(null);
 
-      Assert.Equal(ValueType.Boolean, node.ValueType);
+      Assert.Equal(Type.Boolean, node.ValueType);
       Assert.True(node.BooleanValue);
     }
 
@@ -424,7 +423,7 @@ namespace EpsilonScript.Tests.AST
         Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float);
       node.Execute(null);
 
-      Assert.Equal(ValueType.Boolean, node.ValueType);
+      Assert.Equal(Type.Boolean, node.ValueType);
       Assert.True(node.BooleanValue);
     }
 
@@ -464,7 +463,7 @@ namespace EpsilonScript.Tests.AST
         Compiler.IntegerPrecision.Long, Compiler.FloatPrecision.Float);
       node.Execute(null);
 
-      Assert.Equal(ValueType.Boolean, node.ValueType);
+      Assert.Equal(Type.Boolean, node.ValueType);
       Assert.True(node.BooleanValue);
     }
 
@@ -481,7 +480,7 @@ namespace EpsilonScript.Tests.AST
         Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Double);
       node.Execute(null);
 
-      Assert.Equal(ValueType.Boolean, node.ValueType);
+      Assert.Equal(Type.Boolean, node.ValueType);
       Assert.True(node.BooleanValue);
     }
 

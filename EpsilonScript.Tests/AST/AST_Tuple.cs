@@ -6,7 +6,6 @@ using EpsilonScript.Intermediate;
 using Xunit;
 using EpsilonScript.Tests.TestInfrastructure;
 using EpsilonScript.Tests.TestInfrastructure.Fakes;
-using ValueType = EpsilonScript.AST.ValueType;
 
 namespace EpsilonScript.Tests.AST
 {
@@ -22,11 +21,11 @@ namespace EpsilonScript.Tests.AST
       node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
         Compiler.FloatPrecision.Float);
 
-      Assert.Equal(ValueType.Tuple, node.ValueType);
+      Assert.Equal(Type.Tuple, node.ValueType);
       Assert.NotNull(node.TupleValue);
       Assert.Equal(2, node.TupleValue.Count);
-      Assert.Equal(ValueType.Integer, node.TupleValue[0].ValueType);
-      Assert.Equal(ValueType.Integer, node.TupleValue[1].ValueType);
+      Assert.Equal(Type.Integer, node.TupleValue[0].ValueType);
+      Assert.Equal(Type.Integer, node.TupleValue[1].ValueType);
     }
 
     [Fact]
@@ -40,7 +39,7 @@ namespace EpsilonScript.Tests.AST
         Compiler.FloatPrecision.Float);
       node.Execute(null);
 
-      Assert.Equal(ValueType.Tuple, node.ValueType);
+      Assert.Equal(Type.Tuple, node.ValueType);
       Assert.Equal(2, node.TupleValue.Count);
       Assert.Equal(42, node.TupleValue[0].IntegerValue);
       Assert.Equal(3.14f, node.TupleValue[1].FloatValue, 6);
@@ -64,7 +63,7 @@ namespace EpsilonScript.Tests.AST
         Compiler.FloatPrecision.Float);
       outerTuple.Execute(null);
 
-      Assert.Equal(ValueType.Tuple, outerTuple.ValueType);
+      Assert.Equal(Type.Tuple, outerTuple.ValueType);
       Assert.Equal(3, outerTuple.TupleValue.Count); // Should be unfolded
       Assert.Equal(1, outerTuple.TupleValue[0].IntegerValue);
       Assert.Equal(2, outerTuple.TupleValue[1].IntegerValue);
@@ -89,10 +88,10 @@ namespace EpsilonScript.Tests.AST
         Compiler.FloatPrecision.Float);
       outerTuple.Execute(null);
 
-      Assert.Equal(ValueType.Tuple, outerTuple.ValueType);
+      Assert.Equal(Type.Tuple, outerTuple.ValueType);
       Assert.Equal(2, outerTuple.TupleValue.Count); // Right side is not unfolded
       Assert.Equal(1, outerTuple.TupleValue[0].IntegerValue);
-      Assert.Equal(ValueType.Tuple, outerTuple.TupleValue[1].ValueType);
+      Assert.Equal(Type.Tuple, outerTuple.TupleValue[1].ValueType);
     }
 
     [Fact]
@@ -185,7 +184,7 @@ namespace EpsilonScript.Tests.AST
       node.Build(rpn, element, options, null, null, Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float);
       node.Execute(null);
 
-      Assert.Equal(ValueType.Tuple, node.ValueType);
+      Assert.Equal(Type.Tuple, node.ValueType);
       Assert.Equal(2, node.TupleValue.Count);
     }
 
@@ -207,7 +206,7 @@ namespace EpsilonScript.Tests.AST
         Compiler.FloatPrecision.Float);
       finalTuple.Execute(null);
 
-      Assert.Equal(ValueType.Tuple, finalTuple.ValueType);
+      Assert.Equal(Type.Tuple, finalTuple.ValueType);
       Assert.Equal(3, finalTuple.TupleValue.Count);
       Assert.Equal(1, finalTuple.TupleValue[0].IntegerValue);
       Assert.Equal(2, finalTuple.TupleValue[1].IntegerValue);
@@ -215,16 +214,16 @@ namespace EpsilonScript.Tests.AST
     }
 
     [Theory]
-    [InlineData(ValueType.Integer)]
-    [InlineData(ValueType.Float)]
-    [InlineData(ValueType.Boolean)]
+    [InlineData(Type.Integer)]
+    [InlineData(Type.Float)]
+    [InlineData(Type.Boolean)]
     public void AST_Tuple_WithDifferentTypes_HandlesCorrectly(ValueType nodeType)
     {
       Node leftNode = nodeType switch
       {
-        ValueType.Integer => new FakeIntegerNode(1),
-        ValueType.Float => new FakeFloatNode(1.0f),
-        ValueType.Boolean => new FakeBooleanNode(true),
+        Type.Integer => new FakeIntegerNode(1),
+        Type.Float => new FakeFloatNode(1.0f),
+        Type.Boolean => new FakeBooleanNode(true),
         _ => throw new ArgumentOutOfRangeException(nameof(nodeType))
       };
 
@@ -236,10 +235,10 @@ namespace EpsilonScript.Tests.AST
         Compiler.FloatPrecision.Float);
       node.Execute(null);
 
-      Assert.Equal(ValueType.Tuple, node.ValueType);
+      Assert.Equal(Type.Tuple, node.ValueType);
       Assert.Equal(2, node.TupleValue.Count);
       Assert.Equal(nodeType, node.TupleValue[0].ValueType);
-      Assert.Equal(ValueType.Integer, node.TupleValue[1].ValueType);
+      Assert.Equal(Type.Integer, node.TupleValue[1].ValueType);
     }
 
     // Helper classes for testing
@@ -273,7 +272,7 @@ namespace EpsilonScript.Tests.AST
 
       public TestVariableNode()
       {
-        ValueType = ValueType.Integer;
+        ValueType = Type.Integer;
         IntegerValue = 5;
         FloatValue = 5.0f;
         BooleanValue = true;
@@ -302,7 +301,7 @@ namespace EpsilonScript.Tests.AST
       public TestOptimizableNode(bool isConstant)
       {
         _isConstant = isConstant;
-        ValueType = ValueType.Integer;
+        ValueType = Type.Integer;
         IntegerValue = 1;
         FloatValue = 1.0f;
         BooleanValue = true;

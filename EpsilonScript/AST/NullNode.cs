@@ -10,7 +10,7 @@ namespace EpsilonScript.AST
       IVariableContainer variables, IDictionary<VariableId, CustomFunctionOverload> functions,
       Compiler.IntegerPrecision intPrecision, Compiler.FloatPrecision floatPrecision)
     {
-      ValueType = ValueType.Null;
+      ValueType = Type.Null;
     }
   }
 }

@@ -14,7 +14,7 @@ namespace EpsilonScript.AST
       IVariableContainer variables, IDictionary<VariableId, CustomFunctionOverload> functions,
       Compiler.IntegerPrecision intPrecision, Compiler.FloatPrecision floatPrecision)
     {
-      ValueType = ValueType.Boolean;
+      ValueType = Type.Boolean;
 
       if (!rpnStack.TryPop(out _childNode))
       {
@@ -25,7 +25,7 @@ namespace EpsilonScript.AST
     public override void Execute(IVariableContainer variablesOverride)
     {
       _childNode.Execute(variablesOverride);
-      if (_childNode.ValueType != ValueType.Boolean)
+      if (_childNode.ValueType != Type.Boolean)
       {
         throw new RuntimeException("Cannot negate a non-boolean value");
       }

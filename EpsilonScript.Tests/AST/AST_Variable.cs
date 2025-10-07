@@ -3,7 +3,6 @@ using EpsilonScript.AST;
 using EpsilonScript.Intermediate;
 using Xunit;
 using EpsilonScript.Tests.TestInfrastructure;
-using ValueType = EpsilonScript.AST.ValueType;
 
 namespace EpsilonScript.Tests.AST
 {
@@ -120,7 +119,7 @@ namespace EpsilonScript.Tests.AST
         Compiler.FloatPrecision.Float);
       node.Execute(null);
 
-      Assert.Equal(ValueType.Integer, node.ValueType);
+      Assert.Equal(Type.Integer, node.ValueType);
       Assert.Equal(42, node.IntegerValue);
     }
 
@@ -235,9 +234,9 @@ namespace EpsilonScript.Tests.AST
     {
       return type switch
       {
-        Type.Integer => ValueType.Integer,
-        Type.Float => ValueType.Float,
-        Type.Boolean => ValueType.Boolean,
+        Type.Integer => Type.Integer,
+        Type.Float => Type.Float,
+        Type.Boolean => Type.Boolean,
         _ => throw new ArgumentOutOfRangeException(nameof(type))
       };
     }

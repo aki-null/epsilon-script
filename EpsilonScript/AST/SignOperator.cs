@@ -35,7 +35,7 @@ namespace EpsilonScript.AST
 
       switch (_childNode.ValueType)
       {
-        case ValueType.Integer:
+        case Type.Integer:
           switch (_operationType)
           {
             case ElementType.PositiveOperator:
@@ -50,7 +50,7 @@ namespace EpsilonScript.AST
           }
 
           break;
-        case ValueType.Long:
+        case Type.Long:
           switch (_operationType)
           {
             case ElementType.PositiveOperator:
@@ -65,7 +65,7 @@ namespace EpsilonScript.AST
           }
 
           break;
-        case ValueType.Float:
+        case Type.Float:
           switch (_operationType)
           {
             case ElementType.PositiveOperator:
@@ -80,7 +80,7 @@ namespace EpsilonScript.AST
           }
 
           break;
-        case ValueType.Double:
+        case Type.Double:
           switch (_operationType)
           {
             case ElementType.PositiveOperator:
@@ -95,7 +95,7 @@ namespace EpsilonScript.AST
           }
 
           break;
-        case ValueType.Decimal:
+        case Type.Decimal:
           switch (_operationType)
           {
             case ElementType.PositiveOperator:

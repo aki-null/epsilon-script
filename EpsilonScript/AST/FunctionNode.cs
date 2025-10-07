@@ -50,28 +50,18 @@ namespace EpsilonScript.AST
 
       switch (childNode.ValueType)
       {
-        case ValueType.Boolean:
-        case ValueType.Integer:
-        case ValueType.Long:
-        case ValueType.Float:
-        case ValueType.Double:
-        case ValueType.Decimal:
-        case ValueType.String:
-        case ValueType.Undefined:
-          _parameters = new List<Node> { childNode };
-          _parameterTypes = new Type[1];
-          break;
-        case ValueType.Tuple:
+        case Type.Tuple:
           _parameters = childNode.TupleValue;
           _parameterTypes = new Type[_parameters.Count];
           break;
-        case ValueType.Null:
+        case Type.Null:
           _parameters = new List<Node>();
           _parameterTypes = Array.Empty<Type>();
           break;
         default:
-          throw new ArgumentOutOfRangeException(nameof(childNode.ValueType), childNode.ValueType,
-            "Unsupported child not value type");
+          _parameters = new List<Node> { childNode };
+          _parameterTypes = new Type[1];
+          break;
       }
     }
 
@@ -83,18 +73,7 @@ namespace EpsilonScript.AST
       {
         var parameter = _parameters[i];
         parameter.Execute(variablesOverride);
-        _parameterTypes[i] = parameter.ValueType switch
-        {
-          ValueType.Integer => Type.Integer,
-          ValueType.Long => Type.Long,
-          ValueType.Float => Type.Float,
-          ValueType.Double => Type.Double,
-          ValueType.Decimal => Type.Decimal,
-          ValueType.Boolean => Type.Boolean,
-          ValueType.String => Type.String,
-          _ => throw new ArgumentOutOfRangeException(nameof(_parameters), parameter.ValueType,
-            "Unsupported parameter value type")
-        };
+        _parameterTypes[i] = parameter.ValueType;
       }
 
       var function = _functionOverload.Find(_parameterTypes);
@@ -103,40 +82,29 @@ namespace EpsilonScript.AST
         throw new RuntimeException("A function with given type signature is undefined");
       }
 
-      ValueType = function.ReturnType switch
-      {
-        Type.Integer => ValueType.Integer,
-        Type.Long => ValueType.Long,
-        Type.Float => ValueType.Float,
-        Type.Double => ValueType.Double,
-        Type.Decimal => ValueType.Decimal,
-        Type.Boolean => ValueType.Boolean,
-        Type.String => ValueType.String,
-        _ => throw new ArgumentOutOfRangeException(nameof(function.ReturnType), function.ReturnType,
-          "Unsupported function return type")
-      };
+      ValueType = function.ReturnType;
 
       switch (ValueType)
       {
-        case ValueType.Integer:
+        case Type.Integer:
           IntegerValue = function.ExecuteInt(_parameters);
           break;
-        case ValueType.Long:
+        case Type.Long:
           LongValue = function.ExecuteLong(_parameters);
           break;
-        case ValueType.Float:
+        case Type.Float:
           FloatValue = function.ExecuteFloat(_parameters);
           break;
-        case ValueType.Double:
+        case Type.Double:
           DoubleValue = function.ExecuteDouble(_parameters);
           break;
-        case ValueType.Decimal:
+        case Type.Decimal:
           DecimalValue = function.ExecuteDecimal(_parameters);
           break;
-        case ValueType.String:
+        case Type.String:
           StringValue = function.ExecuteString(_parameters);
           break;
-        case ValueType.Boolean:
+        case Type.Boolean:
           BooleanValue = function.ExecuteBool(_parameters);
           break;
         default:

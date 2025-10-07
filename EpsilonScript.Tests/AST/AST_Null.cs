@@ -3,7 +3,6 @@ using EpsilonScript.Intermediate;
 using Xunit;
 using EpsilonScript.Tests.TestInfrastructure;
 using EpsilonScript.Tests.TestInfrastructure.Fakes;
-using ValueType = EpsilonScript.AST.ValueType;
 
 namespace EpsilonScript.Tests.AST
 {
@@ -19,7 +18,7 @@ namespace EpsilonScript.Tests.AST
       node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
         Compiler.FloatPrecision.Float);
 
-      Assert.Equal(ValueType.Null, node.ValueType);
+      Assert.Equal(Type.Null, node.ValueType);
     }
 
     [Fact]
@@ -43,7 +42,7 @@ namespace EpsilonScript.Tests.AST
       // Execute should not throw or change anything
       node.Execute(null);
 
-      Assert.Equal(ValueType.Null, node.ValueType);
+      Assert.Equal(Type.Null, node.ValueType);
     }
 
     [Theory]
@@ -58,7 +57,7 @@ namespace EpsilonScript.Tests.AST
       node.Build(rpn, element, options, null, null, Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float);
       node.Execute(null);
 
-      Assert.Equal(ValueType.Null, node.ValueType);
+      Assert.Equal(Type.Null, node.ValueType);
     }
 
     [Fact]
@@ -75,7 +74,7 @@ namespace EpsilonScript.Tests.AST
 
       // Since NullNode is constant, optimization should return a value node
       Assert.IsAssignableFrom<Node>(optimizedNode);
-      Assert.Equal(ValueType.Null, optimizedNode.ValueType);
+      Assert.Equal(Type.Null, optimizedNode.ValueType);
     }
 
     [Fact]
@@ -89,7 +88,7 @@ namespace EpsilonScript.Tests.AST
       node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
         Compiler.FloatPrecision.Float);
 
-      Assert.Equal(ValueType.Null, node.ValueType);
+      Assert.Equal(Type.Null, node.ValueType);
     }
 
     [Fact]
@@ -103,7 +102,7 @@ namespace EpsilonScript.Tests.AST
       node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
         Compiler.FloatPrecision.Float);
 
-      Assert.Equal(ValueType.Null, node.ValueType);
+      Assert.Equal(Type.Null, node.ValueType);
       // Stack should still contain the integer node since null doesn't consume it
       Assert.True(rpn.TryPop(out var remainingNode));
       Assert.IsAssignableFrom<Node>(remainingNode);
@@ -119,7 +118,7 @@ namespace EpsilonScript.Tests.AST
       node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
         Compiler.FloatPrecision.Float);
 
-      Assert.Equal(ValueType.Null, node.ValueType);
+      Assert.Equal(Type.Null, node.ValueType);
       Assert.Equal(0, node.IntegerValue);
       Assert.Equal(0.0f, node.FloatValue);
       Assert.False(node.BooleanValue);
@@ -144,7 +143,7 @@ namespace EpsilonScript.Tests.AST
       node.Execute(null);
 
       // Should remain null
-      Assert.Equal(ValueType.Null, node.ValueType);
+      Assert.Equal(Type.Null, node.ValueType);
     }
 
     [Fact]
@@ -158,7 +157,7 @@ namespace EpsilonScript.Tests.AST
         Compiler.FloatPrecision.Float);
       node.Execute(null); // null variable container should be fine
 
-      Assert.Equal(ValueType.Null, node.ValueType);
+      Assert.Equal(Type.Null, node.ValueType);
     }
   }
 }

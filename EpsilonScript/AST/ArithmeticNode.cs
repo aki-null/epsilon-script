@@ -10,8 +10,8 @@ namespace EpsilonScript.AST
     private Node _leftNode;
     private Node _rightNode;
     private ElementType _operator;
-    private ValueType _configuredIntegerType;
-    private ValueType _configuredFloatType;
+    private Type _configuredIntegerType;
+    private Type _configuredFloatType;
 
     public override bool IsConstant => _leftNode.IsConstant && _rightNode.IsConstant;
 
@@ -40,20 +40,21 @@ namespace EpsilonScript.AST
       _operator = element.Type;
 
       // Store configured types for optimized type promotion
-      _configuredIntegerType = intPrecision == Compiler.IntegerPrecision.Integer ? ValueType.Integer : ValueType.Long;
+      _configuredIntegerType = intPrecision == Compiler.IntegerPrecision.Integer ? Type.Integer : Type.Long;
       _configuredFloatType = floatPrecision switch
       {
-        Compiler.FloatPrecision.Float => ValueType.Float,
-        Compiler.FloatPrecision.Double => ValueType.Double,
-        Compiler.FloatPrecision.Decimal => ValueType.Decimal,
-        _ => ValueType.Float
+        Compiler.FloatPrecision.Float => Type.Float,
+        Compiler.FloatPrecision.Double => Type.Double,
+        Compiler.FloatPrecision.Decimal => Type.Decimal,
+        _ => Type.Float
       };
     }
 
-    private ValueType PromoteType(ValueType left, ValueType right)
+    [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+    private Type PromoteType(Type left, Type right)
     {
-      if (left == ValueType.String || right == ValueType.String)
-        return ValueType.String;
+      if (left == Type.String || right == Type.String)
+        return Type.String;
 
       // Since precision is fixed per compiler, only two numeric types exist:
       // the configured integer type and the configured float type
@@ -68,9 +69,9 @@ namespace EpsilonScript.AST
       _leftNode.Execute(variablesOverride);
       _rightNode.Execute(variablesOverride);
 
-      if ((!_leftNode.IsNumeric || !_rightNode.IsNumeric) && _leftNode.ValueType != ValueType.String)
+      if ((!_leftNode.IsNumeric || !_rightNode.IsNumeric) && _leftNode.ValueType != Type.String)
       {
-        if (_leftNode.ValueType == ValueType.Boolean || _rightNode.ValueType == ValueType.Boolean)
+        if (_leftNode.ValueType == Type.Boolean || _rightNode.ValueType == Type.Boolean)
         {
           throw new RuntimeException(
             $"Boolean values cannot be used in arithmetic operations ({GetOperatorName(_operator)})");
@@ -82,11 +83,9 @@ namespace EpsilonScript.AST
       ValueType = PromoteType(_leftNode.ValueType, _rightNode.ValueType);
 
       var targetType = ValueType;
-      // Consolidated arithmetic calculation using switch expression for better performance
-      // Single dispatch point reduces branch mispredictions and method call overhead
       switch (targetType)
       {
-        case ValueType.Integer:
+        case Type.Integer:
           var leftInt = _leftNode.IntegerValue;
           var rightInt = _rightNode.IntegerValue;
           IntegerValue = _operator switch
@@ -104,7 +103,7 @@ namespace EpsilonScript.AST
           };
           break;
 
-        case ValueType.Long:
+        case Type.Long:
           var leftLong = _leftNode.LongValue;
           var rightLong = _rightNode.LongValue;
           LongValue = _operator switch
@@ -122,7 +121,7 @@ namespace EpsilonScript.AST
           };
           break;
 
-        case ValueType.Float:
+        case Type.Float:
           var leftFloat = _leftNode.FloatValue;
           var rightFloat = _rightNode.FloatValue;
           FloatValue = _operator switch
@@ -140,7 +139,7 @@ namespace EpsilonScript.AST
           };
           break;
 
-        case ValueType.Double:
+        case Type.Double:
           var leftDouble = _leftNode.DoubleValue;
           var rightDouble = _rightNode.DoubleValue;
           DoubleValue = _operator switch
@@ -158,7 +157,7 @@ namespace EpsilonScript.AST
           };
           break;
 
-        case ValueType.Decimal:
+        case Type.Decimal:
           var leftDecimal = _leftNode.DecimalValue;
           var rightDecimal = _rightNode.DecimalValue;
           DecimalValue = _operator switch
@@ -176,7 +175,7 @@ namespace EpsilonScript.AST
           };
           break;
 
-        case ValueType.String:
+        case Type.String:
           if (_operator == ElementType.AddOperator)
           {
             // The left node is guaranteed to be a string node

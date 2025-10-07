@@ -5,7 +5,6 @@ using EpsilonScript.Intermediate;
 using Xunit;
 using EpsilonScript.Tests.TestInfrastructure;
 using EpsilonScript.Tests.TestInfrastructure.Fakes;
-using ValueType = EpsilonScript.AST.ValueType;
 
 namespace EpsilonScript.Tests.AST
 {
@@ -16,7 +15,7 @@ namespace EpsilonScript.Tests.AST
     [Theory]
     [MemberData(nameof(SimpleAssignmentData))]
     public void AST_Assignment_SimpleAssignment_Succeeds(ElementType operatorType, string operatorSymbol,
-      Type variableType, object initialValue, object assignValue, object expectedValue, ValueType expectedValueType)
+      Type variableType, object initialValue, object assignValue, object expectedValue, Type expectedValueType)
     {
       var variable = new VariableValue(variableType);
       SetVariableValue(variable, initialValue);
@@ -42,16 +41,16 @@ namespace EpsilonScript.Tests.AST
         return new[]
         {
           // Integer assignments
-          new object[] { ElementType.AssignmentOperator, "=", Type.Integer, 10, 42, 42, ValueType.Integer },
-          new object[] { ElementType.AssignmentOperator, "=", Type.Integer, 5, -15, -15, ValueType.Integer },
+          new object[] { ElementType.AssignmentOperator, "=", Type.Integer, 10, 42, 42, Type.Integer },
+          new object[] { ElementType.AssignmentOperator, "=", Type.Integer, 5, -15, -15, Type.Integer },
 
           // Float assignments
-          new object[] { ElementType.AssignmentOperator, "=", Type.Float, 10.5f, 42.7f, 42.7f, ValueType.Float },
-          new object[] { ElementType.AssignmentOperator, "=", Type.Float, 5.0f, -15.3f, -15.3f, ValueType.Float },
+          new object[] { ElementType.AssignmentOperator, "=", Type.Float, 10.5f, 42.7f, 42.7f, Type.Float },
+          new object[] { ElementType.AssignmentOperator, "=", Type.Float, 5.0f, -15.3f, -15.3f, Type.Float },
 
           // Boolean assignments
-          new object[] { ElementType.AssignmentOperator, "=", Type.Boolean, true, false, false, ValueType.Boolean },
-          new object[] { ElementType.AssignmentOperator, "=", Type.Boolean, false, true, true, ValueType.Boolean }
+          new object[] { ElementType.AssignmentOperator, "=", Type.Boolean, true, false, false, Type.Boolean },
+          new object[] { ElementType.AssignmentOperator, "=", Type.Boolean, false, true, true, Type.Boolean }
         };
       }
     }
@@ -59,7 +58,7 @@ namespace EpsilonScript.Tests.AST
     [Theory]
     [MemberData(nameof(CompoundAssignmentData))]
     public void AST_Assignment_CompoundAssignment_Succeeds(ElementType operatorType, string operatorSymbol,
-      Type variableType, object initialValue, object operandValue, object expectedValue, ValueType expectedValueType)
+      Type variableType, object initialValue, object operandValue, object expectedValue, Type expectedValueType)
     {
       var variable = new VariableValue(variableType);
       SetVariableValue(variable, initialValue);
@@ -85,16 +84,16 @@ namespace EpsilonScript.Tests.AST
         return new[]
         {
           // Integer compound assignments
-          new object[] { ElementType.AssignmentAddOperator, "+=", Type.Integer, 10, 5, 15, ValueType.Integer },
-          new object[] { ElementType.AssignmentSubtractOperator, "-=", Type.Integer, 10, 3, 7, ValueType.Integer },
-          new object[] { ElementType.AssignmentMultiplyOperator, "*=", Type.Integer, 6, 2, 12, ValueType.Integer },
-          new object[] { ElementType.AssignmentDivideOperator, "/=", Type.Integer, 12, 3, 4, ValueType.Integer },
+          new object[] { ElementType.AssignmentAddOperator, "+=", Type.Integer, 10, 5, 15, Type.Integer },
+          new object[] { ElementType.AssignmentSubtractOperator, "-=", Type.Integer, 10, 3, 7, Type.Integer },
+          new object[] { ElementType.AssignmentMultiplyOperator, "*=", Type.Integer, 6, 2, 12, Type.Integer },
+          new object[] { ElementType.AssignmentDivideOperator, "/=", Type.Integer, 12, 3, 4, Type.Integer },
 
           // Float compound assignments
-          new object[] { ElementType.AssignmentAddOperator, "+=", Type.Float, 10.5f, 5.2f, 15.7f, ValueType.Float },
-          new object[] { ElementType.AssignmentSubtractOperator, "-=", Type.Float, 10.5f, 3.2f, 7.3f, ValueType.Float },
-          new object[] { ElementType.AssignmentMultiplyOperator, "*=", Type.Float, 6.5f, 2.0f, 13.0f, ValueType.Float },
-          new object[] { ElementType.AssignmentDivideOperator, "/=", Type.Float, 12.0f, 3.0f, 4.0f, ValueType.Float }
+          new object[] { ElementType.AssignmentAddOperator, "+=", Type.Float, 10.5f, 5.2f, 15.7f, Type.Float },
+          new object[] { ElementType.AssignmentSubtractOperator, "-=", Type.Float, 10.5f, 3.2f, 7.3f, Type.Float },
+          new object[] { ElementType.AssignmentMultiplyOperator, "*=", Type.Float, 6.5f, 2.0f, 13.0f, Type.Float },
+          new object[] { ElementType.AssignmentDivideOperator, "/=", Type.Float, 12.0f, 3.0f, 4.0f, Type.Float }
         };
       }
     }

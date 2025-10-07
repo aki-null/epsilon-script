@@ -6,7 +6,6 @@ using EpsilonScript.Intermediate;
 using Xunit;
 using EpsilonScript.Tests.TestInfrastructure;
 using EpsilonScript.Tests.TestInfrastructure.Fakes;
-using ValueType = EpsilonScript.AST.ValueType;
 
 namespace EpsilonScript.Tests.AST
 {
@@ -26,7 +25,7 @@ namespace EpsilonScript.Tests.AST
         Compiler.FloatPrecision.Float);
       node.Execute(null);
 
-      Assert.Equal(ValueType.Boolean, node.ValueType);
+      Assert.Equal(Type.Boolean, node.ValueType);
       Assert.Equal(expectedBool, node.BooleanValue);
       Assert.Equal(expectedInt, node.IntegerValue);
       Assert.Equal(expectedFloat, node.FloatValue, 6);
@@ -139,7 +138,7 @@ namespace EpsilonScript.Tests.AST
 
       // Should return a value node since it's constant
       Assert.IsAssignableFrom<Node>(optimizedNode);
-      Assert.Equal(ValueType.Boolean, optimizedNode.ValueType);
+      Assert.Equal(Type.Boolean, optimizedNode.ValueType);
       Assert.Equal(expectedValue, optimizedNode.BooleanValue);
     }
 
@@ -172,7 +171,7 @@ namespace EpsilonScript.Tests.AST
       node.Build(rpn, element, options, null, null, Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float);
       node.Execute(null);
 
-      Assert.Equal(ValueType.Boolean, node.ValueType);
+      Assert.Equal(Type.Boolean, node.ValueType);
       Assert.False(node.BooleanValue);
     }
 
@@ -194,7 +193,7 @@ namespace EpsilonScript.Tests.AST
 
       outerNegate.Execute(null);
 
-      Assert.Equal(ValueType.Boolean, outerNegate.ValueType);
+      Assert.Equal(Type.Boolean, outerNegate.ValueType);
       Assert.True(outerNegate.BooleanValue); // !!true should be true
     }
 
@@ -205,7 +204,7 @@ namespace EpsilonScript.Tests.AST
 
       public TestVariableNode()
       {
-        ValueType = ValueType.Boolean;
+        ValueType = Type.Boolean;
         BooleanValue = true;
         IntegerValue = 1;
         FloatValue = 1.0f;

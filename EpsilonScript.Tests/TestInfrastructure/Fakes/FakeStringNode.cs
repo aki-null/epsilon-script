@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using EpsilonScript.AST;
 using EpsilonScript.Function;
 using EpsilonScript.Intermediate;
-using ValueType = EpsilonScript.AST.ValueType;
 
 namespace EpsilonScript.Tests.TestInfrastructure.Fakes
 {
@@ -11,7 +10,7 @@ namespace EpsilonScript.Tests.TestInfrastructure.Fakes
   {
     public FakeStringNode(string value)
     {
-      ValueType = ValueType.String;
+      ValueType = Type.String;
       IntegerValue = 0;
       FloatValue = 0;
       BooleanValue = false;

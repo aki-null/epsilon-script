@@ -43,13 +43,13 @@ namespace EpsilonScript.AST
 
     public VariableValue Variable { get; protected set; }
 
-    public ValueType ValueType
+    public Type ValueType
     {
-      get => (ValueType)_type;
-      protected set => _type = (Type)value;
+      get => _type;
+      protected set => _type = value;
     }
 
-    public bool IsNumeric => ValueType.IsNumber();
+    public bool IsNumeric => _type.IsNumber();
     public virtual bool IsConstant => true;
 
     public int IntegerValue
@@ -287,19 +287,19 @@ namespace EpsilonScript.AST
     {
       switch (ValueType)
       {
-        case ValueType.Integer:
+        case Type.Integer:
           return new IntegerNode(IntegerValue);
-        case ValueType.Long:
+        case Type.Long:
           return new IntegerNode(LongValue);
-        case ValueType.Float:
+        case Type.Float:
           return new FloatNode(FloatValue);
-        case ValueType.Double:
+        case Type.Double:
           return new FloatNode(DoubleValue);
-        case ValueType.Decimal:
+        case Type.Decimal:
           return new FloatNode(DecimalValue);
-        case ValueType.Boolean:
+        case Type.Boolean:
           return new BooleanNode(BooleanValue);
-        case ValueType.String:
+        case Type.String:
           return new StringNode(StringValue);
         default:
           throw new ArgumentOutOfRangeException(nameof(ValueType), ValueType, "Unsupported value type");
@@ -310,25 +310,25 @@ namespace EpsilonScript.AST
     {
       switch (ValueType)
       {
-        case ValueType.Undefined:
+        case Type.Undefined:
           return "Undefined";
-        case ValueType.Null:
+        case Type.Null:
           return "null";
-        case ValueType.Integer:
+        case Type.Integer:
           return IntegerValue.ToString();
-        case ValueType.Long:
+        case Type.Long:
           return LongValue.ToString();
-        case ValueType.Float:
+        case Type.Float:
           return FloatValue.ToString(CultureInfo.InvariantCulture);
-        case ValueType.Double:
+        case Type.Double:
           return DoubleValue.ToString(CultureInfo.InvariantCulture);
-        case ValueType.Decimal:
+        case Type.Decimal:
           return DecimalValue.ToString(CultureInfo.InvariantCulture);
-        case ValueType.Boolean:
+        case Type.Boolean:
           return BooleanValue ? "true" : "false";
-        case ValueType.Tuple:
+        case Type.Tuple:
           return "Tuple";
-        case ValueType.String:
+        case Type.String:
           return StringValue;
         default:
           throw new ArgumentOutOfRangeException(nameof(ValueType), ValueType, "Unsupported value type");

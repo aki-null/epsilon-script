@@ -6,7 +6,6 @@ using EpsilonScript.Intermediate;
 using Xunit;
 using EpsilonScript.Tests.TestInfrastructure;
 using EpsilonScript.Tests.TestInfrastructure.Fakes;
-using ValueType = EpsilonScript.AST.ValueType;
 
 namespace EpsilonScript.Tests.AST
 {
@@ -27,7 +26,7 @@ namespace EpsilonScript.Tests.AST
         Compiler.FloatPrecision.Float);
       node.Execute(null);
 
-      Assert.Equal(ValueType.Boolean, node.ValueType);
+      Assert.Equal(Type.Boolean, node.ValueType);
       Assert.Equal(expectedResult, node.BooleanValue);
       Assert.Equal(expectedInteger, node.IntegerValue);
       Assert.Equal(expectedFloat, node.FloatValue, 6);
@@ -68,7 +67,7 @@ namespace EpsilonScript.Tests.AST
         Compiler.FloatPrecision.Float);
       node.Execute(null);
 
-      Assert.Equal(ValueType.Boolean, node.ValueType);
+      Assert.Equal(Type.Boolean, node.ValueType);
       Assert.False(node.BooleanValue);
       Assert.False(rightNode.WasExecuted); // Right node should not have been executed
     }
@@ -87,7 +86,7 @@ namespace EpsilonScript.Tests.AST
         Compiler.FloatPrecision.Float);
       node.Execute(null);
 
-      Assert.Equal(ValueType.Boolean, node.ValueType);
+      Assert.Equal(Type.Boolean, node.ValueType);
       Assert.True(node.BooleanValue);
       Assert.False(rightNode.WasExecuted); // Right node should not have been executed
     }
@@ -193,7 +192,7 @@ namespace EpsilonScript.Tests.AST
       public TrackingBooleanNode(bool value)
       {
         _value = value;
-        ValueType = ValueType.Boolean;
+        ValueType = Type.Boolean;
         BooleanValue = value;
         IntegerValue = value ? 1 : 0;
         FloatValue = IntegerValue;

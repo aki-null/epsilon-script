@@ -41,33 +41,33 @@ namespace EpsilonScript.AST
 
       switch (_rightNode.ValueType)
       {
-        case ValueType.Integer:
+        case Type.Integer:
           IntegerValue = _rightNode.IntegerValue;
           break;
-        case ValueType.Long:
+        case Type.Long:
           LongValue = _rightNode.LongValue;
           break;
-        case ValueType.Float:
+        case Type.Float:
           FloatValue = _rightNode.FloatValue;
           break;
-        case ValueType.Double:
+        case Type.Double:
           DoubleValue = _rightNode.DoubleValue;
           break;
-        case ValueType.Decimal:
+        case Type.Decimal:
           DecimalValue = _rightNode.DecimalValue;
           break;
-        case ValueType.Boolean:
+        case Type.Boolean:
           BooleanValue = _rightNode.BooleanValue;
           break;
-        case ValueType.String:
+        case Type.String:
           StringValue = _rightNode.StringValue;
           break;
-        case ValueType.Tuple:
+        case Type.Tuple:
           TupleValue = _rightNode.TupleValue;
-          ValueType = ValueType.Tuple;
+          ValueType = Type.Tuple;
           break;
-        case ValueType.Null:
-          ValueType = ValueType.Null;
+        case Type.Null:
+          ValueType = Type.Null;
           break;
         default:
           ValueType = _rightNode.ValueType;

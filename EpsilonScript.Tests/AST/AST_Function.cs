@@ -6,7 +6,6 @@ using EpsilonScript.Intermediate;
 using Xunit;
 using EpsilonScript.Tests.TestInfrastructure;
 using EpsilonScript.Tests.TestInfrastructure.Fakes;
-using ValueType = EpsilonScript.AST.ValueType;
 
 namespace EpsilonScript.Tests.AST
 {
@@ -34,7 +33,7 @@ namespace EpsilonScript.Tests.AST
         Compiler.FloatPrecision.Float);
       node.Execute(null);
 
-      Assert.Equal(ValueType.Integer, node.ValueType);
+      Assert.Equal(Type.Integer, node.ValueType);
       Assert.Equal(10, node.IntegerValue);
       Assert.Equal(10.0f, node.FloatValue);
       Assert.True(node.BooleanValue);
@@ -60,7 +59,7 @@ namespace EpsilonScript.Tests.AST
         Compiler.FloatPrecision.Float);
       node.Execute(null);
 
-      Assert.Equal(ValueType.Float, node.ValueType);
+      Assert.Equal(Type.Float, node.ValueType);
       Assert.Equal(10.0f, node.FloatValue, 6);
       Assert.Equal(10, node.IntegerValue);
     }
@@ -85,7 +84,7 @@ namespace EpsilonScript.Tests.AST
         Compiler.FloatPrecision.Float);
       node.Execute(null);
 
-      Assert.Equal(ValueType.Boolean, node.ValueType);
+      Assert.Equal(Type.Boolean, node.ValueType);
       Assert.False(node.BooleanValue);
       Assert.Equal(0, node.IntegerValue);
       Assert.Equal(0.0f, node.FloatValue);
@@ -111,7 +110,7 @@ namespace EpsilonScript.Tests.AST
         Compiler.FloatPrecision.Float);
       node.Execute(null);
 
-      Assert.Equal(ValueType.String, node.ValueType);
+      Assert.Equal(Type.String, node.ValueType);
       Assert.Equal("HELLO", node.StringValue);
     }
 
@@ -142,7 +141,7 @@ namespace EpsilonScript.Tests.AST
         Compiler.FloatPrecision.Float);
       node.Execute(null);
 
-      Assert.Equal(ValueType.Integer, node.ValueType);
+      Assert.Equal(Type.Integer, node.ValueType);
       Assert.Equal(10, node.IntegerValue);
     }
 
@@ -300,7 +299,7 @@ namespace EpsilonScript.Tests.AST
         Compiler.FloatPrecision.Float);
       node.Execute(null);
 
-      Assert.Equal(ValueType.Integer, node.ValueType);
+      Assert.Equal(Type.Integer, node.ValueType);
       Assert.Equal(6, node.IntegerValue);
     }
 
@@ -327,7 +326,7 @@ namespace EpsilonScript.Tests.AST
         Compiler.FloatPrecision.Float);
       node.Execute(null);
 
-      Assert.Equal(ValueType.Integer, node.ValueType);
+      Assert.Equal(Type.Integer, node.ValueType);
       Assert.Equal(42, node.IntegerValue);
       Assert.Equal(42.0f, node.FloatValue);
       Assert.True(node.BooleanValue);
@@ -356,7 +355,7 @@ namespace EpsilonScript.Tests.AST
         Compiler.FloatPrecision.Float);
       node.Execute(null);
 
-      Assert.Equal(ValueType.Float, node.ValueType);
+      Assert.Equal(Type.Float, node.ValueType);
       Assert.Equal(3.14159f, node.FloatValue, 5);
       Assert.Equal(3, node.IntegerValue);
       Assert.True(node.BooleanValue);
@@ -385,7 +384,7 @@ namespace EpsilonScript.Tests.AST
         Compiler.FloatPrecision.Float);
       node.Execute(null);
 
-      Assert.Equal(ValueType.Boolean, node.ValueType);
+      Assert.Equal(Type.Boolean, node.ValueType);
       Assert.True(node.BooleanValue);
       Assert.Equal(1, node.IntegerValue);
       Assert.Equal(1.0f, node.FloatValue);
@@ -414,7 +413,7 @@ namespace EpsilonScript.Tests.AST
         Compiler.FloatPrecision.Float);
       node.Execute(null);
 
-      Assert.Equal(ValueType.String, node.ValueType);
+      Assert.Equal(Type.String, node.ValueType);
       Assert.Equal("v1.2.0", node.StringValue);
     }
 
@@ -726,7 +725,7 @@ namespace EpsilonScript.Tests.AST
         Compiler.FloatPrecision.Float);
       node.Execute(null);
 
-      Assert.Equal(ValueType.Long, node.ValueType);
+      Assert.Equal(Type.Long, node.ValueType);
       Assert.Equal(6000000000L, node.LongValue);
     }
 
@@ -750,7 +749,7 @@ namespace EpsilonScript.Tests.AST
         Compiler.FloatPrecision.Double);
       node.Execute(null);
 
-      Assert.Equal(ValueType.Double, node.ValueType);
+      Assert.Equal(Type.Double, node.ValueType);
       Assert.Equal(7.85398163397448, node.DoubleValue, precision: 10);
     }
 
@@ -775,7 +774,7 @@ namespace EpsilonScript.Tests.AST
         Compiler.FloatPrecision.Decimal);
       node.Execute(null);
 
-      Assert.Equal(ValueType.Decimal, node.ValueType);
+      Assert.Equal(Type.Decimal, node.ValueType);
       var expected = inputValue * 2.5m;
       Assert.Equal(expected, node.DecimalValue);
     }
@@ -806,7 +805,7 @@ namespace EpsilonScript.Tests.AST
         Compiler.FloatPrecision.Float);
       node.Execute(null);
 
-      Assert.Equal(ValueType.Long, node.ValueType);
+      Assert.Equal(Type.Long, node.ValueType);
       Assert.Equal(8000000000L, node.LongValue);
     }
 
@@ -836,7 +835,7 @@ namespace EpsilonScript.Tests.AST
         Compiler.FloatPrecision.Double);
       node.Execute(null);
 
-      Assert.Equal(ValueType.Double, node.ValueType);
+      Assert.Equal(Type.Double, node.ValueType);
       Assert.Equal(5.859874482048838, node.DoubleValue, precision: 10);
     }
 
@@ -866,7 +865,7 @@ namespace EpsilonScript.Tests.AST
         Compiler.FloatPrecision.Decimal);
       node.Execute(null);
 
-      Assert.Equal(ValueType.Decimal, node.ValueType);
+      Assert.Equal(Type.Decimal, node.ValueType);
       Assert.Equal(0.3m, node.DecimalValue); // Exact decimal arithmetic
     }
 
@@ -896,7 +895,7 @@ namespace EpsilonScript.Tests.AST
         Compiler.FloatPrecision.Float);
       intNode.Execute(null);
 
-      Assert.Equal(ValueType.Integer, intNode.ValueType);
+      Assert.Equal(Type.Integer, intNode.ValueType);
       Assert.Equal(20, intNode.IntegerValue); // int overload: x * 2
 
       // Test long parameter
@@ -906,7 +905,7 @@ namespace EpsilonScript.Tests.AST
         Compiler.FloatPrecision.Float);
       longNode.Execute(null);
 
-      Assert.Equal(ValueType.Long, longNode.ValueType);
+      Assert.Equal(Type.Long, longNode.ValueType);
       Assert.Equal(30L, longNode.LongValue); // long overload: x * 3
     }
 
@@ -936,7 +935,7 @@ namespace EpsilonScript.Tests.AST
         Compiler.FloatPrecision.Float);
       floatNode.Execute(null);
 
-      Assert.Equal(ValueType.Float, floatNode.ValueType);
+      Assert.Equal(Type.Float, floatNode.ValueType);
       Assert.True(EpsilonScript.Math.IsNearlyEqual(3.0f, floatNode.FloatValue)); // float overload: x * 2
 
       // Test double parameter
@@ -946,7 +945,7 @@ namespace EpsilonScript.Tests.AST
         Compiler.FloatPrecision.Double);
       doubleNode.Execute(null);
 
-      Assert.Equal(ValueType.Double, doubleNode.ValueType);
+      Assert.Equal(Type.Double, doubleNode.ValueType);
       Assert.Equal(4.5, doubleNode.DoubleValue); // double overload: x * 3
     }
 
@@ -959,7 +958,7 @@ namespace EpsilonScript.Tests.AST
 
       public TestVariableNode()
       {
-        ValueType = ValueType.Integer;
+        ValueType = Type.Integer;
         IntegerValue = 5;
         FloatValue = 5.0f;
         BooleanValue = true;
