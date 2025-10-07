@@ -6,7 +6,7 @@ namespace EpsilonScript.Function
 {
   public abstract class CustomFunction
   {
-    internal Type[] ParameterTypes { get; }
+    public Type[] ParameterTypes { get; }
 
     protected CustomFunction(string name, bool isConstant, Type[] parameterTypes, Type returnType)
     {
