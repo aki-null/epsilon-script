@@ -178,6 +178,61 @@ Console.WriteLine(script.BooleanValue);
 True
 ```
 
+#### Variable Container Override
+
+Scripts can override variables at execution time by passing an `IVariableContainer` to `Execute()`. The override container is checked first; if a variable isn't found, it falls back to the compile-time container.
+
+Compile once with global variables, execute multiple times with instance-specific overrides.
+
+```c#
+// Compile with global config
+var globals = new DictionaryVariableContainer
+{
+  ["shipping_fee"] = new VariableValue(5.99f),
+  ["tax_rate"] = new VariableValue(0.08f)
+};
+var script = compiler.Compile("price + shipping_fee + price * tax_rate",
+                               Compiler.Options.None, globals);
+
+// Execute for each instance
+foreach (var user in users)
+{
+  var instanceVars = new DictionaryVariableContainer
+  {
+    ["price"] = new VariableValue(user.CartTotal)  // Override with instance value
+    // shipping_fee and tax_rate fall back to globals
+  };
+  script.Execute(instanceVars);
+  Console.WriteLine($"Total: ${script.FloatValue}");
+}
+```
+
+#### Dynamic Typing
+
+Variables are dynamically typed - their type is determined at runtime from the `VariableValue`, not at compile time. The same compiled script can execute with different types.
+
+```c#
+var script = compiler.Compile("a + b", Compiler.Options.None, null);
+
+// Execute with floats
+var floatVars = new DictionaryVariableContainer
+{
+  ["a"] = new VariableValue(1.5f),
+  ["b"] = new VariableValue(2.3f)
+};
+script.Execute(floatVars);
+Console.WriteLine(script.FloatValue);  // 3.8
+
+// Execute with strings (same script)
+var stringVars = new DictionaryVariableContainer
+{
+  ["a"] = new VariableValue("Hello"),
+  ["b"] = new VariableValue(" World")
+};
+script.Execute(stringVars);
+Console.WriteLine(script.StringValue);  // "Hello World"
+```
+
 ### Functions
 
 EpsilonScript supports built-in functions and custom functions.
