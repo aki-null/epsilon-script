@@ -1,15 +1,28 @@
+using System.Runtime.CompilerServices;
+#if UNITY_2018_1_OR_NEWER
+using Unity.Collections.LowLevel.Unsafe;
+#endif
+
 namespace EpsilonScript
 {
   public static class Math
   {
-    private static unsafe int UnsafeFloatAsInt32(float f)
+    private static int UnsafeFloatAsInt32(float f)
     {
-      return *((int*)&f);
+#if UNITY_2018_1_OR_NEWER
+      return UnsafeUtility.As<float, int>(ref f);
+#else
+      return Unsafe.As<float, int>(ref f);
+#endif
     }
 
-    private static unsafe long UnsafeDoubleAsInt64(double d)
+    private static long UnsafeDoubleAsInt64(double d)
     {
-      return *((long*)&d);
+#if UNITY_2018_1_OR_NEWER
+      return UnsafeUtility.As<double, long>(ref d);
+#else
+      return Unsafe.As<double, long>(ref d);
+#endif
     }
 
     // https://randomascii.wordpress.com/2012/02/25/comparing-floating-point-numbers-2012-edition/
