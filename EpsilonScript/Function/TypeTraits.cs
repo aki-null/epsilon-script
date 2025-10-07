@@ -18,6 +18,7 @@ namespace EpsilonScript.Function
     private static readonly Func<T, bool> ToBoolFunc;
     private static readonly Func<T, string> ToStringFunc;
 
+    // ReSharper disable once StaticMemberInGenericType
     public static Type ValueType { get; }
 
     static TypeTraits()
