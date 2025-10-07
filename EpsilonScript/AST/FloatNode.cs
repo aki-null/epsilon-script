@@ -4,7 +4,7 @@ using EpsilonScript.Intermediate;
 
 namespace EpsilonScript.AST
 {
-  public class FloatNode : Node
+  internal class FloatNode : Node
   {
     public FloatNode()
     {

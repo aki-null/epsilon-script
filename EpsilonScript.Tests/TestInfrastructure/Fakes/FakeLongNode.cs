@@ -6,7 +6,7 @@ using EpsilonScript.Intermediate;
 
 namespace EpsilonScript.Tests.TestInfrastructure.Fakes
 {
-  public class FakeLongNode : Node
+  internal class FakeLongNode : Node
   {
     public FakeLongNode(long value)
     {

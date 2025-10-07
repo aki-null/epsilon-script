@@ -9,7 +9,7 @@ namespace EpsilonScript.Tests.RpnConverter
   {
     [Theory]
     [MemberData(nameof(CorrectData))]
-    public void RPNConverter_ParsesNegate_Correctly(Element[] input, Element[] expected)
+    internal void RPNConverter_ParsesNegate_Correctly(Element[] input, Element[] expected)
     {
       AssertRpnSucceeds(input, expected);
     }

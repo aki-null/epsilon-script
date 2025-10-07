@@ -12,7 +12,7 @@ namespace EpsilonScript.Tests.AST
   {
     [Theory]
     [MemberData(nameof(CorrectData))]
-    public void AST_FloatNode_WithValidElement_CreatesCorrectValue(Element element, Type expectedNodeType,
+    internal void AST_FloatNode_WithValidElement_CreatesCorrectValue(Element element, ExtendedType expectedNodeType,
       int expectedInt,
       float expectedFloat, bool expectedBool)
     {
@@ -30,12 +30,12 @@ namespace EpsilonScript.Tests.AST
     [InlineData(0.0f)]
     [InlineData(1.0f)]
     [InlineData(1.2f)]
-    public void AST_FloatNode_WithConstructorValue_CreatesCorrectNode(float value)
+    internal void AST_FloatNode_WithConstructorValue_CreatesCorrectNode(float value)
     {
       var node = new FloatNode(value);
       var expectedInt = (int)value;
       var expectedBool = value != 0.0f && !float.IsInfinity(value) && !float.IsNaN(value);
-      Assert.Equal(Type.Float, node.ValueType);
+      Assert.Equal(ExtendedType.Float, node.ValueType);
       Assert.Equal(expectedInt, node.IntegerValue);
       Assert.True(EpsilonScript.Math.IsNearlyEqual(value, node.FloatValue));
       Assert.Equal(expectedBool, node.BooleanValue);
@@ -45,11 +45,11 @@ namespace EpsilonScript.Tests.AST
     [InlineData(float.PositiveInfinity)]
     [InlineData(float.NegativeInfinity)]
     [InlineData(float.NaN)]
-    public void AST_FloatNode_WithSpecialValues_HasSafeIntegerConversion(float inputValue)
+    internal void AST_FloatNode_WithSpecialValues_HasSafeIntegerConversion(float inputValue)
     {
       // Test special float values convert to 0
       var node = new FloatNode(inputValue);
-      Assert.Equal(Type.Float, node.ValueType);
+      Assert.Equal(ExtendedType.Float, node.ValueType);
       Assert.Equal(inputValue, node.FloatValue);
       Assert.Equal(0, node.IntegerValue);
     }
@@ -57,17 +57,17 @@ namespace EpsilonScript.Tests.AST
     [Theory]
     [InlineData(float.MaxValue)]
     [InlineData(-float.MaxValue)]
-    public void AST_FloatNode_WithOverflowValues_UncheckedCast(float inputValue)
+    internal void AST_FloatNode_WithOverflowValues_UncheckedCast(float inputValue)
     {
       // Test unchecked cast behavior for out-of-range values
       // Float stored as double, then cast to int - matches runtime behavior
       var node = new FloatNode(inputValue);
-      Assert.Equal(Type.Float, node.ValueType);
+      Assert.Equal(ExtendedType.Float, node.ValueType);
       Assert.Equal(inputValue, node.FloatValue);
 
       // Compute expected value using same conversion path as Node.cs
       double d = inputValue;
-      int expectedInt = (int)d;
+      var expectedInt = (int)d;
       Assert.Equal(expectedInt, node.IntegerValue);
     }
 
@@ -80,7 +80,7 @@ namespace EpsilonScript.Tests.AST
           new object[]
           {
             new Element(new Token("0.0", TokenType.Float), ElementType.Float),
-            Type.Float,
+            ExtendedType.Float,
             0,
             0.0f,
             false
@@ -88,7 +88,7 @@ namespace EpsilonScript.Tests.AST
           new object[]
           {
             new Element(new Token("1.0", TokenType.Float), ElementType.Float),
-            Type.Float,
+            ExtendedType.Float,
             1,
             1.0f,
             true
@@ -96,7 +96,7 @@ namespace EpsilonScript.Tests.AST
           new object[]
           {
             new Element(new Token("1.2", TokenType.Float), ElementType.Float),
-            Type.Float,
+            ExtendedType.Float,
             1,
             1.2f,
             true
@@ -104,7 +104,7 @@ namespace EpsilonScript.Tests.AST
           new object[]
           {
             new Element(new Token("1e+5", TokenType.Float), ElementType.Float),
-            Type.Float,
+            ExtendedType.Float,
             100000,
             1.0E+5,
             true
@@ -112,7 +112,7 @@ namespace EpsilonScript.Tests.AST
           new object[]
           {
             new Element(new Token("1E+5", TokenType.Float), ElementType.Float),
-            Type.Float,
+            ExtendedType.Float,
             100000,
             1.0E+5,
             true
@@ -120,7 +120,7 @@ namespace EpsilonScript.Tests.AST
           new object[]
           {
             new Element(new Token("1.2E+5", TokenType.Float), ElementType.Float),
-            Type.Float,
+            ExtendedType.Float,
             120000,
             1.2E+5,
             true

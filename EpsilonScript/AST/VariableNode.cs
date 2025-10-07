@@ -5,7 +5,7 @@ using EpsilonScript.Intermediate;
 
 namespace EpsilonScript.AST
 {
-  public class VariableNode : Node
+  internal class VariableNode : Node
   {
     private VariableId _variableName;
     private IVariableContainer _variables;

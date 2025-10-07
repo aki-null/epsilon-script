@@ -5,7 +5,7 @@ namespace EpsilonScript.Tests.TestInfrastructure
 {
   public abstract class AstTestBase
   {
-    protected static Stack<Node> CreateStack(params Node[] nodes)
+    internal static Stack<Node> CreateStack(params Node[] nodes)
     {
       var stack = new Stack<Node>();
       foreach (var node in nodes)

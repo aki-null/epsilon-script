@@ -4,7 +4,7 @@ using Xunit;
 
 namespace EpsilonScript.Tests.TestInfrastructure.Fakes
 {
-  public class TestElementReader : IElementReader
+  internal class TestElementReader : IElementReader
   {
     public bool EndCalled { get; private set; }
 

@@ -6,7 +6,7 @@ using EpsilonScript.Intermediate;
 
 namespace EpsilonScript.Tests.TestInfrastructure.Fakes
 {
-  public class FakeFloatNode : Node
+  internal class FakeFloatNode : Node
   {
     public FakeFloatNode(float value)
     {

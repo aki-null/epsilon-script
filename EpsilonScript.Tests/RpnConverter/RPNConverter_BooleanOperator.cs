@@ -11,7 +11,7 @@ namespace EpsilonScript.Tests.RpnConverter
   {
     [Theory]
     [MemberData(nameof(CorrectData))]
-    public void RPNConverter_ParsesBooleanOperator_Correctly(Element[] input, Element[] expected)
+    internal void RPNConverter_ParsesBooleanOperator_Correctly(Element[] input, Element[] expected)
     {
       AssertRpnSucceeds(input, expected);
     }

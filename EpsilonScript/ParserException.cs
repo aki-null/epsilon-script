@@ -11,16 +11,16 @@ namespace EpsilonScript
       return string.IsNullOrEmpty(message) ? $"{token.ToString()}: Unknown error" : $"{token.ToString()}: {message}";
     }
 
-    public ParserException(in Token token) : base(FormatMessage(token, ""))
+    internal ParserException(in Token token) : base(FormatMessage(token, ""))
     {
     }
 
-    public ParserException(in Token token, string message)
+    internal ParserException(in Token token, string message)
       : base(FormatMessage(token, message))
     {
     }
 
-    public ParserException(in Token token, string message, Exception inner)
+    internal ParserException(in Token token, string message, Exception inner)
       : base(FormatMessage(token, message), inner)
     {
     }

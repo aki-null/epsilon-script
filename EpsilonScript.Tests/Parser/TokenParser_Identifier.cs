@@ -10,7 +10,7 @@ namespace EpsilonScript.Tests.Parser
   {
     [Theory]
     [MemberData(nameof(CorrectData))]
-    public void RPNConverter_ParsesVariable_Correctly(Token[] input, Element[] expected)
+    internal void RPNConverter_ParsesVariable_Correctly(Token[] input, Element[] expected)
     {
       AssertParseSucceeds(input, expected);
     }

@@ -10,7 +10,7 @@ namespace EpsilonScript.Tests.ScriptSystem
     public void ConstantIntegerExpression_ReturnsExpectedValue()
     {
       var result = CompileAndExecute("(1 + 2 + 3 * 2) * 2", Compiler.Options.Immutable);
-      Assert.Equal(Type.Integer, result.ValueType);
+      Assert.Equal(Type.Integer, result.Type);
       Assert.True(result.IsConstant);
       Assert.Equal(18, result.IntegerValue);
     }
@@ -19,7 +19,7 @@ namespace EpsilonScript.Tests.ScriptSystem
     public void ConstantFloatExpression_ReturnsExpectedValue()
     {
       var result = CompileAndExecute("10 + -2 * -(20.2 - 10)", Compiler.Options.Immutable);
-      Assert.Equal(Type.Float, result.ValueType);
+      Assert.Equal(Type.Float, result.Type);
       Assert.True(result.IsConstant);
       AssertNearlyEqual(30.4f, result.FloatValue);
     }
@@ -28,7 +28,7 @@ namespace EpsilonScript.Tests.ScriptSystem
     public void MixedIntegerFloatExpression_ReturnsFloat()
     {
       var result = CompileAndExecute("(10 + 2.5) / 2", Compiler.Options.Immutable);
-      Assert.Equal(Type.Float, result.ValueType);
+      Assert.Equal(Type.Float, result.Type);
       Assert.True(result.IsConstant);
       AssertNearlyEqual(6.25f, result.FloatValue);
     }
@@ -37,7 +37,7 @@ namespace EpsilonScript.Tests.ScriptSystem
     public void ModuloExpression_ReturnsRemainder()
     {
       var result = CompileAndExecute("23 % 7", Compiler.Options.Immutable);
-      Assert.Equal(Type.Integer, result.ValueType);
+      Assert.Equal(Type.Integer, result.Type);
       Assert.Equal(2, result.IntegerValue);
     }
 
@@ -45,7 +45,7 @@ namespace EpsilonScript.Tests.ScriptSystem
     public void FloatModuloExpression_ReturnsRemainder()
     {
       var result = CompileAndExecute("10.5 % 4", Compiler.Options.Immutable);
-      Assert.Equal(Type.Float, result.ValueType);
+      Assert.Equal(Type.Float, result.Type);
       AssertNearlyEqual(2.5f, result.FloatValue);
     }
 
@@ -53,7 +53,7 @@ namespace EpsilonScript.Tests.ScriptSystem
     public void StringConcatenationWithNumbers_ReturnsString()
     {
       var result = CompileAndExecute("\"Hello \" + 10 + \"!\"", Compiler.Options.Immutable);
-      Assert.Equal(Type.String, result.ValueType);
+      Assert.Equal(Type.String, result.Type);
       Assert.Equal("Hello 10!", result.StringValue);
     }
   }

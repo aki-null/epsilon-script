@@ -2,7 +2,7 @@ using System;
 
 namespace EpsilonScript.Function
 {
-  public class CustomFunctionOverload
+  internal class CustomFunctionOverload
   {
     private CustomFunctionOverloadNode _rootNode;
 
@@ -29,7 +29,7 @@ namespace EpsilonScript.Function
       _rootNode.Build(function);
     }
 
-    public CustomFunction Find(Type[] paramTypes)
+    internal CustomFunction Find(ExtendedType[] paramTypes)
     {
       return _rootNode.Find(paramTypes, ConfiguredFloatType);
     }

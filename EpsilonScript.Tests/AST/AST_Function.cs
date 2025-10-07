@@ -14,7 +14,7 @@ namespace EpsilonScript.Tests.AST
   public class AST_Function : AstTestBase
   {
     [Fact]
-    public void AST_Function_WithIntegerFunction_ReturnsCorrectValue()
+    internal void AST_Function_WithIntegerFunction_ReturnsCorrectValue()
     {
       var functions = new Dictionary<VariableId, CustomFunctionOverload>();
       var functionName = "testFunc";
@@ -33,14 +33,14 @@ namespace EpsilonScript.Tests.AST
         Compiler.FloatPrecision.Float);
       node.Execute(null);
 
-      Assert.Equal(Type.Integer, node.ValueType);
+      Assert.Equal(ExtendedType.Integer, node.ValueType);
       Assert.Equal(10, node.IntegerValue);
       Assert.Equal(10.0f, node.FloatValue);
       Assert.True(node.BooleanValue);
     }
 
     [Fact]
-    public void AST_Function_WithFloatFunction_ReturnsCorrectValue()
+    internal void AST_Function_WithFloatFunction_ReturnsCorrectValue()
     {
       var functions = new Dictionary<VariableId, CustomFunctionOverload>();
       var functionName = "testFunc";
@@ -59,13 +59,13 @@ namespace EpsilonScript.Tests.AST
         Compiler.FloatPrecision.Float);
       node.Execute(null);
 
-      Assert.Equal(Type.Float, node.ValueType);
+      Assert.Equal(ExtendedType.Float, node.ValueType);
       Assert.Equal(10.0f, node.FloatValue, 6);
       Assert.Equal(10, node.IntegerValue);
     }
 
     [Fact]
-    public void AST_Function_WithBooleanFunction_ReturnsCorrectValue()
+    internal void AST_Function_WithBooleanFunction_ReturnsCorrectValue()
     {
       var functions = new Dictionary<VariableId, CustomFunctionOverload>();
       var functionName = "testFunc";
@@ -84,14 +84,14 @@ namespace EpsilonScript.Tests.AST
         Compiler.FloatPrecision.Float);
       node.Execute(null);
 
-      Assert.Equal(Type.Boolean, node.ValueType);
+      Assert.Equal(ExtendedType.Boolean, node.ValueType);
       Assert.False(node.BooleanValue);
       Assert.Equal(0, node.IntegerValue);
       Assert.Equal(0.0f, node.FloatValue);
     }
 
     [Fact]
-    public void AST_Function_WithStringFunction_ReturnsCorrectValue()
+    internal void AST_Function_WithStringFunction_ReturnsCorrectValue()
     {
       var functions = new Dictionary<VariableId, CustomFunctionOverload>();
       var functionName = "testFunc";
@@ -110,12 +110,12 @@ namespace EpsilonScript.Tests.AST
         Compiler.FloatPrecision.Float);
       node.Execute(null);
 
-      Assert.Equal(Type.String, node.ValueType);
+      Assert.Equal(ExtendedType.String, node.ValueType);
       Assert.Equal("HELLO", node.StringValue);
     }
 
     [Fact]
-    public void AST_Function_WithTwoParameters_ReturnsCorrectValue()
+    internal void AST_Function_WithTwoParameters_ReturnsCorrectValue()
     {
       var functions = new Dictionary<VariableId, CustomFunctionOverload>();
       var functionName = "add";
@@ -141,12 +141,12 @@ namespace EpsilonScript.Tests.AST
         Compiler.FloatPrecision.Float);
       node.Execute(null);
 
-      Assert.Equal(Type.Integer, node.ValueType);
+      Assert.Equal(ExtendedType.Integer, node.ValueType);
       Assert.Equal(10, node.IntegerValue);
     }
 
     [Fact]
-    public void AST_Function_UndefinedFunction_ThrowsParserException()
+    internal void AST_Function_UndefinedFunction_ThrowsParserException()
     {
       var functions = new Dictionary<VariableId, CustomFunctionOverload>();
       var functionName = "undefinedFunc";
@@ -165,7 +165,7 @@ namespace EpsilonScript.Tests.AST
     }
 
     [Fact]
-    public void AST_Function_WithoutParameters_ThrowsParserException()
+    internal void AST_Function_WithoutParameters_ThrowsParserException()
     {
       var functions = new Dictionary<VariableId, CustomFunctionOverload>();
       var functionName = "testFunc";
@@ -188,7 +188,7 @@ namespace EpsilonScript.Tests.AST
     }
 
     [Fact]
-    public void AST_Function_WithWrongParameterType_ThrowsRuntimeException()
+    internal void AST_Function_WithWrongParameterType_ThrowsRuntimeException()
     {
       var functions = new Dictionary<VariableId, CustomFunctionOverload>();
       var functionName = "testFunc";
@@ -212,7 +212,7 @@ namespace EpsilonScript.Tests.AST
     }
 
     [Fact]
-    public void AST_Function_IsConstant_WithConstantFunction_ReturnsTrue()
+    internal void AST_Function_IsConstant_WithConstantFunction_ReturnsTrue()
     {
       var functions = new Dictionary<VariableId, CustomFunctionOverload>();
       var functionName = "constFunc";
@@ -234,7 +234,7 @@ namespace EpsilonScript.Tests.AST
     }
 
     [Fact]
-    public void AST_Function_IsConstant_WithNonConstantFunction_ReturnsFalse()
+    internal void AST_Function_IsConstant_WithNonConstantFunction_ReturnsFalse()
     {
       var functions = new Dictionary<VariableId, CustomFunctionOverload>();
       var functionName = "nonConstFunc";
@@ -256,7 +256,7 @@ namespace EpsilonScript.Tests.AST
     }
 
     [Fact]
-    public void AST_Function_IsConstant_WithVariableParameter_ReturnsFalse()
+    internal void AST_Function_IsConstant_WithVariableParameter_ReturnsFalse()
     {
       var functions = new Dictionary<VariableId, CustomFunctionOverload>();
       var functionName = "constFunc";
@@ -280,7 +280,7 @@ namespace EpsilonScript.Tests.AST
     [Theory]
     [InlineData(Compiler.Options.None)]
     [InlineData(Compiler.Options.Immutable)]
-    public void AST_Function_WorksWithAllCompilerOptions(Compiler.Options options)
+    internal void AST_Function_WorksWithAllCompilerOptions(Compiler.Options options)
     {
       var functions = new Dictionary<VariableId, CustomFunctionOverload>();
       var functionName = "testFunc";
@@ -299,12 +299,12 @@ namespace EpsilonScript.Tests.AST
         Compiler.FloatPrecision.Float);
       node.Execute(null);
 
-      Assert.Equal(Type.Integer, node.ValueType);
+      Assert.Equal(ExtendedType.Integer, node.ValueType);
       Assert.Equal(6, node.IntegerValue);
     }
 
     [Fact]
-    public void AST_Function_WithZeroParameterIntegerFunction_ReturnsCorrectValue()
+    internal void AST_Function_WithZeroParameterIntegerFunction_ReturnsCorrectValue()
     {
       var functions = new Dictionary<VariableId, CustomFunctionOverload>();
       var functionName = "getAnswer";
@@ -326,14 +326,14 @@ namespace EpsilonScript.Tests.AST
         Compiler.FloatPrecision.Float);
       node.Execute(null);
 
-      Assert.Equal(Type.Integer, node.ValueType);
+      Assert.Equal(ExtendedType.Integer, node.ValueType);
       Assert.Equal(42, node.IntegerValue);
       Assert.Equal(42.0f, node.FloatValue);
       Assert.True(node.BooleanValue);
     }
 
     [Fact]
-    public void AST_Function_WithZeroParameterFloatFunction_ReturnsCorrectValue()
+    internal void AST_Function_WithZeroParameterFloatFunction_ReturnsCorrectValue()
     {
       var functions = new Dictionary<VariableId, CustomFunctionOverload>();
       var functionName = "getPi";
@@ -355,14 +355,14 @@ namespace EpsilonScript.Tests.AST
         Compiler.FloatPrecision.Float);
       node.Execute(null);
 
-      Assert.Equal(Type.Float, node.ValueType);
+      Assert.Equal(ExtendedType.Float, node.ValueType);
       Assert.Equal(3.14159f, node.FloatValue, 5);
       Assert.Equal(3, node.IntegerValue);
       Assert.True(node.BooleanValue);
     }
 
     [Fact]
-    public void AST_Function_WithZeroParameterBooleanFunction_ReturnsCorrectValue()
+    internal void AST_Function_WithZeroParameterBooleanFunction_ReturnsCorrectValue()
     {
       var functions = new Dictionary<VariableId, CustomFunctionOverload>();
       var functionName = "isReady";
@@ -384,14 +384,14 @@ namespace EpsilonScript.Tests.AST
         Compiler.FloatPrecision.Float);
       node.Execute(null);
 
-      Assert.Equal(Type.Boolean, node.ValueType);
+      Assert.Equal(ExtendedType.Boolean, node.ValueType);
       Assert.True(node.BooleanValue);
       Assert.Equal(1, node.IntegerValue);
       Assert.Equal(1.0f, node.FloatValue);
     }
 
     [Fact]
-    public void AST_Function_WithZeroParameterStringFunction_ReturnsCorrectValue()
+    internal void AST_Function_WithZeroParameterStringFunction_ReturnsCorrectValue()
     {
       var functions = new Dictionary<VariableId, CustomFunctionOverload>();
       var functionName = "getVersion";
@@ -413,12 +413,12 @@ namespace EpsilonScript.Tests.AST
         Compiler.FloatPrecision.Float);
       node.Execute(null);
 
-      Assert.Equal(Type.String, node.ValueType);
+      Assert.Equal(ExtendedType.String, node.ValueType);
       Assert.Equal("v1.2.0", node.StringValue);
     }
 
     [Fact]
-    public void AST_Function_WithZeroParameterConstantFunction_IsConstant()
+    internal void AST_Function_WithZeroParameterConstantFunction_IsConstant()
     {
       var functions = new Dictionary<VariableId, CustomFunctionOverload>();
       var functionName = "getConstant";
@@ -445,7 +445,7 @@ namespace EpsilonScript.Tests.AST
     }
 
     [Fact]
-    public void AST_Function_WithZeroParameterNonConstantFunction_IsNotConstant()
+    internal void AST_Function_WithZeroParameterNonConstantFunction_IsNotConstant()
     {
       var functions = new Dictionary<VariableId, CustomFunctionOverload>();
       var functionName = "getTimestamp";
@@ -471,7 +471,7 @@ namespace EpsilonScript.Tests.AST
 
 
     [Fact]
-    public void AST_Function_WithZeroParameterFunctionMixedWithParameterizedFunction_WorksCorrectly()
+    internal void AST_Function_WithZeroParameterFunctionMixedWithParameterizedFunction_WorksCorrectly()
     {
       var functions = new Dictionary<VariableId, CustomFunctionOverload>();
 
@@ -515,7 +515,7 @@ namespace EpsilonScript.Tests.AST
     }
 
     [Fact]
-    public void AST_Function_Optimize_WithConstantFunctionAndParameters_ReturnsValueNode()
+    internal void AST_Function_Optimize_WithConstantFunctionAndParameters_ReturnsValueNode()
     {
       var functions = new Dictionary<VariableId, CustomFunctionOverload>();
       var functionName = "square";
@@ -542,7 +542,7 @@ namespace EpsilonScript.Tests.AST
     }
 
     [Fact]
-    public void AST_Function_Optimize_WithNonConstantFunction_ReturnsSelf()
+    internal void AST_Function_Optimize_WithNonConstantFunction_ReturnsSelf()
     {
       var functions = new Dictionary<VariableId, CustomFunctionOverload>();
       var functionName = "random";
@@ -567,7 +567,7 @@ namespace EpsilonScript.Tests.AST
     }
 
     [Fact]
-    public void AST_Function_Optimize_WithNonConstantParameter_ReturnsSelf()
+    internal void AST_Function_Optimize_WithNonConstantParameter_ReturnsSelf()
     {
       var functions = new Dictionary<VariableId, CustomFunctionOverload>();
       var functionName = "double";
@@ -592,7 +592,7 @@ namespace EpsilonScript.Tests.AST
     }
 
     [Fact]
-    public void AST_Function_Optimize_WithConstantFloatFunction_ReturnsFloatNode()
+    internal void AST_Function_Optimize_WithConstantFloatFunction_ReturnsFloatNode()
     {
       var functions = new Dictionary<VariableId, CustomFunctionOverload>();
       var functionName = "half";
@@ -618,7 +618,7 @@ namespace EpsilonScript.Tests.AST
     }
 
     [Fact]
-    public void AST_Function_Optimize_WithConstantBooleanFunction_ReturnsBooleanNode()
+    internal void AST_Function_Optimize_WithConstantBooleanFunction_ReturnsBooleanNode()
     {
       var functions = new Dictionary<VariableId, CustomFunctionOverload>();
       var functionName = "not";
@@ -644,7 +644,7 @@ namespace EpsilonScript.Tests.AST
     }
 
     [Fact]
-    public void AST_Function_Optimize_WithConstantStringFunction_ReturnsStringNode()
+    internal void AST_Function_Optimize_WithConstantStringFunction_ReturnsStringNode()
     {
       var functions = new Dictionary<VariableId, CustomFunctionOverload>();
       var functionName = "upper";
@@ -671,7 +671,7 @@ namespace EpsilonScript.Tests.AST
     }
 
     [Fact]
-    public void AST_Function_Optimize_WithMultipleParameters_EvaluatesCorrectly()
+    internal void AST_Function_Optimize_WithMultipleParameters_EvaluatesCorrectly()
     {
       var functions = new Dictionary<VariableId, CustomFunctionOverload>();
       var functionName = "add";
@@ -706,7 +706,7 @@ namespace EpsilonScript.Tests.AST
     #region Precision Type Tests (Long, Double, Decimal)
 
     [Fact]
-    public void AST_Function_WithLongFunction_ReturnsCorrectValue()
+    internal void AST_Function_WithLongFunction_ReturnsCorrectValue()
     {
       var functions = new Dictionary<VariableId, CustomFunctionOverload>();
       var functionName = "multiplyLong";
@@ -725,12 +725,12 @@ namespace EpsilonScript.Tests.AST
         Compiler.FloatPrecision.Float);
       node.Execute(null);
 
-      Assert.Equal(Type.Long, node.ValueType);
+      Assert.Equal(ExtendedType.Long, node.ValueType);
       Assert.Equal(6000000000L, node.LongValue);
     }
 
     [Fact]
-    public void AST_Function_WithDoubleFunction_ReturnsCorrectValue()
+    internal void AST_Function_WithDoubleFunction_ReturnsCorrectValue()
     {
       var functions = new Dictionary<VariableId, CustomFunctionOverload>();
       var functionName = "multiplyDouble";
@@ -749,12 +749,12 @@ namespace EpsilonScript.Tests.AST
         Compiler.FloatPrecision.Double);
       node.Execute(null);
 
-      Assert.Equal(Type.Double, node.ValueType);
+      Assert.Equal(ExtendedType.Double, node.ValueType);
       Assert.Equal(7.85398163397448, node.DoubleValue, precision: 10);
     }
 
     [Fact]
-    public void AST_Function_WithDecimalFunction_ReturnsCorrectValue()
+    internal void AST_Function_WithDecimalFunction_ReturnsCorrectValue()
     {
       var functions = new Dictionary<VariableId, CustomFunctionOverload>();
       var functionName = "multiplyDecimal";
@@ -774,13 +774,13 @@ namespace EpsilonScript.Tests.AST
         Compiler.FloatPrecision.Decimal);
       node.Execute(null);
 
-      Assert.Equal(Type.Decimal, node.ValueType);
+      Assert.Equal(ExtendedType.Decimal, node.ValueType);
       var expected = inputValue * 2.5m;
       Assert.Equal(expected, node.DecimalValue);
     }
 
     [Fact]
-    public void AST_Function_WithLongParameters_ReturnsCorrectValue()
+    internal void AST_Function_WithLongParameters_ReturnsCorrectValue()
     {
       var functions = new Dictionary<VariableId, CustomFunctionOverload>();
       var functionName = "addLong";
@@ -805,12 +805,12 @@ namespace EpsilonScript.Tests.AST
         Compiler.FloatPrecision.Float);
       node.Execute(null);
 
-      Assert.Equal(Type.Long, node.ValueType);
+      Assert.Equal(ExtendedType.Long, node.ValueType);
       Assert.Equal(8000000000L, node.LongValue);
     }
 
     [Fact]
-    public void AST_Function_WithDoubleParameters_ReturnsCorrectValue()
+    internal void AST_Function_WithDoubleParameters_ReturnsCorrectValue()
     {
       var functions = new Dictionary<VariableId, CustomFunctionOverload>();
       var functionName = "addDouble";
@@ -821,7 +821,8 @@ namespace EpsilonScript.Tests.AST
       functions[functionId] = overload;
 
       var tupleNode = new TupleNode();
-      var tupleRpn = CreateStack(new FakeDoubleNode(3.141592653589793), new FakeDoubleNode(2.718281828459045));
+      var tupleRpn =
+        CreateStack(new FakeDoubleNode(3.141592653589793), new FakeDoubleNode(2.718281828459045));
       var tupleElement = new Element(new Token(",", TokenType.Comma), ElementType.Comma);
       tupleNode.Build(tupleRpn, tupleElement, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
         Compiler.FloatPrecision.Double);
@@ -835,12 +836,12 @@ namespace EpsilonScript.Tests.AST
         Compiler.FloatPrecision.Double);
       node.Execute(null);
 
-      Assert.Equal(Type.Double, node.ValueType);
+      Assert.Equal(ExtendedType.Double, node.ValueType);
       Assert.Equal(5.859874482048838, node.DoubleValue, precision: 10);
     }
 
     [Fact]
-    public void AST_Function_WithDecimalParameters_ReturnsCorrectValue()
+    internal void AST_Function_WithDecimalParameters_ReturnsCorrectValue()
     {
       var functions = new Dictionary<VariableId, CustomFunctionOverload>();
       var functionName = "addDecimal";
@@ -865,12 +866,12 @@ namespace EpsilonScript.Tests.AST
         Compiler.FloatPrecision.Decimal);
       node.Execute(null);
 
-      Assert.Equal(Type.Decimal, node.ValueType);
+      Assert.Equal(ExtendedType.Decimal, node.ValueType);
       Assert.Equal(0.3m, node.DecimalValue); // Exact decimal arithmetic
     }
 
     [Fact]
-    public void AST_Function_WithMixedIntAndLong_OverloadResolution()
+    internal void AST_Function_WithMixedIntAndLong_OverloadResolution()
     {
       var functions = new Dictionary<VariableId, CustomFunctionOverload>();
       var functionName = "overloaded";
@@ -895,7 +896,7 @@ namespace EpsilonScript.Tests.AST
         Compiler.FloatPrecision.Float);
       intNode.Execute(null);
 
-      Assert.Equal(Type.Integer, intNode.ValueType);
+      Assert.Equal(ExtendedType.Integer, intNode.ValueType);
       Assert.Equal(20, intNode.IntegerValue); // int overload: x * 2
 
       // Test long parameter
@@ -905,12 +906,12 @@ namespace EpsilonScript.Tests.AST
         Compiler.FloatPrecision.Float);
       longNode.Execute(null);
 
-      Assert.Equal(Type.Long, longNode.ValueType);
+      Assert.Equal(ExtendedType.Long, longNode.ValueType);
       Assert.Equal(30L, longNode.LongValue); // long overload: x * 3
     }
 
     [Fact]
-    public void AST_Function_WithMixedFloatAndDouble_OverloadResolution()
+    internal void AST_Function_WithMixedFloatAndDouble_OverloadResolution()
     {
       var functions = new Dictionary<VariableId, CustomFunctionOverload>();
       var functionName = "overloaded";
@@ -935,7 +936,7 @@ namespace EpsilonScript.Tests.AST
         Compiler.FloatPrecision.Float);
       floatNode.Execute(null);
 
-      Assert.Equal(Type.Float, floatNode.ValueType);
+      Assert.Equal(ExtendedType.Float, floatNode.ValueType);
       Assert.True(EpsilonScript.Math.IsNearlyEqual(3.0f, floatNode.FloatValue)); // float overload: x * 2
 
       // Test double parameter
@@ -945,7 +946,7 @@ namespace EpsilonScript.Tests.AST
         Compiler.FloatPrecision.Double);
       doubleNode.Execute(null);
 
-      Assert.Equal(Type.Double, doubleNode.ValueType);
+      Assert.Equal(ExtendedType.Double, doubleNode.ValueType);
       Assert.Equal(4.5, doubleNode.DoubleValue); // double overload: x * 3
     }
 
@@ -958,7 +959,6 @@ namespace EpsilonScript.Tests.AST
 
       public TestVariableNode()
       {
-        ValueType = Type.Integer;
         IntegerValue = 5;
         FloatValue = 5.0f;
         BooleanValue = true;

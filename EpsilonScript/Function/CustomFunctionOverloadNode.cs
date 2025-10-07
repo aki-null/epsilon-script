@@ -19,7 +19,7 @@ namespace EpsilonScript.Function
     private CustomFunctionOverloadNode _booleanNode;
     private CustomFunctionOverloadNode _stringNode;
 
-    public CustomFunction Find(Type[] paramTypes, Compiler.FloatPrecision configuredFloatType, int index = 0)
+    public CustomFunction Find(ExtendedType[] paramTypes, Compiler.FloatPrecision configuredFloatType, int index = 0)
     {
       if (index >= paramTypes.Length)
       {
@@ -28,13 +28,13 @@ namespace EpsilonScript.Function
 
       var nextNode = paramTypes[index] switch
       {
-        Type.Integer => _integerNode,
-        Type.Long => _longNode,
-        Type.Float => _floatNode,
-        Type.Double => _doubleNode,
-        Type.Decimal => _decimalNode,
-        Type.Boolean => _booleanNode,
-        Type.String => _stringNode,
+        ExtendedType.Integer => _integerNode,
+        ExtendedType.Long => _longNode,
+        ExtendedType.Float => _floatNode,
+        ExtendedType.Double => _doubleNode,
+        ExtendedType.Decimal => _decimalNode,
+        ExtendedType.Boolean => _booleanNode,
+        ExtendedType.String => _stringNode,
         _ => null
       };
 
@@ -46,7 +46,7 @@ namespace EpsilonScript.Function
 
       // Fallback: try converting integer types to the configured float type
       // Since compiler precision is fixed, only one float type exists per script
-      if (paramTypes[index] == Type.Integer || paramTypes[index] == Type.Long)
+      if (paramTypes[index] == ExtendedType.Integer || paramTypes[index] == ExtendedType.Long)
       {
         var fallbackNode = configuredFloatType switch
         {

@@ -6,14 +6,10 @@ using EpsilonScript.Intermediate;
 
 namespace EpsilonScript.Tests.TestInfrastructure.Fakes
 {
-  public class FakeStringNode : Node
+  internal class FakeStringNode : Node
   {
     public FakeStringNode(string value)
     {
-      ValueType = Type.String;
-      IntegerValue = 0;
-      FloatValue = 0;
-      BooleanValue = false;
       StringValue = value;
     }
 

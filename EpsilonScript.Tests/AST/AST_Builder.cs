@@ -1,16 +1,16 @@
 using System.Collections.Generic;
 using EpsilonScript.AST;
 using EpsilonScript.Intermediate;
-using Xunit;
 using EpsilonScript.Tests.TestInfrastructure;
+using Xunit;
 
 namespace EpsilonScript.Tests.AST
 {
-  public class AST_Builder : AstTestBase
+  public class AST_Builder
   {
     [Theory]
     [MemberData(nameof(SuccessData))]
-    public void AST_Build_Succeeds(List<Element> elements, Type expectedType)
+    internal void AST_Build_Succeeds(List<Element> elements, ExtendedType expectedType)
     {
       var builder = new AstBuilder(null);
       builder.Configure(Compiler.Options.Immutable, null, Compiler.IntegerPrecision.Integer,
@@ -31,7 +31,7 @@ namespace EpsilonScript.Tests.AST
 
     [Theory]
     [MemberData(nameof(FailData))]
-    public void AST_Build_Fails(List<Element> elements)
+    internal void AST_Build_Fails(List<Element> elements)
     {
       Assert.Throws<RuntimeException>(() =>
       {
@@ -60,7 +60,7 @@ namespace EpsilonScript.Tests.AST
             {
               new Element(new Token("42", TokenType.Integer), ElementType.Integer)
             },
-            Type.Integer
+            ExtendedType.Integer
           },
           // Simple float literal
           new object[]
@@ -69,7 +69,7 @@ namespace EpsilonScript.Tests.AST
             {
               new Element(new Token("3.14", TokenType.Float), ElementType.Float)
             },
-            Type.Float
+            ExtendedType.Float
           },
           // Simple boolean literal
           new object[]
@@ -78,7 +78,7 @@ namespace EpsilonScript.Tests.AST
             {
               new Element(new Token("true", TokenType.BooleanLiteralTrue), ElementType.BooleanLiteralTrue)
             },
-            Type.Boolean
+            ExtendedType.Boolean
           },
           // Simple string literal
           new object[]
@@ -87,7 +87,7 @@ namespace EpsilonScript.Tests.AST
             {
               new Element(new Token("\"hello\"", TokenType.String), ElementType.String)
             },
-            Type.String
+            ExtendedType.String
           },
           // Simple arithmetic: 2 + 3 (in RPN: 2 3 +)
           new object[]
@@ -98,7 +98,7 @@ namespace EpsilonScript.Tests.AST
               new Element(new Token("3", TokenType.Integer), ElementType.Integer),
               new Element(new Token("+", TokenType.PlusSign), ElementType.AddOperator)
             },
-            Type.Integer
+            ExtendedType.Integer
           },
           // Mixed arithmetic: 2.5 * 4 (in RPN: 2.5 4 *)
           new object[]
@@ -109,7 +109,7 @@ namespace EpsilonScript.Tests.AST
               new Element(new Token("4", TokenType.Integer), ElementType.Integer),
               new Element(new Token("*", TokenType.MultiplyOperator), ElementType.MultiplyOperator)
             },
-            Type.Float
+            ExtendedType.Float
           },
           // Comparison: 5 > 3 (in RPN: 5 3 >)
           new object[]
@@ -120,7 +120,7 @@ namespace EpsilonScript.Tests.AST
               new Element(new Token("3", TokenType.Integer), ElementType.Integer),
               new Element(new Token(">", TokenType.ComparisonGreaterThan), ElementType.ComparisonGreaterThan)
             },
-            Type.Boolean
+            ExtendedType.Boolean
           },
           // Boolean operation: true && false (in RPN: true false &&)
           new object[]
@@ -131,7 +131,7 @@ namespace EpsilonScript.Tests.AST
               new Element(new Token("false", TokenType.BooleanLiteralFalse), ElementType.BooleanLiteralFalse),
               new Element(new Token("&&", TokenType.BooleanAndOperator), ElementType.BooleanAndOperator)
             },
-            Type.Boolean
+            ExtendedType.Boolean
           },
           // Unary negation: !true (in RPN: true !)
           new object[]
@@ -141,7 +141,7 @@ namespace EpsilonScript.Tests.AST
               new Element(new Token("true", TokenType.BooleanLiteralTrue), ElementType.BooleanLiteralTrue),
               new Element(new Token("!", TokenType.NegateOperator), ElementType.NegateOperator)
             },
-            Type.Boolean
+            ExtendedType.Boolean
           },
           // String concatenation: "hello" + "world" (in RPN: "hello" "world" +)
           new object[]
@@ -152,7 +152,7 @@ namespace EpsilonScript.Tests.AST
               new Element(new Token("\"world\"", TokenType.String), ElementType.String),
               new Element(new Token("+", TokenType.PlusSign), ElementType.AddOperator)
             },
-            Type.String
+            ExtendedType.String
           }
         };
       }

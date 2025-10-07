@@ -9,7 +9,7 @@ namespace EpsilonScript.Tests.AST
   public class AST_Null : AstTestBase
   {
     [Fact]
-    public void AST_Null_Build_SetsCorrectValueType()
+    internal void AST_Null_Build_SetsCorrectValueType()
     {
       var node = new NullNode();
       var rpn = CreateStack();
@@ -18,11 +18,13 @@ namespace EpsilonScript.Tests.AST
       node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
         Compiler.FloatPrecision.Float);
 
-      Assert.Equal(Type.Null, node.ValueType);
+      Assert.Null(node.TupleValue);
+      Assert.Null(node.StringValue);
+      Assert.Null(node.Variable);
     }
 
     [Fact]
-    public void AST_Null_IsConstant_ReturnsTrue()
+    internal void AST_Null_IsConstant_ReturnsTrue()
     {
       var node = new NullNode();
 
@@ -30,7 +32,7 @@ namespace EpsilonScript.Tests.AST
     }
 
     [Fact]
-    public void AST_Null_Execute_DoesNothing()
+    internal void AST_Null_Execute_DoesNothing()
     {
       var node = new NullNode();
       var rpn = CreateStack();
@@ -42,13 +44,15 @@ namespace EpsilonScript.Tests.AST
       // Execute should not throw or change anything
       node.Execute(null);
 
-      Assert.Equal(Type.Null, node.ValueType);
+      Assert.Null(node.TupleValue);
+      Assert.Null(node.StringValue);
+      Assert.Null(node.Variable);
     }
 
     [Theory]
     [InlineData(Compiler.Options.None)]
     [InlineData(Compiler.Options.Immutable)]
-    public void AST_Null_WorksWithAllCompilerOptions(Compiler.Options options)
+    internal void AST_Null_WorksWithAllCompilerOptions(Compiler.Options options)
     {
       var node = new NullNode();
       var rpn = CreateStack();
@@ -57,11 +61,13 @@ namespace EpsilonScript.Tests.AST
       node.Build(rpn, element, options, null, null, Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float);
       node.Execute(null);
 
-      Assert.Equal(Type.Null, node.ValueType);
+      Assert.Null(node.TupleValue);
+      Assert.Null(node.StringValue);
+      Assert.Null(node.Variable);
     }
 
     [Fact]
-    public void AST_Null_Optimize_ReturnsValueNode()
+    internal void AST_Null_Optimize_ReturnsValueNode()
     {
       var node = new NullNode();
       var rpn = CreateStack();
@@ -74,11 +80,13 @@ namespace EpsilonScript.Tests.AST
 
       // Since NullNode is constant, optimization should return a value node
       Assert.IsAssignableFrom<Node>(optimizedNode);
-      Assert.Equal(Type.Null, optimizedNode.ValueType);
+      Assert.Null(optimizedNode.TupleValue);
+      Assert.Null(optimizedNode.StringValue);
+      Assert.Null(optimizedNode.Variable);
     }
 
     [Fact]
-    public void AST_Null_BuildWithEmptyStack_Succeeds()
+    internal void AST_Null_BuildWithEmptyStack_Succeeds()
     {
       var node = new NullNode();
       var rpn = CreateStack(); // Empty stack is fine for null
@@ -88,11 +96,13 @@ namespace EpsilonScript.Tests.AST
       node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
         Compiler.FloatPrecision.Float);
 
-      Assert.Equal(Type.Null, node.ValueType);
+      Assert.Null(node.TupleValue);
+      Assert.Null(node.StringValue);
+      Assert.Null(node.Variable);
     }
 
     [Fact]
-    public void AST_Null_BuildWithNonEmptyStack_Succeeds()
+    internal void AST_Null_BuildWithNonEmptyStack_Succeeds()
     {
       var node = new NullNode();
       var rpn = CreateStack(new FakeIntegerNode(42)); // Non-empty stack should also work
@@ -102,14 +112,16 @@ namespace EpsilonScript.Tests.AST
       node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
         Compiler.FloatPrecision.Float);
 
-      Assert.Equal(Type.Null, node.ValueType);
+      Assert.Null(node.TupleValue);
+      Assert.Null(node.StringValue);
+      Assert.Null(node.Variable);
       // Stack should still contain the integer node since null doesn't consume it
       Assert.True(rpn.TryPop(out var remainingNode));
       Assert.IsAssignableFrom<Node>(remainingNode);
     }
 
     [Fact]
-    public void AST_Null_DefaultValues_AreCorrect()
+    internal void AST_Null_DefaultValues_AreCorrect()
     {
       var node = new NullNode();
       var rpn = CreateStack();
@@ -118,7 +130,6 @@ namespace EpsilonScript.Tests.AST
       node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
         Compiler.FloatPrecision.Float);
 
-      Assert.Equal(Type.Null, node.ValueType);
       Assert.Equal(0, node.IntegerValue);
       Assert.Equal(0.0f, node.FloatValue);
       Assert.False(node.BooleanValue);
@@ -128,7 +139,7 @@ namespace EpsilonScript.Tests.AST
     }
 
     [Fact]
-    public void AST_Null_MultipleExecutions_RemainConsistent()
+    internal void AST_Null_MultipleExecutions_RemainConsistent()
     {
       var node = new NullNode();
       var rpn = CreateStack();
@@ -143,11 +154,13 @@ namespace EpsilonScript.Tests.AST
       node.Execute(null);
 
       // Should remain null
-      Assert.Equal(Type.Null, node.ValueType);
+      Assert.Null(node.TupleValue);
+      Assert.Null(node.StringValue);
+      Assert.Null(node.Variable);
     }
 
     [Fact]
-    public void AST_Null_WithNullVariableContainer_WorksCorrectly()
+    internal void AST_Null_WithNullVariableContainer_WorksCorrectly()
     {
       var node = new NullNode();
       var rpn = CreateStack();
@@ -157,7 +170,9 @@ namespace EpsilonScript.Tests.AST
         Compiler.FloatPrecision.Float);
       node.Execute(null); // null variable container should be fine
 
-      Assert.Equal(Type.Null, node.ValueType);
+      Assert.Null(node.TupleValue);
+      Assert.Null(node.StringValue);
+      Assert.Null(node.Variable);
     }
   }
 }

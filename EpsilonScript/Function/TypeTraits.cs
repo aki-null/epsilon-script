@@ -1,7 +1,6 @@
 using System;
 using System.Runtime.CompilerServices;
 using EpsilonScript.AST;
-using ScriptType = EpsilonScript.Type;
 #if UNITY_2018_1_OR_NEWER
 using Unity.Collections.LowLevel.Unsafe;
 #endif
@@ -19,7 +18,7 @@ namespace EpsilonScript.Function
     private static readonly Func<T, bool> ToBoolFunc;
     private static readonly Func<T, string> ToStringFunc;
 
-    public static ScriptType ScriptType { get; }
+    public static Type ValueType { get; }
 
     static TypeTraits()
     {
@@ -34,7 +33,7 @@ namespace EpsilonScript.Function
 
       if (typeof(T) == typeof(int))
       {
-        ScriptType = ScriptType.Integer;
+        ValueType = Type.Integer;
         ReadFunc = ReadInt;
         ToIntFunc = ToIntIdentity;
         ToLongFunc = ToIntAsLong;
@@ -43,7 +42,7 @@ namespace EpsilonScript.Function
 
       if (typeof(T) == typeof(long))
       {
-        ScriptType = ScriptType.Long;
+        ValueType = Type.Long;
         ReadFunc = ReadLong;
         ToIntFunc = ToLongAsInt;
         ToLongFunc = ToLongIdentity;
@@ -52,7 +51,7 @@ namespace EpsilonScript.Function
 
       if (typeof(T) == typeof(float))
       {
-        ScriptType = ScriptType.Float;
+        ValueType = Type.Float;
         ReadFunc = ReadFloat;
         ToFloatFunc = ToFloatIdentity;
         ToDoubleFunc = ToFloatAsDouble;
@@ -61,7 +60,7 @@ namespace EpsilonScript.Function
 
       if (typeof(T) == typeof(double))
       {
-        ScriptType = ScriptType.Double;
+        ValueType = Type.Double;
         ReadFunc = ReadDouble;
         ToFloatFunc = ToDoubleAsFloat;
         ToDoubleFunc = ToDoubleIdentity;
@@ -70,7 +69,7 @@ namespace EpsilonScript.Function
 
       if (typeof(T) == typeof(decimal))
       {
-        ScriptType = ScriptType.Decimal;
+        ValueType = Type.Decimal;
         ReadFunc = ReadDecimal;
         ToDecimalFunc = ToDecimalIdentity;
         return;
@@ -78,7 +77,7 @@ namespace EpsilonScript.Function
 
       if (typeof(T) == typeof(bool))
       {
-        ScriptType = ScriptType.Boolean;
+        ValueType = Type.Boolean;
         ReadFunc = ReadBool;
         ToBoolFunc = ToBoolIdentity;
         return;
@@ -86,7 +85,7 @@ namespace EpsilonScript.Function
 
       if (typeof(T) == typeof(string))
       {
-        ScriptType = ScriptType.String;
+        ValueType = Type.String;
         ReadFunc = ReadString;
         ToStringFunc = ToStringIdentity;
         return;
@@ -145,7 +144,7 @@ namespace EpsilonScript.Function
 
     private static T ThrowRead(Node _)
     {
-      throw new InvalidOperationException($"Unsupported script type: {ScriptType}");
+      throw new InvalidOperationException($"Unsupported script type: {ValueType}");
     }
 
     private static int ThrowToInt(T _)

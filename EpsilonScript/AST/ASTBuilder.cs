@@ -5,7 +5,7 @@ using EpsilonScript.Intermediate;
 
 namespace EpsilonScript.AST
 {
-  public class AstBuilder : IElementReader
+  internal class AstBuilder : IElementReader
   {
     public Node Result { get; private set; }
 

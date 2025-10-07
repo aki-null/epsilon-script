@@ -16,7 +16,7 @@ namespace EpsilonScript.Tests.ScriptSystem
     public void IntegerComparisons_ReturnExpectedResults(string expression, bool expected)
     {
       var result = CompileAndExecute(expression, Compiler.Options.Immutable);
-      Assert.Equal(Type.Boolean, result.ValueType);
+      Assert.Equal(Type.Boolean, result.Type);
       Assert.Equal(expected, result.BooleanValue);
     }
 
@@ -28,7 +28,7 @@ namespace EpsilonScript.Tests.ScriptSystem
     public void MixedNumberComparisons_ReturnExpectedResults(string expression, bool expected)
     {
       var result = CompileAndExecute(expression, Compiler.Options.Immutable);
-      Assert.Equal(Type.Boolean, result.ValueType);
+      Assert.Equal(Type.Boolean, result.Type);
       Assert.Equal(expected, result.BooleanValue);
     }
 

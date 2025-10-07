@@ -5,12 +5,12 @@ using EpsilonScript.Intermediate;
 
 namespace EpsilonScript.AST
 {
-  public class ComparisonNode : Node
+  internal class ComparisonNode : Node
   {
     private Node _leftNode;
     private Node _rightNode;
     private ElementType _comparisonType;
-    private Type _comparisonValueType;
+    private ExtendedType _comparisonValueType;
     private Type _configuredIntegerType;
     private Type _configuredFloatType;
 
@@ -21,7 +21,7 @@ namespace EpsilonScript.AST
       IDictionary<VariableId, CustomFunctionOverload> functions,
       Compiler.IntegerPrecision intPrecision, Compiler.FloatPrecision floatPrecision)
     {
-      ValueType = Type.Boolean;
+      ValueType = ExtendedType.Boolean;
       _comparisonType = element.Type;
 
       if (!rpnStack.TryPop(out _rightNode) || !rpnStack.TryPop(out _leftNode))
@@ -43,20 +43,20 @@ namespace EpsilonScript.AST
     }
 
     [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-    private Type PromoteType(Type left, Type right)
+    private ExtendedType PromoteType(ExtendedType left, ExtendedType right)
     {
-      if (left == Type.String || right == Type.String)
-        return Type.String;
+      if (left == ExtendedType.String || right == ExtendedType.String)
+        return ExtendedType.String;
 
-      if (left == Type.Boolean || right == Type.Boolean)
-        return Type.Boolean;
+      if (left == ExtendedType.Boolean || right == ExtendedType.Boolean)
+        return ExtendedType.Boolean;
 
       // Since precision is fixed per compiler, only two numeric types exist:
       // the configured integer type and the configured float type
-      if (left == _configuredFloatType || right == _configuredFloatType)
-        return _configuredFloatType;
+      if (left == (ExtendedType)_configuredFloatType || right == (ExtendedType)_configuredFloatType)
+        return (ExtendedType)_configuredFloatType;
 
-      return _configuredIntegerType;
+      return (ExtendedType)_configuredIntegerType;
     }
 
     public override void Execute(IVariableContainer variablesOverride)
@@ -68,7 +68,7 @@ namespace EpsilonScript.AST
       {
         case ElementType.ComparisonEqual:
         case ElementType.ComparisonNotEqual:
-          if (_leftNode.ValueType == Type.Tuple || _rightNode.ValueType == Type.Tuple ||
+          if (_leftNode.ValueType == ExtendedType.Tuple || _rightNode.ValueType == ExtendedType.Tuple ||
               _leftNode.IsNumeric != _rightNode.IsNumeric)
           {
             throw new RuntimeException("Cannot perform comparison for different value types");
@@ -90,7 +90,7 @@ namespace EpsilonScript.AST
             "Unsupported comparision type");
       }
 
-      if (_leftNode.ValueType == Type.String && _rightNode.ValueType != Type.String)
+      if (_leftNode.ValueType == ExtendedType.String && _rightNode.ValueType != ExtendedType.String)
       {
         throw new RuntimeException("String can only be compared against a string");
       }
@@ -100,83 +100,83 @@ namespace EpsilonScript.AST
       BooleanValue = (_comparisonType, _comparisonValueType) switch
       {
         // Equal comparisons
-        (ElementType.ComparisonEqual, Type.Integer) =>
+        (ElementType.ComparisonEqual, ExtendedType.Integer) =>
           _leftNode.IntegerValue == _rightNode.IntegerValue,
-        (ElementType.ComparisonEqual, Type.Long) =>
+        (ElementType.ComparisonEqual, ExtendedType.Long) =>
           _leftNode.LongValue == _rightNode.LongValue,
-        (ElementType.ComparisonEqual, Type.Float) =>
+        (ElementType.ComparisonEqual, ExtendedType.Float) =>
           Math.IsNearlyEqual(_leftNode.FloatValue, _rightNode.FloatValue),
-        (ElementType.ComparisonEqual, Type.Double) =>
+        (ElementType.ComparisonEqual, ExtendedType.Double) =>
           Math.IsNearlyEqual(_leftNode.DoubleValue, _rightNode.DoubleValue),
-        (ElementType.ComparisonEqual, Type.Decimal) =>
+        (ElementType.ComparisonEqual, ExtendedType.Decimal) =>
           _leftNode.DecimalValue == _rightNode.DecimalValue,
-        (ElementType.ComparisonEqual, Type.Boolean) =>
+        (ElementType.ComparisonEqual, ExtendedType.Boolean) =>
           _leftNode.BooleanValue == _rightNode.BooleanValue,
-        (ElementType.ComparisonEqual, Type.String) =>
+        (ElementType.ComparisonEqual, ExtendedType.String) =>
           string.Equals(_leftNode.StringValue, _rightNode.StringValue, StringComparison.Ordinal),
 
         // Not equal comparisons
-        (ElementType.ComparisonNotEqual, Type.Integer) =>
+        (ElementType.ComparisonNotEqual, ExtendedType.Integer) =>
           _leftNode.IntegerValue != _rightNode.IntegerValue,
-        (ElementType.ComparisonNotEqual, Type.Long) =>
+        (ElementType.ComparisonNotEqual, ExtendedType.Long) =>
           _leftNode.LongValue != _rightNode.LongValue,
-        (ElementType.ComparisonNotEqual, Type.Float) =>
+        (ElementType.ComparisonNotEqual, ExtendedType.Float) =>
           !Math.IsNearlyEqual(_leftNode.FloatValue, _rightNode.FloatValue),
-        (ElementType.ComparisonNotEqual, Type.Double) =>
+        (ElementType.ComparisonNotEqual, ExtendedType.Double) =>
           !Math.IsNearlyEqual(_leftNode.DoubleValue, _rightNode.DoubleValue),
-        (ElementType.ComparisonNotEqual, Type.Decimal) =>
+        (ElementType.ComparisonNotEqual, ExtendedType.Decimal) =>
           _leftNode.DecimalValue != _rightNode.DecimalValue,
-        (ElementType.ComparisonNotEqual, Type.Boolean) =>
+        (ElementType.ComparisonNotEqual, ExtendedType.Boolean) =>
           _leftNode.BooleanValue != _rightNode.BooleanValue,
-        (ElementType.ComparisonNotEqual, Type.String) =>
+        (ElementType.ComparisonNotEqual, ExtendedType.String) =>
           !string.Equals(_leftNode.StringValue, _rightNode.StringValue, StringComparison.Ordinal),
 
         // Less than comparisons
-        (ElementType.ComparisonLessThan, Type.Integer) =>
+        (ElementType.ComparisonLessThan, ExtendedType.Integer) =>
           _leftNode.IntegerValue < _rightNode.IntegerValue,
-        (ElementType.ComparisonLessThan, Type.Long) =>
+        (ElementType.ComparisonLessThan, ExtendedType.Long) =>
           _leftNode.LongValue < _rightNode.LongValue,
-        (ElementType.ComparisonLessThan, Type.Float) =>
+        (ElementType.ComparisonLessThan, ExtendedType.Float) =>
           _leftNode.FloatValue < _rightNode.FloatValue,
-        (ElementType.ComparisonLessThan, Type.Double) =>
+        (ElementType.ComparisonLessThan, ExtendedType.Double) =>
           _leftNode.DoubleValue < _rightNode.DoubleValue,
-        (ElementType.ComparisonLessThan, Type.Decimal) =>
+        (ElementType.ComparisonLessThan, ExtendedType.Decimal) =>
           _leftNode.DecimalValue < _rightNode.DecimalValue,
 
         // Less than or equal comparisons
-        (ElementType.ComparisonLessThanOrEqualTo, Type.Integer) =>
+        (ElementType.ComparisonLessThanOrEqualTo, ExtendedType.Integer) =>
           _leftNode.IntegerValue <= _rightNode.IntegerValue,
-        (ElementType.ComparisonLessThanOrEqualTo, Type.Long) =>
+        (ElementType.ComparisonLessThanOrEqualTo, ExtendedType.Long) =>
           _leftNode.LongValue <= _rightNode.LongValue,
-        (ElementType.ComparisonLessThanOrEqualTo, Type.Float) =>
+        (ElementType.ComparisonLessThanOrEqualTo, ExtendedType.Float) =>
           _leftNode.FloatValue <= _rightNode.FloatValue,
-        (ElementType.ComparisonLessThanOrEqualTo, Type.Double) =>
+        (ElementType.ComparisonLessThanOrEqualTo, ExtendedType.Double) =>
           _leftNode.DoubleValue <= _rightNode.DoubleValue,
-        (ElementType.ComparisonLessThanOrEqualTo, Type.Decimal) =>
+        (ElementType.ComparisonLessThanOrEqualTo, ExtendedType.Decimal) =>
           _leftNode.DecimalValue <= _rightNode.DecimalValue,
 
         // Greater than comparisons
-        (ElementType.ComparisonGreaterThan, Type.Integer) =>
+        (ElementType.ComparisonGreaterThan, ExtendedType.Integer) =>
           _leftNode.IntegerValue > _rightNode.IntegerValue,
-        (ElementType.ComparisonGreaterThan, Type.Long) =>
+        (ElementType.ComparisonGreaterThan, ExtendedType.Long) =>
           _leftNode.LongValue > _rightNode.LongValue,
-        (ElementType.ComparisonGreaterThan, Type.Float) =>
+        (ElementType.ComparisonGreaterThan, ExtendedType.Float) =>
           _leftNode.FloatValue > _rightNode.FloatValue,
-        (ElementType.ComparisonGreaterThan, Type.Double) =>
+        (ElementType.ComparisonGreaterThan, ExtendedType.Double) =>
           _leftNode.DoubleValue > _rightNode.DoubleValue,
-        (ElementType.ComparisonGreaterThan, Type.Decimal) =>
+        (ElementType.ComparisonGreaterThan, ExtendedType.Decimal) =>
           _leftNode.DecimalValue > _rightNode.DecimalValue,
 
         // Greater than or equal comparisons
-        (ElementType.ComparisonGreaterThanOrEqualTo, Type.Integer) =>
+        (ElementType.ComparisonGreaterThanOrEqualTo, ExtendedType.Integer) =>
           _leftNode.IntegerValue >= _rightNode.IntegerValue,
-        (ElementType.ComparisonGreaterThanOrEqualTo, Type.Long) =>
+        (ElementType.ComparisonGreaterThanOrEqualTo, ExtendedType.Long) =>
           _leftNode.LongValue >= _rightNode.LongValue,
-        (ElementType.ComparisonGreaterThanOrEqualTo, Type.Float) =>
+        (ElementType.ComparisonGreaterThanOrEqualTo, ExtendedType.Float) =>
           _leftNode.FloatValue >= _rightNode.FloatValue,
-        (ElementType.ComparisonGreaterThanOrEqualTo, Type.Double) =>
+        (ElementType.ComparisonGreaterThanOrEqualTo, ExtendedType.Double) =>
           _leftNode.DoubleValue >= _rightNode.DoubleValue,
-        (ElementType.ComparisonGreaterThanOrEqualTo, Type.Decimal) =>
+        (ElementType.ComparisonGreaterThanOrEqualTo, ExtendedType.Decimal) =>
           _leftNode.DecimalValue >= _rightNode.DecimalValue,
 
         _ => throw new ArgumentOutOfRangeException(

@@ -7,7 +7,7 @@ namespace EpsilonScript.Tests.TestInfrastructure
 {
   public abstract class RpnConverterTestBase
   {
-    protected static void AssertRpnSucceeds(IList<Element> input, IList<Element> expected)
+    internal static void AssertRpnSucceeds(IList<Element> input, IList<Element> expected)
     {
       var elementReader = new TestElementReader();
       var converter = new EpsilonScript.Parser.RpnConverter(elementReader);
@@ -30,7 +30,7 @@ namespace EpsilonScript.Tests.TestInfrastructure
       }
     }
 
-    protected static void AssertRpnFails(IList<Element> input)
+    internal static void AssertRpnFails(IList<Element> input)
     {
       var elementReader = new TestElementReader();
       var converter = new global::EpsilonScript.Parser.RpnConverter(elementReader);

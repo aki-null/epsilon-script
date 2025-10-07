@@ -5,7 +5,7 @@ using EpsilonScript.Intermediate;
 
 namespace EpsilonScript.AST
 {
-  public class AssignmentNode : Node
+  internal class AssignmentNode : Node
   {
     private Node _leftNode;
     private Node _rightNode;

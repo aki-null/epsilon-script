@@ -10,35 +10,35 @@ namespace EpsilonScript.Tests.Parser
   {
     [Theory]
     [MemberData(nameof(DeeplyNestedExpressions))]
-    public void TokenParser_DeeplyNestedExpressions_ParsesCorrectly(Token[] input, Element[] expected)
+    internal void TokenParser_DeeplyNestedExpressions_ParsesCorrectly(Token[] input, Element[] expected)
     {
       AssertParseSucceeds(input, expected);
     }
 
     [Theory]
     [MemberData(nameof(ComplexArithmeticExpressions))]
-    public void TokenParser_ComplexArithmeticExpressions_ParsesCorrectly(Token[] input, Element[] expected)
+    internal void TokenParser_ComplexArithmeticExpressions_ParsesCorrectly(Token[] input, Element[] expected)
     {
       AssertParseSucceeds(input, expected);
     }
 
     [Theory]
     [MemberData(nameof(ComplexBooleanExpressions))]
-    public void TokenParser_ComplexBooleanExpressions_ParsesCorrectly(Token[] input, Element[] expected)
+    internal void TokenParser_ComplexBooleanExpressions_ParsesCorrectly(Token[] input, Element[] expected)
     {
       AssertParseSucceeds(input, expected);
     }
 
     [Theory]
     [MemberData(nameof(ComplexFunctionCallExpressions))]
-    public void TokenParser_ComplexFunctionCallExpressions_ParsesCorrectly(Token[] input, Element[] expected)
+    internal void TokenParser_ComplexFunctionCallExpressions_ParsesCorrectly(Token[] input, Element[] expected)
     {
       AssertParseSucceeds(input, expected);
     }
 
     [Theory]
     [MemberData(nameof(MixedTypeExpressions))]
-    public void TokenParser_MixedTypeExpressions_ParsesCorrectly(Token[] input, Element[] expected)
+    internal void TokenParser_MixedTypeExpressions_ParsesCorrectly(Token[] input, Element[] expected)
     {
       AssertParseSucceeds(input, expected);
     }

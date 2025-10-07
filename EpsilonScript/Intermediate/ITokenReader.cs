@@ -1,6 +1,6 @@
 namespace EpsilonScript.Intermediate
 {
-  public interface ITokenReader
+  internal interface ITokenReader
   {
     void Push(Token token);
     void End();

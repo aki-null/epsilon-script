@@ -15,7 +15,7 @@ namespace EpsilonScript.Tests.TestInfrastructure
     /// <summary>
     /// Assert that a parser exception is thrown with the expected message fragment
     /// </summary>
-    public static void AssertParserException(Action action, string expectedMessageFragment)
+    internal static void AssertParserException(Action action, string expectedMessageFragment)
     {
       var exception = Assert.Throws<ParserException>(action);
       if (!string.IsNullOrEmpty(expectedMessageFragment))
@@ -27,7 +27,7 @@ namespace EpsilonScript.Tests.TestInfrastructure
     /// <summary>
     /// Assert that a runtime exception is thrown with the expected message fragment
     /// </summary>
-    public static void AssertRuntimeException(Action action, string expectedMessageFragment)
+    internal static void AssertRuntimeException(Action action, string expectedMessageFragment)
     {
       var exception = Assert.Throws<RuntimeException>(action);
       if (!string.IsNullOrEmpty(expectedMessageFragment))
@@ -39,7 +39,7 @@ namespace EpsilonScript.Tests.TestInfrastructure
     /// <summary>
     /// Helper to build AST node with error handling
     /// </summary>
-    public static void BuildNodeExpectingError<TException>(Node node, Stack<Node> rpnStack, Element element,
+    internal static void BuildNodeExpectingError<TException>(Node node, Stack<Node> rpnStack, Element element,
       Compiler.Options options, IVariableContainer variables,
       IDictionary<VariableId, CustomFunctionOverload> functions, string expectedMessageFragment = null)
       where TException : Exception
@@ -57,7 +57,7 @@ namespace EpsilonScript.Tests.TestInfrastructure
     /// <summary>
     /// Helper to execute AST node expecting error
     /// </summary>
-    public static void ExecuteNodeExpectingError<TException>(Node node,
+    internal static void ExecuteNodeExpectingError<TException>(Node node,
       IVariableContainer variablesOverride = null, string expectedMessageFragment = null)
       where TException : Exception
     {

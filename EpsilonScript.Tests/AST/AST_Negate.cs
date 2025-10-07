@@ -14,7 +14,7 @@ namespace EpsilonScript.Tests.AST
     [Theory]
     [InlineData(true, false, 0, 0.0f)]
     [InlineData(false, true, 1, 1.0f)]
-    public void AST_Negate_WithBooleanValue_ReturnsNegatedValue(bool inputValue, bool expectedBool, int expectedInt,
+    internal void AST_Negate_WithBooleanValue_ReturnsNegatedValue(bool inputValue, bool expectedBool, int expectedInt,
       float expectedFloat)
     {
       var node = new NegateNode();
@@ -25,7 +25,7 @@ namespace EpsilonScript.Tests.AST
         Compiler.FloatPrecision.Float);
       node.Execute(null);
 
-      Assert.Equal(Type.Boolean, node.ValueType);
+      Assert.Equal(ExtendedType.Boolean, node.ValueType);
       Assert.Equal(expectedBool, node.BooleanValue);
       Assert.Equal(expectedInt, node.IntegerValue);
       Assert.Equal(expectedFloat, node.FloatValue, 6);
@@ -36,7 +36,7 @@ namespace EpsilonScript.Tests.AST
     [InlineData(0)]
     [InlineData(-1)]
     [InlineData(42)]
-    public void AST_Negate_WithIntegerValue_ThrowsRuntimeException(int value)
+    internal void AST_Negate_WithIntegerValue_ThrowsRuntimeException(int value)
     {
       var node = new NegateNode();
       var rpn = CreateStack(new FakeIntegerNode(value));
@@ -52,7 +52,7 @@ namespace EpsilonScript.Tests.AST
     [InlineData(3.14f)]
     [InlineData(0.0f)]
     [InlineData(-2.5f)]
-    public void AST_Negate_WithFloatValue_ThrowsRuntimeException(float value)
+    internal void AST_Negate_WithFloatValue_ThrowsRuntimeException(float value)
     {
       var node = new NegateNode();
       var rpn = CreateStack(new FakeFloatNode(value));
@@ -69,7 +69,7 @@ namespace EpsilonScript.Tests.AST
     [InlineData("")]
     [InlineData("true")]
     [InlineData("false")]
-    public void AST_Negate_WithStringValue_ThrowsRuntimeException(string value)
+    internal void AST_Negate_WithStringValue_ThrowsRuntimeException(string value)
     {
       var node = new NegateNode();
       var rpn = CreateStack(new FakeStringNode(value));
@@ -82,7 +82,7 @@ namespace EpsilonScript.Tests.AST
     }
 
     [Fact]
-    public void AST_Negate_WithoutChild_ThrowsParserException()
+    internal void AST_Negate_WithoutChild_ThrowsParserException()
     {
       var node = new NegateNode();
       var rpn = CreateStack(); // Empty stack
@@ -95,7 +95,7 @@ namespace EpsilonScript.Tests.AST
     [Theory]
     [InlineData(true)]
     [InlineData(false)]
-    public void AST_Negate_IsConstant_ReflectsChildConstantness(bool childValue)
+    internal void AST_Negate_IsConstant_ReflectsChildConstantness(bool childValue)
     {
       var node = new NegateNode();
       var childNode = new FakeBooleanNode(childValue); // FakeNode is constant
@@ -109,7 +109,7 @@ namespace EpsilonScript.Tests.AST
     }
 
     [Fact]
-    public void AST_Negate_IsConstant_WithVariableChild_ReturnsFalse()
+    internal void AST_Negate_IsConstant_WithVariableChild_ReturnsFalse()
     {
       var node = new NegateNode();
       var childNode = new TestVariableNode(); // Variable node is not constant
@@ -125,7 +125,7 @@ namespace EpsilonScript.Tests.AST
     [Theory]
     [InlineData(true, false)]
     [InlineData(false, true)]
-    public void AST_Negate_Optimize_WithConstantChild_ReturnsValueNode(bool inputValue, bool expectedValue)
+    internal void AST_Negate_Optimize_WithConstantChild_ReturnsValueNode(bool inputValue, bool expectedValue)
     {
       var node = new NegateNode();
       var rpn = CreateStack(new FakeBooleanNode(inputValue));
@@ -138,12 +138,12 @@ namespace EpsilonScript.Tests.AST
 
       // Should return a value node since it's constant
       Assert.IsAssignableFrom<Node>(optimizedNode);
-      Assert.Equal(Type.Boolean, optimizedNode.ValueType);
+      Assert.Equal(ExtendedType.Boolean, optimizedNode.ValueType);
       Assert.Equal(expectedValue, optimizedNode.BooleanValue);
     }
 
     [Fact]
-    public void AST_Negate_Optimize_WithNonConstantChild_ReturnsSelf()
+    internal void AST_Negate_Optimize_WithNonConstantChild_ReturnsSelf()
     {
       var node = new NegateNode();
       var childNode = new TestVariableNode();
@@ -162,7 +162,7 @@ namespace EpsilonScript.Tests.AST
     [Theory]
     [InlineData(Compiler.Options.None)]
     [InlineData(Compiler.Options.Immutable)]
-    public void AST_Negate_WorksWithAllCompilerOptions(Compiler.Options options)
+    internal void AST_Negate_WorksWithAllCompilerOptions(Compiler.Options options)
     {
       var node = new NegateNode();
       var rpn = CreateStack(new FakeBooleanNode(true));
@@ -171,12 +171,12 @@ namespace EpsilonScript.Tests.AST
       node.Build(rpn, element, options, null, null, Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float);
       node.Execute(null);
 
-      Assert.Equal(Type.Boolean, node.ValueType);
+      Assert.Equal(ExtendedType.Boolean, node.ValueType);
       Assert.False(node.BooleanValue);
     }
 
     [Fact]
-    public void AST_Negate_DoubleNegation_ReturnsOriginalValue()
+    internal void AST_Negate_DoubleNegation_ReturnsOriginalValue()
     {
       // Create !!true
       var innerNegate = new NegateNode();
@@ -193,7 +193,7 @@ namespace EpsilonScript.Tests.AST
 
       outerNegate.Execute(null);
 
-      Assert.Equal(Type.Boolean, outerNegate.ValueType);
+      Assert.Equal(ExtendedType.Boolean, outerNegate.ValueType);
       Assert.True(outerNegate.BooleanValue); // !!true should be true
     }
 
@@ -204,7 +204,6 @@ namespace EpsilonScript.Tests.AST
 
       public TestVariableNode()
       {
-        ValueType = Type.Boolean;
         BooleanValue = true;
         IntegerValue = 1;
         FloatValue = 1.0f;

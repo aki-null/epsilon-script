@@ -3,7 +3,7 @@ using EpsilonScript.Intermediate;
 
 namespace EpsilonScript.Parser
 {
-  public class TokenParser : ITokenReader
+  internal class TokenParser : ITokenReader
   {
     private enum State
     {

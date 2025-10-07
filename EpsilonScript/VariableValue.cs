@@ -7,7 +7,7 @@ namespace EpsilonScript
   [StructLayout(LayoutKind.Explicit)]
   public class VariableValue
   {
-    // Offset 0: Type tag (4 bytes)
+    // Offset 0: Type tag (1 byte for byte enum)
     [FieldOffset(0)] private Type _type;
 
     // Offset 8: Union of 8-byte numeric types (8 bytes total, 8-byte aligned)

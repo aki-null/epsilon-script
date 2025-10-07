@@ -12,7 +12,7 @@ namespace EpsilonScript.Tests.AST
   {
     [Theory]
     [MemberData(nameof(CorrectData))]
-    public void AST_BuildInteger_Succeeds(Element element, Type expectedNodeType, int expectedInt,
+    internal void AST_BuildInteger_Succeeds(Element element, ExtendedType expectedNodeType, int expectedInt,
       float expectedFloat, bool expectedBool)
     {
       var node = new IntegerNode();
@@ -30,12 +30,12 @@ namespace EpsilonScript.Tests.AST
     [InlineData(0)]
     [InlineData(1)]
     [InlineData(2147483647)]
-    public void AST_CreateInteger_Succeeds(int value)
+    internal void AST_CreateInteger_Succeeds(int value)
     {
       var node = new IntegerNode(value);
       var expectedFloat = (float)value;
       var expectedBool = value != 0;
-      Assert.Equal(Type.Integer, node.ValueType);
+      Assert.Equal(ExtendedType.Integer, node.ValueType);
       Assert.Equal(value, node.IntegerValue);
       Assert.True(EpsilonScript.Math.IsNearlyEqual(expectedFloat, node.FloatValue));
       Assert.Equal(expectedBool, node.BooleanValue);
@@ -50,7 +50,7 @@ namespace EpsilonScript.Tests.AST
           new object[]
           {
             new Element(new Token("0", TokenType.Integer), ElementType.Integer),
-            Type.Integer,
+            ExtendedType.Integer,
             0,
             0.0f,
             false
@@ -58,7 +58,7 @@ namespace EpsilonScript.Tests.AST
           new object[]
           {
             new Element(new Token("1", TokenType.Integer), ElementType.Integer),
-            Type.Integer,
+            ExtendedType.Integer,
             1,
             1.0f,
             true
@@ -66,7 +66,7 @@ namespace EpsilonScript.Tests.AST
           new object[]
           {
             new Element(new Token("2147483647", TokenType.Integer), ElementType.Integer),
-            Type.Integer,
+            ExtendedType.Integer,
             2147483647,
             2147483647.0f,
             true

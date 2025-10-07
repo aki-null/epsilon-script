@@ -34,7 +34,7 @@ namespace EpsilonScript.Tests.ScriptSystem
     public void LogicalNegation_ReturnsOppositeBoolean()
     {
       var result = CompileAndExecute("!(10 > 5)");
-      Assert.Equal(Type.Boolean, result.ValueType);
+      Assert.Equal(Type.Boolean, result.Type);
       Assert.False(result.BooleanValue);
     }
   }

@@ -5,7 +5,7 @@ using EpsilonScript.Intermediate;
 
 namespace EpsilonScript.AST
 {
-  public class SignOperator : Node
+  internal class SignOperator : Node
   {
     private Node _childNode;
     private ElementType _operationType;
@@ -35,7 +35,7 @@ namespace EpsilonScript.AST
 
       switch (_childNode.ValueType)
       {
-        case Type.Integer:
+        case ExtendedType.Integer:
           switch (_operationType)
           {
             case ElementType.PositiveOperator:
@@ -50,7 +50,7 @@ namespace EpsilonScript.AST
           }
 
           break;
-        case Type.Long:
+        case ExtendedType.Long:
           switch (_operationType)
           {
             case ElementType.PositiveOperator:
@@ -65,7 +65,7 @@ namespace EpsilonScript.AST
           }
 
           break;
-        case Type.Float:
+        case ExtendedType.Float:
           switch (_operationType)
           {
             case ElementType.PositiveOperator:
@@ -80,7 +80,7 @@ namespace EpsilonScript.AST
           }
 
           break;
-        case Type.Double:
+        case ExtendedType.Double:
           switch (_operationType)
           {
             case ElementType.PositiveOperator:
@@ -95,7 +95,7 @@ namespace EpsilonScript.AST
           }
 
           break;
-        case Type.Decimal:
+        case ExtendedType.Decimal:
           switch (_operationType)
           {
             case ElementType.PositiveOperator:

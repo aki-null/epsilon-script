@@ -4,7 +4,7 @@ using EpsilonScript.Intermediate;
 
 namespace EpsilonScript.AST
 {
-  public class NegateNode : Node
+  internal class NegateNode : Node
   {
     private Node _childNode;
 
@@ -14,7 +14,7 @@ namespace EpsilonScript.AST
       IVariableContainer variables, IDictionary<VariableId, CustomFunctionOverload> functions,
       Compiler.IntegerPrecision intPrecision, Compiler.FloatPrecision floatPrecision)
     {
-      ValueType = Type.Boolean;
+      ValueType = ExtendedType.Boolean;
 
       if (!rpnStack.TryPop(out _childNode))
       {
@@ -25,7 +25,7 @@ namespace EpsilonScript.AST
     public override void Execute(IVariableContainer variablesOverride)
     {
       _childNode.Execute(variablesOverride);
-      if (_childNode.ValueType != Type.Boolean)
+      if (_childNode.ValueType != ExtendedType.Boolean)
       {
         throw new RuntimeException("Cannot negate a non-boolean value");
       }

@@ -30,7 +30,7 @@ namespace EpsilonScript.Tests.AST
     }
 
     [Fact]
-    public void AST_Assignment_ConvertsDoubleToFloat_WhenAssigningToFloatVariable()
+    internal void AST_Assignment_ConvertsDoubleToFloat_WhenAssigningToFloatVariable()
     {
       // Create variable with Float type
       var variable = new VariableValue(Type.Float);
@@ -53,7 +53,7 @@ namespace EpsilonScript.Tests.AST
     }
 
     [Fact]
-    public void AST_Assignment_ConvertsDecimalToFloat_WhenAssigningToFloatVariable()
+    internal void AST_Assignment_ConvertsDecimalToFloat_WhenAssigningToFloatVariable()
     {
       // Create variable with Float type
       var variable = new VariableValue(Type.Float);
@@ -79,7 +79,7 @@ namespace EpsilonScript.Tests.AST
     [InlineData(Compiler.FloatPrecision.Float)]
     [InlineData(Compiler.FloatPrecision.Double)]
     [InlineData(Compiler.FloatPrecision.Decimal)]
-    public void AST_Assignment_PreservesPrecision_WhenAssigningToDoubleVariable(
+    internal void AST_Assignment_PreservesPrecision_WhenAssigningToDoubleVariable(
       Compiler.FloatPrecision floatPrecision)
     {
       // Create variable with Double type
@@ -88,7 +88,7 @@ namespace EpsilonScript.Tests.AST
       var leftNode = new FakeVariableNode(variable);
 
       // Create right node with high precision value
-      double highPrecisionValue = 1.23456789012345;
+      var highPrecisionValue = 1.23456789012345;
       Node rightNode = floatPrecision switch
       {
         Compiler.FloatPrecision.Float => new FakeFloatNode((float)highPrecisionValue),
@@ -106,7 +106,7 @@ namespace EpsilonScript.Tests.AST
       node.Execute(null);
 
       // Double variable receives value with precision limited by right-hand side type
-      double expectedValue = floatPrecision switch
+      var expectedValue = floatPrecision switch
       {
         Compiler.FloatPrecision.Float => (float)highPrecisionValue, // Float precision
         Compiler.FloatPrecision.Double => highPrecisionValue, // Double precision
@@ -117,7 +117,7 @@ namespace EpsilonScript.Tests.AST
     }
 
     [Fact]
-    public void AST_Assignment_PreservesPrecision_WhenAssigningToDecimalVariable()
+    internal void AST_Assignment_PreservesPrecision_WhenAssigningToDecimalVariable()
     {
       // Create variable with Decimal type
       var variable = new VariableValue(Type.Decimal);
@@ -125,7 +125,7 @@ namespace EpsilonScript.Tests.AST
       var leftNode = new FakeVariableNode(variable);
 
       // Create right node with high precision decimal value
-      decimal highPrecisionValue = 1.234567890123456789012345678m;
+      var highPrecisionValue = 1.234567890123456789012345678m;
       var rightNode = new FakeDecimalNode(highPrecisionValue);
 
       var node = new AssignmentNode();
@@ -145,7 +145,7 @@ namespace EpsilonScript.Tests.AST
     [InlineData(ElementType.AssignmentSubtractOperator, "-=")]
     [InlineData(ElementType.AssignmentMultiplyOperator, "*=")]
     [InlineData(ElementType.AssignmentDivideOperator, "/=")]
-    public void AST_Assignment_CompoundAssignments_PreserveDoublePrecision(
+    internal void AST_Assignment_CompoundAssignments_PreserveDoublePrecision(
       ElementType operatorType, string operatorSymbol)
     {
       // Create variable with Double type
@@ -165,7 +165,7 @@ namespace EpsilonScript.Tests.AST
       node.Execute(null);
 
       // Calculate expected value
-      double expected = operatorType switch
+      var expected = operatorType switch
       {
         ElementType.AssignmentAddOperator => 1.0 + 1.23456789012345,
         ElementType.AssignmentSubtractOperator => 1.0 - 1.23456789012345,
@@ -183,7 +183,7 @@ namespace EpsilonScript.Tests.AST
     [InlineData(ElementType.AssignmentSubtractOperator, "-=")]
     [InlineData(ElementType.AssignmentMultiplyOperator, "*=")]
     [InlineData(ElementType.AssignmentDivideOperator, "/=")]
-    public void AST_Assignment_CompoundAssignments_PreserveDecimalPrecision(
+    internal void AST_Assignment_CompoundAssignments_PreserveDecimalPrecision(
       ElementType operatorType, string operatorSymbol)
     {
       // Create variable with Decimal type
@@ -192,7 +192,7 @@ namespace EpsilonScript.Tests.AST
       var leftNode = new FakeVariableNode(variable);
 
       // Create right node with decimal precision value
-      decimal rightValue = 1.234567890123456789m;
+      var rightValue = 1.234567890123456789m;
       var rightNode = new FakeDecimalNode(rightValue);
 
       var node = new AssignmentNode();
@@ -204,7 +204,7 @@ namespace EpsilonScript.Tests.AST
       node.Execute(null);
 
       // Calculate expected value
-      decimal expected = operatorType switch
+      var expected = operatorType switch
       {
         ElementType.AssignmentAddOperator => 1.0m + rightValue,
         ElementType.AssignmentSubtractOperator => 1.0m - rightValue,
@@ -218,7 +218,7 @@ namespace EpsilonScript.Tests.AST
     }
 
     [Fact]
-    public void AST_Assignment_PreservesLongPrecision_WhenAssigningToLongVariable()
+    internal void AST_Assignment_PreservesLongPrecision_WhenAssigningToLongVariable()
     {
       // Create variable with Long type
       var variable = new VariableValue(Type.Long);
@@ -226,7 +226,7 @@ namespace EpsilonScript.Tests.AST
       var leftNode = new FakeVariableNode(variable);
 
       // Create right node with long value
-      long largeValue = 987654321012345678L;
+      var largeValue = 987654321012345678L;
       var rightNode = new FakeLongNode(largeValue);
 
       var node = new AssignmentNode();
@@ -246,7 +246,7 @@ namespace EpsilonScript.Tests.AST
     [InlineData(ElementType.AssignmentSubtractOperator, "-=")]
     [InlineData(ElementType.AssignmentMultiplyOperator, "*=")]
     [InlineData(ElementType.AssignmentDivideOperator, "/=")]
-    public void AST_Assignment_CompoundAssignments_PreserveLongPrecision(
+    internal void AST_Assignment_CompoundAssignments_PreserveLongPrecision(
       ElementType operatorType, string operatorSymbol)
     {
       // Create variable with Long type
@@ -255,7 +255,7 @@ namespace EpsilonScript.Tests.AST
       var leftNode = new FakeVariableNode(variable);
 
       // Create right node with long value
-      long rightValue = 123456789L;
+      var rightValue = 123456789L;
       var rightNode = new FakeLongNode(rightValue);
 
       var node = new AssignmentNode();
@@ -267,7 +267,7 @@ namespace EpsilonScript.Tests.AST
       node.Execute(null);
 
       // Calculate expected value
-      long expected = operatorType switch
+      var expected = operatorType switch
       {
         ElementType.AssignmentAddOperator => 1000000000000L + rightValue,
         ElementType.AssignmentSubtractOperator => 1000000000000L - rightValue,
@@ -281,7 +281,7 @@ namespace EpsilonScript.Tests.AST
     }
 
     [Fact]
-    public void AST_Assignment_CompoundAssignment_ConvertsDoubleToFloat()
+    internal void AST_Assignment_CompoundAssignment_ConvertsDoubleToFloat()
     {
       // Create Float variable
       var variable = new VariableValue(Type.Float);
@@ -300,12 +300,12 @@ namespace EpsilonScript.Tests.AST
       node.Execute(null);
 
       // Double value should be converted to float for compound assignment
-      float expected = 1.0f + 1.2345679f;
+      var expected = 1.0f + 1.2345679f;
       Assert.Equal(expected, variable.FloatValue, precision: 6);
     }
 
     [Fact]
-    public void AST_Assignment_ConvertsLongToInteger_WithPotentialOverflow()
+    internal void AST_Assignment_ConvertsLongToInteger_WithPotentialOverflow()
     {
       // Create Integer variable
       var variable = new VariableValue(Type.Integer);

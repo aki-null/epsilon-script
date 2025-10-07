@@ -7,7 +7,7 @@ using EpsilonScript.Intermediate;
 
 namespace EpsilonScript.AST
 {
-  public abstract class Node
+  internal abstract class Node
   {
     /// Value storage using union approach for memory efficiency
     /// - Union stores long/double (8 bytes, overlapping)
@@ -24,7 +24,7 @@ namespace EpsilonScript.AST
       public double FloatValue;
     }
 
-    private Type _type;
+    private ExtendedType _type;
     private ValueUnion _value;
     private decimal _decimalValue;
     private string _stringValue;
@@ -34,7 +34,7 @@ namespace EpsilonScript.AST
       get => _stringValue;
       protected set
       {
-        _type = Type.String;
+        _type = ExtendedType.String;
         _stringValue = value;
       }
     }
@@ -43,10 +43,10 @@ namespace EpsilonScript.AST
 
     public VariableValue Variable { get; protected set; }
 
-    public Type ValueType
+    internal ExtendedType ValueType
     {
       get => _type;
-      protected set => _type = value;
+      set => _type = value;
     }
 
     public bool IsNumeric => _type.IsNumber();
@@ -59,22 +59,22 @@ namespace EpsilonScript.AST
       {
         switch (_type)
         {
-          case Type.Integer:
-          case Type.Long:
+          case ExtendedType.Integer:
+          case ExtendedType.Long:
             return (int)_value.IntValue;
-          case Type.Float:
-          case Type.Double:
+          case ExtendedType.Float:
+          case ExtendedType.Double:
             var floatVal = _value.FloatValue;
             if (double.IsNaN(floatVal) || double.IsInfinity(floatVal))
               return 0;
             return (int)floatVal;
-          case Type.Decimal:
+          case ExtendedType.Decimal:
             return (int)_decimalValue;
-          case Type.Boolean:
+          case ExtendedType.Boolean:
             return _value.IntValue != 0 ? 1 : 0;
-          case Type.String:
-          case Type.Null:
-          case Type.Undefined:
+          case ExtendedType.String:
+          case ExtendedType.Null:
+          case ExtendedType.Undefined:
             return 0;
           default:
             throw new RuntimeException($"Cannot convert {_type} to integer");
@@ -84,7 +84,7 @@ namespace EpsilonScript.AST
       [MethodImpl(MethodImplOptions.AggressiveInlining)]
       protected set
       {
-        _type = Type.Integer;
+        _type = ExtendedType.Integer;
         _value.IntValue = value;
       }
     }
@@ -96,22 +96,22 @@ namespace EpsilonScript.AST
       {
         switch (_type)
         {
-          case Type.Integer:
-          case Type.Long:
+          case ExtendedType.Integer:
+          case ExtendedType.Long:
             return _value.IntValue;
-          case Type.Float:
-          case Type.Double:
+          case ExtendedType.Float:
+          case ExtendedType.Double:
             var floatVal = _value.FloatValue;
             if (double.IsNaN(floatVal) || double.IsInfinity(floatVal))
               return 0;
             return (long)floatVal;
-          case Type.Decimal:
+          case ExtendedType.Decimal:
             return (long)_decimalValue;
-          case Type.Boolean:
+          case ExtendedType.Boolean:
             return _value.IntValue;
-          case Type.String:
-          case Type.Null:
-          case Type.Undefined:
+          case ExtendedType.String:
+          case ExtendedType.Null:
+          case ExtendedType.Undefined:
             return 0L;
           default:
             throw new RuntimeException($"Cannot convert {_type} to long");
@@ -121,7 +121,7 @@ namespace EpsilonScript.AST
       [MethodImpl(MethodImplOptions.AggressiveInlining)]
       protected set
       {
-        _type = Type.Long;
+        _type = ExtendedType.Long;
         _value.IntValue = value;
       }
     }
@@ -133,19 +133,19 @@ namespace EpsilonScript.AST
       {
         switch (_type)
         {
-          case Type.Integer:
-          case Type.Long:
+          case ExtendedType.Integer:
+          case ExtendedType.Long:
             return _value.IntValue;
-          case Type.Float:
-          case Type.Double:
+          case ExtendedType.Float:
+          case ExtendedType.Double:
             return (float)_value.FloatValue;
-          case Type.Decimal:
+          case ExtendedType.Decimal:
             return (float)_decimalValue;
-          case Type.Boolean:
+          case ExtendedType.Boolean:
             return _value.IntValue != 0 ? 1.0f : 0.0f;
-          case Type.String:
-          case Type.Null:
-          case Type.Undefined:
+          case ExtendedType.String:
+          case ExtendedType.Null:
+          case ExtendedType.Undefined:
             return 0.0f;
           default:
             throw new RuntimeException($"Cannot convert {_type} to float");
@@ -155,7 +155,7 @@ namespace EpsilonScript.AST
       [MethodImpl(MethodImplOptions.AggressiveInlining)]
       protected set
       {
-        _type = Type.Float;
+        _type = ExtendedType.Float;
         _value.FloatValue = value;
       }
     }
@@ -167,19 +167,19 @@ namespace EpsilonScript.AST
       {
         switch (_type)
         {
-          case Type.Integer:
-          case Type.Long:
+          case ExtendedType.Integer:
+          case ExtendedType.Long:
             return _value.IntValue;
-          case Type.Float:
-          case Type.Double:
+          case ExtendedType.Float:
+          case ExtendedType.Double:
             return _value.FloatValue;
-          case Type.Decimal:
+          case ExtendedType.Decimal:
             return (double)_decimalValue;
-          case Type.Boolean:
+          case ExtendedType.Boolean:
             return _value.IntValue != 0 ? 1.0 : 0.0;
-          case Type.String:
-          case Type.Null:
-          case Type.Undefined:
+          case ExtendedType.String:
+          case ExtendedType.Null:
+          case ExtendedType.Undefined:
             return 0.0;
           default:
             throw new RuntimeException($"Cannot convert {_type} to double");
@@ -189,7 +189,7 @@ namespace EpsilonScript.AST
       [MethodImpl(MethodImplOptions.AggressiveInlining)]
       protected set
       {
-        _type = Type.Double;
+        _type = ExtendedType.Double;
         _value.FloatValue = value;
       }
     }
@@ -201,19 +201,19 @@ namespace EpsilonScript.AST
       {
         switch (_type)
         {
-          case Type.Integer:
-          case Type.Long:
+          case ExtendedType.Integer:
+          case ExtendedType.Long:
             return _value.IntValue;
-          case Type.Float:
-          case Type.Double:
+          case ExtendedType.Float:
+          case ExtendedType.Double:
             return (decimal)_value.FloatValue;
-          case Type.Decimal:
+          case ExtendedType.Decimal:
             return _decimalValue;
-          case Type.Boolean:
+          case ExtendedType.Boolean:
             return _value.IntValue != 0 ? 1m : 0m;
-          case Type.String:
-          case Type.Null:
-          case Type.Undefined:
+          case ExtendedType.String:
+          case ExtendedType.Null:
+          case ExtendedType.Undefined:
             return 0m;
           default:
             throw new RuntimeException($"Cannot convert {_type} to decimal");
@@ -223,7 +223,7 @@ namespace EpsilonScript.AST
       [MethodImpl(MethodImplOptions.AggressiveInlining)]
       protected set
       {
-        _type = Type.Decimal;
+        _type = ExtendedType.Decimal;
         _decimalValue = value;
       }
     }
@@ -235,19 +235,19 @@ namespace EpsilonScript.AST
       {
         switch (_type)
         {
-          case Type.Boolean:
-          case Type.Integer:
-          case Type.Long:
+          case ExtendedType.Boolean:
+          case ExtendedType.Integer:
+          case ExtendedType.Long:
             return _value.IntValue != 0;
-          case Type.Float:
-          case Type.Double:
+          case ExtendedType.Float:
+          case ExtendedType.Double:
             var val = _value.FloatValue;
             return val != 0.0 && !double.IsNaN(val);
-          case Type.Decimal:
+          case ExtendedType.Decimal:
             return _decimalValue != 0m;
-          case Type.String:
-          case Type.Null:
-          case Type.Undefined:
+          case ExtendedType.String:
+          case ExtendedType.Null:
+          case ExtendedType.Undefined:
             return false;
           default:
             throw new RuntimeException($"Cannot convert {_type} to boolean");
@@ -257,7 +257,7 @@ namespace EpsilonScript.AST
       [MethodImpl(MethodImplOptions.AggressiveInlining)]
       protected set
       {
-        _type = Type.Boolean;
+        _type = ExtendedType.Boolean;
         _value.IntValue = value ? 1L : 0L;
       }
     }
@@ -287,19 +287,19 @@ namespace EpsilonScript.AST
     {
       switch (ValueType)
       {
-        case Type.Integer:
+        case ExtendedType.Integer:
           return new IntegerNode(IntegerValue);
-        case Type.Long:
+        case ExtendedType.Long:
           return new IntegerNode(LongValue);
-        case Type.Float:
+        case ExtendedType.Float:
           return new FloatNode(FloatValue);
-        case Type.Double:
+        case ExtendedType.Double:
           return new FloatNode(DoubleValue);
-        case Type.Decimal:
+        case ExtendedType.Decimal:
           return new FloatNode(DecimalValue);
-        case Type.Boolean:
+        case ExtendedType.Boolean:
           return new BooleanNode(BooleanValue);
-        case Type.String:
+        case ExtendedType.String:
           return new StringNode(StringValue);
         default:
           throw new ArgumentOutOfRangeException(nameof(ValueType), ValueType, "Unsupported value type");
@@ -310,25 +310,25 @@ namespace EpsilonScript.AST
     {
       switch (ValueType)
       {
-        case Type.Undefined:
+        case ExtendedType.Undefined:
           return "Undefined";
-        case Type.Null:
+        case ExtendedType.Null:
           return "null";
-        case Type.Integer:
+        case ExtendedType.Integer:
           return IntegerValue.ToString();
-        case Type.Long:
+        case ExtendedType.Long:
           return LongValue.ToString();
-        case Type.Float:
+        case ExtendedType.Float:
           return FloatValue.ToString(CultureInfo.InvariantCulture);
-        case Type.Double:
+        case ExtendedType.Double:
           return DoubleValue.ToString(CultureInfo.InvariantCulture);
-        case Type.Decimal:
+        case ExtendedType.Decimal:
           return DecimalValue.ToString(CultureInfo.InvariantCulture);
-        case Type.Boolean:
+        case ExtendedType.Boolean:
           return BooleanValue ? "true" : "false";
-        case Type.Tuple:
+        case ExtendedType.Tuple:
           return "Tuple";
-        case Type.String:
+        case ExtendedType.String:
           return StringValue;
         default:
           throw new ArgumentOutOfRangeException(nameof(ValueType), ValueType, "Unsupported value type");

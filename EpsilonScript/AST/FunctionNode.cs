@@ -5,12 +5,12 @@ using EpsilonScript.Intermediate;
 
 namespace EpsilonScript.AST
 {
-  public class FunctionNode : Node
+  internal class FunctionNode : Node
   {
     public override bool IsConstant => _functionOverload.IsConstant && AreParametersConstant;
 
     private CustomFunctionOverload _functionOverload;
-    private Type[] _parameterTypes;
+    private ExtendedType[] _parameterTypes;
 
     private List<Node> _parameters;
 
@@ -50,17 +50,17 @@ namespace EpsilonScript.AST
 
       switch (childNode.ValueType)
       {
-        case Type.Tuple:
+        case ExtendedType.Tuple:
           _parameters = childNode.TupleValue;
-          _parameterTypes = new Type[_parameters.Count];
+          _parameterTypes = new ExtendedType[_parameters.Count];
           break;
-        case Type.Null:
+        case ExtendedType.Null:
           _parameters = new List<Node>();
-          _parameterTypes = Array.Empty<Type>();
+          _parameterTypes = Array.Empty<ExtendedType>();
           break;
         default:
           _parameters = new List<Node> { childNode };
-          _parameterTypes = new Type[1];
+          _parameterTypes = new ExtendedType[1];
           break;
       }
     }
@@ -82,33 +82,34 @@ namespace EpsilonScript.AST
         throw new RuntimeException("A function with given type signature is undefined");
       }
 
-      ValueType = function.ReturnType;
+      ValueType = (ExtendedType)function.ReturnType;
 
       switch (ValueType)
       {
-        case Type.Integer:
+        case ExtendedType.Integer:
           IntegerValue = function.ExecuteInt(_parameters);
           break;
-        case Type.Long:
+        case ExtendedType.Long:
           LongValue = function.ExecuteLong(_parameters);
           break;
-        case Type.Float:
+        case ExtendedType.Float:
           FloatValue = function.ExecuteFloat(_parameters);
           break;
-        case Type.Double:
+        case ExtendedType.Double:
           DoubleValue = function.ExecuteDouble(_parameters);
           break;
-        case Type.Decimal:
+        case ExtendedType.Decimal:
           DecimalValue = function.ExecuteDecimal(_parameters);
           break;
-        case Type.String:
+        case ExtendedType.String:
           StringValue = function.ExecuteString(_parameters);
           break;
-        case Type.Boolean:
+        case ExtendedType.Boolean:
           BooleanValue = function.ExecuteBool(_parameters);
           break;
         default:
-          throw new ArgumentOutOfRangeException(nameof(ValueType), ValueType, "Unsupported function return type");
+          throw new ArgumentOutOfRangeException(nameof(ValueType), ValueType,
+            "Unsupported function return type");
       }
     }
 

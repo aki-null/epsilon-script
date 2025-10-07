@@ -1,15 +1,13 @@
 using System;
-using System.Collections.Generic;
 using EpsilonScript.AST;
-using EpsilonScript.Intermediate;
-using Xunit;
 using EpsilonScript.Tests.TestInfrastructure;
+using Xunit;
 
 namespace EpsilonScript.Tests.AST
 {
   [Trait("Category", "Unit")]
   [Trait("Component", "AST")]
-  public class TypeConversion : AstTestBase
+  public class TypeConversion
   {
     #region GetValueAsInteger Tests
 
@@ -429,7 +427,7 @@ namespace EpsilonScript.Tests.AST
       var node = new FloatNode(float.MaxValue);
       // Unchecked runtime cast behavior - float stored as double, then cast to int
       // This matches: float f = float.MaxValue; double d = f; int i = (int)d;
-      float f = float.MaxValue;
+      var f = float.MaxValue;
       double d = f;
       Assert.Equal((int)d, node.IntegerValue);
     }
@@ -439,7 +437,7 @@ namespace EpsilonScript.Tests.AST
     {
       var node = new FloatNode(-float.MaxValue);
       // Unchecked runtime cast behavior - float stored as double, then cast to int
-      float f = -float.MaxValue;
+      var f = -float.MaxValue;
       double d = f;
       Assert.Equal((int)d, node.IntegerValue);
     }
@@ -449,7 +447,7 @@ namespace EpsilonScript.Tests.AST
     {
       var node = new FloatNode(double.MaxValue);
       // Unchecked runtime cast behavior
-      double d = double.MaxValue;
+      var d = double.MaxValue;
       Assert.Equal((int)d, node.IntegerValue);
     }
 
@@ -458,7 +456,7 @@ namespace EpsilonScript.Tests.AST
     {
       var node = new FloatNode(-double.MaxValue);
       // Unchecked runtime cast behavior
-      double d = -double.MaxValue;
+      var d = -double.MaxValue;
       Assert.Equal((int)d, node.IntegerValue);
     }
 

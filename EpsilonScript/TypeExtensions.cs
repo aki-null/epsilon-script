@@ -1,27 +1,27 @@
 namespace EpsilonScript
 {
-  public static class TypeExtensions
+  internal static class ExtendedTypeExtensions
   {
     [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-    public static bool IsNumber(this Type t)
+    public static bool IsNumber(this ExtendedType t)
     {
-      return t == Type.Integer
-             || t == Type.Long
-             || t == Type.Float
-             || t == Type.Double
-             || t == Type.Decimal;
+      return t == ExtendedType.Integer
+             || t == ExtendedType.Long
+             || t == ExtendedType.Float
+             || t == ExtendedType.Double
+             || t == ExtendedType.Decimal;
     }
 
     [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-    public static bool IsInteger(this Type t)
+    public static bool IsInteger(this ExtendedType t)
     {
-      return t == Type.Integer || t == Type.Long;
+      return t == ExtendedType.Integer || t == ExtendedType.Long;
     }
 
     [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-    public static bool IsFloat(this Type t)
+    public static bool IsFloat(this ExtendedType t)
     {
-      return t == Type.Float || t == Type.Double || t == Type.Decimal;
+      return t == ExtendedType.Float || t == ExtendedType.Double || t == ExtendedType.Decimal;
     }
   }
 }

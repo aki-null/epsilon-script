@@ -12,9 +12,9 @@ namespace EpsilonScript.Tests.AST
   public class AST_Sequence : AstTestBase
   {
     [Theory]
-    [InlineData(5, 10, Type.Integer)]
-    [InlineData(-3, 42, Type.Integer)]
-    public void AST_Sequence_WithTwoIntegers_ReturnsRightValue(int leftValue, int rightValue, Type expectedType)
+    [InlineData(5, 10, ExtendedType.Integer)]
+    [InlineData(-3, 42, ExtendedType.Integer)]
+    internal void AST_Sequence_WithTwoIntegers_ReturnsRightValue(int leftValue, int rightValue, ValueType expectedType)
     {
       var node = new SequenceNode();
       var rpn = CreateStack(new FakeIntegerNode(leftValue), new FakeIntegerNode(rightValue));
@@ -31,9 +31,10 @@ namespace EpsilonScript.Tests.AST
     }
 
     [Theory]
-    [InlineData(1.5f, 3.7f, Type.Float)]
-    [InlineData(-2.1f, 0.0f, Type.Float)]
-    public void AST_Sequence_WithTwoFloats_ReturnsRightValue(float leftValue, float rightValue, Type expectedType)
+    [InlineData(1.5f, 3.7f, ExtendedType.Float)]
+    [InlineData(-2.1f, 0.0f, ExtendedType.Float)]
+    internal void AST_Sequence_WithTwoFloats_ReturnsRightValue(float leftValue, float rightValue,
+      ValueType expectedType)
     {
       var node = new SequenceNode();
       var rpn = CreateStack(new FakeFloatNode(leftValue), new FakeFloatNode(rightValue));
@@ -49,9 +50,10 @@ namespace EpsilonScript.Tests.AST
     }
 
     [Theory]
-    [InlineData(true, false, Type.Boolean)]
-    [InlineData(false, true, Type.Boolean)]
-    public void AST_Sequence_WithTwoBooleans_ReturnsRightValue(bool leftValue, bool rightValue, Type expectedType)
+    [InlineData(true, false, ExtendedType.Boolean)]
+    [InlineData(false, true, ExtendedType.Boolean)]
+    internal void AST_Sequence_WithTwoBooleans_ReturnsRightValue(bool leftValue, bool rightValue,
+      ValueType expectedType)
     {
       var node = new SequenceNode();
       var rpn = CreateStack(new FakeBooleanNode(leftValue), new FakeBooleanNode(rightValue));
@@ -68,7 +70,7 @@ namespace EpsilonScript.Tests.AST
     }
 
     [Fact]
-    public void AST_Sequence_WithMixedTypes_ReturnsRightType()
+    internal void AST_Sequence_WithMixedTypes_ReturnsRightType()
     {
       var node = new SequenceNode();
       var rpn = CreateStack(new FakeIntegerNode(42), new FakeFloatNode(3.14f));
@@ -78,12 +80,12 @@ namespace EpsilonScript.Tests.AST
         Compiler.FloatPrecision.Float);
       node.Execute(null);
 
-      Assert.Equal(Type.Float, node.ValueType);
+      Assert.Equal(ExtendedType.Float, node.ValueType);
       Assert.Equal(3.14f, node.FloatValue, 6);
     }
 
     [Fact]
-    public void AST_Sequence_ExecutesBothNodes()
+    internal void AST_Sequence_ExecutesBothNodes()
     {
       var leftNode = new TrackingIntegerNode(10);
       var rightNode = new TrackingIntegerNode(20);
@@ -98,12 +100,12 @@ namespace EpsilonScript.Tests.AST
 
       Assert.True(leftNode.WasExecuted);
       Assert.True(rightNode.WasExecuted);
-      Assert.Equal(Type.Integer, node.ValueType);
+      Assert.Equal(ExtendedType.Integer, node.ValueType);
       Assert.Equal(20, node.IntegerValue); // Returns right value
     }
 
     [Fact]
-    public void AST_Sequence_WithSingleNode_ActsAsNoOp()
+    internal void AST_Sequence_WithSingleNode_ActsAsNoOp()
     {
       var node = new SequenceNode();
       var rpn = CreateStack(new FakeIntegerNode(5)); // Only one node (trailing semicolon case)
@@ -113,12 +115,12 @@ namespace EpsilonScript.Tests.AST
         Compiler.FloatPrecision.Float);
       node.Execute(null);
 
-      Assert.Equal(Type.Integer, node.ValueType);
+      Assert.Equal(ExtendedType.Integer, node.ValueType);
       Assert.Equal(5, node.IntegerValue);
     }
 
     [Fact]
-    public void AST_Sequence_IsConstant_WithTwoConstantNodes_ReturnsTrue()
+    internal void AST_Sequence_IsConstant_WithTwoConstantNodes_ReturnsTrue()
     {
       var node = new SequenceNode();
       var rpn = CreateStack(new FakeIntegerNode(5), new FakeIntegerNode(10)); // Both constant
@@ -131,7 +133,7 @@ namespace EpsilonScript.Tests.AST
     }
 
     [Fact]
-    public void AST_Sequence_IsConstant_WithOneVariableNode_ReturnsFalse()
+    internal void AST_Sequence_IsConstant_WithOneVariableNode_ReturnsFalse()
     {
       var node = new SequenceNode();
       var rpn = CreateStack(new TestVariableNode(), new FakeIntegerNode(10)); // Left is variable
@@ -144,7 +146,7 @@ namespace EpsilonScript.Tests.AST
     }
 
     [Fact]
-    public void AST_Sequence_Optimize_WithConstantNodes_ReturnsValueNode()
+    internal void AST_Sequence_Optimize_WithConstantNodes_ReturnsValueNode()
     {
       var node = new SequenceNode();
       var rpn = CreateStack(new FakeIntegerNode(5), new FakeIntegerNode(10));
@@ -157,12 +159,12 @@ namespace EpsilonScript.Tests.AST
 
       // Should return a value node since both children are constant
       Assert.IsAssignableFrom<Node>(optimizedNode);
-      Assert.Equal(Type.Integer, optimizedNode.ValueType);
+      Assert.Equal(ExtendedType.Integer, optimizedNode.ValueType);
       Assert.Equal(10, optimizedNode.IntegerValue); // Right value
     }
 
     [Fact]
-    public void AST_Sequence_Optimize_WithNonConstantNodes_ReturnsSelf()
+    internal void AST_Sequence_Optimize_WithNonConstantNodes_ReturnsSelf()
     {
       var node = new SequenceNode();
       var rpn = CreateStack(new TestVariableNode(), new FakeIntegerNode(10));
@@ -180,7 +182,7 @@ namespace EpsilonScript.Tests.AST
     [Theory]
     [InlineData(Compiler.Options.None)]
     [InlineData(Compiler.Options.Immutable)]
-    public void AST_Sequence_WorksWithAllCompilerOptions(Compiler.Options options)
+    internal void AST_Sequence_WorksWithAllCompilerOptions(Compiler.Options options)
     {
       var node = new SequenceNode();
       var rpn = CreateStack(new FakeIntegerNode(1), new FakeIntegerNode(2));
@@ -189,12 +191,12 @@ namespace EpsilonScript.Tests.AST
       node.Build(rpn, element, options, null, null, Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float);
       node.Execute(null);
 
-      Assert.Equal(Type.Integer, node.ValueType);
+      Assert.Equal(ExtendedType.Integer, node.ValueType);
       Assert.Equal(2, node.IntegerValue);
     }
 
     [Fact]
-    public void AST_Sequence_WithTupleValues_PropagatesTupleFromRightNode()
+    internal void AST_Sequence_WithTupleValues_PropagatesTupleFromRightNode()
     {
       var tupleNode = new TupleNode();
       var tupleRpn = CreateStack(new FakeIntegerNode(1), new FakeIntegerNode(2));
@@ -211,13 +213,12 @@ namespace EpsilonScript.Tests.AST
         Compiler.FloatPrecision.Float);
       node.Execute(null);
 
-      Assert.Equal(Type.Tuple, node.ValueType);
       Assert.NotNull(node.TupleValue);
       Assert.Equal(2, node.TupleValue.Count);
     }
 
     [Fact]
-    public void AST_Sequence_WithMultipleSemicolons_ReturnsRightmostValue()
+    internal void AST_Sequence_WithMultipleSemicolons_ReturnsRightmostValue()
     {
       // Test: 1; 2; 3 should return 3
       var node1 = new SequenceNode();
@@ -233,12 +234,12 @@ namespace EpsilonScript.Tests.AST
         Compiler.FloatPrecision.Float);
       node2.Execute(null);
 
-      Assert.Equal(Type.Integer, node2.ValueType);
+      Assert.Equal(ExtendedType.Integer, node2.ValueType);
       Assert.Equal(3, node2.IntegerValue);
     }
 
     [Fact]
-    public void AST_Sequence_WithMultipleSemicolons_ExecutesAllNodes()
+    internal void AST_Sequence_WithMultipleSemicolons_ExecutesAllNodes()
     {
       // Test: node1; node2; node3 - all should execute
       var node1 = new TrackingIntegerNode(10);
@@ -265,7 +266,7 @@ namespace EpsilonScript.Tests.AST
     }
 
     [Fact]
-    public void AST_Sequence_WithConsecutiveSemicolons_HandlesEmptyStatements()
+    internal void AST_Sequence_WithConsecutiveSemicolons_HandlesEmptyStatements()
     {
       // Test: value;;;; (multiple trailing semicolons)
       var baseNode = new FakeIntegerNode(42);
@@ -296,7 +297,7 @@ namespace EpsilonScript.Tests.AST
         Compiler.FloatPrecision.Float);
       seq4.Execute(null);
 
-      Assert.Equal(Type.Integer, seq4.ValueType);
+      Assert.Equal(ExtendedType.Integer, seq4.ValueType);
       Assert.Equal(42, seq4.IntegerValue);
     }
 
@@ -331,7 +332,6 @@ namespace EpsilonScript.Tests.AST
 
       public TestVariableNode()
       {
-        ValueType = Type.Integer;
         IntegerValue = 5;
         FloatValue = 5.0f;
         BooleanValue = true;

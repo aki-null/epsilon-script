@@ -1,6 +1,6 @@
 ﻿namespace EpsilonScript.Intermediate
 {
-  public enum Associativity
+  internal enum Associativity
   {
     None,
     Left,

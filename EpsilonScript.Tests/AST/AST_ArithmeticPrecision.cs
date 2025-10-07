@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using EpsilonScript.AST;
-using EpsilonScript.Function;
 using EpsilonScript.Intermediate;
 using Xunit;
 using EpsilonScript.Tests.TestInfrastructure;
@@ -37,7 +36,7 @@ namespace EpsilonScript.Tests.AST
         Compiler.IntegerPrecision.Long, Compiler.FloatPrecision.Float);
       node.Execute(null);
 
-      Assert.Equal(Type.Long, node.ValueType);
+      Assert.Equal(ExtendedType.Long, node.ValueType);
       Assert.Equal(expectedResult, node.LongValue);
     }
 
@@ -55,7 +54,7 @@ namespace EpsilonScript.Tests.AST
         Compiler.IntegerPrecision.Long, Compiler.FloatPrecision.Float);
       node.Execute(null);
 
-      Assert.Equal(Type.Long, node.ValueType);
+      Assert.Equal(ExtendedType.Long, node.ValueType);
       // Overflow wraps in unchecked context
       Assert.Equal(long.MinValue, node.LongValue);
     }
@@ -106,7 +105,7 @@ namespace EpsilonScript.Tests.AST
         Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Double);
       node.Execute(null);
 
-      Assert.Equal(Type.Double, node.ValueType);
+      Assert.Equal(ExtendedType.Double, node.ValueType);
       Assert.Equal(expectedResult, node.DoubleValue, precision: 10);
     }
 
@@ -124,7 +123,7 @@ namespace EpsilonScript.Tests.AST
         Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Double);
       node.Execute(null);
 
-      Assert.Equal(Type.Double, node.ValueType);
+      Assert.Equal(ExtendedType.Double, node.ValueType);
       // Double should maintain precision better than float
       Assert.Equal(0.3, node.DoubleValue, precision: 15);
     }
@@ -171,7 +170,7 @@ namespace EpsilonScript.Tests.AST
         Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Decimal);
       node.Execute(null);
 
-      Assert.Equal(Type.Decimal, node.ValueType);
+      Assert.Equal(ExtendedType.Decimal, node.ValueType);
       Assert.Equal(expectedResult, node.DecimalValue);
     }
 
@@ -207,7 +206,7 @@ namespace EpsilonScript.Tests.AST
         Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Decimal);
       node.Execute(null);
 
-      Assert.Equal(Type.Decimal, node.ValueType);
+      Assert.Equal(ExtendedType.Decimal, node.ValueType);
       // Decimal should be exactly 0.3 (no floating point errors)
       Assert.Equal(0.3m, node.DecimalValue);
     }
@@ -271,7 +270,7 @@ namespace EpsilonScript.Tests.AST
       node.Execute(null);
 
       // Result should be promoted to Long based on precision setting
-      Assert.Equal(Type.Long, node.ValueType);
+      Assert.Equal(ExtendedType.Long, node.ValueType);
       Assert.Equal(30L, node.LongValue);
     }
 
@@ -290,7 +289,7 @@ namespace EpsilonScript.Tests.AST
       node.Execute(null);
 
       // Result should be promoted to Double based on precision setting
-      Assert.Equal(Type.Double, node.ValueType);
+      Assert.Equal(ExtendedType.Double, node.ValueType);
       Assert.Equal(4.0, node.DoubleValue);
     }
 
@@ -309,7 +308,7 @@ namespace EpsilonScript.Tests.AST
       node.Execute(null);
 
       // Result should be promoted to Decimal based on precision setting
-      Assert.Equal(Type.Decimal, node.ValueType);
+      Assert.Equal(ExtendedType.Decimal, node.ValueType);
       Assert.Equal(4.0m, node.DecimalValue);
     }
 
@@ -328,7 +327,7 @@ namespace EpsilonScript.Tests.AST
       node.Execute(null);
 
       // Result should be Double (the configured float precision)
-      Assert.Equal(Type.Double, node.ValueType);
+      Assert.Equal(ExtendedType.Double, node.ValueType);
       Assert.Equal(12.5, node.DoubleValue);
     }
 

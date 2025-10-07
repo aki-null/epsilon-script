@@ -4,7 +4,7 @@ using EpsilonScript.Intermediate;
 
 namespace EpsilonScript.AST
 {
-  public class BooleanNode : Node
+  internal class BooleanNode : Node
   {
     public BooleanNode()
     {

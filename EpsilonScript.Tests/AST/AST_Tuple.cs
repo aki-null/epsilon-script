@@ -12,7 +12,7 @@ namespace EpsilonScript.Tests.AST
   public class AST_Tuple : AstTestBase
   {
     [Fact]
-    public void AST_Tuple_WithTwoSimpleNodes_CreatesCorrectTuple()
+    internal void AST_Tuple_WithTwoSimpleNodes_CreatesCorrectTuple()
     {
       var node = new TupleNode();
       var rpn = CreateStack(new FakeIntegerNode(5), new FakeIntegerNode(10));
@@ -21,15 +21,14 @@ namespace EpsilonScript.Tests.AST
       node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
         Compiler.FloatPrecision.Float);
 
-      Assert.Equal(Type.Tuple, node.ValueType);
       Assert.NotNull(node.TupleValue);
       Assert.Equal(2, node.TupleValue.Count);
-      Assert.Equal(Type.Integer, node.TupleValue[0].ValueType);
-      Assert.Equal(Type.Integer, node.TupleValue[1].ValueType);
+      Assert.Equal(ExtendedType.Integer, node.TupleValue[0].ValueType);
+      Assert.Equal(ExtendedType.Integer, node.TupleValue[1].ValueType);
     }
 
     [Fact]
-    public void AST_Tuple_WithMixedTypes_CreatesCorrectTuple()
+    internal void AST_Tuple_WithMixedTypes_CreatesCorrectTuple()
     {
       var node = new TupleNode();
       var rpn = CreateStack(new FakeIntegerNode(42), new FakeFloatNode(3.14f));
@@ -39,14 +38,14 @@ namespace EpsilonScript.Tests.AST
         Compiler.FloatPrecision.Float);
       node.Execute(null);
 
-      Assert.Equal(Type.Tuple, node.ValueType);
+      Assert.NotNull(node.TupleValue);
       Assert.Equal(2, node.TupleValue.Count);
       Assert.Equal(42, node.TupleValue[0].IntegerValue);
       Assert.Equal(3.14f, node.TupleValue[1].FloatValue, 6);
     }
 
     [Fact]
-    public void AST_Tuple_WithNestedTuple_UnfoldsTupleCorrectly()
+    internal void AST_Tuple_WithNestedTuple_UnfoldsTupleCorrectly()
     {
       // Create first tuple (1, 2)
       var innerTuple = new TupleNode();
@@ -63,7 +62,7 @@ namespace EpsilonScript.Tests.AST
         Compiler.FloatPrecision.Float);
       outerTuple.Execute(null);
 
-      Assert.Equal(Type.Tuple, outerTuple.ValueType);
+      Assert.NotNull(outerTuple.TupleValue);
       Assert.Equal(3, outerTuple.TupleValue.Count); // Should be unfolded
       Assert.Equal(1, outerTuple.TupleValue[0].IntegerValue);
       Assert.Equal(2, outerTuple.TupleValue[1].IntegerValue);
@@ -71,7 +70,7 @@ namespace EpsilonScript.Tests.AST
     }
 
     [Fact]
-    public void AST_Tuple_WithSimpleAndTuple_UnfoldsCorrectly()
+    internal void AST_Tuple_WithSimpleAndTuple_UnfoldsCorrectly()
     {
       // Create tuple (2, 3)
       var rightTuple = new TupleNode();
@@ -88,14 +87,14 @@ namespace EpsilonScript.Tests.AST
         Compiler.FloatPrecision.Float);
       outerTuple.Execute(null);
 
-      Assert.Equal(Type.Tuple, outerTuple.ValueType);
+      Assert.NotNull(outerTuple.TupleValue);
       Assert.Equal(2, outerTuple.TupleValue.Count); // Right side is not unfolded
       Assert.Equal(1, outerTuple.TupleValue[0].IntegerValue);
-      Assert.Equal(Type.Tuple, outerTuple.TupleValue[1].ValueType);
+      Assert.NotNull(outerTuple.TupleValue[1].TupleValue);
     }
 
     [Fact]
-    public void AST_Tuple_Execute_ExecutesAllChildren()
+    internal void AST_Tuple_Execute_ExecutesAllChildren()
     {
       var leftNode = new TrackingIntegerNode(5);
       var rightNode = new TrackingIntegerNode(10);
@@ -113,7 +112,7 @@ namespace EpsilonScript.Tests.AST
     }
 
     [Fact]
-    public void AST_Tuple_WithMissingNodes_ThrowsParserException()
+    internal void AST_Tuple_WithMissingNodes_ThrowsParserException()
     {
       var node = new TupleNode();
       var rpn = CreateStack(new FakeIntegerNode(5)); // Only one node
@@ -127,7 +126,7 @@ namespace EpsilonScript.Tests.AST
     }
 
     [Fact]
-    public void AST_Tuple_IsConstant_WithAllConstantChildren_ReturnsTrue()
+    internal void AST_Tuple_IsConstant_WithAllConstantChildren_ReturnsTrue()
     {
       var node = new TupleNode();
       var rpn = CreateStack(new FakeIntegerNode(5), new FakeIntegerNode(10)); // Both constant
@@ -140,7 +139,7 @@ namespace EpsilonScript.Tests.AST
     }
 
     [Fact]
-    public void AST_Tuple_IsConstant_WithOneVariableChild_ReturnsFalse()
+    internal void AST_Tuple_IsConstant_WithOneVariableChild_ReturnsFalse()
     {
       var node = new TupleNode();
       var rpn = CreateStack(new TestVariableNode(), new FakeIntegerNode(10)); // Left is variable
@@ -153,7 +152,7 @@ namespace EpsilonScript.Tests.AST
     }
 
     [Fact]
-    public void AST_Tuple_Optimize_OptimizesAllChildren()
+    internal void AST_Tuple_Optimize_OptimizesAllChildren()
     {
       var leftNode = new TestOptimizableNode(true);
       var rightNode = new TestOptimizableNode(false);
@@ -175,7 +174,7 @@ namespace EpsilonScript.Tests.AST
     [Theory]
     [InlineData(Compiler.Options.None)]
     [InlineData(Compiler.Options.Immutable)]
-    public void AST_Tuple_WorksWithAllCompilerOptions(Compiler.Options options)
+    internal void AST_Tuple_WorksWithAllCompilerOptions(Compiler.Options options)
     {
       var node = new TupleNode();
       var rpn = CreateStack(new FakeIntegerNode(1), new FakeIntegerNode(2));
@@ -184,12 +183,12 @@ namespace EpsilonScript.Tests.AST
       node.Build(rpn, element, options, null, null, Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float);
       node.Execute(null);
 
-      Assert.Equal(Type.Tuple, node.ValueType);
+      Assert.NotNull(node.TupleValue);
       Assert.Equal(2, node.TupleValue.Count);
     }
 
     [Fact]
-    public void AST_Tuple_WithThreeElements_CreatesCorrectTuple()
+    internal void AST_Tuple_WithThreeElements_CreatesCorrectTuple()
     {
       // Create (1, 2)
       var firstTuple = new TupleNode();
@@ -206,7 +205,7 @@ namespace EpsilonScript.Tests.AST
         Compiler.FloatPrecision.Float);
       finalTuple.Execute(null);
 
-      Assert.Equal(Type.Tuple, finalTuple.ValueType);
+      Assert.NotNull(finalTuple.TupleValue);
       Assert.Equal(3, finalTuple.TupleValue.Count);
       Assert.Equal(1, finalTuple.TupleValue[0].IntegerValue);
       Assert.Equal(2, finalTuple.TupleValue[1].IntegerValue);
@@ -214,16 +213,16 @@ namespace EpsilonScript.Tests.AST
     }
 
     [Theory]
-    [InlineData(Type.Integer)]
-    [InlineData(Type.Float)]
-    [InlineData(Type.Boolean)]
-    public void AST_Tuple_WithDifferentTypes_HandlesCorrectly(ValueType nodeType)
+    [InlineData(ExtendedType.Integer)]
+    [InlineData(ExtendedType.Float)]
+    [InlineData(ExtendedType.Boolean)]
+    internal void AST_Tuple_WithDifferentTypes_HandlesCorrectly(ExtendedType nodeType)
     {
       Node leftNode = nodeType switch
       {
-        Type.Integer => new FakeIntegerNode(1),
-        Type.Float => new FakeFloatNode(1.0f),
-        Type.Boolean => new FakeBooleanNode(true),
+        ExtendedType.Integer => new FakeIntegerNode(1),
+        ExtendedType.Float => new FakeFloatNode(1.0f),
+        ExtendedType.Boolean => new FakeBooleanNode(true),
         _ => throw new ArgumentOutOfRangeException(nameof(nodeType))
       };
 
@@ -235,10 +234,10 @@ namespace EpsilonScript.Tests.AST
         Compiler.FloatPrecision.Float);
       node.Execute(null);
 
-      Assert.Equal(Type.Tuple, node.ValueType);
+      Assert.NotNull(node.TupleValue);
       Assert.Equal(2, node.TupleValue.Count);
       Assert.Equal(nodeType, node.TupleValue[0].ValueType);
-      Assert.Equal(Type.Integer, node.TupleValue[1].ValueType);
+      Assert.Equal(ExtendedType.Integer, node.TupleValue[1].ValueType);
     }
 
     // Helper classes for testing
@@ -272,7 +271,6 @@ namespace EpsilonScript.Tests.AST
 
       public TestVariableNode()
       {
-        ValueType = Type.Integer;
         IntegerValue = 5;
         FloatValue = 5.0f;
         BooleanValue = true;
@@ -301,7 +299,6 @@ namespace EpsilonScript.Tests.AST
       public TestOptimizableNode(bool isConstant)
       {
         _isConstant = isConstant;
-        ValueType = Type.Integer;
         IntegerValue = 1;
         FloatValue = 1.0f;
         BooleanValue = true;

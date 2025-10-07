@@ -1,6 +1,4 @@
-using System;
 using Xunit;
-using EpsilonScript.Tests.TestInfrastructure;
 
 namespace EpsilonScript.Tests.AST
 {
@@ -9,7 +7,7 @@ namespace EpsilonScript.Tests.AST
   public class AST_VariableAutoConversion
   {
     [Fact]
-    public void AST_Variable_AutoConverts_FloatVariableToDouble_WhenCompilerUsesDouble()
+    internal void AST_Variable_AutoConverts_FloatVariableToDouble_WhenCompilerUsesDouble()
     {
       // Compiler configured for Double precision
       var compiler = new Compiler(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Double);
@@ -30,7 +28,7 @@ namespace EpsilonScript.Tests.AST
     }
 
     [Fact]
-    public void AST_Variable_AutoConverts_DoubleVariableToFloat_WhenCompilerUsesFloat()
+    internal void AST_Variable_AutoConverts_DoubleVariableToFloat_WhenCompilerUsesFloat()
     {
       // Compiler configured for Float precision
       var compiler = new Compiler(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float);
@@ -51,7 +49,7 @@ namespace EpsilonScript.Tests.AST
     }
 
     [Fact]
-    public void AST_Variable_AutoConverts_DecimalVariableToDouble_WhenCompilerUsesDouble()
+    internal void AST_Variable_AutoConverts_DecimalVariableToDouble_WhenCompilerUsesDouble()
     {
       // Compiler configured for Double precision
       var compiler = new Compiler(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Double);
@@ -72,7 +70,7 @@ namespace EpsilonScript.Tests.AST
     }
 
     [Fact]
-    public void AST_Variable_AutoConverts_IntegerVariableToLong_WhenCompilerUsesLong()
+    internal void AST_Variable_AutoConverts_IntegerVariableToLong_WhenCompilerUsesLong()
     {
       // Compiler configured for Long precision
       var compiler = new Compiler(Compiler.IntegerPrecision.Long, Compiler.FloatPrecision.Float);
@@ -88,12 +86,12 @@ namespace EpsilonScript.Tests.AST
       script.Execute();
 
       // Should convert to long and perform long-precision arithmetic
-      long expected = 42L + 1000000000000L;
+      var expected = 42L + 1000000000000L;
       Assert.Equal(expected, script.LongValue);
     }
 
     [Fact]
-    public void AST_Variable_AutoConverts_LongVariableToInteger_WhenCompilerUsesInteger()
+    internal void AST_Variable_AutoConverts_LongVariableToInteger_WhenCompilerUsesInteger()
     {
       // Compiler configured for Integer precision
       var compiler = new Compiler(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float);
@@ -109,12 +107,12 @@ namespace EpsilonScript.Tests.AST
       script.Execute();
 
       // Should convert to int and perform int-precision arithmetic
-      int expected = 42 + 100;
+      var expected = 42 + 100;
       Assert.Equal(expected, script.IntegerValue);
     }
 
     [Fact]
-    public void AST_Variable_AutoConverts_MixedPrecisionVariables_InComplexExpression()
+    internal void AST_Variable_AutoConverts_MixedPrecisionVariables_InComplexExpression()
     {
       // Compiler configured for Double and Long precision
       var compiler = new Compiler(Compiler.IntegerPrecision.Long, Compiler.FloatPrecision.Double);
@@ -133,12 +131,12 @@ namespace EpsilonScript.Tests.AST
       script.Execute();
 
       // All should be converted to appropriate precision
-      double expected = 1.5 + 2.5 + 100.0 + 200.0;
+      var expected = 1.5 + 2.5 + 100.0 + 200.0;
       Assert.Equal(expected, script.DoubleValue, precision: 14);
     }
 
     [Fact]
-    public void AST_Variable_AutoConverts_FloatToDouble_InComparison()
+    internal void AST_Variable_AutoConverts_FloatToDouble_InComparison()
     {
       // Compiler configured for Double precision
       var compiler = new Compiler(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Double);
@@ -158,7 +156,7 @@ namespace EpsilonScript.Tests.AST
     }
 
     [Fact]
-    public void AST_Variable_AutoConverts_ComparesMixedPrecisionVariables()
+    internal void AST_Variable_AutoConverts_ComparesMixedPrecisionVariables()
     {
       // Compiler configured for Double precision
       var compiler = new Compiler(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Double);
@@ -179,7 +177,7 @@ namespace EpsilonScript.Tests.AST
     }
 
     [Fact]
-    public void AST_Variable_AutoConverts_WithAssignmentOperations()
+    internal void AST_Variable_AutoConverts_WithAssignmentOperations()
     {
       // Compiler configured for Double precision
       var compiler = new Compiler(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Double);
@@ -201,7 +199,7 @@ namespace EpsilonScript.Tests.AST
     }
 
     [Fact]
-    public void AST_Variable_AutoConverts_DoesNotAffectBooleanVariables()
+    internal void AST_Variable_AutoConverts_DoesNotAffectBooleanVariables()
     {
       // Compiler configured with any precision
       var compiler = new Compiler(Compiler.IntegerPrecision.Long, Compiler.FloatPrecision.Double);
@@ -220,7 +218,7 @@ namespace EpsilonScript.Tests.AST
     }
 
     [Fact]
-    public void AST_Variable_AutoConverts_DoesNotAffectStringVariables()
+    internal void AST_Variable_AutoConverts_DoesNotAffectStringVariables()
     {
       // Compiler configured with any precision
       var compiler = new Compiler(Compiler.IntegerPrecision.Long, Compiler.FloatPrecision.Decimal);
@@ -239,7 +237,7 @@ namespace EpsilonScript.Tests.AST
     }
 
     [Fact]
-    public void AST_Variable_AutoConverts_PreservesOriginalVariableType()
+    internal void AST_Variable_AutoConverts_PreservesOriginalVariableType()
     {
       // Compiler configured for Double precision
       var compiler = new Compiler(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Double);
@@ -261,7 +259,7 @@ namespace EpsilonScript.Tests.AST
     }
 
     [Fact]
-    public void AST_Variable_AutoConverts_DecimalToDouble_InArithmeticChain()
+    internal void AST_Variable_AutoConverts_DecimalToDouble_InArithmeticChain()
     {
       // Compiler configured for Double precision
       var compiler = new Compiler(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Double);
@@ -277,8 +275,8 @@ namespace EpsilonScript.Tests.AST
       script.Execute();
 
       // Should use double precision throughout (decimal precision lost during conversion)
-      double xAsDouble = 1.234567890123456789012345678;
-      double expected = xAsDouble * 2.0 + xAsDouble * 3.0;
+      var xAsDouble = 1.234567890123456789012345678;
+      var expected = xAsDouble * 2.0 + xAsDouble * 3.0;
       Assert.Equal(expected, script.DoubleValue, precision: 14);
     }
   }

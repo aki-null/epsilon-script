@@ -6,7 +6,7 @@ using EpsilonScript.Intermediate;
 
 namespace EpsilonScript.Tests.TestInfrastructure.Fakes
 {
-  public class FakeVariableNode : Node
+  internal class FakeVariableNode : Node
   {
     public FakeVariableNode(VariableValue variable)
     {

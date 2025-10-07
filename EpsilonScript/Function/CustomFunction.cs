@@ -1,15 +1,14 @@
 using System;
 using System.Collections.Generic;
 using EpsilonScript.AST;
-using ScriptType = EpsilonScript.Type;
 
 namespace EpsilonScript.Function
 {
   public abstract class CustomFunction
   {
-    private readonly ScriptType[] _parameterTypes;
+    internal Type[] ParameterTypes { get; }
 
-    protected CustomFunction(string name, bool isConstant, ScriptType[] parameterTypes, ScriptType returnType)
+    protected CustomFunction(string name, bool isConstant, Type[] parameterTypes, Type returnType)
     {
       if (string.IsNullOrEmpty(name))
       {
@@ -18,24 +17,23 @@ namespace EpsilonScript.Function
 
       Name = name;
       IsConstant = isConstant;
-      _parameterTypes = parameterTypes ?? Array.Empty<ScriptType>();
+      ParameterTypes = parameterTypes ?? Array.Empty<Type>();
       ReturnType = returnType;
     }
 
     public VariableId Name { get; }
     public bool IsConstant { get; }
-    public ScriptType ReturnType { get; }
-    public ScriptType[] ParameterTypes => _parameterTypes;
+    public Type ReturnType { get; }
 
-    protected void EnsureParameterCount(List<Node> parameters)
+    private protected void EnsureParameterCount(List<Node> parameters)
     {
-      if ((parameters?.Count ?? 0) != _parameterTypes.Length)
+      if ((parameters?.Count ?? 0) != ParameterTypes.Length)
       {
         throw new RuntimeException($"Invalid number of parameters for function: {Name}");
       }
     }
 
-    protected void EnsureReturnType(ScriptType expected)
+    protected void EnsureReturnType(Type expected)
     {
       if (ReturnType != expected)
       {
@@ -43,37 +41,37 @@ namespace EpsilonScript.Function
       }
     }
 
-    public virtual int ExecuteInt(List<Node> parameters)
+    internal virtual int ExecuteInt(List<Node> parameters)
     {
       throw new InvalidOperationException("Function does not return integer");
     }
 
-    public virtual long ExecuteLong(List<Node> parameters)
+    internal virtual long ExecuteLong(List<Node> parameters)
     {
       throw new InvalidOperationException("Function does not return long");
     }
 
-    public virtual float ExecuteFloat(List<Node> parameters)
+    internal virtual float ExecuteFloat(List<Node> parameters)
     {
       throw new InvalidOperationException("Function does not return float");
     }
 
-    public virtual double ExecuteDouble(List<Node> parameters)
+    internal virtual double ExecuteDouble(List<Node> parameters)
     {
       throw new InvalidOperationException("Function does not return double");
     }
 
-    public virtual decimal ExecuteDecimal(List<Node> parameters)
+    internal virtual decimal ExecuteDecimal(List<Node> parameters)
     {
       throw new InvalidOperationException("Function does not return decimal");
     }
 
-    public virtual string ExecuteString(List<Node> parameters)
+    internal virtual string ExecuteString(List<Node> parameters)
     {
       throw new InvalidOperationException("Function does not return string");
     }
 
-    public virtual bool ExecuteBool(List<Node> parameters)
+    internal virtual bool ExecuteBool(List<Node> parameters)
     {
       throw new InvalidOperationException("Function does not return boolean");
     }
@@ -118,7 +116,7 @@ namespace EpsilonScript.Function
     private readonly Func<TResult> _func;
 
     public CustomFunction(string name, Func<TResult> func, bool isConstant = false)
-      : base(name, isConstant, Array.Empty<ScriptType>(), TypeTraits<TResult>.ScriptType)
+      : base(name, isConstant, Array.Empty<Type>(), TypeTraits<TResult>.ValueType)
     {
       _func = func ?? throw new ArgumentNullException(nameof(func));
     }
@@ -129,43 +127,43 @@ namespace EpsilonScript.Function
       return _func();
     }
 
-    public override int ExecuteInt(List<Node> parameters)
+    internal override int ExecuteInt(List<Node> parameters)
     {
       EnsureReturnType(Type.Integer);
       return TypeTraits<TResult>.ToInt(Invoke(parameters));
     }
 
-    public override long ExecuteLong(List<Node> parameters)
+    internal override long ExecuteLong(List<Node> parameters)
     {
       EnsureReturnType(Type.Long);
       return TypeTraits<TResult>.ToLong(Invoke(parameters));
     }
 
-    public override float ExecuteFloat(List<Node> parameters)
+    internal override float ExecuteFloat(List<Node> parameters)
     {
       EnsureReturnType(Type.Float);
       return TypeTraits<TResult>.ToFloat(Invoke(parameters));
     }
 
-    public override double ExecuteDouble(List<Node> parameters)
+    internal override double ExecuteDouble(List<Node> parameters)
     {
       EnsureReturnType(Type.Double);
       return TypeTraits<TResult>.ToDouble(Invoke(parameters));
     }
 
-    public override decimal ExecuteDecimal(List<Node> parameters)
+    internal override decimal ExecuteDecimal(List<Node> parameters)
     {
       EnsureReturnType(Type.Decimal);
       return TypeTraits<TResult>.ToDecimal(Invoke(parameters));
     }
 
-    public override string ExecuteString(List<Node> parameters)
+    internal override string ExecuteString(List<Node> parameters)
     {
       EnsureReturnType(Type.String);
       return TypeTraits<TResult>.ToStringValue(Invoke(parameters));
     }
 
-    public override bool ExecuteBool(List<Node> parameters)
+    internal override bool ExecuteBool(List<Node> parameters)
     {
       EnsureReturnType(Type.Boolean);
       return TypeTraits<TResult>.ToBool(Invoke(parameters));
@@ -174,11 +172,11 @@ namespace EpsilonScript.Function
 
   public sealed class CustomFunction<T1, TResult> : CustomFunction
   {
-    private static readonly ScriptType[] ParameterCache = { TypeTraits<T1>.ScriptType };
+    private static readonly Type[] ParameterCache = { TypeTraits<T1>.ValueType };
     private readonly Func<T1, TResult> _func;
 
     public CustomFunction(string name, Func<T1, TResult> func, bool isConstant = false)
-      : base(name, isConstant, ParameterCache, TypeTraits<TResult>.ScriptType)
+      : base(name, isConstant, ParameterCache, TypeTraits<TResult>.ValueType)
     {
       _func = func ?? throw new ArgumentNullException(nameof(func));
     }
@@ -189,43 +187,43 @@ namespace EpsilonScript.Function
       return _func(TypeTraits<T1>.Read(parameters[0]));
     }
 
-    public override int ExecuteInt(List<Node> parameters)
+    internal override int ExecuteInt(List<Node> parameters)
     {
       EnsureReturnType(Type.Integer);
       return TypeTraits<TResult>.ToInt(Invoke(parameters));
     }
 
-    public override long ExecuteLong(List<Node> parameters)
+    internal override long ExecuteLong(List<Node> parameters)
     {
       EnsureReturnType(Type.Long);
       return TypeTraits<TResult>.ToLong(Invoke(parameters));
     }
 
-    public override float ExecuteFloat(List<Node> parameters)
+    internal override float ExecuteFloat(List<Node> parameters)
     {
       EnsureReturnType(Type.Float);
       return TypeTraits<TResult>.ToFloat(Invoke(parameters));
     }
 
-    public override double ExecuteDouble(List<Node> parameters)
+    internal override double ExecuteDouble(List<Node> parameters)
     {
       EnsureReturnType(Type.Double);
       return TypeTraits<TResult>.ToDouble(Invoke(parameters));
     }
 
-    public override decimal ExecuteDecimal(List<Node> parameters)
+    internal override decimal ExecuteDecimal(List<Node> parameters)
     {
       EnsureReturnType(Type.Decimal);
       return TypeTraits<TResult>.ToDecimal(Invoke(parameters));
     }
 
-    public override string ExecuteString(List<Node> parameters)
+    internal override string ExecuteString(List<Node> parameters)
     {
       EnsureReturnType(Type.String);
       return TypeTraits<TResult>.ToStringValue(Invoke(parameters));
     }
 
-    public override bool ExecuteBool(List<Node> parameters)
+    internal override bool ExecuteBool(List<Node> parameters)
     {
       EnsureReturnType(Type.Boolean);
       return TypeTraits<TResult>.ToBool(Invoke(parameters));
@@ -234,16 +232,16 @@ namespace EpsilonScript.Function
 
   public sealed class CustomFunction<T1, T2, TResult> : CustomFunction
   {
-    private static readonly ScriptType[] ParameterCache =
+    private static readonly Type[] ParameterCache =
     {
-      TypeTraits<T1>.ScriptType,
-      TypeTraits<T2>.ScriptType
+      TypeTraits<T1>.ValueType,
+      TypeTraits<T2>.ValueType
     };
 
     private readonly Func<T1, T2, TResult> _func;
 
     public CustomFunction(string name, Func<T1, T2, TResult> func, bool isConstant = false)
-      : base(name, isConstant, ParameterCache, TypeTraits<TResult>.ScriptType)
+      : base(name, isConstant, ParameterCache, TypeTraits<TResult>.ValueType)
     {
       _func = func ?? throw new ArgumentNullException(nameof(func));
     }
@@ -254,43 +252,43 @@ namespace EpsilonScript.Function
       return _func(TypeTraits<T1>.Read(parameters[0]), TypeTraits<T2>.Read(parameters[1]));
     }
 
-    public override int ExecuteInt(List<Node> parameters)
+    internal override int ExecuteInt(List<Node> parameters)
     {
       EnsureReturnType(Type.Integer);
       return TypeTraits<TResult>.ToInt(Invoke(parameters));
     }
 
-    public override long ExecuteLong(List<Node> parameters)
+    internal override long ExecuteLong(List<Node> parameters)
     {
       EnsureReturnType(Type.Long);
       return TypeTraits<TResult>.ToLong(Invoke(parameters));
     }
 
-    public override float ExecuteFloat(List<Node> parameters)
+    internal override float ExecuteFloat(List<Node> parameters)
     {
       EnsureReturnType(Type.Float);
       return TypeTraits<TResult>.ToFloat(Invoke(parameters));
     }
 
-    public override double ExecuteDouble(List<Node> parameters)
+    internal override double ExecuteDouble(List<Node> parameters)
     {
       EnsureReturnType(Type.Double);
       return TypeTraits<TResult>.ToDouble(Invoke(parameters));
     }
 
-    public override decimal ExecuteDecimal(List<Node> parameters)
+    internal override decimal ExecuteDecimal(List<Node> parameters)
     {
       EnsureReturnType(Type.Decimal);
       return TypeTraits<TResult>.ToDecimal(Invoke(parameters));
     }
 
-    public override string ExecuteString(List<Node> parameters)
+    internal override string ExecuteString(List<Node> parameters)
     {
       EnsureReturnType(Type.String);
       return TypeTraits<TResult>.ToStringValue(Invoke(parameters));
     }
 
-    public override bool ExecuteBool(List<Node> parameters)
+    internal override bool ExecuteBool(List<Node> parameters)
     {
       EnsureReturnType(Type.Boolean);
       return TypeTraits<TResult>.ToBool(Invoke(parameters));
@@ -299,17 +297,17 @@ namespace EpsilonScript.Function
 
   public sealed class CustomFunction<T1, T2, T3, TResult> : CustomFunction
   {
-    private static readonly ScriptType[] ParameterCache =
+    private static readonly Type[] ParameterCache =
     {
-      TypeTraits<T1>.ScriptType,
-      TypeTraits<T2>.ScriptType,
-      TypeTraits<T3>.ScriptType
+      TypeTraits<T1>.ValueType,
+      TypeTraits<T2>.ValueType,
+      TypeTraits<T3>.ValueType
     };
 
     private readonly Func<T1, T2, T3, TResult> _func;
 
     public CustomFunction(string name, Func<T1, T2, T3, TResult> func, bool isConstant = false)
-      : base(name, isConstant, ParameterCache, TypeTraits<TResult>.ScriptType)
+      : base(name, isConstant, ParameterCache, TypeTraits<TResult>.ValueType)
     {
       _func = func ?? throw new ArgumentNullException(nameof(func));
     }
@@ -321,43 +319,43 @@ namespace EpsilonScript.Function
         TypeTraits<T3>.Read(parameters[2]));
     }
 
-    public override int ExecuteInt(List<Node> parameters)
+    internal override int ExecuteInt(List<Node> parameters)
     {
       EnsureReturnType(Type.Integer);
       return TypeTraits<TResult>.ToInt(Invoke(parameters));
     }
 
-    public override long ExecuteLong(List<Node> parameters)
+    internal override long ExecuteLong(List<Node> parameters)
     {
       EnsureReturnType(Type.Long);
       return TypeTraits<TResult>.ToLong(Invoke(parameters));
     }
 
-    public override float ExecuteFloat(List<Node> parameters)
+    internal override float ExecuteFloat(List<Node> parameters)
     {
       EnsureReturnType(Type.Float);
       return TypeTraits<TResult>.ToFloat(Invoke(parameters));
     }
 
-    public override double ExecuteDouble(List<Node> parameters)
+    internal override double ExecuteDouble(List<Node> parameters)
     {
       EnsureReturnType(Type.Double);
       return TypeTraits<TResult>.ToDouble(Invoke(parameters));
     }
 
-    public override decimal ExecuteDecimal(List<Node> parameters)
+    internal override decimal ExecuteDecimal(List<Node> parameters)
     {
       EnsureReturnType(Type.Decimal);
       return TypeTraits<TResult>.ToDecimal(Invoke(parameters));
     }
 
-    public override string ExecuteString(List<Node> parameters)
+    internal override string ExecuteString(List<Node> parameters)
     {
       EnsureReturnType(Type.String);
       return TypeTraits<TResult>.ToStringValue(Invoke(parameters));
     }
 
-    public override bool ExecuteBool(List<Node> parameters)
+    internal override bool ExecuteBool(List<Node> parameters)
     {
       EnsureReturnType(Type.Boolean);
       return TypeTraits<TResult>.ToBool(Invoke(parameters));
@@ -366,18 +364,18 @@ namespace EpsilonScript.Function
 
   public sealed class CustomFunction<T1, T2, T3, T4, TResult> : CustomFunction
   {
-    private static readonly ScriptType[] ParameterCache =
+    private static readonly Type[] ParameterCache =
     {
-      TypeTraits<T1>.ScriptType,
-      TypeTraits<T2>.ScriptType,
-      TypeTraits<T3>.ScriptType,
-      TypeTraits<T4>.ScriptType
+      TypeTraits<T1>.ValueType,
+      TypeTraits<T2>.ValueType,
+      TypeTraits<T3>.ValueType,
+      TypeTraits<T4>.ValueType
     };
 
     private readonly Func<T1, T2, T3, T4, TResult> _func;
 
     public CustomFunction(string name, Func<T1, T2, T3, T4, TResult> func, bool isConstant = false)
-      : base(name, isConstant, ParameterCache, TypeTraits<TResult>.ScriptType)
+      : base(name, isConstant, ParameterCache, TypeTraits<TResult>.ValueType)
     {
       _func = func ?? throw new ArgumentNullException(nameof(func));
     }
@@ -392,43 +390,43 @@ namespace EpsilonScript.Function
         TypeTraits<T4>.Read(parameters[3]));
     }
 
-    public override int ExecuteInt(List<Node> parameters)
+    internal override int ExecuteInt(List<Node> parameters)
     {
       EnsureReturnType(Type.Integer);
       return TypeTraits<TResult>.ToInt(Invoke(parameters));
     }
 
-    public override long ExecuteLong(List<Node> parameters)
+    internal override long ExecuteLong(List<Node> parameters)
     {
       EnsureReturnType(Type.Long);
       return TypeTraits<TResult>.ToLong(Invoke(parameters));
     }
 
-    public override float ExecuteFloat(List<Node> parameters)
+    internal override float ExecuteFloat(List<Node> parameters)
     {
       EnsureReturnType(Type.Float);
       return TypeTraits<TResult>.ToFloat(Invoke(parameters));
     }
 
-    public override double ExecuteDouble(List<Node> parameters)
+    internal override double ExecuteDouble(List<Node> parameters)
     {
       EnsureReturnType(Type.Double);
       return TypeTraits<TResult>.ToDouble(Invoke(parameters));
     }
 
-    public override decimal ExecuteDecimal(List<Node> parameters)
+    internal override decimal ExecuteDecimal(List<Node> parameters)
     {
       EnsureReturnType(Type.Decimal);
       return TypeTraits<TResult>.ToDecimal(Invoke(parameters));
     }
 
-    public override string ExecuteString(List<Node> parameters)
+    internal override string ExecuteString(List<Node> parameters)
     {
       EnsureReturnType(Type.String);
       return TypeTraits<TResult>.ToStringValue(Invoke(parameters));
     }
 
-    public override bool ExecuteBool(List<Node> parameters)
+    internal override bool ExecuteBool(List<Node> parameters)
     {
       EnsureReturnType(Type.Boolean);
       return TypeTraits<TResult>.ToBool(Invoke(parameters));
@@ -437,19 +435,19 @@ namespace EpsilonScript.Function
 
   public sealed class CustomFunction<T1, T2, T3, T4, T5, TResult> : CustomFunction
   {
-    private static readonly ScriptType[] ParameterCache =
+    private static readonly Type[] ParameterCache =
     {
-      TypeTraits<T1>.ScriptType,
-      TypeTraits<T2>.ScriptType,
-      TypeTraits<T3>.ScriptType,
-      TypeTraits<T4>.ScriptType,
-      TypeTraits<T5>.ScriptType
+      TypeTraits<T1>.ValueType,
+      TypeTraits<T2>.ValueType,
+      TypeTraits<T3>.ValueType,
+      TypeTraits<T4>.ValueType,
+      TypeTraits<T5>.ValueType
     };
 
     private readonly Func<T1, T2, T3, T4, T5, TResult> _func;
 
     public CustomFunction(string name, Func<T1, T2, T3, T4, T5, TResult> func, bool isConstant = false)
-      : base(name, isConstant, ParameterCache, TypeTraits<TResult>.ScriptType)
+      : base(name, isConstant, ParameterCache, TypeTraits<TResult>.ValueType)
     {
       _func = func ?? throw new ArgumentNullException(nameof(func));
     }
@@ -465,43 +463,43 @@ namespace EpsilonScript.Function
         TypeTraits<T5>.Read(parameters[4]));
     }
 
-    public override int ExecuteInt(List<Node> parameters)
+    internal override int ExecuteInt(List<Node> parameters)
     {
       EnsureReturnType(Type.Integer);
       return TypeTraits<TResult>.ToInt(Invoke(parameters));
     }
 
-    public override long ExecuteLong(List<Node> parameters)
+    internal override long ExecuteLong(List<Node> parameters)
     {
       EnsureReturnType(Type.Long);
       return TypeTraits<TResult>.ToLong(Invoke(parameters));
     }
 
-    public override float ExecuteFloat(List<Node> parameters)
+    internal override float ExecuteFloat(List<Node> parameters)
     {
       EnsureReturnType(Type.Float);
       return TypeTraits<TResult>.ToFloat(Invoke(parameters));
     }
 
-    public override double ExecuteDouble(List<Node> parameters)
+    internal override double ExecuteDouble(List<Node> parameters)
     {
       EnsureReturnType(Type.Double);
       return TypeTraits<TResult>.ToDouble(Invoke(parameters));
     }
 
-    public override decimal ExecuteDecimal(List<Node> parameters)
+    internal override decimal ExecuteDecimal(List<Node> parameters)
     {
       EnsureReturnType(Type.Decimal);
       return TypeTraits<TResult>.ToDecimal(Invoke(parameters));
     }
 
-    public override string ExecuteString(List<Node> parameters)
+    internal override string ExecuteString(List<Node> parameters)
     {
       EnsureReturnType(Type.String);
       return TypeTraits<TResult>.ToStringValue(Invoke(parameters));
     }
 
-    public override bool ExecuteBool(List<Node> parameters)
+    internal override bool ExecuteBool(List<Node> parameters)
     {
       EnsureReturnType(Type.Boolean);
       return TypeTraits<TResult>.ToBool(Invoke(parameters));

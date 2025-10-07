@@ -4,7 +4,7 @@ using EpsilonScript.Intermediate;
 
 namespace EpsilonScript.AST
 {
-  public class SequenceNode : Node
+  internal class SequenceNode : Node
   {
     private Node _leftNode;
     private Node _rightNode;
@@ -41,33 +41,33 @@ namespace EpsilonScript.AST
 
       switch (_rightNode.ValueType)
       {
-        case Type.Integer:
+        case ExtendedType.Integer:
           IntegerValue = _rightNode.IntegerValue;
           break;
-        case Type.Long:
+        case ExtendedType.Long:
           LongValue = _rightNode.LongValue;
           break;
-        case Type.Float:
+        case ExtendedType.Float:
           FloatValue = _rightNode.FloatValue;
           break;
-        case Type.Double:
+        case ExtendedType.Double:
           DoubleValue = _rightNode.DoubleValue;
           break;
-        case Type.Decimal:
+        case ExtendedType.Decimal:
           DecimalValue = _rightNode.DecimalValue;
           break;
-        case Type.Boolean:
+        case ExtendedType.Boolean:
           BooleanValue = _rightNode.BooleanValue;
           break;
-        case Type.String:
+        case ExtendedType.String:
           StringValue = _rightNode.StringValue;
           break;
-        case Type.Tuple:
+        case ExtendedType.Tuple:
           TupleValue = _rightNode.TupleValue;
-          ValueType = Type.Tuple;
+          ValueType = ExtendedType.Tuple;
           break;
-        case Type.Null:
-          ValueType = Type.Null;
+        case ExtendedType.Null:
+          ValueType = ExtendedType.Null;
           break;
         default:
           ValueType = _rightNode.ValueType;

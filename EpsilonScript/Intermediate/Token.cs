@@ -2,7 +2,7 @@ using System;
 
 namespace EpsilonScript.Intermediate
 {
-  public readonly struct Token
+  internal readonly struct Token
   {
     public readonly ReadOnlyMemory<char> Text;
     public readonly TokenType Type;

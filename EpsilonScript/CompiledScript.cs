@@ -5,7 +5,7 @@ namespace EpsilonScript
   public class CompiledScript
   {
     private readonly Node _rootNode;
-    private bool _isResultCached = false;
+    private bool _isResultCached;
     public Type ValueType { get; private set; } = Type.Undefined;
     public bool IsConstant { get; }
 
@@ -21,7 +21,7 @@ namespace EpsilonScript
 
     public Compiler.FloatPrecision FloatPrecision { get; }
 
-    public CompiledScript(Node rootNode, Compiler.IntegerPrecision integerPrecision,
+    internal CompiledScript(Node rootNode, Compiler.IntegerPrecision integerPrecision,
       Compiler.FloatPrecision floatPrecision)
     {
       _rootNode = rootNode;

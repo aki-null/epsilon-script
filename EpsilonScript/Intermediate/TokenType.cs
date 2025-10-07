@@ -1,6 +1,6 @@
 namespace EpsilonScript.Intermediate
 {
-  public enum TokenType
+  internal enum TokenType
   {
     None,
     Identifier,
