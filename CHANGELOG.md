@@ -1,6 +1,6 @@
 # Changelog
 
-## [1.3.0] - 2025-10-06
+## [1.3.0] - 2025-10-07
 
 ### Added
 - **Configurable Numeric Precision**: New `Compiler(IntegerPrecision, FloatPrecision)` constructor
