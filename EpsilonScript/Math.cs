@@ -7,6 +7,7 @@ namespace EpsilonScript
 {
   public static class Math
   {
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static int UnsafeFloatAsInt32(float f)
     {
 #if UNITY_2018_1_OR_NEWER
@@ -16,6 +17,7 @@ namespace EpsilonScript
 #endif
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static long UnsafeDoubleAsInt64(double d)
     {
 #if UNITY_2018_1_OR_NEWER
