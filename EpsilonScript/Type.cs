@@ -6,11 +6,14 @@ namespace EpsilonScript
   public enum Type : byte
   {
     Undefined = 0,
+    // Integer types
     Integer = 1,
     Long = 2,
+    // Floating-point types
     Float = 3,
     Double = 4,
     Decimal = 5,
+    // Other types
     Boolean = 6,
     String = 7,
   }
@@ -23,13 +26,17 @@ namespace EpsilonScript
   internal enum ExtendedType : byte
   {
     Undefined = 0,
+    // Integer types
     Integer = 1,
     Long = 2,
+    // Floating-point types
     Float = 3,
     Double = 4,
     Decimal = 5,
+    // Other types
     Boolean = 6,
     String = 7,
+    // Special AST-only types
     Null = 8,
     Tuple = 9,
   }

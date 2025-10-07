@@ -5,11 +5,7 @@ namespace EpsilonScript
     [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
     public static bool IsNumber(this ExtendedType t)
     {
-      return t == ExtendedType.Integer
-             || t == ExtendedType.Long
-             || t == ExtendedType.Float
-             || t == ExtendedType.Double
-             || t == ExtendedType.Decimal;
+      return t >= ExtendedType.Integer && t <= ExtendedType.Decimal;
     }
 
     [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
@@ -21,7 +17,7 @@ namespace EpsilonScript
     [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
     public static bool IsFloat(this ExtendedType t)
     {
-      return t == ExtendedType.Float || t == ExtendedType.Double || t == ExtendedType.Decimal;
+      return t >= ExtendedType.Float && t <= ExtendedType.Decimal;
     }
   }
 }
