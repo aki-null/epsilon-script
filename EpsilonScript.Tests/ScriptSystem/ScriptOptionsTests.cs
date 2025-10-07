@@ -69,7 +69,7 @@ namespace EpsilonScript.Tests.ScriptSystem
     {
       var memory = "21".AsMemory();
       var result = CompileAndExecute(memory, Compiler.Options.Immutable);
-      Assert.Equal(Type.Integer, result.ValueType);
+      Assert.Equal(Type.Integer, result.Type);
       Assert.Equal(21, result.IntegerValue);
     }
   }

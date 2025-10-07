@@ -1,7 +1,6 @@
 using System;
 using System.Runtime.CompilerServices;
 using EpsilonScript.AST;
-using ScriptType = EpsilonScript.Type;
 #if UNITY_2018_1_OR_NEWER
 using Unity.Collections.LowLevel.Unsafe;
 #endif
@@ -12,39 +11,74 @@ namespace EpsilonScript.Function
   {
     private static readonly Func<Node, T> ReadFunc;
     private static readonly Func<T, int> ToIntFunc;
+    private static readonly Func<T, long> ToLongFunc;
     private static readonly Func<T, float> ToFloatFunc;
+    private static readonly Func<T, double> ToDoubleFunc;
+    private static readonly Func<T, decimal> ToDecimalFunc;
     private static readonly Func<T, bool> ToBoolFunc;
     private static readonly Func<T, string> ToStringFunc;
 
-    public static ScriptType ScriptType { get; }
+    // ReSharper disable once StaticMemberInGenericType
+    public static Type ValueType { get; }
 
     static TypeTraits()
     {
       ReadFunc = ThrowRead;
       ToIntFunc = ThrowToInt;
+      ToLongFunc = ThrowToLong;
       ToFloatFunc = ThrowToFloat;
+      ToDoubleFunc = ThrowToDouble;
+      ToDecimalFunc = ThrowToDecimal;
       ToBoolFunc = ThrowToBool;
       ToStringFunc = ThrowToString;
 
       if (typeof(T) == typeof(int))
       {
-        ScriptType = ScriptType.Integer;
+        ValueType = Type.Integer;
         ReadFunc = ReadInt;
         ToIntFunc = ToIntIdentity;
+        ToLongFunc = ToIntAsLong;
+        return;
+      }
+
+      if (typeof(T) == typeof(long))
+      {
+        ValueType = Type.Long;
+        ReadFunc = ReadLong;
+        ToIntFunc = ToLongAsInt;
+        ToLongFunc = ToLongIdentity;
         return;
       }
 
       if (typeof(T) == typeof(float))
       {
-        ScriptType = ScriptType.Float;
+        ValueType = Type.Float;
         ReadFunc = ReadFloat;
         ToFloatFunc = ToFloatIdentity;
+        ToDoubleFunc = ToFloatAsDouble;
+        return;
+      }
+
+      if (typeof(T) == typeof(double))
+      {
+        ValueType = Type.Double;
+        ReadFunc = ReadDouble;
+        ToFloatFunc = ToDoubleAsFloat;
+        ToDoubleFunc = ToDoubleIdentity;
+        return;
+      }
+
+      if (typeof(T) == typeof(decimal))
+      {
+        ValueType = Type.Decimal;
+        ReadFunc = ReadDecimal;
+        ToDecimalFunc = ToDecimalIdentity;
         return;
       }
 
       if (typeof(T) == typeof(bool))
       {
-        ScriptType = ScriptType.Boolean;
+        ValueType = Type.Boolean;
         ReadFunc = ReadBool;
         ToBoolFunc = ToBoolIdentity;
         return;
@@ -52,7 +86,7 @@ namespace EpsilonScript.Function
 
       if (typeof(T) == typeof(string))
       {
-        ScriptType = ScriptType.String;
+        ValueType = Type.String;
         ReadFunc = ReadString;
         ToStringFunc = ToStringIdentity;
         return;
@@ -74,9 +108,27 @@ namespace EpsilonScript.Function
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static long ToLong(T value)
+    {
+      return ToLongFunc(value);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static float ToFloat(T value)
     {
       return ToFloatFunc(value);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static double ToDouble(T value)
+    {
+      return ToDoubleFunc(value);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static decimal ToDecimal(T value)
+    {
+      return ToDecimalFunc(value);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -93,7 +145,7 @@ namespace EpsilonScript.Function
 
     private static T ThrowRead(Node _)
     {
-      throw new InvalidOperationException($"Unsupported script type: {ScriptType}");
+      throw new InvalidOperationException($"Unsupported script type: {ValueType}");
     }
 
     private static int ThrowToInt(T _)
@@ -101,9 +153,24 @@ namespace EpsilonScript.Function
       throw new InvalidOperationException("Attempted to extract integer value from non-integer type");
     }
 
+    private static long ThrowToLong(T _)
+    {
+      throw new InvalidOperationException("Attempted to extract long value from non-long type");
+    }
+
     private static float ThrowToFloat(T _)
     {
       throw new InvalidOperationException("Attempted to extract float value from non-float type");
+    }
+
+    private static double ThrowToDouble(T _)
+    {
+      throw new InvalidOperationException("Attempted to extract double value from non-double type");
+    }
+
+    private static decimal ThrowToDecimal(T _)
+    {
+      throw new InvalidOperationException("Attempted to extract decimal value from non-decimal type");
     }
 
     private static bool ThrowToBool(T _)
@@ -176,9 +243,109 @@ namespace EpsilonScript.Function
 #endif
     }
 
+    private static T ReadLong(Node node)
+    {
+      var value = node.LongValue;
+#if UNITY_2018_1_OR_NEWER
+      return UnsafeUtility.As<long, T>(ref value);
+#else
+      return Unsafe.As<long, T>(ref value);
+#endif
+    }
+
+    private static int ToLongAsInt(T value)
+    {
+      var temp = value;
+#if UNITY_2018_1_OR_NEWER
+      return (int)UnsafeUtility.As<T, long>(ref temp);
+#else
+      return (int)Unsafe.As<T, long>(ref temp);
+#endif
+    }
+
+    private static T ReadDouble(Node node)
+    {
+      var value = node.DoubleValue;
+#if UNITY_2018_1_OR_NEWER
+      return UnsafeUtility.As<double, T>(ref value);
+#else
+      return Unsafe.As<double, T>(ref value);
+#endif
+    }
+
+    private static float ToDoubleAsFloat(T value)
+    {
+      var temp = value;
+#if UNITY_2018_1_OR_NEWER
+      return (float)UnsafeUtility.As<T, double>(ref temp);
+#else
+      return (float)Unsafe.As<T, double>(ref temp);
+#endif
+    }
+
+    private static T ReadDecimal(Node node)
+    {
+      var value = node.DecimalValue;
+#if UNITY_2018_1_OR_NEWER
+      return UnsafeUtility.As<decimal, T>(ref value);
+#else
+      return Unsafe.As<decimal, T>(ref value);
+#endif
+    }
+
     private static T ReadString(Node node)
     {
       return (T)(object)node.StringValue;
+    }
+
+    private static long ToIntAsLong(T value)
+    {
+      var temp = value;
+#if UNITY_2018_1_OR_NEWER
+      return UnsafeUtility.As<T, int>(ref temp);
+#else
+      return Unsafe.As<T, int>(ref temp);
+#endif
+    }
+
+    private static long ToLongIdentity(T value)
+    {
+      var temp = value;
+#if UNITY_2018_1_OR_NEWER
+      return UnsafeUtility.As<T, long>(ref temp);
+#else
+      return Unsafe.As<T, long>(ref temp);
+#endif
+    }
+
+    private static double ToFloatAsDouble(T value)
+    {
+      var temp = value;
+#if UNITY_2018_1_OR_NEWER
+      return UnsafeUtility.As<T, float>(ref temp);
+#else
+      return Unsafe.As<T, float>(ref temp);
+#endif
+    }
+
+    private static double ToDoubleIdentity(T value)
+    {
+      var temp = value;
+#if UNITY_2018_1_OR_NEWER
+      return UnsafeUtility.As<T, double>(ref temp);
+#else
+      return Unsafe.As<T, double>(ref temp);
+#endif
+    }
+
+    private static decimal ToDecimalIdentity(T value)
+    {
+      var temp = value;
+#if UNITY_2018_1_OR_NEWER
+      return UnsafeUtility.As<T, decimal>(ref temp);
+#else
+      return Unsafe.As<T, decimal>(ref temp);
+#endif
     }
 
     private static string ToStringIdentity(T value)

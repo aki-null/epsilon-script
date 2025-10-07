@@ -11,21 +11,21 @@ namespace EpsilonScript.Tests.RpnConverter
   {
     [Theory]
     [MemberData(nameof(SimpleMathData))]
-    public void RPNConverter_ParsesSimpleMath_Correctly(Element[] input, Element[] expected)
+    internal void RPNConverter_ParsesSimpleMath_Correctly(Element[] input, Element[] expected)
     {
       AssertRpnSucceeds(input, expected);
     }
 
     [Theory]
     [MemberData(nameof(PrecedenceData))]
-    public void RPNConverter_ParsesPrecedence_Correctly(Element[] input, Element[] expected)
+    internal void RPNConverter_ParsesPrecedence_Correctly(Element[] input, Element[] expected)
     {
       AssertRpnSucceeds(input, expected);
     }
 
     [Theory]
     [MemberData(nameof(ComplexExpressionData))]
-    public void RPNConverter_ParsesComplexMath_Correctly(Element[] input, Element[] expected)
+    internal void RPNConverter_ParsesComplexMath_Correctly(Element[] input, Element[] expected)
     {
       AssertRpnSucceeds(input, expected);
     }

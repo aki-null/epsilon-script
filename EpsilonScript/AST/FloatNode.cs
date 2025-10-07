@@ -4,47 +4,43 @@ using EpsilonScript.Intermediate;
 
 namespace EpsilonScript.AST
 {
-  public class FloatNode : Node
+  internal class FloatNode : Node
   {
-    private void Initialize(float value)
-    {
-      ValueType = ValueType.Float;
-      FloatValue = value;
-
-      // Safer float-to-int conversion with overflow handling
-      if (float.IsNaN(value) || float.IsInfinity(value))
-      {
-        IntegerValue = 0;
-      }
-      else if (value > int.MaxValue)
-      {
-        IntegerValue = int.MaxValue;
-      }
-      else if (value < int.MinValue)
-      {
-        IntegerValue = int.MinValue;
-      }
-      else
-      {
-        IntegerValue = (int)value;
-      }
-
-      BooleanValue = FloatValue != 0.0f && !float.IsInfinity(FloatValue) && !float.IsNaN(FloatValue);
-    }
-
     public FloatNode()
     {
     }
 
     public FloatNode(float value)
     {
-      Initialize(value);
+      FloatValue = value;
+    }
+
+    public FloatNode(double value)
+    {
+      DoubleValue = value;
+    }
+
+    public FloatNode(decimal value)
+    {
+      DecimalValue = value;
     }
 
     public override void Build(Stack<Node> rpnStack, Element element, Compiler.Options options,
-      IVariableContainer variables, IDictionary<VariableId, CustomFunctionOverload> functions)
+      IVariableContainer variables, IDictionary<VariableId, CustomFunctionOverload> functions,
+      Compiler.IntegerPrecision intPrecision, Compiler.FloatPrecision floatPrecision)
     {
-      Initialize(float.Parse(element.Token.Text.Span));
+      switch (floatPrecision)
+      {
+        case Compiler.FloatPrecision.Float:
+          FloatValue = float.Parse(element.Token.Text.Span);
+          break;
+        case Compiler.FloatPrecision.Double:
+          DoubleValue = double.Parse(element.Token.Text.Span);
+          break;
+        case Compiler.FloatPrecision.Decimal:
+          DecimalValue = decimal.Parse(element.Token.Text.Span);
+          break;
+      }
     }
   }
 }

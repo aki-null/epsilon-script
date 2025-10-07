@@ -12,47 +12,54 @@ namespace EpsilonScript.Function
     private CustomFunction LeafFunction { get; set; }
 
     private CustomFunctionOverloadNode _integerNode;
+    private CustomFunctionOverloadNode _longNode;
     private CustomFunctionOverloadNode _floatNode;
+    private CustomFunctionOverloadNode _doubleNode;
+    private CustomFunctionOverloadNode _decimalNode;
     private CustomFunctionOverloadNode _booleanNode;
     private CustomFunctionOverloadNode _stringNode;
 
-    private static CustomFunction FindOverload(Type[] paramTypes, int index, CustomFunctionOverloadNode primary,
-      CustomFunctionOverloadNode secondary)
-    {
-      CustomFunction function = null;
-      if (primary != null)
-      {
-        function = primary.Find(paramTypes, index + 1);
-      }
-
-      if (function == null && secondary != null)
-      {
-        function = secondary.Find(paramTypes, index + 1);
-      }
-
-      return function;
-    }
-
-    public CustomFunction Find(Type[] paramTypes, int index = 0)
+    public CustomFunction Find(ExtendedType[] paramTypes, Compiler.FloatPrecision configuredFloatType, int index = 0)
     {
       if (index >= paramTypes.Length)
       {
         return LeafFunction;
       }
 
-      switch (paramTypes[index])
+      var nextNode = paramTypes[index] switch
       {
-        case Type.Integer:
-          return FindOverload(paramTypes, index, _integerNode, _floatNode);
-        case Type.Float:
-          return FindOverload(paramTypes, index, _floatNode, _integerNode);
-        case Type.Boolean:
-          return _booleanNode?.Find(paramTypes, index + 1);
-        case Type.String:
-          return _stringNode?.Find(paramTypes, index + 1);
-        default:
-          throw new ArgumentOutOfRangeException(nameof(paramTypes), paramTypes[index], "Unsupported parameter type");
+        ExtendedType.Integer => _integerNode,
+        ExtendedType.Long => _longNode,
+        ExtendedType.Float => _floatNode,
+        ExtendedType.Double => _doubleNode,
+        ExtendedType.Decimal => _decimalNode,
+        ExtendedType.Boolean => _booleanNode,
+        ExtendedType.String => _stringNode,
+        _ => null
+      };
+
+      var result = nextNode?.Find(paramTypes, configuredFloatType, index + 1);
+      if (result != null)
+      {
+        return result;
       }
+
+      // Fallback: try converting integer types to the configured float type
+      // Since compiler precision is fixed, only one float type exists per script
+      if (paramTypes[index] == ExtendedType.Integer || paramTypes[index] == ExtendedType.Long)
+      {
+        var fallbackNode = configuredFloatType switch
+        {
+          Compiler.FloatPrecision.Float => _floatNode,
+          Compiler.FloatPrecision.Double => _doubleNode,
+          Compiler.FloatPrecision.Decimal => _decimalNode,
+          _ => null
+        };
+
+        return fallbackNode?.Find(paramTypes, configuredFloatType, index + 1);
+      }
+
+      return null;
     }
 
     public void Build(CustomFunction function, int index = 0)
@@ -69,44 +76,17 @@ namespace EpsilonScript.Function
         return;
       }
 
-      CustomFunctionOverloadNode nextNode;
-      switch (paramTypes[index])
+      var nextNode = paramTypes[index] switch
       {
-        case Type.Integer:
-          if (_integerNode == null)
-          {
-            _integerNode = new CustomFunctionOverloadNode();
-          }
-
-          nextNode = _integerNode;
-          break;
-        case Type.Float:
-          if (_floatNode == null)
-          {
-            _floatNode = new CustomFunctionOverloadNode();
-          }
-
-          nextNode = _floatNode;
-          break;
-        case Type.Boolean:
-          if (_booleanNode == null)
-          {
-            _booleanNode = new CustomFunctionOverloadNode();
-          }
-
-          nextNode = _booleanNode;
-          break;
-        case Type.String:
-          if (_stringNode == null)
-          {
-            _stringNode = new CustomFunctionOverloadNode();
-          }
-
-          nextNode = _stringNode;
-          break;
-        default:
-          throw new ArgumentOutOfRangeException(nameof(paramTypes), paramTypes[index], "Unsupported parameter type");
-      }
+        Type.Integer => _integerNode ??= new CustomFunctionOverloadNode(),
+        Type.Long => _longNode ??= new CustomFunctionOverloadNode(),
+        Type.Float => _floatNode ??= new CustomFunctionOverloadNode(),
+        Type.Double => _doubleNode ??= new CustomFunctionOverloadNode(),
+        Type.Decimal => _decimalNode ??= new CustomFunctionOverloadNode(),
+        Type.Boolean => _booleanNode ??= new CustomFunctionOverloadNode(),
+        Type.String => _stringNode ??= new CustomFunctionOverloadNode(),
+        _ => throw new ArgumentOutOfRangeException(nameof(paramTypes), paramTypes[index], "Unsupported parameter type")
+      };
 
       nextNode.Build(function, index + 1);
     }

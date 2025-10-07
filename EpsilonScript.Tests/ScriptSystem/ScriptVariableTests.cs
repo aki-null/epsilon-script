@@ -12,7 +12,7 @@ namespace EpsilonScript.Tests.ScriptSystem
     {
       var variables = Variables().WithInteger("val", 5).Build();
       var result = CompileAndExecute("val * 3", Compiler.Options.None, variables);
-      Assert.Equal(Type.Integer, result.ValueType);
+      Assert.Equal(Type.Integer, result.Type);
       Assert.Equal(15, result.IntegerValue);
     }
 
@@ -37,7 +37,7 @@ namespace EpsilonScript.Tests.ScriptSystem
     {
       var variables = Variables().WithInteger("val", startValue).Build();
       var result = CompileAndExecute(expression, Compiler.Options.None, variables);
-      Assert.Equal(Type.Integer, result.ValueType);
+      Assert.Equal(Type.Integer, result.Type);
       Assert.Equal(expected, result.IntegerValue);
       Assert.Equal(expected, variables["val"].IntegerValue);
     }
@@ -52,7 +52,7 @@ namespace EpsilonScript.Tests.ScriptSystem
     {
       var variables = Variables().WithFloat("val", startValue).Build();
       var result = CompileAndExecute(expression, Compiler.Options.None, variables);
-      Assert.Equal(Type.Float, result.ValueType);
+      Assert.Equal(Type.Float, result.Type);
       AssertNearlyEqual(expected, result.FloatValue);
       AssertNearlyEqual(expected, variables["val"].FloatValue);
     }
@@ -62,7 +62,7 @@ namespace EpsilonScript.Tests.ScriptSystem
     {
       var variables = Variables().WithBoolean("flag", false).Build();
       var result = CompileAndExecute("flag = 30 > 20", Compiler.Options.None, variables);
-      Assert.Equal(Type.Boolean, result.ValueType);
+      Assert.Equal(Type.Boolean, result.Type);
       Assert.True(result.BooleanValue);
       Assert.True(variables["flag"].BooleanValue);
     }
@@ -72,7 +72,7 @@ namespace EpsilonScript.Tests.ScriptSystem
     {
       var variables = Variables().WithInteger("val", 0).Build();
       var result = CompileAndExecute("(val = 1; val *= 5; val + 2)", Compiler.Options.None, variables);
-      Assert.Equal(Type.Integer, result.ValueType);
+      Assert.Equal(Type.Integer, result.Type);
       Assert.Equal(7, result.IntegerValue);
       Assert.Equal(5, variables["val"].IntegerValue);
     }
@@ -82,7 +82,7 @@ namespace EpsilonScript.Tests.ScriptSystem
     {
       var variables = Variables().WithString("message", "Hello World").Build();
       var result = CompileAndExecute("message", Compiler.Options.None, variables);
-      Assert.Equal(Type.String, result.ValueType);
+      Assert.Equal(Type.String, result.Type);
       Assert.Equal("Hello World", result.StringValue);
     }
 
@@ -102,7 +102,7 @@ namespace EpsilonScript.Tests.ScriptSystem
     {
       var variables = Variables().WithString("text", "original").Build();
       var result = CompileAndExecute("text = \"updated\"", Compiler.Options.None, variables);
-      Assert.Equal(Type.String, result.ValueType);
+      Assert.Equal(Type.String, result.Type);
       Assert.Equal("updated", result.StringValue);
       Assert.Equal("updated", variables["text"].StringValue);
     }
@@ -112,7 +112,7 @@ namespace EpsilonScript.Tests.ScriptSystem
     {
       var variables = Variables().WithString("empty", "").Build();
       var result = CompileAndExecute("empty", Compiler.Options.None, variables);
-      Assert.Equal(Type.String, result.ValueType);
+      Assert.Equal(Type.String, result.Type);
       Assert.Equal("", result.StringValue);
     }
 
@@ -121,7 +121,7 @@ namespace EpsilonScript.Tests.ScriptSystem
     {
       var variables = Variables().WithString("special", "Hello\nWorld\t!").Build();
       var result = CompileAndExecute("special", Compiler.Options.None, variables);
-      Assert.Equal(Type.String, result.ValueType);
+      Assert.Equal(Type.String, result.Type);
       Assert.Equal("Hello\nWorld\t!", result.StringValue);
     }
 
@@ -169,7 +169,7 @@ namespace EpsilonScript.Tests.ScriptSystem
 
       var result = CompileAndExecute("user.name", variables: variables);
 
-      Assert.Equal(Type.String, result.ValueType);
+      Assert.Equal(Type.String, result.Type);
       Assert.Equal("John", result.StringValue);
     }
 
@@ -182,7 +182,7 @@ namespace EpsilonScript.Tests.ScriptSystem
 
       var result = CompileAndExecute("config.server.port", variables: variables);
 
-      Assert.Equal(Type.Integer, result.ValueType);
+      Assert.Equal(Type.Integer, result.Type);
       Assert.Equal(8080, result.IntegerValue);
     }
 
@@ -195,7 +195,7 @@ namespace EpsilonScript.Tests.ScriptSystem
 
       var result = CompileAndExecute("math.pi.value", variables: variables);
 
-      Assert.Equal(Type.Float, result.ValueType);
+      Assert.Equal(Type.Float, result.Type);
       AssertNearlyEqual(3.14159f, result.FloatValue);
     }
 
@@ -208,7 +208,7 @@ namespace EpsilonScript.Tests.ScriptSystem
 
       var result = CompileAndExecute("user.name = \"Jane\"; user.name", variables: variables);
 
-      Assert.Equal(Type.String, result.ValueType);
+      Assert.Equal(Type.String, result.Type);
       // Check in the variables container since assignment modifies the variable
       Assert.Equal("Jane", result.Variables["user.name"].StringValue);
     }

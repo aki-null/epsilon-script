@@ -4,7 +4,7 @@ using Xunit;
 
 namespace EpsilonScript.Tests.TestInfrastructure.Fakes
 {
-  public class TestTokenReader : ITokenReader
+  internal class TestTokenReader : ITokenReader
   {
     public bool EndCalled { get; private set; }
 

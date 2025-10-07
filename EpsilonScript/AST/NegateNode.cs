@@ -4,16 +4,17 @@ using EpsilonScript.Intermediate;
 
 namespace EpsilonScript.AST
 {
-  public class NegateNode : Node
+  internal class NegateNode : Node
   {
     private Node _childNode;
 
     public override bool IsConstant => _childNode.IsConstant;
 
     public override void Build(Stack<Node> rpnStack, Element element, Compiler.Options options,
-      IVariableContainer variables, IDictionary<VariableId, CustomFunctionOverload> functions)
+      IVariableContainer variables, IDictionary<VariableId, CustomFunctionOverload> functions,
+      Compiler.IntegerPrecision intPrecision, Compiler.FloatPrecision floatPrecision)
     {
-      ValueType = ValueType.Boolean;
+      ValueType = ExtendedType.Boolean;
 
       if (!rpnStack.TryPop(out _childNode))
       {
@@ -24,14 +25,12 @@ namespace EpsilonScript.AST
     public override void Execute(IVariableContainer variablesOverride)
     {
       _childNode.Execute(variablesOverride);
-      if (_childNode.ValueType != ValueType.Boolean)
+      if (_childNode.ValueType != ExtendedType.Boolean)
       {
         throw new RuntimeException("Cannot negate a non-boolean value");
       }
 
       BooleanValue = !_childNode.BooleanValue;
-      IntegerValue = BooleanValue ? 1 : 0;
-      FloatValue = IntegerValue;
     }
 
     public override Node Optimize()

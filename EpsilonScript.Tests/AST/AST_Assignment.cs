@@ -5,7 +5,6 @@ using EpsilonScript.Intermediate;
 using Xunit;
 using EpsilonScript.Tests.TestInfrastructure;
 using EpsilonScript.Tests.TestInfrastructure.Fakes;
-using ValueType = EpsilonScript.AST.ValueType;
 
 namespace EpsilonScript.Tests.AST
 {
@@ -15,8 +14,8 @@ namespace EpsilonScript.Tests.AST
   {
     [Theory]
     [MemberData(nameof(SimpleAssignmentData))]
-    public void AST_Assignment_SimpleAssignment_Succeeds(ElementType operatorType, string operatorSymbol,
-      Type variableType, object initialValue, object assignValue, object expectedValue, ValueType expectedValueType)
+    internal void AST_Assignment_SimpleAssignment_Succeeds(ElementType operatorType, string operatorSymbol,
+      Type variableType, object initialValue, object assignValue, object expectedValue, ExtendedType expectedValueType)
     {
       var variable = new VariableValue(variableType);
       SetVariableValue(variable, initialValue);
@@ -27,7 +26,8 @@ namespace EpsilonScript.Tests.AST
       var rpn = CreateStack(leftNode, rightNode);
       var element = new Element(new Token(operatorSymbol, GetTokenType(operatorType)), operatorType);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null);
+      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
+        Compiler.FloatPrecision.Float);
       node.Execute(null);
 
       Assert.Equal(expectedValueType, node.ValueType);
@@ -41,24 +41,24 @@ namespace EpsilonScript.Tests.AST
         return new[]
         {
           // Integer assignments
-          new object[] { ElementType.AssignmentOperator, "=", Type.Integer, 10, 42, 42, ValueType.Integer },
-          new object[] { ElementType.AssignmentOperator, "=", Type.Integer, 5, -15, -15, ValueType.Integer },
+          new object[] { ElementType.AssignmentOperator, "=", Type.Integer, 10, 42, 42, ExtendedType.Integer },
+          new object[] { ElementType.AssignmentOperator, "=", Type.Integer, 5, -15, -15, ExtendedType.Integer },
 
           // Float assignments
-          new object[] { ElementType.AssignmentOperator, "=", Type.Float, 10.5f, 42.7f, 42.7f, ValueType.Float },
-          new object[] { ElementType.AssignmentOperator, "=", Type.Float, 5.0f, -15.3f, -15.3f, ValueType.Float },
+          new object[] { ElementType.AssignmentOperator, "=", Type.Float, 10.5f, 42.7f, 42.7f, ExtendedType.Float },
+          new object[] { ElementType.AssignmentOperator, "=", Type.Float, 5.0f, -15.3f, -15.3f, ExtendedType.Float },
 
           // Boolean assignments
-          new object[] { ElementType.AssignmentOperator, "=", Type.Boolean, true, false, false, ValueType.Boolean },
-          new object[] { ElementType.AssignmentOperator, "=", Type.Boolean, false, true, true, ValueType.Boolean }
+          new object[] { ElementType.AssignmentOperator, "=", Type.Boolean, true, false, false, ExtendedType.Boolean },
+          new object[] { ElementType.AssignmentOperator, "=", Type.Boolean, false, true, true, ExtendedType.Boolean }
         };
       }
     }
 
     [Theory]
     [MemberData(nameof(CompoundAssignmentData))]
-    public void AST_Assignment_CompoundAssignment_Succeeds(ElementType operatorType, string operatorSymbol,
-      Type variableType, object initialValue, object operandValue, object expectedValue, ValueType expectedValueType)
+    internal void AST_Assignment_CompoundAssignment_Succeeds(ElementType operatorType, string operatorSymbol,
+      Type variableType, object initialValue, object operandValue, object expectedValue, ExtendedType expectedValueType)
     {
       var variable = new VariableValue(variableType);
       SetVariableValue(variable, initialValue);
@@ -69,7 +69,8 @@ namespace EpsilonScript.Tests.AST
       var rpn = CreateStack(leftNode, rightNode);
       var element = new Element(new Token(operatorSymbol, GetTokenType(operatorType)), operatorType);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null);
+      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
+        Compiler.FloatPrecision.Float);
       node.Execute(null);
 
       Assert.Equal(expectedValueType, node.ValueType);
@@ -83,22 +84,24 @@ namespace EpsilonScript.Tests.AST
         return new[]
         {
           // Integer compound assignments
-          new object[] { ElementType.AssignmentAddOperator, "+=", Type.Integer, 10, 5, 15, ValueType.Integer },
-          new object[] { ElementType.AssignmentSubtractOperator, "-=", Type.Integer, 10, 3, 7, ValueType.Integer },
-          new object[] { ElementType.AssignmentMultiplyOperator, "*=", Type.Integer, 6, 2, 12, ValueType.Integer },
-          new object[] { ElementType.AssignmentDivideOperator, "/=", Type.Integer, 12, 3, 4, ValueType.Integer },
+          new object[] { ElementType.AssignmentAddOperator, "+=", Type.Integer, 10, 5, 15, ExtendedType.Integer },
+          new object[] { ElementType.AssignmentSubtractOperator, "-=", Type.Integer, 10, 3, 7, ExtendedType.Integer },
+          new object[] { ElementType.AssignmentMultiplyOperator, "*=", Type.Integer, 6, 2, 12, ExtendedType.Integer },
+          new object[] { ElementType.AssignmentDivideOperator, "/=", Type.Integer, 12, 3, 4, ExtendedType.Integer },
 
           // Float compound assignments
-          new object[] { ElementType.AssignmentAddOperator, "+=", Type.Float, 10.5f, 5.2f, 15.7f, ValueType.Float },
-          new object[] { ElementType.AssignmentSubtractOperator, "-=", Type.Float, 10.5f, 3.2f, 7.3f, ValueType.Float },
-          new object[] { ElementType.AssignmentMultiplyOperator, "*=", Type.Float, 6.5f, 2.0f, 13.0f, ValueType.Float },
-          new object[] { ElementType.AssignmentDivideOperator, "/=", Type.Float, 12.0f, 3.0f, 4.0f, ValueType.Float }
+          new object[] { ElementType.AssignmentAddOperator, "+=", Type.Float, 10.5f, 5.2f, 15.7f, ExtendedType.Float },
+          new object[]
+            { ElementType.AssignmentSubtractOperator, "-=", Type.Float, 10.5f, 3.2f, 7.3f, ExtendedType.Float },
+          new object[]
+            { ElementType.AssignmentMultiplyOperator, "*=", Type.Float, 6.5f, 2.0f, 13.0f, ExtendedType.Float },
+          new object[] { ElementType.AssignmentDivideOperator, "/=", Type.Float, 12.0f, 3.0f, 4.0f, ExtendedType.Float }
         };
       }
     }
 
     [Fact]
-    public void AST_Assignment_ImmutableMode_ThrowsParserException()
+    internal void AST_Assignment_ImmutableMode_ThrowsParserException()
     {
       var variable = new VariableValue(Type.Integer);
       var leftNode = new FakeVariableNode(variable);
@@ -114,7 +117,7 @@ namespace EpsilonScript.Tests.AST
     }
 
     [Fact]
-    public void AST_Assignment_NonVariableLeftSide_ThrowsRuntimeException()
+    internal void AST_Assignment_NonVariableLeftSide_ThrowsRuntimeException()
     {
       var leftNode = new FakeIntegerNode(10); // Not a variable
       var rightNode = new FakeIntegerNode(42);
@@ -123,13 +126,14 @@ namespace EpsilonScript.Tests.AST
       var rpn = CreateStack(leftNode, rightNode);
       var element = new Element(new Token("=", TokenType.AssignmentOperator), ElementType.AssignmentOperator);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null);
+      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
+        Compiler.FloatPrecision.Float);
 
       ErrorTestHelper.ExecuteNodeExpectingError<RuntimeException>(node, null, ErrorMessages.LeftHandSideMustBeVariable);
     }
 
     [Fact]
-    public void AST_Assignment_FloatToBooleanVariable_ThrowsRuntimeException()
+    internal void AST_Assignment_FloatToBooleanVariable_ThrowsRuntimeException()
     {
       var variable = new VariableValue(Type.Boolean);
       var leftNode = new FakeVariableNode(variable);
@@ -139,7 +143,8 @@ namespace EpsilonScript.Tests.AST
       var rpn = CreateStack(leftNode, rightNode);
       var element = new Element(new Token("=", TokenType.AssignmentOperator), ElementType.AssignmentOperator);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null);
+      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
+        Compiler.FloatPrecision.Float);
 
       ErrorTestHelper.ExecuteNodeExpectingError<RuntimeException>(node, null,
         ErrorMessages.FloatValueCannotBeAssignedToBooleanVariable);
@@ -150,7 +155,7 @@ namespace EpsilonScript.Tests.AST
     [InlineData(ElementType.AssignmentSubtractOperator, "-=")]
     [InlineData(ElementType.AssignmentMultiplyOperator, "*=")]
     [InlineData(ElementType.AssignmentDivideOperator, "/=")]
-    public void AST_Assignment_CompoundAssignmentWithNonNumeric_ThrowsRuntimeException(ElementType operatorType,
+    internal void AST_Assignment_CompoundAssignmentWithNonNumeric_ThrowsRuntimeException(ElementType operatorType,
       string operatorSymbol)
     {
       var variable = new VariableValue(Type.Integer);
@@ -161,7 +166,8 @@ namespace EpsilonScript.Tests.AST
       var rpn = CreateStack(leftNode, rightNode);
       var element = new Element(new Token(operatorSymbol, GetTokenType(operatorType)), operatorType);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null);
+      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
+        Compiler.FloatPrecision.Float);
 
       ErrorTestHelper.ExecuteNodeExpectingError<RuntimeException>(node, null,
         ErrorMessages.ArithmeticOperationOnlyOnNumericValue);
@@ -172,7 +178,7 @@ namespace EpsilonScript.Tests.AST
     [InlineData(ElementType.AssignmentSubtractOperator, "-=")]
     [InlineData(ElementType.AssignmentMultiplyOperator, "*=")]
     [InlineData(ElementType.AssignmentDivideOperator, "/=")]
-    public void AST_Assignment_CompoundAssignmentWithBooleanVariable_ThrowsArgumentException(ElementType operatorType,
+    internal void AST_Assignment_CompoundAssignmentWithBooleanVariable_ThrowsArgumentException(ElementType operatorType,
       string operatorSymbol)
     {
       var variable = new VariableValue(Type.Boolean);
@@ -183,7 +189,8 @@ namespace EpsilonScript.Tests.AST
       var rpn = CreateStack(leftNode, rightNode);
       var element = new Element(new Token(operatorSymbol, GetTokenType(operatorType)), operatorType);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null);
+      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
+        Compiler.FloatPrecision.Float);
 
       ErrorTestHelper.ExecuteNodeExpectingError<ArgumentOutOfRangeException>(node);
     }

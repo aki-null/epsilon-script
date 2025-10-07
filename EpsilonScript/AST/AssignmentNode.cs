@@ -5,7 +5,7 @@ using EpsilonScript.Intermediate;
 
 namespace EpsilonScript.AST
 {
-  public class AssignmentNode : Node
+  internal class AssignmentNode : Node
   {
     private Node _leftNode;
     private Node _rightNode;
@@ -14,7 +14,8 @@ namespace EpsilonScript.AST
     public override bool IsConstant => false;
 
     public override void Build(Stack<Node> rpnStack, Element element, Compiler.Options options,
-      IVariableContainer variables, IDictionary<VariableId, CustomFunctionOverload> functions)
+      IVariableContainer variables, IDictionary<VariableId, CustomFunctionOverload> functions,
+      Compiler.IntegerPrecision intPrecision, Compiler.FloatPrecision floatPrecision)
     {
       if ((options & Compiler.Options.Immutable) == Compiler.Options.Immutable)
       {
@@ -49,13 +50,27 @@ namespace EpsilonScript.AST
             case Type.Integer:
               variable.IntegerValue = _rightNode.IntegerValue;
               break;
+            case Type.Long:
+              variable.LongValue = _rightNode.LongValue;
+              break;
             case Type.Float:
               variable.FloatValue = _rightNode.FloatValue;
               break;
+            case Type.Double:
+              variable.DoubleValue = _rightNode.DoubleValue;
+              break;
+            case Type.Decimal:
+              variable.DecimalValue = _rightNode.DecimalValue;
+              break;
             case Type.Boolean:
-              if (_rightNode.ValueType == ValueType.Float)
+              if (_rightNode.ValueType.IsFloat())
               {
                 throw new RuntimeException("A float value cannot be assigned to a boolean variable");
+              }
+
+              if (_rightNode.IsNumeric)
+              {
+                throw new RuntimeException("A numeric value cannot be assigned to a boolean variable");
               }
 
               variable.BooleanValue = _rightNode.BooleanValue;
@@ -79,8 +94,17 @@ namespace EpsilonScript.AST
             case Type.Integer:
               variable.IntegerValue += _rightNode.IntegerValue;
               break;
+            case Type.Long:
+              variable.LongValue += _rightNode.LongValue;
+              break;
             case Type.Float:
               variable.FloatValue += _rightNode.FloatValue;
+              break;
+            case Type.Double:
+              variable.DoubleValue += _rightNode.DoubleValue;
+              break;
+            case Type.Decimal:
+              variable.DecimalValue += _rightNode.DecimalValue;
               break;
             default:
               throw new ArgumentOutOfRangeException(nameof(variable.Type), variable.Type, "Unsupported variable type");
@@ -98,8 +122,17 @@ namespace EpsilonScript.AST
             case Type.Integer:
               variable.IntegerValue -= _rightNode.IntegerValue;
               break;
+            case Type.Long:
+              variable.LongValue -= _rightNode.LongValue;
+              break;
             case Type.Float:
               variable.FloatValue -= _rightNode.FloatValue;
+              break;
+            case Type.Double:
+              variable.DoubleValue -= _rightNode.DoubleValue;
+              break;
+            case Type.Decimal:
+              variable.DecimalValue -= _rightNode.DecimalValue;
               break;
             default:
               throw new ArgumentOutOfRangeException(nameof(variable.Type), variable.Type, "Unsupported variable type");
@@ -117,8 +150,17 @@ namespace EpsilonScript.AST
             case Type.Integer:
               variable.IntegerValue *= _rightNode.IntegerValue;
               break;
+            case Type.Long:
+              variable.LongValue *= _rightNode.LongValue;
+              break;
             case Type.Float:
               variable.FloatValue *= _rightNode.FloatValue;
+              break;
+            case Type.Double:
+              variable.DoubleValue *= _rightNode.DoubleValue;
+              break;
+            case Type.Decimal:
+              variable.DecimalValue *= _rightNode.DecimalValue;
               break;
             default:
               throw new ArgumentOutOfRangeException(nameof(variable.Type), variable.Type, "Unsupported variable type");
@@ -136,8 +178,17 @@ namespace EpsilonScript.AST
             case Type.Integer:
               variable.IntegerValue /= _rightNode.IntegerValue;
               break;
+            case Type.Long:
+              variable.LongValue /= _rightNode.LongValue;
+              break;
             case Type.Float:
               variable.FloatValue /= _rightNode.FloatValue;
+              break;
+            case Type.Double:
+              variable.DoubleValue /= _rightNode.DoubleValue;
+              break;
+            case Type.Decimal:
+              variable.DecimalValue /= _rightNode.DecimalValue;
               break;
             default:
               throw new ArgumentOutOfRangeException(nameof(variable.Type), variable.Type, "Unsupported variable type");
@@ -152,23 +203,24 @@ namespace EpsilonScript.AST
       switch (variable.Type)
       {
         case Type.Integer:
-          ValueType = ValueType.Integer;
           IntegerValue = variable.IntegerValue;
-          FloatValue = variable.FloatValue;
-          BooleanValue = variable.BooleanValue;
+          break;
+        case Type.Long:
+          LongValue = variable.LongValue;
           break;
         case Type.Float:
-          ValueType = ValueType.Float;
-          IntegerValue = variable.IntegerValue;
           FloatValue = variable.FloatValue;
           break;
+        case Type.Double:
+          DoubleValue = variable.DoubleValue;
+          break;
+        case Type.Decimal:
+          DecimalValue = variable.DecimalValue;
+          break;
         case Type.Boolean:
-          ValueType = ValueType.Boolean;
-          IntegerValue = variable.IntegerValue;
           BooleanValue = variable.BooleanValue;
           break;
         case Type.String:
-          ValueType = ValueType.String;
           StringValue = variable.StringValue;
           break;
         default:

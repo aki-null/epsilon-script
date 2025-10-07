@@ -7,7 +7,7 @@ namespace EpsilonScript.Tests.TestInfrastructure
 {
   public abstract class TokenParserTestBase
   {
-    protected static void AssertParseSucceeds(IList<Token> tokens, IList<Element> expected)
+    internal static void AssertParseSucceeds(IList<Token> tokens, IList<Element> expected)
     {
       var elementReader = new TestElementReader();
       var parser = new EpsilonScript.Parser.TokenParser(elementReader);
@@ -27,7 +27,7 @@ namespace EpsilonScript.Tests.TestInfrastructure
       }
     }
 
-    protected static object[] CreateTestCase(params Element[] elements)
+    internal static object[] CreateTestCase(params Element[] elements)
     {
       var tokens = new Token[elements.Length];
       for (var i = 0; i < elements.Length; ++i)

@@ -11,7 +11,7 @@ namespace EpsilonScript.Tests.Lexer
   {
     [Theory]
     [MemberData(nameof(CorrectData))]
-    public void Lexer_Parenthesis_Correctly(string input, params Token[] expected)
+    internal void Lexer_Parenthesis_Correctly(string input, params Token[] expected)
     {
       AssertLexSucceeds(input, expected);
     }

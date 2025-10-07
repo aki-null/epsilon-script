@@ -2,7 +2,7 @@ using System;
 
 namespace EpsilonScript.Intermediate
 {
-  public enum ElementType
+  internal enum ElementType
   {
     None,
     Variable,

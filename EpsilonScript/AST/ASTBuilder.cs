@@ -5,7 +5,7 @@ using EpsilonScript.Intermediate;
 
 namespace EpsilonScript.AST
 {
-  public class AstBuilder : IElementReader
+  internal class AstBuilder : IElementReader
   {
     public Node Result { get; private set; }
 
@@ -13,6 +13,8 @@ namespace EpsilonScript.AST
 
     private Compiler.Options _options;
     private IVariableContainer _variables;
+    private Compiler.IntegerPrecision _intPrecision;
+    private Compiler.FloatPrecision _floatPrecision;
     private readonly IDictionary<VariableId, CustomFunctionOverload> _functions;
 
     public AstBuilder(IDictionary<VariableId, CustomFunctionOverload> functions)
@@ -25,19 +27,24 @@ namespace EpsilonScript.AST
       _rpnStack.Clear();
       _options = Compiler.Options.None;
       _variables = null;
+      _intPrecision = Compiler.IntegerPrecision.Integer;
+      _floatPrecision = Compiler.FloatPrecision.Float;
       Result = null;
     }
 
-    public void Configure(Compiler.Options options, IVariableContainer variables)
+    public void Configure(Compiler.Options options, IVariableContainer variables,
+      Compiler.IntegerPrecision intPrecision, Compiler.FloatPrecision floatPrecision)
     {
       _options = options;
       _variables = variables;
+      _intPrecision = intPrecision;
+      _floatPrecision = floatPrecision;
     }
 
     public void Push(Element element)
     {
       var node = CreateNode(element.Type);
-      node.Build(_rpnStack, element, _options, _variables, _functions);
+      node.Build(_rpnStack, element, _options, _variables, _functions, _intPrecision, _floatPrecision);
       _rpnStack.Push(node);
     }
 

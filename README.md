@@ -55,6 +55,7 @@ int damage = (int)damageFormula.FloatValue; // 82 at level 10
   - [Functions](#functions)
   - [Strings](#strings)
   - [Expression Sequencing](#expression-sequencing)
+- [Numeric Precision](#numeric-precision)
 - [Heap Allocations](#heap-allocations)
 - [Use Cases](#use-cases)
 - [Context](#context)
@@ -66,6 +67,7 @@ int damage = (int)damageFormula.FloatValue; // 82 at level 10
 - Intentionally simple syntax
 - Unity support
 - No heap allocation after compilation (with exceptions)
+- Configurable numeric precision
 
 ## Installation
 
@@ -349,6 +351,59 @@ Console.WriteLine(script.IntegerValue); // 26 (x is 6, y is 20)
 ```
 26
 ```
+
+## Numeric Precision
+
+Configure numeric precision when creating the compiler to control integer and floating-point types used in expressions.
+
+### Precision Options
+
+**Integer Precision:**
+- `Integer` (default): 32-bit int
+- `Long`: 64-bit long
+
+**Float Precision:**
+- `Float` (default): 32-bit float
+- `Double`: 64-bit double
+- `Decimal`: 128-bit decimal
+
+### Usage
+
+```c#
+// Default: 32-bit int and float
+var compiler = new Compiler();
+
+// High precision: 64-bit long and 128-bit decimal
+var preciseCompiler = new Compiler(
+    Compiler.IntegerPrecision.Long,
+    Compiler.FloatPrecision.Decimal);
+
+var script = preciseCompiler.Compile("0.1 + 0.2");
+script.Execute();
+Console.WriteLine(script.DecimalValue); // 0.3
+```
+
+All operations automatically promote to configured precision.
+
+### Custom Functions and Precision
+
+Custom function parameter types must match the compiler's configured precision:
+
+```c#
+// Compiler uses Double precision
+var compiler = new Compiler(
+    Compiler.IntegerPrecision.Integer,
+    Compiler.FloatPrecision.Double);
+
+// Function must use double, not float
+compiler.AddCustomFunction(CustomFunction.Create("calc", (double x) => x * 2.5));
+
+var script = compiler.Compile("calc(10.5)");
+script.Execute();
+Console.WriteLine(script.DoubleValue); // 26.25
+```
+
+If parameter types don't match, you'll get a runtime error. Integer arguments automatically convert to the configured float type when needed.
 
 ## Heap Allocations
 

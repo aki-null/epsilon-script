@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using EpsilonScript.AST;
 using EpsilonScript.Function;
 using EpsilonScript.Intermediate;
-using ValueType = EpsilonScript.AST.ValueType;
 
 namespace EpsilonScript.Tests.TestInfrastructure.Fakes
 {
-  public class FakeVariableNode : Node
+  internal class FakeVariableNode : Node
   {
     public FakeVariableNode(VariableValue variable)
     {
@@ -15,23 +14,24 @@ namespace EpsilonScript.Tests.TestInfrastructure.Fakes
       switch (Variable.Type)
       {
         case Type.Integer:
-          ValueType = ValueType.Integer;
           IntegerValue = Variable.IntegerValue;
-          FloatValue = Variable.FloatValue;
-          BooleanValue = Variable.BooleanValue;
+          break;
+        case Type.Long:
+          LongValue = Variable.LongValue;
           break;
         case Type.Float:
-          ValueType = ValueType.Float;
-          IntegerValue = Variable.IntegerValue;
           FloatValue = Variable.FloatValue;
           break;
+        case Type.Double:
+          DoubleValue = Variable.DoubleValue;
+          break;
+        case Type.Decimal:
+          DecimalValue = Variable.DecimalValue;
+          break;
         case Type.Boolean:
-          ValueType = ValueType.Boolean;
-          IntegerValue = Variable.IntegerValue;
           BooleanValue = Variable.BooleanValue;
           break;
         case Type.String:
-          ValueType = ValueType.String;
           StringValue = Variable.StringValue;
           break;
         default:
@@ -40,7 +40,8 @@ namespace EpsilonScript.Tests.TestInfrastructure.Fakes
     }
 
     public override void Build(Stack<Node> rpnStack, Element element, Compiler.Options options,
-      IVariableContainer variables, IDictionary<VariableId, CustomFunctionOverload> functions)
+      IVariableContainer variables, IDictionary<VariableId, CustomFunctionOverload> functions,
+      Compiler.IntegerPrecision intPrecision, Compiler.FloatPrecision floatPrecision)
     {
       throw new NotImplementedException("Fake nodes cannot be built from RPN stack");
     }
@@ -51,23 +52,24 @@ namespace EpsilonScript.Tests.TestInfrastructure.Fakes
       switch (Variable.Type)
       {
         case Type.Integer:
-          ValueType = ValueType.Integer;
           IntegerValue = Variable.IntegerValue;
-          FloatValue = Variable.FloatValue;
-          BooleanValue = Variable.BooleanValue;
+          break;
+        case Type.Long:
+          LongValue = Variable.LongValue;
           break;
         case Type.Float:
-          ValueType = ValueType.Float;
-          IntegerValue = Variable.IntegerValue;
           FloatValue = Variable.FloatValue;
           break;
+        case Type.Double:
+          DoubleValue = Variable.DoubleValue;
+          break;
+        case Type.Decimal:
+          DecimalValue = Variable.DecimalValue;
+          break;
         case Type.Boolean:
-          ValueType = ValueType.Boolean;
-          IntegerValue = Variable.IntegerValue;
           BooleanValue = Variable.BooleanValue;
           break;
         case Type.String:
-          ValueType = ValueType.String;
           StringValue = Variable.StringValue;
           break;
       }

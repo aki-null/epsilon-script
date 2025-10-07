@@ -4,7 +4,7 @@ using EpsilonScript.Intermediate;
 
 namespace EpsilonScript.Parser
 {
-  public class RpnConverter : IElementReader
+  internal class RpnConverter : IElementReader
   {
     private readonly Stack<Element> _operatorStack = new Stack<Element>();
 

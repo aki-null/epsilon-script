@@ -9,14 +9,14 @@ namespace EpsilonScript.Tests.Lexer
   {
     [Theory]
     [MemberData(nameof(CorrectData))]
-    public void Lexer_NumericLiteral_Correctly(string input, params Token[] expected)
+    internal void Lexer_NumericLiteral_Correctly(string input, params Token[] expected)
     {
       AssertLexSucceeds(input, expected);
     }
 
     [Theory]
     [MemberData(nameof(IncorrectData))]
-    public void Lexer_NumericLiteral_AssertLexFails(string input)
+    internal void Lexer_NumericLiteral_AssertLexFails(string input)
     {
       AssertLexFails(input);
     }

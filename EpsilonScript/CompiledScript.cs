@@ -5,18 +5,28 @@ namespace EpsilonScript
   public class CompiledScript
   {
     private readonly Node _rootNode;
-    private bool _isResultCached = false;
+    private bool _isResultCached;
     public Type ValueType { get; private set; } = Type.Undefined;
     public bool IsConstant { get; }
 
     public int IntegerValue => _rootNode.IntegerValue;
+    public long LongValue => _rootNode.LongValue;
     public float FloatValue => _rootNode.FloatValue;
+    public double DoubleValue => _rootNode.DoubleValue;
+    public decimal DecimalValue => _rootNode.DecimalValue;
     public bool BooleanValue => _rootNode.BooleanValue;
     public string StringValue => _rootNode.StringValue;
 
-    public CompiledScript(Node rootNode)
+    public Compiler.IntegerPrecision IntegerPrecision { get; }
+
+    public Compiler.FloatPrecision FloatPrecision { get; }
+
+    internal CompiledScript(Node rootNode, Compiler.IntegerPrecision integerPrecision,
+      Compiler.FloatPrecision floatPrecision)
     {
       _rootNode = rootNode;
+      IntegerPrecision = integerPrecision;
+      FloatPrecision = floatPrecision;
       // Constness is cached, because this information is gathered from each AST node O(n)
       IsConstant = rootNode.IsConstant;
     }
@@ -30,23 +40,9 @@ namespace EpsilonScript
       }
 
       _rootNode.Execute(variablesOverride);
-      switch (_rootNode.ValueType)
-      {
-        case AST.ValueType.Integer:
-          ValueType = Type.Integer;
-          break;
-        case AST.ValueType.Float:
-          ValueType = Type.Float;
-          break;
-        case AST.ValueType.Boolean:
-          ValueType = Type.Boolean;
-          break;
-        case AST.ValueType.String:
-          ValueType = Type.String;
-          break;
-        default:
-          throw new RuntimeException("AST root node returned invalid value type");
-      }
+
+      // Direct cast from ExtendedType to Type is safe, because they have identical values.
+      ValueType = (Type)_rootNode.ValueType;
 
       _isResultCached = true;
     }

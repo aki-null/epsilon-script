@@ -2,17 +2,19 @@ using System;
 
 namespace EpsilonScript.Function
 {
-  public class CustomFunctionOverload
+  internal class CustomFunctionOverload
   {
     private CustomFunctionOverloadNode _rootNode;
 
     public VariableId Name { get; }
     public bool IsConstant { get; }
+    public Compiler.FloatPrecision ConfiguredFloatType { get; }
 
-    public CustomFunctionOverload(CustomFunction function)
+    public CustomFunctionOverload(CustomFunction function, Compiler.FloatPrecision floatPrecision)
     {
       Name = function.Name;
       IsConstant = function.IsConstant;
+      ConfiguredFloatType = floatPrecision;
       _rootNode = new CustomFunctionOverloadNode();
       _rootNode.Build(function);
     }
@@ -27,9 +29,9 @@ namespace EpsilonScript.Function
       _rootNode.Build(function);
     }
 
-    public CustomFunction Find(Type[] paramTypes)
+    internal CustomFunction Find(ExtendedType[] paramTypes)
     {
-      return _rootNode.Find(paramTypes);
+      return _rootNode.Find(paramTypes, ConfiguredFloatType);
     }
   }
 }

@@ -10,77 +10,77 @@ namespace EpsilonScript.Tests.Parser
   {
     [Theory]
     [MemberData(nameof(PrecedenceLevel8Data))]
-    public void TokenParser_PrecedenceLevel8_FunctionAndUnaryOperators(Token[] input, Element[] expected)
+    internal void TokenParser_PrecedenceLevel8_FunctionAndUnaryOperators(Token[] input, Element[] expected)
     {
       AssertParseSucceeds(input, expected);
     }
 
     [Theory]
     [MemberData(nameof(PrecedenceLevel7Data))]
-    public void TokenParser_PrecedenceLevel7_MultiplicationDivisionModulo(Token[] input, Element[] expected)
+    internal void TokenParser_PrecedenceLevel7_MultiplicationDivisionModulo(Token[] input, Element[] expected)
     {
       AssertParseSucceeds(input, expected);
     }
 
     [Theory]
     [MemberData(nameof(PrecedenceLevel6Data))]
-    public void TokenParser_PrecedenceLevel6_AdditionSubtraction(Token[] input, Element[] expected)
+    internal void TokenParser_PrecedenceLevel6_AdditionSubtraction(Token[] input, Element[] expected)
     {
       AssertParseSucceeds(input, expected);
     }
 
     [Theory]
     [MemberData(nameof(PrecedenceLevel5Data))]
-    public void TokenParser_PrecedenceLevel5_ComparisonOperators(Token[] input, Element[] expected)
+    internal void TokenParser_PrecedenceLevel5_ComparisonOperators(Token[] input, Element[] expected)
     {
       AssertParseSucceeds(input, expected);
     }
 
     [Theory]
     [MemberData(nameof(PrecedenceLevel4Data))]
-    public void TokenParser_PrecedenceLevel4_BooleanAnd(Token[] input, Element[] expected)
+    internal void TokenParser_PrecedenceLevel4_BooleanAnd(Token[] input, Element[] expected)
     {
       AssertParseSucceeds(input, expected);
     }
 
     [Theory]
     [MemberData(nameof(PrecedenceLevel3Data))]
-    public void TokenParser_PrecedenceLevel3_BooleanOr(Token[] input, Element[] expected)
+    internal void TokenParser_PrecedenceLevel3_BooleanOr(Token[] input, Element[] expected)
     {
       AssertParseSucceeds(input, expected);
     }
 
     [Theory]
     [MemberData(nameof(PrecedenceLevel2Data))]
-    public void TokenParser_PrecedenceLevel2_AssignmentOperators(Token[] input, Element[] expected)
+    internal void TokenParser_PrecedenceLevel2_AssignmentOperators(Token[] input, Element[] expected)
     {
       AssertParseSucceeds(input, expected);
     }
 
     [Theory]
     [MemberData(nameof(PrecedenceLevel1Data))]
-    public void TokenParser_PrecedenceLevel1_Comma(Token[] input, Element[] expected)
+    internal void TokenParser_PrecedenceLevel1_Comma(Token[] input, Element[] expected)
     {
       AssertParseSucceeds(input, expected);
     }
 
     [Theory]
     [MemberData(nameof(PrecedenceLevel0Data))]
-    public void TokenParser_PrecedenceLevel0_Semicolon(Token[] input, Element[] expected)
+    internal void TokenParser_PrecedenceLevel0_Semicolon(Token[] input, Element[] expected)
     {
       AssertParseSucceeds(input, expected);
     }
 
     [Theory]
     [MemberData(nameof(MixedPrecedenceData))]
-    public void TokenParser_MixedPrecedenceLevels_CorrectOrderOfOperations(Token[] input, Element[] expected)
+    internal void TokenParser_MixedPrecedenceLevels_CorrectOrderOfOperations(Token[] input, Element[] expected)
     {
       AssertParseSucceeds(input, expected);
     }
 
     [Theory]
     [MemberData(nameof(AssociativityData))]
-    public void TokenParser_Associativity_CorrectEvaluation(Token[] input, Element[] expected)
+    internal void TokenParser_Associativity_CorrectEvaluation(Token[] input, Element[] expected)
     {
       AssertParseSucceeds(input, expected);
     }

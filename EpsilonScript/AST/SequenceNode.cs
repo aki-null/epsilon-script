@@ -4,7 +4,7 @@ using EpsilonScript.Intermediate;
 
 namespace EpsilonScript.AST
 {
-  public class SequenceNode : Node
+  internal class SequenceNode : Node
   {
     private Node _leftNode;
     private Node _rightNode;
@@ -14,7 +14,8 @@ namespace EpsilonScript.AST
       _isSingleNode ? _rightNode.IsConstant : (_leftNode.IsConstant && _rightNode.IsConstant);
 
     public override void Build(Stack<Node> rpnStack, Element element, Compiler.Options options,
-      IVariableContainer variables, IDictionary<VariableId, CustomFunctionOverload> functions)
+      IVariableContainer variables, IDictionary<VariableId, CustomFunctionOverload> functions,
+      Compiler.IntegerPrecision intPrecision, Compiler.FloatPrecision floatPrecision)
     {
       if (!rpnStack.TryPop(out _rightNode))
       {
@@ -37,12 +38,41 @@ namespace EpsilonScript.AST
       }
 
       _rightNode.Execute(variablesOverride);
-      ValueType = _rightNode.ValueType;
 
-      IntegerValue = _rightNode.IntegerValue;
-      FloatValue = _rightNode.FloatValue;
-      BooleanValue = _rightNode.BooleanValue;
-      TupleValue = _rightNode.TupleValue;
+      switch (_rightNode.ValueType)
+      {
+        case ExtendedType.Integer:
+          IntegerValue = _rightNode.IntegerValue;
+          break;
+        case ExtendedType.Long:
+          LongValue = _rightNode.LongValue;
+          break;
+        case ExtendedType.Float:
+          FloatValue = _rightNode.FloatValue;
+          break;
+        case ExtendedType.Double:
+          DoubleValue = _rightNode.DoubleValue;
+          break;
+        case ExtendedType.Decimal:
+          DecimalValue = _rightNode.DecimalValue;
+          break;
+        case ExtendedType.Boolean:
+          BooleanValue = _rightNode.BooleanValue;
+          break;
+        case ExtendedType.String:
+          StringValue = _rightNode.StringValue;
+          break;
+        case ExtendedType.Tuple:
+          TupleValue = _rightNode.TupleValue;
+          ValueType = ExtendedType.Tuple;
+          break;
+        case ExtendedType.Null:
+          ValueType = ExtendedType.Null;
+          break;
+        default:
+          ValueType = _rightNode.ValueType;
+          break;
+      }
     }
 
     public override Node Optimize()

@@ -4,29 +4,22 @@ using EpsilonScript.Intermediate;
 
 namespace EpsilonScript.AST
 {
-  public class BooleanNode : Node
+  internal class BooleanNode : Node
   {
-    private void Initialize(bool value)
-    {
-      ValueType = ValueType.Boolean;
-      BooleanValue = value;
-      IntegerValue = BooleanValue ? 1 : 0;
-      FloatValue = IntegerValue;
-    }
-
     public BooleanNode()
     {
     }
 
     public BooleanNode(bool value)
     {
-      Initialize(value);
+      BooleanValue = value;
     }
 
     public override void Build(Stack<Node> rpnStack, Element element, Compiler.Options options,
-      IVariableContainer variables, IDictionary<VariableId, CustomFunctionOverload> functions)
+      IVariableContainer variables, IDictionary<VariableId, CustomFunctionOverload> functions,
+      Compiler.IntegerPrecision intPrecision, Compiler.FloatPrecision floatPrecision)
     {
-      Initialize(element.Type == ElementType.BooleanLiteralTrue);
+      BooleanValue = element.Type == ElementType.BooleanLiteralTrue;
     }
   }
 }

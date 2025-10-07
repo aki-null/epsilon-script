@@ -4,7 +4,7 @@ using EpsilonScript.Intermediate;
 
 namespace EpsilonScript.AST
 {
-  public class TupleNode : Node
+  internal class TupleNode : Node
   {
     public override bool IsConstant
     {
@@ -23,9 +23,10 @@ namespace EpsilonScript.AST
     }
 
     public override void Build(Stack<Node> rpnStack, Element element, Compiler.Options options,
-      IVariableContainer variables, IDictionary<VariableId, CustomFunctionOverload> functions)
+      IVariableContainer variables, IDictionary<VariableId, CustomFunctionOverload> functions,
+      Compiler.IntegerPrecision intPrecision, Compiler.FloatPrecision floatPrecision)
     {
-      ValueType = ValueType.Tuple;
+      ValueType = ExtendedType.Tuple;
       TupleValue = new List<Node>();
 
       if (!rpnStack.TryPop(out var rightNode) || !rpnStack.TryPop(out var leftNode))
@@ -33,7 +34,7 @@ namespace EpsilonScript.AST
         throw new ParserException(element.Token, "Cannot find values to create parameter list");
       }
 
-      if (leftNode.ValueType == ValueType.Tuple)
+      if (leftNode.ValueType == ExtendedType.Tuple)
       {
         // unfold tuple list
         foreach (var parameter in leftNode.TupleValue)

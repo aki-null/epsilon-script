@@ -15,6 +15,19 @@ namespace EpsilonScript
       Immutable = 1,
     }
 
+    public enum IntegerPrecision
+    {
+      Integer, // 32-bit int
+      Long, // 64-bit long
+    }
+
+    public enum FloatPrecision
+    {
+      Float, // 32-bit float
+      Double, // 64-bit double
+      Decimal, // 128-bit decimal
+    }
+
     private readonly TokenParser _tokenParser;
     private readonly RpnConverter _rpnConverter;
     private readonly AstBuilder _astBuilder;
@@ -22,40 +35,136 @@ namespace EpsilonScript
     private readonly Dictionary<VariableId, CustomFunctionOverload> _functions =
       new Dictionary<VariableId, CustomFunctionOverload>();
 
-    public Compiler()
+    public IntegerPrecision DefaultIntegerType { get; }
+    public FloatPrecision DefaultFloatType { get; }
+
+    public Compiler() : this(IntegerPrecision.Integer, FloatPrecision.Float)
     {
-      // Built-in functions
-      AddCustomFunction(CustomFunction.Create("sin", (float v) => (float)System.Math.Sin(v), true));
-      AddCustomFunction(CustomFunction.Create("cos", (float v) => (float)System.Math.Cos(v), true));
-      AddCustomFunction(CustomFunction.Create("tan", (float v) => (float)System.Math.Tan(v), true));
-      AddCustomFunction(CustomFunction.Create("asin", (float v) => (float)System.Math.Asin(v), true));
-      AddCustomFunction(CustomFunction.Create("acos", (float v) => (float)System.Math.Acos(v), true));
-      AddCustomFunction(CustomFunction.Create("atan", (float v) => (float)System.Math.Atan(v), true));
-      AddCustomFunction(CustomFunction.Create("sinh", (float v) => (float)System.Math.Sinh(v), true));
-      AddCustomFunction(CustomFunction.Create("cosh", (float v) => (float)System.Math.Cosh(v), true));
-      AddCustomFunction(CustomFunction.Create("tanh", (float v) => (float)System.Math.Tanh(v), true));
-      AddCustomFunction(CustomFunction.Create("atan2", (float v1, float v2) => (float)System.Math.Atan2(v1, v2), true));
-      AddCustomFunction(CustomFunction.Create("sqrt", (float v) => (float)System.Math.Sqrt(v), true));
-      AddCustomFunction(CustomFunction.Create("abs", (int v) => System.Math.Abs(v), true));
-      AddCustomFunction(CustomFunction.Create("abs", (float v) => System.Math.Abs(v), true));
-      AddCustomFunction(CustomFunction.Create("floor", (float v) => (float)System.Math.Floor(v), true));
-      AddCustomFunction(CustomFunction.Create("ceil", (float v) => (float)System.Math.Ceiling(v), true));
-      AddCustomFunction(CustomFunction.Create("trunc", (float v) => (float)System.Math.Truncate(v), true));
-      AddCustomFunction(CustomFunction.Create("min", (int v1, int v2) => System.Math.Min(v1, v2), true));
-      AddCustomFunction(CustomFunction.Create("min", (float v1, float v2) => System.Math.Min(v1, v2), true));
-      AddCustomFunction(CustomFunction.Create("max", (int v1, int v2) => System.Math.Max(v1, v2), true));
-      AddCustomFunction(CustomFunction.Create("max", (float v1, float v2) => System.Math.Max(v1, v2), true));
-      AddCustomFunction(CustomFunction.Create("ifelse", (bool cond, int v1, int v2) => cond ? v1 : v2, true));
-      AddCustomFunction(CustomFunction.Create("ifelse", (bool cond, float v1, float v2) => cond ? v1 : v2, true));
-      AddCustomFunction(CustomFunction.Create("ifelse", (bool cond, string v1, string v2) => cond ? v1 : v2, true));
-      AddCustomFunction(CustomFunction.Create("pow", (float v1, float v2) => (float)System.Math.Pow(v1, v2), true));
-      AddCustomFunction(CustomFunction.Create("lower", (string s) => s.ToLowerInvariant(), true));
-      AddCustomFunction(CustomFunction.Create("upper", (string s) => s.ToUpperInvariant(), true));
-      AddCustomFunction(CustomFunction.Create("len", (string s) => s.Length, true));
+    }
+
+    public Compiler(IntegerPrecision integerPrecision, FloatPrecision floatPrecision)
+    {
+      DefaultIntegerType = integerPrecision;
+      DefaultFloatType = floatPrecision;
+
+      // Register built-in functions with appropriate precision
+      RegisterBuiltInFunctions();
 
       _astBuilder = new AstBuilder(_functions);
       _rpnConverter = new RpnConverter(_astBuilder);
       _tokenParser = new TokenParser(_rpnConverter);
+    }
+
+    private void RegisterBuiltInFunctions()
+    {
+      // Register integer precision functions
+      if (DefaultIntegerType == IntegerPrecision.Integer)
+      {
+        AddCustomFunction(CustomFunction.Create("abs", (int v) => System.Math.Abs(v), true));
+        AddCustomFunction(CustomFunction.Create("min", (int v1, int v2) => System.Math.Min(v1, v2), true));
+        AddCustomFunction(CustomFunction.Create("max", (int v1, int v2) => System.Math.Max(v1, v2), true));
+        AddCustomFunction(CustomFunction.Create("ifelse", (bool cond, int v1, int v2) => cond ? v1 : v2, true));
+      }
+      else // Long
+      {
+        AddCustomFunction(CustomFunction.Create("abs", (long v) => System.Math.Abs(v), true));
+        AddCustomFunction(CustomFunction.Create("min", (long v1, long v2) => System.Math.Min(v1, v2), true));
+        AddCustomFunction(CustomFunction.Create("max", (long v1, long v2) => System.Math.Max(v1, v2), true));
+        AddCustomFunction(CustomFunction.Create("ifelse", (bool cond, long v1, long v2) => cond ? v1 : v2, true));
+      }
+
+      // Register float precision functions
+      switch (DefaultFloatType)
+      {
+        case FloatPrecision.Float:
+          RegisterFloatFunctions();
+          break;
+        case FloatPrecision.Double:
+          RegisterDoubleFunctions();
+          break;
+        case FloatPrecision.Decimal:
+          RegisterDecimalFunctions();
+          break;
+      }
+
+      // String functions (precision-independent)
+      AddCustomFunction(CustomFunction.Create("lower", (string s) => s.ToLowerInvariant(), true));
+      AddCustomFunction(CustomFunction.Create("upper", (string s) => s.ToUpperInvariant(), true));
+      AddCustomFunction(CustomFunction.Create("len", (string s) => s.Length, true));
+      AddCustomFunction(CustomFunction.Create("ifelse", (bool cond, string v1, string v2) => cond ? v1 : v2, true));
+    }
+
+    private void RegisterFloatFunctions()
+    {
+      AddCustomFunction(CustomFunction.Create("sin", (float v) => MathF.Sin(v), true));
+      AddCustomFunction(CustomFunction.Create("cos", (float v) => MathF.Cos(v), true));
+      AddCustomFunction(CustomFunction.Create("tan", (float v) => MathF.Tan(v), true));
+      AddCustomFunction(CustomFunction.Create("asin", (float v) => MathF.Asin(v), true));
+      AddCustomFunction(CustomFunction.Create("acos", (float v) => MathF.Acos(v), true));
+      AddCustomFunction(CustomFunction.Create("atan", (float v) => MathF.Atan(v), true));
+      AddCustomFunction(CustomFunction.Create("sinh", (float v) => MathF.Sinh(v), true));
+      AddCustomFunction(CustomFunction.Create("cosh", (float v) => MathF.Cosh(v), true));
+      AddCustomFunction(CustomFunction.Create("tanh", (float v) => MathF.Tanh(v), true));
+      AddCustomFunction(CustomFunction.Create("atan2", (float v1, float v2) => MathF.Atan2(v1, v2), true));
+      AddCustomFunction(CustomFunction.Create("sqrt", (float v) => MathF.Sqrt(v), true));
+      AddCustomFunction(CustomFunction.Create("abs", (float v) => MathF.Abs(v), true));
+      AddCustomFunction(CustomFunction.Create("floor", (float v) => MathF.Floor(v), true));
+      AddCustomFunction(CustomFunction.Create("ceil", (float v) => MathF.Ceiling(v), true));
+      AddCustomFunction(CustomFunction.Create("trunc", (float v) => MathF.Truncate(v), true));
+      AddCustomFunction(CustomFunction.Create("min", (float v1, float v2) => MathF.Min(v1, v2), true));
+      AddCustomFunction(CustomFunction.Create("max", (float v1, float v2) => MathF.Max(v1, v2), true));
+      AddCustomFunction(CustomFunction.Create("pow", (float v1, float v2) => MathF.Pow(v1, v2), true));
+      AddCustomFunction(CustomFunction.Create("ifelse", (bool cond, float v1, float v2) => cond ? v1 : v2, true));
+    }
+
+    private void RegisterDoubleFunctions()
+    {
+      AddCustomFunction(CustomFunction.Create("sin", (double v) => System.Math.Sin(v), true));
+      AddCustomFunction(CustomFunction.Create("cos", (double v) => System.Math.Cos(v), true));
+      AddCustomFunction(CustomFunction.Create("tan", (double v) => System.Math.Tan(v), true));
+      AddCustomFunction(CustomFunction.Create("asin", (double v) => System.Math.Asin(v), true));
+      AddCustomFunction(CustomFunction.Create("acos", (double v) => System.Math.Acos(v), true));
+      AddCustomFunction(CustomFunction.Create("atan", (double v) => System.Math.Atan(v), true));
+      AddCustomFunction(CustomFunction.Create("sinh", (double v) => System.Math.Sinh(v), true));
+      AddCustomFunction(CustomFunction.Create("cosh", (double v) => System.Math.Cosh(v), true));
+      AddCustomFunction(CustomFunction.Create("tanh", (double v) => System.Math.Tanh(v), true));
+      AddCustomFunction(CustomFunction.Create("atan2", (double v1, double v2) => System.Math.Atan2(v1, v2), true));
+      AddCustomFunction(CustomFunction.Create("sqrt", (double v) => System.Math.Sqrt(v), true));
+      AddCustomFunction(CustomFunction.Create("abs", (double v) => System.Math.Abs(v), true));
+      AddCustomFunction(CustomFunction.Create("floor", (double v) => System.Math.Floor(v), true));
+      AddCustomFunction(CustomFunction.Create("ceil", (double v) => System.Math.Ceiling(v), true));
+      AddCustomFunction(CustomFunction.Create("trunc", (double v) => System.Math.Truncate(v), true));
+      AddCustomFunction(CustomFunction.Create("min", (double v1, double v2) => System.Math.Min(v1, v2), true));
+      AddCustomFunction(CustomFunction.Create("max", (double v1, double v2) => System.Math.Max(v1, v2), true));
+      AddCustomFunction(CustomFunction.Create("pow", (double v1, double v2) => System.Math.Pow(v1, v2), true));
+      AddCustomFunction(CustomFunction.Create("ifelse", (bool cond, double v1, double v2) => cond ? v1 : v2, true));
+    }
+
+    private void RegisterDecimalFunctions()
+    {
+      AddCustomFunction(CustomFunction.Create("sqrt", (decimal v) => (decimal)System.Math.Sqrt((double)v), true));
+      AddCustomFunction(CustomFunction.Create("abs", (decimal v) => System.Math.Abs(v), true));
+      AddCustomFunction(CustomFunction.Create("floor", (decimal v) => System.Math.Floor(v), true));
+      AddCustomFunction(CustomFunction.Create("ceil", (decimal v) => System.Math.Ceiling(v), true));
+      AddCustomFunction(CustomFunction.Create("trunc", (decimal v) => System.Math.Truncate(v), true));
+      AddCustomFunction(CustomFunction.Create("min", (decimal v1, decimal v2) => System.Math.Min(v1, v2), true));
+      AddCustomFunction(CustomFunction.Create("max", (decimal v1, decimal v2) => System.Math.Max(v1, v2), true));
+      AddCustomFunction(CustomFunction.Create("ifelse", (bool cond, decimal v1, decimal v2) => cond ? v1 : v2, true));
+
+      // Trigonometric functions with decimal (convert to double for computation)
+      AddCustomFunction(CustomFunction.Create("sin", (decimal v) => (decimal)System.Math.Sin((double)v), true));
+      AddCustomFunction(CustomFunction.Create("cos", (decimal v) => (decimal)System.Math.Cos((double)v), true));
+      AddCustomFunction(CustomFunction.Create("tan", (decimal v) => (decimal)System.Math.Tan((double)v), true));
+      AddCustomFunction(CustomFunction.Create("asin", (decimal v) => (decimal)System.Math.Asin((double)v), true));
+      AddCustomFunction(CustomFunction.Create("acos", (decimal v) => (decimal)System.Math.Acos((double)v), true));
+      AddCustomFunction(CustomFunction.Create("atan", (decimal v) => (decimal)System.Math.Atan((double)v), true));
+      AddCustomFunction(CustomFunction.Create("sinh", (decimal v) => (decimal)System.Math.Sinh((double)v), true));
+      AddCustomFunction(CustomFunction.Create("cosh", (decimal v) => (decimal)System.Math.Cosh((double)v), true));
+      AddCustomFunction(CustomFunction.Create("tanh", (decimal v) => (decimal)System.Math.Tanh((double)v), true));
+      AddCustomFunction(CustomFunction.Create("atan2",
+        (decimal v1, decimal v2) => (decimal)System.Math.Atan2((double)v1, (double)v2), true));
+      AddCustomFunction(CustomFunction.Create("pow",
+        (decimal v1, decimal v2) => (decimal)System.Math.Pow((double)v1, (double)v2), true));
     }
 
     public CompiledScript Compile(string source, Options options = Options.None, IVariableContainer variables = null)
@@ -70,7 +179,7 @@ namespace EpsilonScript
       _rpnConverter.Reset();
       _tokenParser.Reset();
 
-      _astBuilder.Configure(options, variables);
+      _astBuilder.Configure(options, variables, DefaultIntegerType, DefaultFloatType);
 
       new Lexer.Lexer().Execute(source, _tokenParser);
       var rootNode = _astBuilder.Result;
@@ -79,7 +188,7 @@ namespace EpsilonScript
       _astBuilder.Reset();
       _rpnConverter.Reset();
 
-      return new CompiledScript(rootNode);
+      return new CompiledScript(rootNode, DefaultIntegerType, DefaultFloatType);
     }
 
     public void AddCustomFunction(CustomFunction func)
@@ -90,7 +199,7 @@ namespace EpsilonScript
       }
       else
       {
-        _functions[func.Name] = new CustomFunctionOverload(func);
+        _functions[func.Name] = new CustomFunctionOverload(func, DefaultFloatType);
       }
     }
 

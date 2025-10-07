@@ -1,5 +1,4 @@
 using Xunit;
-using EpsilonScript.Function;
 
 namespace EpsilonScript.Tests.ScriptSystem
 {

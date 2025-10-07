@@ -73,7 +73,7 @@ namespace EpsilonScript.Tests.ScriptSystem
       public CompiledScript Script { get; }
       public DictionaryVariableContainer Variables { get; }
 
-      public Type ValueType => Script.ValueType;
+      public Type Type => Script.ValueType;
       public bool IsConstant => Script.IsConstant;
       public int IntegerValue => Script.IntegerValue;
       public float FloatValue => Script.FloatValue;

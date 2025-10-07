@@ -3,7 +3,6 @@ using EpsilonScript.AST;
 using EpsilonScript.Intermediate;
 using Xunit;
 using EpsilonScript.Tests.TestInfrastructure;
-using ValueType = EpsilonScript.AST.ValueType;
 
 namespace EpsilonScript.Tests.AST
 {
@@ -15,7 +14,7 @@ namespace EpsilonScript.Tests.AST
     [InlineData(Type.Integer, 42)]
     [InlineData(Type.Float, 3.14f)]
     [InlineData(Type.Boolean, true)]
-    public void AST_Variable_WithValidVariable_ReturnsCorrectValue(Type variableType, object value)
+    internal void AST_Variable_WithValidVariable_ReturnsCorrectValue(Type variableType, object value)
     {
       var variableName = "testVar";
       var variableId = (VariableId)variableName;
@@ -27,7 +26,8 @@ namespace EpsilonScript.Tests.AST
       var token = new Token(variableName, TokenType.Identifier);
       var element = new Element(token, ElementType.Variable);
 
-      node.Build(rpn, element, Compiler.Options.None, variables, null);
+      node.Build(rpn, element, Compiler.Options.None, variables, null, Compiler.IntegerPrecision.Integer,
+        Compiler.FloatPrecision.Float);
       node.Execute(null);
 
       Assert.Equal(GetExpectedValueType(variableType), node.ValueType);
@@ -36,7 +36,7 @@ namespace EpsilonScript.Tests.AST
     }
 
     [Fact]
-    public void AST_Variable_UndefinedVariable_ThrowsRuntimeException()
+    internal void AST_Variable_UndefinedVariable_ThrowsRuntimeException()
     {
       var variableName = "undefinedVar";
       var variables = new DictionaryVariableContainer(); // Empty
@@ -46,7 +46,8 @@ namespace EpsilonScript.Tests.AST
       var token = new Token(variableName, TokenType.Identifier);
       var element = new Element(token, ElementType.Variable);
 
-      node.Build(rpn, element, Compiler.Options.None, variables, null);
+      node.Build(rpn, element, Compiler.Options.None, variables, null, Compiler.IntegerPrecision.Integer,
+        Compiler.FloatPrecision.Float);
 
       ErrorTestHelper.ExecuteNodeExpectingError<RuntimeException>(node, null, "Undefined variable");
     }
@@ -55,7 +56,7 @@ namespace EpsilonScript.Tests.AST
     [InlineData(Type.Integer, 10)]
     [InlineData(Type.Float, 5.5f)]
     [InlineData(Type.Boolean, false)]
-    public void AST_Variable_WithVariableOverride_UsesOverrideValue(Type variableType, object overrideValue)
+    internal void AST_Variable_WithVariableOverride_UsesOverrideValue(Type variableType, object overrideValue)
     {
       var variableName = "testVar";
       var variableId = (VariableId)variableName;
@@ -70,7 +71,8 @@ namespace EpsilonScript.Tests.AST
       var token = new Token(variableName, TokenType.Identifier);
       var element = new Element(token, ElementType.Variable);
 
-      node.Build(rpn, element, Compiler.Options.None, variables, null);
+      node.Build(rpn, element, Compiler.Options.None, variables, null, Compiler.IntegerPrecision.Integer,
+        Compiler.FloatPrecision.Float);
       node.Execute(variableOverride);
 
       Assert.Equal(GetExpectedValueType(variableType), node.ValueType);
@@ -79,7 +81,7 @@ namespace EpsilonScript.Tests.AST
     }
 
     [Fact]
-    public void AST_Variable_WithNullVariablesAndOverride_ThrowsRuntimeException()
+    internal void AST_Variable_WithNullVariablesAndOverride_ThrowsRuntimeException()
     {
       var variableName = "testVar";
 
@@ -88,7 +90,8 @@ namespace EpsilonScript.Tests.AST
       var token = new Token(variableName, TokenType.Identifier);
       var element = new Element(token, ElementType.Variable);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null);
+      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
+        Compiler.FloatPrecision.Float);
 
       ErrorTestHelper.ExecuteNodeExpectingError<RuntimeException>(node, null, "Undefined variable");
     }
@@ -101,7 +104,7 @@ namespace EpsilonScript.Tests.AST
     [InlineData("camelCase")]
     [InlineData("PascalCase")]
     [InlineData("snake_case")]
-    public void AST_Variable_WithValidIdentifierNames_Works(string variableName)
+    internal void AST_Variable_WithValidIdentifierNames_Works(string variableName)
     {
       var variableId = (VariableId)variableName;
       var variableValue = new VariableValue(42);
@@ -112,15 +115,16 @@ namespace EpsilonScript.Tests.AST
       var token = new Token(variableName, TokenType.Identifier);
       var element = new Element(token, ElementType.Variable);
 
-      node.Build(rpn, element, Compiler.Options.None, variables, null);
+      node.Build(rpn, element, Compiler.Options.None, variables, null, Compiler.IntegerPrecision.Integer,
+        Compiler.FloatPrecision.Float);
       node.Execute(null);
 
-      Assert.Equal(ValueType.Integer, node.ValueType);
+      Assert.Equal(ExtendedType.Integer, node.ValueType);
       Assert.Equal(42, node.IntegerValue);
     }
 
     [Fact]
-    public void AST_Variable_IsConstant_ReturnsFalse()
+    internal void AST_Variable_IsConstant_ReturnsFalse()
     {
       var variableName = "testVar";
       var variableId = (VariableId)variableName;
@@ -132,7 +136,8 @@ namespace EpsilonScript.Tests.AST
       var token = new Token(variableName, TokenType.Identifier);
       var element = new Element(token, ElementType.Variable);
 
-      node.Build(rpn, element, Compiler.Options.None, variables, null);
+      node.Build(rpn, element, Compiler.Options.None, variables, null, Compiler.IntegerPrecision.Integer,
+        Compiler.FloatPrecision.Float);
 
       Assert.False(node.IsConstant); // Variables are never constant
     }
@@ -141,7 +146,7 @@ namespace EpsilonScript.Tests.AST
     [InlineData(Type.Integer, 100)]
     [InlineData(Type.Float, 2.5f)]
     [InlineData(Type.Boolean, true)]
-    public void AST_Variable_MultipleExecutions_ReflectsVariableChanges(Type variableType, object newValue)
+    internal void AST_Variable_MultipleExecutions_ReflectsVariableChanges(Type variableType, object newValue)
     {
       var variableName = "testVar";
       var variableId = (VariableId)variableName;
@@ -153,7 +158,8 @@ namespace EpsilonScript.Tests.AST
       var token = new Token(variableName, TokenType.Identifier);
       var element = new Element(token, ElementType.Variable);
 
-      node.Build(rpn, element, Compiler.Options.None, variables, null);
+      node.Build(rpn, element, Compiler.Options.None, variables, null, Compiler.IntegerPrecision.Integer,
+        Compiler.FloatPrecision.Float);
 
       // First execution
       node.Execute(null);
@@ -168,7 +174,7 @@ namespace EpsilonScript.Tests.AST
     }
 
     [Fact]
-    public void AST_Variable_UnsupportedVariableType_ThrowsArgumentOutOfRangeException()
+    internal void AST_Variable_UnsupportedVariableType_ThrowsArgumentOutOfRangeException()
     {
       var variableName = "testVar";
       var variableId = (VariableId)variableName;
@@ -180,7 +186,8 @@ namespace EpsilonScript.Tests.AST
       var token = new Token(variableName, TokenType.Identifier);
       var element = new Element(token, ElementType.Variable);
 
-      node.Build(rpn, element, Compiler.Options.None, variables, null);
+      node.Build(rpn, element, Compiler.Options.None, variables, null, Compiler.IntegerPrecision.Integer,
+        Compiler.FloatPrecision.Float);
 
       ErrorTestHelper.ExecuteNodeExpectingError<ArgumentOutOfRangeException>(node);
     }
@@ -196,7 +203,7 @@ namespace EpsilonScript.Tests.AST
       };
     }
 
-    private static void SetVariableValue(VariableValue variable, Type type, object value)
+    private static void SetVariableValue(VariableValue variable, ValueType type, object value)
     {
       switch (type)
       {
@@ -227,14 +234,14 @@ namespace EpsilonScript.Tests.AST
     {
       return type switch
       {
-        Type.Integer => ValueType.Integer,
-        Type.Float => ValueType.Float,
-        Type.Boolean => ValueType.Boolean,
+        Type.Integer => ExtendedType.Integer,
+        Type.Float => ExtendedType.Float,
+        Type.Boolean => ExtendedType.Boolean,
         _ => throw new ArgumentOutOfRangeException(nameof(type))
       };
     }
 
-    private static void AssertVariableValue(VariableNode node, Type type, object expectedValue)
+    private static void AssertVariableValue(VariableNode node, ValueType type, object expectedValue)
     {
       switch (type)
       {

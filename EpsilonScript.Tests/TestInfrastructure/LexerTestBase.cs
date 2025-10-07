@@ -9,7 +9,7 @@ namespace EpsilonScript.Tests.TestInfrastructure
 {
   public abstract class LexerTestBase
   {
-    protected static void AssertLexSucceeds(string source, IReadOnlyList<Token> expected)
+    internal static void AssertLexSucceeds(string source, IReadOnlyList<Token> expected)
     {
       var lexer = new EpsilonScript.Lexer.Lexer();
       var tokenReader = new TestTokenReader();
@@ -26,7 +26,7 @@ namespace EpsilonScript.Tests.TestInfrastructure
       Assert.True(tokenReader.EndCalled, "Token reader not closed");
     }
 
-    protected static void AssertLexFails(string source)
+    internal static void AssertLexFails(string source)
     {
       Assert.Throws<LexerException>(() =>
       {

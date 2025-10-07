@@ -12,7 +12,7 @@ namespace EpsilonScript.Tests.ScriptSystem
     public void BuiltInSin_ReturnsExpectedValue()
     {
       var result = CompileAndExecute("sin(0.0)", Compiler.Options.Immutable);
-      Assert.Equal(Type.Float, result.ValueType);
+      Assert.Equal(Type.Float, result.Type);
       AssertNearlyEqual(0.0f, result.FloatValue);
     }
 
@@ -20,7 +20,7 @@ namespace EpsilonScript.Tests.ScriptSystem
     public void BuiltInCos_ReturnsExpectedValue()
     {
       var result = CompileAndExecute("cos(0.0)", Compiler.Options.Immutable);
-      Assert.Equal(Type.Float, result.ValueType);
+      Assert.Equal(Type.Float, result.Type);
       AssertNearlyEqual(1.0f, result.FloatValue);
     }
 
@@ -28,11 +28,11 @@ namespace EpsilonScript.Tests.ScriptSystem
     public void BuiltInAbsOverloads_ReturnCorrectTypes()
     {
       var intResult = CompileAndExecute("abs(-5)", Compiler.Options.Immutable);
-      Assert.Equal(Type.Integer, intResult.ValueType);
+      Assert.Equal(Type.Integer, intResult.Type);
       Assert.Equal(5, intResult.IntegerValue);
 
       var floatResult = CompileAndExecute("abs(-5.5)", Compiler.Options.Immutable);
-      Assert.Equal(Type.Float, floatResult.ValueType);
+      Assert.Equal(Type.Float, floatResult.Type);
       AssertNearlyEqual(5.5f, floatResult.FloatValue);
     }
 
@@ -40,7 +40,7 @@ namespace EpsilonScript.Tests.ScriptSystem
     public void BuiltInSqrt_ReturnsExpectedValue()
     {
       var result = CompileAndExecute("sqrt(9.0)", Compiler.Options.Immutable);
-      Assert.Equal(Type.Float, result.ValueType);
+      Assert.Equal(Type.Float, result.Type);
       AssertNearlyEqual(3.0f, result.FloatValue);
     }
 
@@ -48,15 +48,15 @@ namespace EpsilonScript.Tests.ScriptSystem
     public void BuiltInIfElse_SelectsBranchesByType()
     {
       var intResult = CompileAndExecute("ifelse(true, 10, 20)", Compiler.Options.Immutable);
-      Assert.Equal(Type.Integer, intResult.ValueType);
+      Assert.Equal(Type.Integer, intResult.Type);
       Assert.Equal(10, intResult.IntegerValue);
 
       var floatResult = CompileAndExecute("ifelse(false, 1.5, 2.5)", Compiler.Options.Immutable);
-      Assert.Equal(Type.Float, floatResult.ValueType);
+      Assert.Equal(Type.Float, floatResult.Type);
       AssertNearlyEqual(2.5f, floatResult.FloatValue);
 
       var stringResult = CompileAndExecute("ifelse(true, \"left\", \"right\")", Compiler.Options.Immutable);
-      Assert.Equal(Type.String, stringResult.ValueType);
+      Assert.Equal(Type.String, stringResult.Type);
       Assert.Equal("left", stringResult.StringValue);
     }
 
@@ -64,7 +64,7 @@ namespace EpsilonScript.Tests.ScriptSystem
     public void BuiltInMin_EvaluatesCompositeArguments()
     {
       var result = CompileAndExecute("min(1 + 2, 3 + 4)", Compiler.Options.Immutable);
-      Assert.Equal(Type.Integer, result.ValueType);
+      Assert.Equal(Type.Integer, result.Type);
       Assert.Equal(3, result.IntegerValue);
     }
 
@@ -72,7 +72,7 @@ namespace EpsilonScript.Tests.ScriptSystem
     public void BuiltInMax_HandlesMixedNumericArguments()
     {
       var result = CompileAndExecute("max(1.5, 2)", Compiler.Options.Immutable);
-      Assert.Equal(Type.Float, result.ValueType);
+      Assert.Equal(Type.Float, result.Type);
       AssertNearlyEqual(2.0f, result.FloatValue);
     }
 
@@ -86,7 +86,7 @@ namespace EpsilonScript.Tests.ScriptSystem
       Assert.Equal("HELLO", upper.StringValue);
 
       var length = CompileAndExecute("len(\"Hello\")", Compiler.Options.Immutable);
-      Assert.Equal(Type.Integer, length.ValueType);
+      Assert.Equal(Type.Integer, length.Type);
       Assert.Equal(5, length.IntegerValue);
     }
 
@@ -94,7 +94,7 @@ namespace EpsilonScript.Tests.ScriptSystem
     public void BuiltInPow_ReturnsExponentiation()
     {
       var result = CompileAndExecute("pow(2, 3)", Compiler.Options.Immutable);
-      Assert.Equal(Type.Float, result.ValueType);
+      Assert.Equal(Type.Float, result.Type);
       AssertNearlyEqual(8.0f, result.FloatValue);
     }
 
@@ -192,22 +192,22 @@ namespace EpsilonScript.Tests.ScriptSystem
 
       // Test integer return
       var intResult = CompileAndExecute("getAnswer()", Compiler.Options.None, null, null, getAnswer);
-      Assert.Equal(Type.Integer, intResult.ValueType);
+      Assert.Equal(Type.Integer, intResult.Type);
       Assert.Equal(42, intResult.IntegerValue);
 
       // Test float return
       var floatResult = CompileAndExecute("getPi()", Compiler.Options.None, null, null, getPi);
-      Assert.Equal(Type.Float, floatResult.ValueType);
+      Assert.Equal(Type.Float, floatResult.Type);
       AssertNearlyEqual(3.14159f, floatResult.FloatValue);
 
       // Test string return
       var stringResult = CompileAndExecute("getGreeting()", Compiler.Options.None, null, null, getGreeting);
-      Assert.Equal(Type.String, stringResult.ValueType);
+      Assert.Equal(Type.String, stringResult.Type);
       Assert.Equal("Hello", stringResult.StringValue);
 
       // Test boolean return
       var boolResult = CompileAndExecute("isReady()", Compiler.Options.None, null, null, isReady);
-      Assert.Equal(Type.Boolean, boolResult.ValueType);
+      Assert.Equal(Type.Boolean, boolResult.Type);
       Assert.True(boolResult.BooleanValue);
     }
 
@@ -219,13 +219,13 @@ namespace EpsilonScript.Tests.ScriptSystem
 
       // Test zero-parameter functions in arithmetic expressions
       var result1 = CompileAndExecute("getTwo() + getThree()", Compiler.Options.None, null, null, getTwo, getThree);
-      Assert.Equal(Type.Integer, result1.ValueType);
+      Assert.Equal(Type.Integer, result1.Type);
       Assert.Equal(5, result1.IntegerValue);
 
       // Test zero-parameter function with regular parameter function
       var doubleFunc = CustomFunction.Create("double", (int x) => x * 2);
       var result2 = CompileAndExecute("double(getTwo())", Compiler.Options.None, null, null, getTwo, doubleFunc);
-      Assert.Equal(Type.Integer, result2.ValueType);
+      Assert.Equal(Type.Integer, result2.Type);
       Assert.Equal(4, result2.IntegerValue);
     }
 
@@ -342,11 +342,11 @@ namespace EpsilonScript.Tests.ScriptSystem
       var stringConcat = CustomFunction.Create("string.concat", (string a, string b) => a + b);
 
       var result1 = CompileAndExecute("util.double(5)", extraFunctions: utilDouble);
-      Assert.Equal(Type.Integer, result1.ValueType);
+      Assert.Equal(Type.Integer, result1.Type);
       Assert.Equal(10, result1.IntegerValue);
 
       var result2 = CompileAndExecute("string.concat(\"Hello\", \" World\")", extraFunctions: stringConcat);
-      Assert.Equal(Type.String, result2.ValueType);
+      Assert.Equal(Type.String, result2.Type);
       Assert.Equal("Hello World", result2.StringValue);
     }
 
@@ -360,7 +360,7 @@ namespace EpsilonScript.Tests.ScriptSystem
 
       var result = CompileAndExecute("math.square(math.pi.value)", variables: variables, extraFunctions: mathSquare);
 
-      Assert.Equal(Type.Float, result.ValueType);
+      Assert.Equal(Type.Float, result.Type);
       // Calculate the expected value precisely: 3.14159f * 3.14159f = 9.869589f
       AssertNearlyEqual(9.869589f, result.FloatValue);
     }

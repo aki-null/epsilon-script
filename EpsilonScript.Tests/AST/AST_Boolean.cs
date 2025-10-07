@@ -12,13 +12,13 @@ namespace EpsilonScript.Tests.AST
   {
     [Theory]
     [MemberData(nameof(CorrectData))]
-    public void AST_BuildBoolean_Succeeds(Element element, ValueType expectedNodeType, int expectedInt,
+    internal void AST_BuildBoolean_Succeeds(Element element, ExtendedType expectedNodeType, int expectedInt,
       float expectedFloat, bool expectedBool)
     {
       var node = new BooleanNode();
       var rpn = CreateStack();
       node.Build(rpn, element, Compiler.Options.None, null,
-        null);
+        null, Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float);
       Assert.Equal(expectedNodeType, node.ValueType);
       Assert.Equal(expectedInt, node.IntegerValue);
       Assert.True(EpsilonScript.Math.IsNearlyEqual(expectedFloat, node.FloatValue));
@@ -28,12 +28,12 @@ namespace EpsilonScript.Tests.AST
     [Theory]
     [InlineData(true)]
     [InlineData(false)]
-    public void AST_CreateBoolean_Succeeds(bool value)
+    internal void AST_CreateBoolean_Succeeds(bool value)
     {
       var node = new BooleanNode(value);
       var expectedInt = value ? 1 : 0;
       var expectedFloat = (float)expectedInt;
-      Assert.Equal(ValueType.Boolean, node.ValueType);
+      Assert.Equal(ExtendedType.Boolean, node.ValueType);
       Assert.Equal(expectedInt, node.IntegerValue);
       Assert.True(EpsilonScript.Math.IsNearlyEqual(expectedFloat, node.FloatValue));
       Assert.Equal(value, node.BooleanValue);
@@ -48,7 +48,7 @@ namespace EpsilonScript.Tests.AST
           new object[]
           {
             new Element(new Token("true", TokenType.BooleanLiteralTrue), ElementType.BooleanLiteralTrue),
-            ValueType.Boolean,
+            ExtendedType.Boolean,
             1,
             1.0f,
             true
@@ -56,7 +56,7 @@ namespace EpsilonScript.Tests.AST
           new object[]
           {
             new Element(new Token("false", TokenType.BooleanLiteralFalse), ElementType.BooleanLiteralFalse),
-            ValueType.Boolean,
+            ExtendedType.Boolean,
             0,
             0.0f,
             false

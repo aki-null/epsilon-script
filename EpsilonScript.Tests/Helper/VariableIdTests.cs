@@ -83,7 +83,7 @@ namespace EpsilonScript.Tests.Helper
       // Arrange
       const string variableName = "testVariable";
       VariableId variableId = variableName;
-      uint expectedId = variableName.GetUniqueIdentifier();
+      var expectedId = variableName.GetUniqueIdentifier();
 
       // Act & Assert
       Assert.True(variableId.Equals(expectedId));
