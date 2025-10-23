@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.4.0] - 2025-XX-XX
+
+### Added
+- **Contextual Custom Functions**: Functions can read variables from execution environment without explicit parameters
+  - `CustomFunction.CreateContextual()` factory methods for creating context-aware functions
+  - Supports up to 3 context variables and 3 script parameters
+
+### Changed
+- **Function Resolution Caching**: Function overload lookups now cached per execution for improved performance
+  - Cached using packed parameter types for fast comparison
+  - Cache invalidated when parameter type signature changes
+
 ## [1.3.0] - 2025-10-07
 
 ### Added
