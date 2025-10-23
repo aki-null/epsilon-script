@@ -307,7 +307,7 @@ var compiler = new Compiler();
 
 // Function reads 'day' from context
 compiler.AddCustomFunction(
-    ContextualCustomFunction.Create(
+    CustomFunction.CreateContextual(
         "IsMon",
         "day",
         (int day) => day % 7 == 1));
@@ -326,7 +326,7 @@ Functions can combine context variables with script parameters:
 
 ```c#
 compiler.AddCustomFunction(
-    ContextualCustomFunction.Create(
+    CustomFunction.CreateContextual(
         "IsAfter",
         "currentDay",
         (int current, int target) => current > target));
