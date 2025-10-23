@@ -20,7 +20,7 @@ namespace EpsilonScript.Function
 
     public static CustomFunction CreateContextual<T1, TResult>(
       string name,
-      string contextVar1,
+      VariableId contextVar1,
       Func<T1, TResult> func,
       bool isConstant = false)
     {
@@ -29,7 +29,7 @@ namespace EpsilonScript.Function
 
     public static CustomFunction CreateContextual<T1, T2, TResult>(
       string name,
-      string contextVar1,
+      VariableId contextVar1,
       Func<T1, T2, TResult> func,
       bool isConstant = false)
     {
@@ -38,7 +38,7 @@ namespace EpsilonScript.Function
 
     public static CustomFunction CreateContextual<T1, T2, T3, TResult>(
       string name,
-      string contextVar1,
+      VariableId contextVar1,
       Func<T1, T2, T3, TResult> func,
       bool isConstant = false)
     {
@@ -47,7 +47,7 @@ namespace EpsilonScript.Function
 
     public static CustomFunction CreateContextual<T1, T2, T3, T4, TResult>(
       string name,
-      string contextVar1,
+      VariableId contextVar1,
       Func<T1, T2, T3, T4, TResult> func,
       bool isConstant = false)
     {
@@ -60,7 +60,7 @@ namespace EpsilonScript.Function
 
     public static CustomFunction CreateContextual<T1, T2, TResult>(
       string name,
-      string contextVar1, string contextVar2,
+      VariableId contextVar1, VariableId contextVar2,
       Func<T1, T2, TResult> func,
       bool isConstant = false)
     {
@@ -69,7 +69,7 @@ namespace EpsilonScript.Function
 
     public static CustomFunction CreateContextual<T1, T2, T3, TResult>(
       string name,
-      string contextVar1, string contextVar2,
+      VariableId contextVar1, VariableId contextVar2,
       Func<T1, T2, T3, TResult> func,
       bool isConstant = false)
     {
@@ -78,7 +78,7 @@ namespace EpsilonScript.Function
 
     public static CustomFunction CreateContextual<T1, T2, T3, T4, TResult>(
       string name,
-      string contextVar1, string contextVar2,
+      VariableId contextVar1, VariableId contextVar2,
       Func<T1, T2, T3, T4, TResult> func,
       bool isConstant = false)
     {
@@ -87,7 +87,7 @@ namespace EpsilonScript.Function
 
     public static CustomFunction CreateContextual<T1, T2, T3, T4, T5, TResult>(
       string name,
-      string contextVar1, string contextVar2,
+      VariableId contextVar1, VariableId contextVar2,
       Func<T1, T2, T3, T4, T5, TResult> func,
       bool isConstant = false)
     {
@@ -100,7 +100,7 @@ namespace EpsilonScript.Function
 
     public static CustomFunction CreateContextual<T1, T2, T3, TResult>(
       string name,
-      string contextVar1, string contextVar2, string contextVar3,
+      VariableId contextVar1, VariableId contextVar2, VariableId contextVar3,
       Func<T1, T2, T3, TResult> func,
       bool isConstant = false)
     {
@@ -109,7 +109,7 @@ namespace EpsilonScript.Function
 
     public static CustomFunction CreateContextual<T1, T2, T3, T4, TResult>(
       string name,
-      string contextVar1, string contextVar2, string contextVar3,
+      VariableId contextVar1, VariableId contextVar2, VariableId contextVar3,
       Func<T1, T2, T3, T4, TResult> func,
       bool isConstant = false)
     {
@@ -118,7 +118,7 @@ namespace EpsilonScript.Function
 
     public static CustomFunction CreateContextual<T1, T2, T3, T4, T5, TResult>(
       string name,
-      string contextVar1, string contextVar2, string contextVar3,
+      VariableId contextVar1, VariableId contextVar2, VariableId contextVar3,
       Func<T1, T2, T3, T4, T5, TResult> func,
       bool isConstant = false)
     {
@@ -127,7 +127,7 @@ namespace EpsilonScript.Function
 
     public static CustomFunction CreateContextual<T1, T2, T3, T4, T5, T6, TResult>(
       string name,
-      string contextVar1, string contextVar2, string contextVar3,
+      VariableId contextVar1, VariableId contextVar2, VariableId contextVar3,
       Func<T1, T2, T3, T4, T5, T6, TResult> func,
       bool isConstant = false)
     {
@@ -148,7 +148,7 @@ namespace EpsilonScript.Function
     private readonly Func<T1, TResult> _func;
     private readonly VariableId _contextVar1;
 
-    public ContextualCustomFunction(string name, string contextVar1, Func<T1, TResult> func, bool isConstant)
+    public ContextualCustomFunction(string name, VariableId contextVar1, Func<T1, TResult> func, bool isConstant)
       : base(name, isConstant, Array.Empty<Type>(), TypeTraits<TResult>.ValueType, hasContext: true)
     {
       _func = func ?? throw new ArgumentNullException(nameof(func));
@@ -222,7 +222,7 @@ namespace EpsilonScript.Function
     private readonly Func<T1, T2, TResult> _func;
     private readonly VariableId _contextVar1;
 
-    public ContextualCustomFunction(string name, string contextVar1, Func<T1, T2, TResult> func, bool isConstant)
+    public ContextualCustomFunction(string name, VariableId contextVar1, Func<T1, T2, TResult> func, bool isConstant)
       : base(name, isConstant, ParameterCache, TypeTraits<TResult>.ValueType, hasContext: true)
     {
       _func = func ?? throw new ArgumentNullException(nameof(func));
@@ -297,7 +297,7 @@ namespace EpsilonScript.Function
     private readonly Func<T1, T2, T3, TResult> _func;
     private readonly VariableId _contextVar1;
 
-    public ContextualCustomFunction(string name, string contextVar1, Func<T1, T2, T3, TResult> func, bool isConstant)
+    public ContextualCustomFunction(string name, VariableId contextVar1, Func<T1, T2, T3, TResult> func, bool isConstant)
       : base(name, isConstant, ParameterCache, TypeTraits<TResult>.ValueType, hasContext: true)
     {
       _func = func ?? throw new ArgumentNullException(nameof(func));
@@ -373,7 +373,7 @@ namespace EpsilonScript.Function
     private readonly Func<T1, T2, T3, T4, TResult> _func;
     private readonly VariableId _contextVar1;
 
-    public ContextualCustomFunction(string name, string contextVar1, Func<T1, T2, T3, T4, TResult> func, bool isConstant)
+    public ContextualCustomFunction(string name, VariableId contextVar1, Func<T1, T2, T3, T4, TResult> func, bool isConstant)
       : base(name, isConstant, ParameterCache, TypeTraits<TResult>.ValueType, hasContext: true)
     {
       _func = func ?? throw new ArgumentNullException(nameof(func));
@@ -448,7 +448,7 @@ namespace EpsilonScript.Function
     private readonly VariableId _contextVar1;
     private readonly VariableId _contextVar2;
 
-    public ContextualCustomFunction2(string name, string contextVar1, string contextVar2, Func<T1, T2, TResult> func, bool isConstant)
+    public ContextualCustomFunction2(string name, VariableId contextVar1, VariableId contextVar2, Func<T1, T2, TResult> func, bool isConstant)
       : base(name, isConstant, Array.Empty<Type>(), TypeTraits<TResult>.ValueType, hasContext: true)
     {
       _func = func ?? throw new ArgumentNullException(nameof(func));
@@ -529,7 +529,7 @@ namespace EpsilonScript.Function
     private readonly VariableId _contextVar1;
     private readonly VariableId _contextVar2;
 
-    public ContextualCustomFunction2(string name, string contextVar1, string contextVar2, Func<T1, T2, T3, TResult> func, bool isConstant)
+    public ContextualCustomFunction2(string name, VariableId contextVar1, VariableId contextVar2, Func<T1, T2, T3, TResult> func, bool isConstant)
       : base(name, isConstant, ParameterCache, TypeTraits<TResult>.ValueType, hasContext: true)
     {
       _func = func ?? throw new ArgumentNullException(nameof(func));
@@ -611,7 +611,7 @@ namespace EpsilonScript.Function
     private readonly VariableId _contextVar1;
     private readonly VariableId _contextVar2;
 
-    public ContextualCustomFunction2(string name, string contextVar1, string contextVar2, Func<T1, T2, T3, T4, TResult> func, bool isConstant)
+    public ContextualCustomFunction2(string name, VariableId contextVar1, VariableId contextVar2, Func<T1, T2, T3, T4, TResult> func, bool isConstant)
       : base(name, isConstant, ParameterCache, TypeTraits<TResult>.ValueType, hasContext: true)
     {
       _func = func ?? throw new ArgumentNullException(nameof(func));
@@ -694,7 +694,7 @@ namespace EpsilonScript.Function
     private readonly VariableId _contextVar1;
     private readonly VariableId _contextVar2;
 
-    public ContextualCustomFunction2(string name, string contextVar1, string contextVar2, Func<T1, T2, T3, T4, T5, TResult> func, bool isConstant)
+    public ContextualCustomFunction2(string name, VariableId contextVar1, VariableId contextVar2, Func<T1, T2, T3, T4, T5, TResult> func, bool isConstant)
       : base(name, isConstant, ParameterCache, TypeTraits<TResult>.ValueType, hasContext: true)
     {
       _func = func ?? throw new ArgumentNullException(nameof(func));
@@ -776,7 +776,7 @@ namespace EpsilonScript.Function
     private readonly VariableId _contextVar2;
     private readonly VariableId _contextVar3;
 
-    public ContextualCustomFunction3(string name, string contextVar1, string contextVar2, string contextVar3, Func<T1, T2, T3, TResult> func, bool isConstant)
+    public ContextualCustomFunction3(string name, VariableId contextVar1, VariableId contextVar2, VariableId contextVar3, Func<T1, T2, T3, TResult> func, bool isConstant)
       : base(name, isConstant, Array.Empty<Type>(), TypeTraits<TResult>.ValueType, hasContext: true)
     {
       _func = func ?? throw new ArgumentNullException(nameof(func));
@@ -864,7 +864,7 @@ namespace EpsilonScript.Function
     private readonly VariableId _contextVar2;
     private readonly VariableId _contextVar3;
 
-    public ContextualCustomFunction3(string name, string contextVar1, string contextVar2, string contextVar3, Func<T1, T2, T3, T4, TResult> func, bool isConstant)
+    public ContextualCustomFunction3(string name, VariableId contextVar1, VariableId contextVar2, VariableId contextVar3, Func<T1, T2, T3, T4, TResult> func, bool isConstant)
       : base(name, isConstant, ParameterCache, TypeTraits<TResult>.ValueType, hasContext: true)
     {
       _func = func ?? throw new ArgumentNullException(nameof(func));
@@ -953,7 +953,7 @@ namespace EpsilonScript.Function
     private readonly VariableId _contextVar2;
     private readonly VariableId _contextVar3;
 
-    public ContextualCustomFunction3(string name, string contextVar1, string contextVar2, string contextVar3, Func<T1, T2, T3, T4, T5, TResult> func, bool isConstant)
+    public ContextualCustomFunction3(string name, VariableId contextVar1, VariableId contextVar2, VariableId contextVar3, Func<T1, T2, T3, T4, T5, TResult> func, bool isConstant)
       : base(name, isConstant, ParameterCache, TypeTraits<TResult>.ValueType, hasContext: true)
     {
       _func = func ?? throw new ArgumentNullException(nameof(func));
@@ -1043,7 +1043,7 @@ namespace EpsilonScript.Function
     private readonly VariableId _contextVar2;
     private readonly VariableId _contextVar3;
 
-    public ContextualCustomFunction3(string name, string contextVar1, string contextVar2, string contextVar3, Func<T1, T2, T3, T4, T5, T6, TResult> func, bool isConstant)
+    public ContextualCustomFunction3(string name, VariableId contextVar1, VariableId contextVar2, VariableId contextVar3, Func<T1, T2, T3, T4, T5, T6, TResult> func, bool isConstant)
       : base(name, isConstant, ParameterCache, TypeTraits<TResult>.ValueType, hasContext: true)
     {
       _func = func ?? throw new ArgumentNullException(nameof(func));

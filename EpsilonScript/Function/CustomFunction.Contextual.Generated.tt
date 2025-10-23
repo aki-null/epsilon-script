@@ -33,7 +33,7 @@
     var parts = new string[contextCount];
     for (var i = 1; i <= contextCount; i++)
     {
-      parts[i - 1] = $"string contextVar{i}";
+      parts[i - 1] = $"VariableId contextVar{i}";
     }
     return string.Join(", ", parts);
   }
