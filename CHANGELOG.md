@@ -12,6 +12,10 @@
   - Cached using packed parameter types for fast comparison
   - Cache invalidated when parameter type signature changes
 
+### Fixed
+- **Type Enum Serialization Compatibility**: Restored pre-1.3.0 enum indices for Integer/Float/Boolean/String
+  - Version 1.3.0 broke serialization by reordering existing types
+
 ## [1.3.0] - 2025-10-07
 
 ### Added
