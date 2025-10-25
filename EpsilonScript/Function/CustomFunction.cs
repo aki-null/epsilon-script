@@ -114,5 +114,22 @@ namespace EpsilonScript.Function
     {
       throw new InvalidOperationException("Function does not support contextual execution with boolean return");
     }
+
+    public override string ToString()
+    {
+      if (ParameterTypes.Length == 0)
+      {
+        return $"{ReturnType.ToDebugString()} {Name}()";
+      }
+
+      var paramTypeNames = new string[ParameterTypes.Length];
+      for (var i = 0; i < ParameterTypes.Length; i++)
+      {
+        paramTypeNames[i] = ParameterTypes[i].ToDebugString();
+      }
+
+      var parameters = string.Join(", ", paramTypeNames);
+      return $"{ReturnType.ToDebugString()} {Name}({parameters})";
+    }
   }
 }

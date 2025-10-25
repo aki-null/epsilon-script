@@ -71,7 +71,8 @@ namespace EpsilonScript.Function
       {
         if (LeafFunction != null)
         {
-          throw new RuntimeException("The custom function with same name and same parameter types is already defined");
+          throw new RuntimeException(
+            $"The custom function with same name and same parameter types is already defined: {function}");
         }
 
         LeafFunction = function;
