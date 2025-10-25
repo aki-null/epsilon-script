@@ -1,6 +1,6 @@
 # EpsilonScript
 
-EpsilonScript is an interpreter for evaluating simple expressions, written in C#.
+EpsilonScript is an embeddable expression engine for C# with functions and allocation-free execution.
 
 It targets .NET Standard 2.1.
 
@@ -37,10 +37,6 @@ var damageFormula = compiler.Compile(
 damageFormula.Execute();
 int damage = (int)damageFormula.FloatValue; // 82 at level 10
 ```
-
-- Game designers can write expressions directly
-- Zero GC alloc after compilation
-- Embeds into programs with strong integration through variables and custom functions
 
 ## Table of Contents
 
@@ -302,20 +298,43 @@ public int GetConstant() => 42;
 compiler.AddCustomFunction(CustomFunction.Create("constant", GetConstant));
 ```
 
-#### Upgrading Existing Code
+#### Contextual Custom Functions
 
-Older releases used concrete custom function constructors. Use the factory helper instead:
+Contextual functions read variables from the execution environment without requiring them as parameters.
 
 ```c#
-// old
-compiler.AddCustomFunction(new CustomFunction("foo", (float v) => v * 2));
+var compiler = new Compiler();
 
-// new
-compiler.AddCustomFunction(CustomFunction.Create("foo", (float v) => v * 2));
+// Function reads 'day' from context
+compiler.AddCustomFunction(
+    CustomFunction.CreateContextual(
+        "IsMon",
+        "day",
+        (int day) => day % 7 == 1));
+
+var variables = new DictionaryVariableContainer
+{
+    ["day"] = new VariableValue(1)
+};
+
+var script = compiler.Compile("IsMon()", Compiler.Options.Immutable, variables);
+script.Execute();
+Console.WriteLine(script.BooleanValue); // True
 ```
 
-This change allows any parameter types in custom functions. The factory supports one to five parameters with an optional `isConstant` flag.
+Functions can combine context variables with script parameters:
 
+```c#
+compiler.AddCustomFunction(
+    CustomFunction.CreateContextual(
+        "IsAfter",
+        "currentDay",
+        (int current, int target) => current > target));
+
+var script = compiler.Compile("IsAfter(5)", Compiler.Options.Immutable, variables);
+```
+
+Supports up to 3 context variables and 3 script parameters.
 
 ### Strings
 
@@ -491,6 +510,36 @@ Game designers often need to express conditions. For example, a character might 
 
 ```
 monsters_fought == 0 && has_key
+```
+
+## Development
+
+### T4 Template Code Generation
+
+Custom function implementations use T4 templates to reduce maintenance burden and ensure consistency.
+
+**Generated files**:
+- `EpsilonScript/Function/CustomFunction.Generated.cs`
+- `EpsilonScript/Function/CustomFunction.Contextual.Generated.cs`
+
+**Template files**:
+- `EpsilonScript/Function/CustomFunction.Generated.tt`
+- `EpsilonScript/Function/CustomFunction.Contextual.Generated.tt`
+
+#### Prerequisites
+
+Install the T4 command-line tool:
+```bash
+dotnet tool install -g dotnet-t4
+```
+
+#### Regenerating Code
+
+After modifying templates, regenerate the code:
+```bash
+cd EpsilonScript/Function
+t4 CustomFunction.Generated.tt
+t4 CustomFunction.Contextual.Generated.tt
 ```
 
 ## Context

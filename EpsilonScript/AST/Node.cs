@@ -283,56 +283,37 @@ namespace EpsilonScript.AST
       return this;
     }
 
-    public Node CreateValueNode()
+    protected Node CreateValueNode()
     {
-      switch (ValueType)
+      return ValueType switch
       {
-        case ExtendedType.Integer:
-          return new IntegerNode(IntegerValue);
-        case ExtendedType.Long:
-          return new IntegerNode(LongValue);
-        case ExtendedType.Float:
-          return new FloatNode(FloatValue);
-        case ExtendedType.Double:
-          return new FloatNode(DoubleValue);
-        case ExtendedType.Decimal:
-          return new FloatNode(DecimalValue);
-        case ExtendedType.Boolean:
-          return new BooleanNode(BooleanValue);
-        case ExtendedType.String:
-          return new StringNode(StringValue);
-        default:
-          throw new ArgumentOutOfRangeException(nameof(ValueType), ValueType, "Unsupported value type");
-      }
+        ExtendedType.Integer => new IntegerNode(IntegerValue),
+        ExtendedType.Long => new IntegerNode(LongValue),
+        ExtendedType.Float => new FloatNode(FloatValue),
+        ExtendedType.Double => new FloatNode(DoubleValue),
+        ExtendedType.Decimal => new FloatNode(DecimalValue),
+        ExtendedType.Boolean => new BooleanNode(BooleanValue),
+        ExtendedType.String => new StringNode(StringValue),
+        _ => throw new ArgumentOutOfRangeException(nameof(ValueType), ValueType, "Unsupported value type")
+      };
     }
 
     public override string ToString()
     {
-      switch (ValueType)
+      return ValueType switch
       {
-        case ExtendedType.Undefined:
-          return "Undefined";
-        case ExtendedType.Null:
-          return "null";
-        case ExtendedType.Integer:
-          return IntegerValue.ToString();
-        case ExtendedType.Long:
-          return LongValue.ToString();
-        case ExtendedType.Float:
-          return FloatValue.ToString(CultureInfo.InvariantCulture);
-        case ExtendedType.Double:
-          return DoubleValue.ToString(CultureInfo.InvariantCulture);
-        case ExtendedType.Decimal:
-          return DecimalValue.ToString(CultureInfo.InvariantCulture);
-        case ExtendedType.Boolean:
-          return BooleanValue ? "true" : "false";
-        case ExtendedType.Tuple:
-          return "Tuple";
-        case ExtendedType.String:
-          return StringValue;
-        default:
-          throw new ArgumentOutOfRangeException(nameof(ValueType), ValueType, "Unsupported value type");
-      }
+        ExtendedType.Undefined => "Undefined",
+        ExtendedType.Null => "null",
+        ExtendedType.Integer => IntegerValue.ToString(),
+        ExtendedType.Long => LongValue.ToString(),
+        ExtendedType.Float => FloatValue.ToString(CultureInfo.InvariantCulture),
+        ExtendedType.Double => DoubleValue.ToString(CultureInfo.InvariantCulture),
+        ExtendedType.Decimal => DecimalValue.ToString(CultureInfo.InvariantCulture),
+        ExtendedType.Boolean => BooleanValue ? "true" : "false",
+        ExtendedType.Tuple => "Tuple",
+        ExtendedType.String => StringValue,
+        _ => throw new ArgumentOutOfRangeException(nameof(ValueType), ValueType, "Unsupported value type")
+      };
     }
   }
 }

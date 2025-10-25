@@ -10,6 +10,7 @@ namespace EpsilonScript.Function
   internal static class TypeTraits<T>
   {
     private static readonly Func<Node, T> ReadFunc;
+    private static readonly Func<VariableValue, T> FromVariableValueFunc;
     private static readonly Func<T, int> ToIntFunc;
     private static readonly Func<T, long> ToLongFunc;
     private static readonly Func<T, float> ToFloatFunc;
@@ -24,6 +25,7 @@ namespace EpsilonScript.Function
     static TypeTraits()
     {
       ReadFunc = ThrowRead;
+      FromVariableValueFunc = ThrowFromVariableValue;
       ToIntFunc = ThrowToInt;
       ToLongFunc = ThrowToLong;
       ToFloatFunc = ThrowToFloat;
@@ -36,6 +38,7 @@ namespace EpsilonScript.Function
       {
         ValueType = Type.Integer;
         ReadFunc = ReadInt;
+        FromVariableValueFunc = FromVariableValueInt;
         ToIntFunc = ToIntIdentity;
         ToLongFunc = ToIntAsLong;
         return;
@@ -45,6 +48,7 @@ namespace EpsilonScript.Function
       {
         ValueType = Type.Long;
         ReadFunc = ReadLong;
+        FromVariableValueFunc = FromVariableValueLong;
         ToIntFunc = ToLongAsInt;
         ToLongFunc = ToLongIdentity;
         return;
@@ -54,6 +58,7 @@ namespace EpsilonScript.Function
       {
         ValueType = Type.Float;
         ReadFunc = ReadFloat;
+        FromVariableValueFunc = FromVariableValueFloat;
         ToFloatFunc = ToFloatIdentity;
         ToDoubleFunc = ToFloatAsDouble;
         return;
@@ -63,6 +68,7 @@ namespace EpsilonScript.Function
       {
         ValueType = Type.Double;
         ReadFunc = ReadDouble;
+        FromVariableValueFunc = FromVariableValueDouble;
         ToFloatFunc = ToDoubleAsFloat;
         ToDoubleFunc = ToDoubleIdentity;
         return;
@@ -72,6 +78,7 @@ namespace EpsilonScript.Function
       {
         ValueType = Type.Decimal;
         ReadFunc = ReadDecimal;
+        FromVariableValueFunc = FromVariableValueDecimal;
         ToDecimalFunc = ToDecimalIdentity;
         return;
       }
@@ -80,6 +87,7 @@ namespace EpsilonScript.Function
       {
         ValueType = Type.Boolean;
         ReadFunc = ReadBool;
+        FromVariableValueFunc = FromVariableValueBool;
         ToBoolFunc = ToBoolIdentity;
         return;
       }
@@ -88,6 +96,7 @@ namespace EpsilonScript.Function
       {
         ValueType = Type.String;
         ReadFunc = ReadString;
+        FromVariableValueFunc = FromVariableValueString;
         ToStringFunc = ToStringIdentity;
         return;
       }
@@ -99,6 +108,12 @@ namespace EpsilonScript.Function
     public static T Read(Node node)
     {
       return ReadFunc(node);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static T FromVariableValue(VariableValue variableValue)
+    {
+      return FromVariableValueFunc(variableValue);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -146,6 +161,11 @@ namespace EpsilonScript.Function
     private static T ThrowRead(Node _)
     {
       throw new InvalidOperationException($"Unsupported script type: {ValueType}");
+    }
+
+    private static T ThrowFromVariableValue(VariableValue _)
+    {
+      throw new InvalidOperationException($"Unsupported variable type: {ValueType}");
     }
 
     private static int ThrowToInt(T _)
@@ -351,6 +371,71 @@ namespace EpsilonScript.Function
     private static string ToStringIdentity(T value)
     {
       return (string)(object)value;
+    }
+
+    private static T FromVariableValueInt(VariableValue variableValue)
+    {
+      var value = variableValue.IntegerValue;
+#if UNITY_2018_1_OR_NEWER
+      return UnsafeUtility.As<int, T>(ref value);
+#else
+      return Unsafe.As<int, T>(ref value);
+#endif
+    }
+
+    private static T FromVariableValueLong(VariableValue variableValue)
+    {
+      var value = variableValue.LongValue;
+#if UNITY_2018_1_OR_NEWER
+      return UnsafeUtility.As<long, T>(ref value);
+#else
+      return Unsafe.As<long, T>(ref value);
+#endif
+    }
+
+    private static T FromVariableValueFloat(VariableValue variableValue)
+    {
+      var value = variableValue.FloatValue;
+#if UNITY_2018_1_OR_NEWER
+      return UnsafeUtility.As<float, T>(ref value);
+#else
+      return Unsafe.As<float, T>(ref value);
+#endif
+    }
+
+    private static T FromVariableValueDouble(VariableValue variableValue)
+    {
+      var value = variableValue.DoubleValue;
+#if UNITY_2018_1_OR_NEWER
+      return UnsafeUtility.As<double, T>(ref value);
+#else
+      return Unsafe.As<double, T>(ref value);
+#endif
+    }
+
+    private static T FromVariableValueDecimal(VariableValue variableValue)
+    {
+      var value = variableValue.DecimalValue;
+#if UNITY_2018_1_OR_NEWER
+      return UnsafeUtility.As<decimal, T>(ref value);
+#else
+      return Unsafe.As<decimal, T>(ref value);
+#endif
+    }
+
+    private static T FromVariableValueBool(VariableValue variableValue)
+    {
+      var value = variableValue.BooleanValue;
+#if UNITY_2018_1_OR_NEWER
+      return UnsafeUtility.As<bool, T>(ref value);
+#else
+      return Unsafe.As<bool, T>(ref value);
+#endif
+    }
+
+    private static T FromVariableValueString(VariableValue variableValue)
+    {
+      return (T)(object)variableValue.StringValue;
     }
   }
 }
