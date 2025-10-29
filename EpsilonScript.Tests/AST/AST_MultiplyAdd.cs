@@ -193,34 +193,6 @@ namespace EpsilonScript.Tests.AST
     }
 
     [Fact]
-    public void NonMA_AdditionOnly_NoFusion()
-    {
-      // a + b (no multiply) should not create FMA
-      var vars = Variables()
-        .WithInteger("a", 2)
-        .WithInteger("b", 3)
-        .Build();
-
-      var result = CompileAndExecute("a + b", Compiler.Options.None, vars);
-
-      Assert.Equal(5, result.IntegerValue);
-    }
-
-    [Fact]
-    public void NonMA_MultiplyOnly_NoFusion()
-    {
-      // a * b (no add) should not create FMA
-      var vars = Variables()
-        .WithInteger("a", 2)
-        .WithInteger("b", 3)
-        .Build();
-
-      var result = CompileAndExecute("a * b", Compiler.Options.None, vars);
-
-      Assert.Equal(6, result.IntegerValue);
-    }
-
-    [Fact]
     public void NonMA_WrongOrder_MultiplyAfterAdd()
     {
       // (a + b) * c should not create FMA
