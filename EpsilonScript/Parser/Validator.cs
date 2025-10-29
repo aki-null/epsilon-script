@@ -27,8 +27,6 @@ namespace EpsilonScript.Parser
       ElementType? previousElementType,
       int parenthesisDepth)
     {
-      var isFirstElement = !previousElementType.HasValue;
-
       // Check value-related rules first (most common)
       if (currentElementType.IsValue())
       {
@@ -38,7 +36,7 @@ namespace EpsilonScript.Parser
       // Check operator rules (second most common)
       if (currentElementType.IsBinaryOperator())
       {
-        ValidateBinaryOperator(currentToken, isFirstElement, previousToken, previousElementType);
+        ValidateBinaryOperator(currentToken, previousToken, previousElementType);
       }
 
       // Check specific element types
@@ -49,11 +47,11 @@ namespace EpsilonScript.Parser
         case ElementType.AssignmentSubtractOperator:
         case ElementType.AssignmentMultiplyOperator:
         case ElementType.AssignmentDivideOperator:
-          ValidateAssignmentLValue(currentToken, isFirstElement, previousElementType);
+          ValidateAssignmentLValue(currentToken, previousElementType);
           break;
 
         case ElementType.Comma:
-          ValidateCommaPlacement(currentToken, isFirstElement, previousElementType);
+          ValidateCommaPlacement(currentToken, previousElementType);
           break;
 
         case ElementType.LeftParenthesis:
@@ -65,7 +63,7 @@ namespace EpsilonScript.Parser
           break;
 
         case ElementType.Function:
-          ValidateFunctionPlacement(currentToken, isFirstElement, previousElementType);
+          ValidateFunctionPlacement(currentToken, previousElementType);
           break;
       }
     }
@@ -90,23 +88,20 @@ namespace EpsilonScript.Parser
     /// Invalid: "1 * / 2"      (consecutive operators where neither can be unary)
     /// Invalid: "x = = 5"      (consecutive binary operators)
     /// </summary>
-    private static void ValidateBinaryOperator(Token currentToken, bool isFirstElement, Token? previousToken,
+    private static void ValidateBinaryOperator(Token currentToken, Token? previousToken,
       ElementType? previousElementType)
     {
       // Rule 1: Binary operators cannot be the first element
-      if (isFirstElement)
+      if (!previousElementType.HasValue)
       {
-        throw new ParserException(
-          currentToken,
-          $"Expression cannot start with binary operator '{currentToken.Text}'");
+        throw new ParserException(currentToken, $"Expression cannot start with binary operator '{currentToken.Text}'");
       }
 
       // Rule 2: Binary operators cannot follow other binary operators
       // This check occurs AFTER +/- signs have been classified as unary or binary.
       // If the previous element is a binary operator, we cannot have another binary operator.
       // Example: "1 + - 2" is valid because - was classified as NegativeOperator (unary), not SubtractOperator (binary)
-      // Note: isFirstElement is false at this point, so previousElementType is guaranteed to have a value
-      if (previousElementType.HasValue && previousElementType.Value.IsBinaryOperator())
+      if (previousElementType.Value.IsBinaryOperator())
       {
         if (!previousToken.HasValue)
         {
@@ -114,10 +109,8 @@ namespace EpsilonScript.Parser
             nameof(previousToken));
         }
 
-        throw new ParserException(
-          currentToken,
-          $"Invalid consecutive operators: '{previousToken.Value.Text}' " +
-          $"followed by '{currentToken.Text}'");
+        throw new ParserException(currentToken,
+          $"Invalid consecutive operators: '{previousToken.Value.Text}' " + $"followed by '{currentToken.Text}'");
       }
     }
 
@@ -148,9 +141,7 @@ namespace EpsilonScript.Parser
       // Example: "(1)2" or "func()x"
       if (prev == ElementType.RightParenthesis)
       {
-        throw new ParserException(
-          currentToken,
-          "Value cannot directly follow closing parenthesis without an operator");
+        throw new ParserException(currentToken, "Value cannot directly follow closing parenthesis without an operator");
       }
 
       // Case 2: Value after another value
@@ -158,8 +149,7 @@ namespace EpsilonScript.Parser
       // Grammar does not allow two values side by side, so always reject
       if (prev.IsValue())
       {
-        throw new ParserException(
-          currentToken,
+        throw new ParserException(currentToken,
           "Adjacent values require an operator between them (e.g., '1 + 2' not '1 2')");
       }
     }
@@ -175,29 +165,19 @@ namespace EpsilonScript.Parser
     /// Invalid: "(x+1) = 2"      (expression lvalue)
     /// Invalid: "func() = x"     (function result lvalue)
     /// </summary>
-    private static void ValidateAssignmentLValue(Token currentToken, bool isFirstElement,
-      ElementType? previousElementType)
+    private static void ValidateAssignmentLValue(Token currentToken, ElementType? previousElementType)
     {
       // Rule 1: Assignment must have a previous element
-      if (isFirstElement)
+      if (!previousElementType.HasValue)
       {
-        throw new ParserException(
-          currentToken,
+        throw new ParserException(currentToken,
           "Assignment operator requires a variable on the left side (e.g., 'x = 5' not '= 5')");
       }
 
       // Rule 2: Previous element must be a variable (lvalue)
-      if (!previousElementType.HasValue)
-      {
-        throw new ArgumentException("previousElementType must have value when isFirstElement is false",
-          nameof(previousElementType));
-      }
-
       if (previousElementType != ElementType.Variable)
       {
-        throw new ParserException(
-          currentToken,
-          "Assignment can only be to a variable, not to literals or expressions");
+        throw new ParserException(currentToken, "Assignment can only be to a variable, not to literals or expressions");
       }
     }
 
@@ -212,31 +192,25 @@ namespace EpsilonScript.Parser
     /// Invalid: "func(1,)"           (trailing comma)
     /// Invalid: "func(1,, 2)"        (double comma)
     /// </summary>
-    private static void ValidateCommaPlacement(Token currentToken, bool isFirstElement,
-      ElementType? previousElementType)
+    private static void ValidateCommaPlacement(Token currentToken, ElementType? previousElementType)
     {
       // Rule 1: Cannot start expression with comma
-      if (isFirstElement)
+      if (!previousElementType.HasValue)
       {
-        throw new ParserException(
-          currentToken,
+        throw new ParserException(currentToken,
           "Expression cannot start with a comma (commas separate function arguments)");
       }
 
       // Rule 2: Cannot have comma right after opening paren
       if (previousElementType == ElementType.FunctionStartParenthesis)
       {
-        throw new ParserException(
-          currentToken,
-          "Unexpected comma - missing expression");
+        throw new ParserException(currentToken, "Unexpected comma - missing expression");
       }
 
       // Rule 3: Cannot have double comma
       if (previousElementType == ElementType.Comma)
       {
-        throw new ParserException(
-          currentToken,
-          "Unexpected comma - missing expression");
+        throw new ParserException(currentToken, "Unexpected comma - missing expression");
       }
     }
 
@@ -255,8 +229,7 @@ namespace EpsilonScript.Parser
       // This happens when we have expressions like (1)(2) - closing paren followed by opening paren
       if (previousElementType == ElementType.RightParenthesis)
       {
-        throw new ParserException(
-          currentToken,
+        throw new ParserException(currentToken,
           "Adjacent parenthesized expressions require an operator between them (e.g., '(1) + (2)' not '(1)(2)')");
       }
     }
@@ -279,9 +252,7 @@ namespace EpsilonScript.Parser
       // Rule 1: Check for extra closing parenthesis (no matching opening)
       if (parenthesisDepth <= 0)
       {
-        throw new ParserException(
-          currentToken,
-          "Unopened closing parenthesis - missing opening parenthesis '('");
+        throw new ParserException(currentToken, "Unopened closing parenthesis - missing opening parenthesis '('");
       }
 
       // Rule 2: Check for empty grouping parentheses (non-function)
@@ -289,16 +260,14 @@ namespace EpsilonScript.Parser
       // in TokenParser, so this check only catches empty grouping parens () where previous is LeftParenthesis
       if (previousElementType == ElementType.LeftParenthesis)
       {
-        throw new ParserException(
-          currentToken,
+        throw new ParserException(currentToken,
           "Empty parentheses are not allowed (use them with functions like 'func()' or with expressions like '(1 + 2)')");
       }
 
       // Rule 3: Check for trailing comma before closing paren
       if (previousElementType == ElementType.Comma)
       {
-        throw new ParserException(
-          currentToken,
+        throw new ParserException(currentToken,
           "Trailing comma before closing parenthesis (e.g., use 'func(1, 2)' not 'func(1, 2,)')");
       }
     }
@@ -314,8 +283,7 @@ namespace EpsilonScript.Parser
     /// Invalid: "1 func()"        (function directly after literal)
     /// Invalid: "true func()"     (function directly after boolean)
     /// </summary>
-    private static void ValidateFunctionPlacement(Token currentToken, bool isFirstElement,
-      ElementType? previousElementType)
+    private static void ValidateFunctionPlacement(Token currentToken, ElementType? previousElementType)
     {
       // Functions can appear after:
       // - Nothing (start of expression)
@@ -327,22 +295,15 @@ namespace EpsilonScript.Parser
       // - Values (numbers, booleans, strings, variables)
       // - Closing parenthesis
 
-      if (isFirstElement)
-      {
-        return; // Start of expression is fine
-      }
-
       if (!previousElementType.HasValue)
       {
-        throw new ArgumentException("previousElementType must have value when isFirstElement is false",
-          nameof(previousElementType));
+        return; // Start of expression is fine
       }
 
       // Check if previous was a value or closing paren
       if (previousElementType.Value.IsValue() || previousElementType == ElementType.RightParenthesis)
       {
-        throw new ParserException(
-          currentToken,
+        throw new ParserException(currentToken,
           "Function call cannot directly follow an expression without an operator (e.g., 'x + func()' not 'x func()')");
       }
     }
@@ -370,8 +331,7 @@ namespace EpsilonScript.Parser
       // Check for unclosed parentheses
       if (parenthesisDepth > 0)
       {
-        throw new ParserException(lastToken,
-          "Unclosed parenthesis - missing closing parenthesis");
+        throw new ParserException(lastToken, "Unclosed parenthesis - missing closing parenthesis");
       }
 
       if (!lastElementType.HasValue)
@@ -387,19 +347,16 @@ namespace EpsilonScript.Parser
         case ElementType.NegativeOperator:
         case ElementType.PositiveOperator:
         case ElementType.NegateOperator:
-          throw new ParserException(lastToken,
-            "Unary operator requires an operand");
+          throw new ParserException(lastToken, "Unary operator requires an operand");
         // Check for trailing comma
         case ElementType.Comma:
-          throw new ParserException(lastToken,
-            "Expression cannot end with a comma");
+          throw new ParserException(lastToken, "Expression cannot end with a comma");
       }
 
       // Check for trailing binary operators
       if (lastType.IsBinaryOperator())
       {
-        throw new ParserException(lastToken,
-          "Expression cannot end with an operator");
+        throw new ParserException(lastToken, "Expression cannot end with an operator");
       }
     }
 
