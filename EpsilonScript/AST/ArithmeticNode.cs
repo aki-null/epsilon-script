@@ -205,7 +205,6 @@ namespace EpsilonScript.AST
       switch (_operator)
       {
         // Try Multiply-Add optimization for addition operations
-        // Pattern: (a * b) + c  or  c + (a * b)
         // Pattern: (a * b) + c
         case ElementType.AddOperator when _leftNode is ArithmeticNode
         {
@@ -233,7 +232,6 @@ namespace EpsilonScript.AST
             MultiplyAddNode.OperationMode.AddMultiply
           ).Optimize();
         // Try Multiply-Subtract optimization for subtraction operations
-        // Pattern: (a * b) - c  or  c - (a * b)
         // Pattern: (a * b) - c
         case ElementType.SubtractOperator when _leftNode is ArithmeticNode
         {
