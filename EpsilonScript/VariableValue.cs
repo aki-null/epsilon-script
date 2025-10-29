@@ -4,22 +4,20 @@ using System.Globalization;
 
 namespace EpsilonScript
 {
-  [StructLayout(LayoutKind.Explicit)]
   public class VariableValue
   {
-    // Offset 0: Type tag (1 byte for byte enum)
-    [FieldOffset(0)] private Type _type;
+    [StructLayout(LayoutKind.Explicit)]
+    private struct ValueUnion
+    {
+      [FieldOffset(0)] public long IntValue; // For Integer and Long (8 bytes)
+      [FieldOffset(0)] public double FloatValue; // For Float and Double (8 bytes)
+      [FieldOffset(0)] public bool BoolValue; // For Boolean (1 byte, 7 bytes unused)
+    }
 
-    // Offset 8: Union of 8-byte numeric types (8 bytes total, 8-byte aligned)
-    [FieldOffset(8)] private long _intValue; // For Integer and Long
-    [FieldOffset(8)] private double _floatValue; // For Float and Double
-    [FieldOffset(8)] private bool _boolValue; // For Boolean (1 byte)
-
-    // Offset 16: Decimal (16 bytes, 8-byte aligned)
-    [FieldOffset(16)] private decimal _decimalValue;
-
-    // Offset 32: String reference (8 bytes on 64-bit, 8-byte aligned)
-    [FieldOffset(32)] private string _stringValue;
+    private Type _type;
+    private ValueUnion _value; // 8-byte union
+    private decimal _decimalValue; // Separate field for Decimal (16 bytes)
+    private string _stringValue; // Reference type
 
     public Type Type => _type;
 
@@ -31,16 +29,18 @@ namespace EpsilonScript
         {
           case Type.Integer:
           case Type.Long:
-            return (int)_intValue;
+            return (int)_value.IntValue;
           case Type.Float:
           case Type.Double:
-            if (double.IsNaN(_floatValue) || double.IsInfinity(_floatValue))
-              return 0;
-            return (int)_floatValue;
+            if (double.IsNaN(_value.FloatValue))
+              throw new InvalidCastException("Cannot convert NaN to integer");
+            if (double.IsInfinity(_value.FloatValue))
+              throw new InvalidCastException("Cannot convert Infinity to integer");
+            return (int)_value.FloatValue;
           case Type.Decimal:
             return (int)_decimalValue;
           case Type.Boolean:
-            return _boolValue ? 1 : 0;
+            return _value.BoolValue ? 1 : 0;
           case Type.String:
             if (int.TryParse(_stringValue, NumberStyles.Integer, CultureInfo.InvariantCulture, out var result))
               return result;
@@ -55,21 +55,21 @@ namespace EpsilonScript
         {
           case Type.Undefined:
             _type = Type.Integer;
-            _intValue = value;
+            _value.IntValue = value;
             break;
           case Type.Integer:
           case Type.Long:
-            _intValue = value;
+            _value.IntValue = value;
             break;
           case Type.Float:
           case Type.Double:
-            _floatValue = value;
+            _value.FloatValue = value;
             break;
           case Type.Decimal:
             _decimalValue = value;
             break;
           case Type.Boolean:
-            _boolValue = value != 0;
+            _value.BoolValue = value != 0;
             break;
           case Type.String:
             _stringValue = value.ToString();
@@ -88,16 +88,18 @@ namespace EpsilonScript
         {
           case Type.Integer:
           case Type.Long:
-            return _intValue;
+            return _value.IntValue;
           case Type.Float:
           case Type.Double:
-            if (double.IsNaN(_floatValue) || double.IsInfinity(_floatValue))
-              return 0;
-            return (long)_floatValue;
+            if (double.IsNaN(_value.FloatValue))
+              throw new InvalidCastException("Cannot convert NaN to long");
+            if (double.IsInfinity(_value.FloatValue))
+              throw new InvalidCastException("Cannot convert Infinity to long");
+            return (long)_value.FloatValue;
           case Type.Decimal:
             return (long)_decimalValue;
           case Type.Boolean:
-            return _boolValue ? 1L : 0L;
+            return _value.BoolValue ? 1L : 0L;
           case Type.String:
             if (long.TryParse(_stringValue, NumberStyles.Integer, CultureInfo.InvariantCulture, out var result))
               return result;
@@ -112,21 +114,21 @@ namespace EpsilonScript
         {
           case Type.Undefined:
             _type = Type.Long;
-            _intValue = value;
+            _value.IntValue = value;
             break;
           case Type.Integer:
           case Type.Long:
-            _intValue = value;
+            _value.IntValue = value;
             break;
           case Type.Float:
           case Type.Double:
-            _floatValue = value;
+            _value.FloatValue = value;
             break;
           case Type.Decimal:
             _decimalValue = value;
             break;
           case Type.Boolean:
-            _boolValue = value != 0;
+            _value.BoolValue = value != 0;
             break;
           case Type.String:
             _stringValue = value.ToString();
@@ -145,14 +147,14 @@ namespace EpsilonScript
         {
           case Type.Integer:
           case Type.Long:
-            return _intValue;
+            return _value.IntValue;
           case Type.Float:
           case Type.Double:
-            return (float)_floatValue;
+            return (float)_value.FloatValue;
           case Type.Decimal:
             return (float)_decimalValue;
           case Type.Boolean:
-            throw new InvalidCastException("A boolean value cannot be casted to a float value");
+            return _value.BoolValue ? 1.0f : 0.0f;
           case Type.String:
             if (float.TryParse(_stringValue, NumberStyles.Float, CultureInfo.InvariantCulture, out var result))
               return result;
@@ -167,21 +169,22 @@ namespace EpsilonScript
         {
           case Type.Undefined:
             _type = Type.Float;
-            _floatValue = value;
+            _value.FloatValue = value;
             break;
           case Type.Integer:
           case Type.Long:
-            _intValue = (long)value;
+            _value.IntValue = (long)value;
             break;
           case Type.Float:
           case Type.Double:
-            _floatValue = value;
+            _value.FloatValue = value;
             break;
           case Type.Decimal:
             _decimalValue = (decimal)value;
             break;
           case Type.Boolean:
-            throw new InvalidCastException("A float value cannot be casted to a boolean value");
+            _value.BoolValue = value != 0.0f;
+            break;
           default:
             throw new InvalidCastException($"Cannot assign float to {_type}");
         }
@@ -196,14 +199,14 @@ namespace EpsilonScript
         {
           case Type.Integer:
           case Type.Long:
-            return _intValue;
+            return _value.IntValue;
           case Type.Float:
           case Type.Double:
-            return _floatValue;
+            return _value.FloatValue;
           case Type.Decimal:
             return (double)_decimalValue;
           case Type.Boolean:
-            throw new InvalidCastException("A boolean value cannot be casted to a double value");
+            return _value.BoolValue ? 1.0 : 0.0;
           case Type.String:
             if (double.TryParse(_stringValue, NumberStyles.Float, CultureInfo.InvariantCulture, out var result))
               return result;
@@ -218,21 +221,22 @@ namespace EpsilonScript
         {
           case Type.Undefined:
             _type = Type.Double;
-            _floatValue = value;
+            _value.FloatValue = value;
             break;
           case Type.Integer:
           case Type.Long:
-            _intValue = (long)value;
+            _value.IntValue = (long)value;
             break;
           case Type.Float:
           case Type.Double:
-            _floatValue = value;
+            _value.FloatValue = value;
             break;
           case Type.Decimal:
             _decimalValue = (decimal)value;
             break;
           case Type.Boolean:
-            throw new InvalidCastException("A double value cannot be casted to a boolean value");
+            _value.BoolValue = value != 0.0;
+            break;
           default:
             throw new InvalidCastException($"Cannot assign double to {_type}");
         }
@@ -247,14 +251,14 @@ namespace EpsilonScript
         {
           case Type.Integer:
           case Type.Long:
-            return _intValue;
+            return _value.IntValue;
           case Type.Float:
           case Type.Double:
-            return (decimal)_floatValue;
+            return (decimal)_value.FloatValue;
           case Type.Decimal:
             return _decimalValue;
           case Type.Boolean:
-            throw new InvalidCastException("A boolean value cannot be casted to a decimal value");
+            return _value.BoolValue ? 1m : 0m;
           case Type.String:
             if (decimal.TryParse(_stringValue, NumberStyles.Float, CultureInfo.InvariantCulture, out var result))
               return result;
@@ -273,17 +277,18 @@ namespace EpsilonScript
             break;
           case Type.Integer:
           case Type.Long:
-            _intValue = (long)value;
+            _value.IntValue = (long)value;
             break;
           case Type.Float:
           case Type.Double:
-            _floatValue = (double)value;
+            _value.FloatValue = (double)value;
             break;
           case Type.Decimal:
             _decimalValue = value;
             break;
           case Type.Boolean:
-            throw new InvalidCastException("A decimal value cannot be casted to a boolean value");
+            _value.BoolValue = value != 0m;
+            break;
           default:
             throw new InvalidCastException($"Cannot assign decimal to {_type}");
         }
@@ -297,15 +302,15 @@ namespace EpsilonScript
         switch (_type)
         {
           case Type.Boolean:
-            return _boolValue;
+            return _value.BoolValue;
           case Type.Integer:
           case Type.Long:
-            return _intValue != 0;
+            return _value.IntValue != 0;
           case Type.Float:
           case Type.Double:
-            throw new InvalidCastException($"Cannot convert {_type} to boolean");
+            return _value.FloatValue != 0.0;
           case Type.Decimal:
-            throw new InvalidCastException($"Cannot convert {_type} to boolean");
+            return _decimalValue != 0m;
           default:
             throw new InvalidCastException($"Cannot convert {_type} to boolean");
         }
@@ -316,20 +321,22 @@ namespace EpsilonScript
         {
           case Type.Undefined:
             _type = Type.Boolean;
-            _boolValue = value;
+            _value.BoolValue = value;
             break;
           case Type.Integer:
           case Type.Long:
-            _intValue = value ? 1 : 0;
+            _value.IntValue = value ? 1 : 0;
             break;
           case Type.Boolean:
-            _boolValue = value;
+            _value.BoolValue = value;
             break;
           case Type.Float:
           case Type.Double:
-            throw new InvalidCastException("A boolean value cannot be casted to a float value");
+            _value.FloatValue = value ? 1.0 : 0.0;
+            break;
           case Type.Decimal:
-            throw new InvalidCastException("A boolean value cannot be casted to a decimal value");
+            _decimalValue = value ? 1m : 0m;
+            break;
           default:
             throw new InvalidCastException($"Cannot assign boolean to {_type}");
         }
@@ -405,11 +412,12 @@ namespace EpsilonScript
         case Type.Integer:
         case Type.Long:
         case Type.Boolean:
-          _intValue = other._intValue; // Boolean stored in same union, copy entire 8 bytes
+          _value.IntValue =
+            other._value.IntValue; // Copy all 8 bytes of union (boolean uses 1 byte, but copying 8 is faster)
           break;
         case Type.Float:
         case Type.Double:
-          _floatValue = other._floatValue;
+          _value.FloatValue = other._value.FloatValue;
           break;
         case Type.Decimal:
           _decimalValue = other._decimalValue;

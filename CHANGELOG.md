@@ -17,6 +17,18 @@
 - **Type Enum Serialization Compatibility**: Restored pre-1.3.0 enum indices for Integer/Float/Boolean/String
   - Version 1.3.0 broke serialization by reordering existing types
 
+### Breaking Changes
+- **VariableValue.IntegerValue/LongValue**: Accessing integer properties on NaN or Infinity float values now throws `InvalidCastException`
+  - Previously: `VariableValue` containing `NaN` or `Infinity` returned `0` when accessing `IntegerValue` or `LongValue`
+  - Now: Throws `InvalidCastException` with descriptive message ("Cannot convert NaN to integer", "Cannot convert Infinity to long", etc.)
+  - Impact: Code using `IntegerValue`/`LongValue` on float results must handle exceptions or validate for NaN/Infinity before conversion
+  - Rationale: Silent conversion to 0 masked errors and could lead to incorrect calculations in user code
+- **VariableValue Float Conversion**: Boolean `VariableValue` can now be read as float/double/decimal types
+  - Previously: Accessing `FloatValue`, `DoubleValue`, or `DecimalValue` on a boolean `VariableValue` threw `InvalidCastException`
+  - Now: `true` converts to `1.0`, `false` converts to `0.0` (matching existing `IntegerValue`/`LongValue` behavior)
+  - Impact: Error handling code expecting exceptions must be updated; enables boolean arithmetic in user code
+  - Note: This aligns boolean behavior across all numeric type conversions
+
 ## [1.3.0] - 2025-10-07
 
 ### Added
