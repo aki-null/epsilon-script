@@ -8,46 +8,36 @@
   - Supports up to 3 context variables and 3 script parameters
 
 ### Changed
+- **BREAKING CHANGE - Parser Validation**: Improved syntax error detection at parse time instead of deferring to compilation or execution
+  - **Timing Change**: Many syntax errors now fail at parse-time instead of runtime
+    - Adjacent values without operators (e.g., `1 2`, `x y`) fail at parse time
+    - Trailing and leading operators (e.g., `1 +`, `+ 1`) detected immediately
+    - Mismatched parentheses (e.g., `(1`) caught during parsing
+    - Invalid function syntax validated early
+  - **Empty Parentheses**: Empty grouping parentheses `()` are now invalid and throw `ParserException`
+    - Previously: `()` created an empty expression (undefined behavior)
+    - Now: `()` throws "Empty parentheses are not allowed"
+    - Note: Empty function calls `func()` remain valid
+  - **Assignment Validation**: Invalid assignment targets now detected at parse-time instead of runtime
+    - Previously: `1 = 2` threw `RuntimeException` during execution
+    - Now: `1 = 2` throws `ParserException` during compilation with message "Assignment can only be to a variable, not to literals or expressions"
+  - **Impact**: Code catching `RuntimeException` for syntax errors must now catch `ParserException` instead
+    - Assignment errors: catch `ParserException` instead of `RuntimeException`
+    - Syntax validation errors: catch `ParserException` at compilation time
+- **BREAKING CHANGE**: `VariableValue.IntegerValue/LongValue` now throws `InvalidCastException` for NaN or Infinity float values
+  - Previously: `VariableValue` containing `NaN` or `Infinity` returned `0` when accessing `IntegerValue` or `LongValue`
+  - Now: Throws `InvalidCastException` with descriptive message ("Cannot convert NaN to integer", "Cannot convert Infinity to long", etc.)
+- **BREAKING CHANGE**: Boolean `VariableValue` can now be read as float/double/decimal types
+  - Previously: Accessing `FloatValue`, `DoubleValue`, or `DecimalValue` on a boolean `VariableValue` threw `InvalidCastException`
+  - Now: `true` converts to `1.0`, `false` converts to `0.0` (matching existing `IntegerValue`/`LongValue` behavior)
+- **Error Messages**: Improved error message clarity
 - **Function Resolution Caching**: Function overload lookups now cached per execution for improved performance
-  - Cached using packed parameter types for fast comparison
   - Cache invalidated when parameter type signature changes
 - **Multiply-Add Optimization**: Improved performance for expressions matching pattern `(a*b)±c`
 
 ### Fixed
 - **Type Enum Serialization Compatibility**: Restored pre-1.3.0 enum indices for Integer/Float/Boolean/String
   - Version 1.3.0 broke serialization by reordering existing types
-- **Parser Validation**: Improved syntax error detection at parse time instead of deferring to compilation or execution
-  - Adjacent values without operators (e.g., `1 2`, `x y`) fail at parse time
-  - Trailing and leading operators detected immediately
-  - Mismatched parentheses caught during parsing
-  - Invalid function syntax validated early
-- **Error Messages**: Improved error message clarity with specific context
-  - Parser errors indicate the specific syntax violation and location
-
-### Breaking Changes
-- **Empty Parentheses**: Empty grouping parentheses `()` are now invalid and will throw `ParserException`
-  - Previously: `()` created an empty expression (undefined behavior)
-  - Now: `()` throws "Empty parentheses are not allowed"
-  - Note: Empty function calls `func()` remain valid
-- **Assignment Validation**: Invalid assignment targets now detected at parse-time instead of runtime
-  - Previously: `1 = 2` threw `RuntimeException` during execution
-  - Now: `1 = 2` throws `ParserException` during compilation with message "Assignment can only be to a variable, not to literals or expressions"
-  - Impact: Code catching `RuntimeException` for assignment errors must now catch `ParserException`
-- **Syntax Error Timing**: Many syntax errors now fail earlier (at parse-time vs. runtime)
-  - Adjacent values without operators: `1 2` now fails at parse-time
-  - Trailing operators: `1 +` now fails at parse-time
-  - Unmatched parentheses: `(1` now fails at parse-time
-  - Impact: Error handling code may need to catch `ParserException` instead of `RuntimeException`
-- **VariableValue.IntegerValue/LongValue**: Accessing integer properties on NaN or Infinity float values now throws `InvalidCastException`
-  - Previously: `VariableValue` containing `NaN` or `Infinity` returned `0` when accessing `IntegerValue` or `LongValue`
-  - Now: Throws `InvalidCastException` with descriptive message ("Cannot convert NaN to integer", "Cannot convert Infinity to long", etc.)
-  - Impact: Code using `IntegerValue`/`LongValue` on float results must handle exceptions or validate for NaN/Infinity before conversion
-  - Rationale: Silent conversion to 0 masked errors and could lead to incorrect calculations in user code
-- **VariableValue Float Conversion**: Boolean `VariableValue` can now be read as float/double/decimal types
-  - Previously: Accessing `FloatValue`, `DoubleValue`, or `DecimalValue` on a boolean `VariableValue` threw `InvalidCastException`
-  - Now: `true` converts to `1.0`, `false` converts to `0.0` (matching existing `IntegerValue`/`LongValue` behavior)
-  - Impact: Error handling code expecting exceptions must be updated; enables boolean arithmetic in user code
-  - Note: This aligns boolean behavior across all numeric type conversions
 
 ## [1.3.0] - 2025-10-07
 
