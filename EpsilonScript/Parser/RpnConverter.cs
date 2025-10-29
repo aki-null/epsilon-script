@@ -38,7 +38,9 @@ namespace EpsilonScript.Parser
 
     private void PushStandardElement(in Element element)
     {
-      if (element.Type.IsValue())
+      // None is a special placeholder element (e.g., for empty function calls)
+      // It should be pushed directly to output like values
+      if (element.Type == ElementType.None || element.Type.IsValue())
       {
         _output.Push(element);
         return;

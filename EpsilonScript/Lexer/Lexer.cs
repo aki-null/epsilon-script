@@ -4,6 +4,16 @@ using EpsilonScript.Intermediate;
 
 namespace EpsilonScript.Lexer
 {
+  /// <summary>
+  /// Tokenizes input strings into tokens for the parser.
+  ///
+  /// Error Handling Policy:
+  /// - LexerException: Thrown for invalid user input (unexpected characters, malformed literals)
+  /// - ArgumentException: Reserved for programming errors (null input, invalid state)
+  ///
+  /// This distinction ensures that lexical errors are user-recoverable while
+  /// programming errors fail fast during development.
+  /// </summary>
   internal ref struct Lexer
   {
     private const char Eof = (char)0;
@@ -193,6 +203,27 @@ namespace EpsilonScript.Lexer
       }
     }
 
+    /// <summary>
+    /// Gets a human-readable description of a character for error messages
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static string GetCharacterDescription(char c)
+    {
+      // Special handling for common control characters
+      return c switch
+      {
+        '\t' => "tab character (Unicode U+0009)",
+        '\n' => "newline character (Unicode U+000A)",
+        '\r' => "carriage return (Unicode U+000D)",
+        '\0' => "null character (Unicode U+0000)",
+        '\b' => "backspace (Unicode U+0008)",
+        '\f' => "form feed (Unicode U+000C)",
+        '\v' => "vertical tab (Unicode U+000B)",
+        _ when char.IsControl(c) => $"control character (Unicode U+{(int)c:X4})",
+        _ => $"'{c}'"
+      };
+    }
+
     private Token Emit(TokenType tokenType)
     {
       var token = new Token(OutputToken, tokenType, _startLineNumber);
@@ -251,7 +282,8 @@ namespace EpsilonScript.Lexer
               // Integers lead by + or - sign
               if (!AcceptRunNumbers())
               {
-                throw new LexerException(_startLineNumber, "Integer value is required for float exponent value");
+                throw new LexerException(_startLineNumber,
+                  "Float exponent requires an integer value (e.g., '1.0e10', not '1.0e')");
               }
             }
 
@@ -259,6 +291,14 @@ namespace EpsilonScript.Lexer
           }
           else
           {
+            // Check if integer is immediately followed by exponent character
+            // This is invalid - float literals with exponent notation require a decimal point (e.g., 2.0e10, not 2e10)
+            if (AcceptExponent())
+            {
+              throw new LexerException(_startLineNumber,
+                "Float exponent notation requires decimal point (e.g., use '2.0e10' instead of '2e10')");
+            }
+
             output.Push(Emit(TokenType.Integer));
           }
 
@@ -353,7 +393,7 @@ namespace EpsilonScript.Lexer
             else
             {
               throw new LexerException(_startLineNumber,
-                "OR boolean operand requires two vertical bar characters (||)");
+                "OR boolean operator requires two vertical bar characters '||'");
             }
 
             break;
@@ -365,7 +405,7 @@ namespace EpsilonScript.Lexer
             }
             else
             {
-              throw new LexerException(_startLineNumber, "AND boolean operand requires two ampersand characters (&&)");
+              throw new LexerException(_startLineNumber, "AND boolean operator requires two ampersand characters '&&'");
             }
 
             break;
@@ -435,7 +475,9 @@ namespace EpsilonScript.Lexer
             output.Push(Emit(TokenType.Semicolon));
             break;
           default:
-            throw new LexerException(_startLineNumber, $"Unexpected character found: {nextChar}");
+            var charDescription = GetCharacterDescription(nextChar);
+            throw new LexerException(_startLineNumber,
+              $"Unexpected character {charDescription}. Expected identifier, number, string, operator, or parenthesis.");
         }
       }
     }

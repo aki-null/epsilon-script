@@ -143,13 +143,20 @@ namespace EpsilonScript.Tests
     }
 
     [Fact]
-    public void VariableValue_BooleanToNumeric_ThrowsException()
+    public void VariableValue_BooleanToNumeric_ConvertsToOneOrZero()
     {
-      var variable = new VariableValue(true);
+      var variableTrue = new VariableValue(true);
+      var variableFalse = new VariableValue(false);
 
-      Assert.Throws<InvalidCastException>(() => variable.FloatValue);
-      Assert.Throws<InvalidCastException>(() => variable.DoubleValue);
-      Assert.Throws<InvalidCastException>(() => variable.DecimalValue);
+      // True converts to 1
+      Assert.Equal(1.0f, variableTrue.FloatValue);
+      Assert.Equal(1.0, variableTrue.DoubleValue);
+      Assert.Equal(1m, variableTrue.DecimalValue);
+
+      // False converts to 0
+      Assert.Equal(0.0f, variableFalse.FloatValue);
+      Assert.Equal(0.0, variableFalse.DoubleValue);
+      Assert.Equal(0m, variableFalse.DecimalValue);
     }
 
     #endregion

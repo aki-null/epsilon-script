@@ -1,3 +1,4 @@
+using System;
 using EpsilonScript.Function;
 using EpsilonScript.Tests.TestInfrastructure;
 using Xunit;
@@ -46,7 +47,7 @@ namespace EpsilonScript.Tests.ScriptSystem
     {
       var compiler = CreateCompiler();
       ErrorTestHelper.AssertRuntimeException(() => compiler.Compile("\"hello\" == 1", Compiler.Options.Immutable),
-        "comparison");
+        "compare");
     }
 
     [Fact]
@@ -76,8 +77,9 @@ namespace EpsilonScript.Tests.ScriptSystem
     public void AssignmentRequiresVariableLeftHandSide()
     {
       var compiler = CreateCompiler();
-      var script = compiler.Compile("1 = 2");
-      ErrorTestHelper.AssertRuntimeException(() => script.Execute(), "assignment");
+      // Parser now catches this at parse time, not runtime
+      var ex = Assert.Throws<ParserException>(() => compiler.Compile("1 = 2"));
+      Assert.Contains("assignment", ex.Message, StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact]
@@ -118,7 +120,7 @@ namespace EpsilonScript.Tests.ScriptSystem
       var compiler = CreateCompiler();
 
       ErrorTestHelper.AssertRuntimeException(() => compiler.Compile(expression, Compiler.Options.Immutable),
-        "Cannot find values to perform arithmetic comparision on non numeric types");
+        "Cannot perform arithmetic comparison on non-numeric types");
     }
   }
 }

@@ -16,8 +16,28 @@
 ### Fixed
 - **Type Enum Serialization Compatibility**: Restored pre-1.3.0 enum indices for Integer/Float/Boolean/String
   - Version 1.3.0 broke serialization by reordering existing types
+- **Parser Validation**: Improved syntax error detection at parse time instead of deferring to compilation or execution
+  - Adjacent values without operators (e.g., `1 2`, `x y`) fail at parse time
+  - Trailing and leading operators detected immediately
+  - Mismatched parentheses caught during parsing
+  - Invalid function syntax validated early
+- **Error Messages**: Improved error message clarity with specific context
+  - Parser errors indicate the specific syntax violation and location
 
 ### Breaking Changes
+- **Empty Parentheses**: Empty grouping parentheses `()` are now invalid and will throw `ParserException`
+  - Previously: `()` created an empty expression (undefined behavior)
+  - Now: `()` throws "Empty parentheses are not allowed"
+  - Note: Empty function calls `func()` remain valid
+- **Assignment Validation**: Invalid assignment targets now detected at parse-time instead of runtime
+  - Previously: `1 = 2` threw `RuntimeException` during execution
+  - Now: `1 = 2` throws `ParserException` during compilation with message "Assignment can only be to a variable, not to literals or expressions"
+  - Impact: Code catching `RuntimeException` for assignment errors must now catch `ParserException`
+- **Syntax Error Timing**: Many syntax errors now fail earlier (at parse-time vs. runtime)
+  - Adjacent values without operators: `1 2` now fails at parse-time
+  - Trailing operators: `1 +` now fails at parse-time
+  - Unmatched parentheses: `(1` now fails at parse-time
+  - Impact: Error handling code may need to catch `ParserException` instead of `RuntimeException`
 - **VariableValue.IntegerValue/LongValue**: Accessing integer properties on NaN or Infinity float values now throws `InvalidCastException`
   - Previously: `VariableValue` containing `NaN` or `Infinity` returned `0` when accessing `IntegerValue` or `LongValue`
   - Now: Throws `InvalidCastException` with descriptive message ("Cannot convert NaN to integer", "Cannot convert Infinity to long", etc.)

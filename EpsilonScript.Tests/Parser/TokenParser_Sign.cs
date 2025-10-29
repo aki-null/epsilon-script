@@ -11,7 +11,7 @@ namespace EpsilonScript.Tests.Parser
   {
     [Theory]
     [MemberData(nameof(CorrectData))]
-    internal void RPNConverter_ParsesSign_Correctly(Token[] input, Element[] expected)
+    internal void Parser_ParsesSign_Correctly(Token[] input, Element[] expected)
     {
       AssertParseSucceeds(input, expected);
     }
@@ -22,12 +22,6 @@ namespace EpsilonScript.Tests.Parser
       {
         return new[]
         {
-          CreateTestCase(
-            new Element(new Token("-", TokenType.MinusSign), ElementType.SubtractOperator)
-          ),
-          CreateTestCase(
-            new Element(new Token("+", TokenType.PlusSign), ElementType.AddOperator)
-          ),
           CreateTestCase(
             new Element(new Token("-", TokenType.MinusSign), ElementType.NegativeOperator),
             new Element(new Token("1", TokenType.Integer), ElementType.Integer)

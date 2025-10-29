@@ -1,8 +1,25 @@
 using System;
+using System.Collections.Generic;
 using EpsilonScript.Intermediate;
 
 namespace EpsilonScript.Parser
 {
+  /// <summary>
+  /// Parses tokens into elements while validating syntax rules.
+  ///
+  /// Architecture Note:
+  /// The parser converts tokens to elements while preserving infix order.
+  /// - Input: tokens in infix notation (e.g., "2 * 3" as [2, *, 3])
+  /// - Output: elements in infix notation (same order, validated and categorized)
+  /// - Precedence-based evaluation happens in a later compilation phase, not in the parser.
+  ///
+  /// Error Handling Policy:
+  /// - ParserException: Thrown for invalid user input (syntax errors) - see ValidationEngine
+  /// - ArgumentException: Thrown for programming errors (null tokens, invalid state)
+  ///
+  /// This distinction ensures that syntax errors are user-recoverable while
+  /// programming errors fail fast during development.
+  /// </summary>
   internal class TokenParser : ITokenReader
   {
     private enum State
@@ -10,6 +27,22 @@ namespace EpsilonScript.Parser
       Init = 0,
       Process,
       End
+    }
+
+    /// <summary>
+    /// Type of parenthesis context
+    /// </summary>
+    private enum ParenthesisType
+    {
+      /// <summary>
+      /// Regular grouping parenthesis for expressions like (1 + 2)
+      /// </summary>
+      Grouping,
+
+      /// <summary>
+      /// Function call parenthesis like func(args)
+      /// </summary>
+      Function
     }
 
     private State _state;
@@ -20,12 +53,18 @@ namespace EpsilonScript.Parser
     private Token _nextToken;
 
     private ElementType? _previousElementType;
+    private Token? _previousToken;
+    private int _parenthesisDepth;
+
+    // Stack to track the type of each opening parenthesis (grouping vs function)
+    private readonly Stack<ParenthesisType> _parenthesisTypeStack;
 
     private readonly IElementReader _output;
 
     public TokenParser(IElementReader output)
     {
       _output = output;
+      _parenthesisTypeStack = new Stack<ParenthesisType>();
     }
 
     public void Reset()
@@ -34,12 +73,65 @@ namespace EpsilonScript.Parser
       _currentToken = new Token();
       _nextToken = new Token();
       _previousElementType = null;
+      _previousToken = null;
+      _parenthesisDepth = 0;
+      _parenthesisTypeStack.Clear();
     }
 
     private void PushElement(Token token, ElementType type)
     {
-      _previousElementType = type;
+      if (token.Type == TokenType.None && type != ElementType.None)
+      {
+        throw new ArgumentException("Token type cannot be None when element type is not None", nameof(token));
+      }
+
+      // Order of operations ensures state consistency:
+      // 1. Validate: Throws ParserException if syntax is invalid
+      // 2. Push to output: Throws if output fails
+      // 3. Update parser state: Only happens if validation and push succeed
+      // This ordering ensures parser state is never inconsistent with validated output
+      Validator.Validate(
+        currentToken: token,
+        currentElementType: type,
+        previousToken: _previousToken,
+        previousElementType: _previousElementType,
+        parenthesisDepth: _parenthesisDepth
+      );
+
       _output.Push(new Element(token, type));
+
+      UpdateState(token, type);
+    }
+
+    /// <summary>
+    /// Updates parser state after validation passes
+    /// </summary>
+    private void UpdateState(Token token, ElementType type)
+    {
+      switch (type)
+      {
+        // Track parenthesis depth and type
+        case ElementType.LeftParenthesis:
+          _parenthesisDepth++;
+          _parenthesisTypeStack.Push(ParenthesisType.Grouping);
+          break;
+        case ElementType.FunctionStartParenthesis:
+          _parenthesisDepth++;
+          _parenthesisTypeStack.Push(ParenthesisType.Function);
+          break;
+        case ElementType.RightParenthesis:
+        {
+          _parenthesisDepth--;
+          // Safe to pop without checking count: ValidationEngine ensures parenthesisDepth > 0
+          // before this method is called, guaranteeing the stack has a matching entry
+          _parenthesisTypeStack.Pop();
+          break;
+        }
+      }
+
+      // Update previous element tracking
+      _previousElementType = type;
+      _previousToken = token;
     }
 
     private void PushElementDirect(Token token)
@@ -149,6 +241,8 @@ namespace EpsilonScript.Parser
         {
           case null:
           case ElementType.LeftParenthesis:
+          case ElementType.FunctionStartParenthesis: // Function calls also need unary operators
+          case ElementType.Comma: // After comma in function arguments, allow unary operators
             return true;
           case ElementType.RightParenthesis:
             return false;
@@ -168,7 +262,8 @@ namespace EpsilonScript.Parser
       {
         case TokenType.Identifier:
           // Detect whether the current token is a function or a variable
-          PushElement(_currentToken, IsCurrentTokenFunction ? ElementType.Function : ElementType.Variable);
+          var elementType = IsCurrentTokenFunction ? ElementType.Function : ElementType.Variable;
+          PushElement(_currentToken, elementType);
           break;
         case TokenType.MinusSign:
           // Detect whether the current token is a negative operator or a subtract operator
@@ -202,6 +297,8 @@ namespace EpsilonScript.Parser
             // Insert null element because parenthesis was opened but closed immediately for a function call.
             // This is needed so a function element has something to build its parameter list on even if no parameters
             // were specified.
+            // Note: _currentToken is guaranteed valid here because FunctionStartParenthesis can only be set
+            // after processing a valid function token, so _currentToken.LineNumber is safe to use
             PushElement(new Token(ReadOnlyMemory<char>.Empty, TokenType.None, _currentToken.LineNumber),
               ElementType.None);
           }
@@ -217,6 +314,11 @@ namespace EpsilonScript.Parser
 
     public void Push(Token token)
     {
+      if (token.Type == TokenType.None)
+      {
+        throw new ArgumentException("Cannot push empty token (TokenType.None)", nameof(token));
+      }
+
       _currentToken = _nextToken;
       _nextToken = token;
       Process();
@@ -228,6 +330,9 @@ namespace EpsilonScript.Parser
       _currentToken = _nextToken;
       _state = State.End;
       Process();
+
+      Validator.ValidateExpressionEnd(_previousElementType, _currentToken, _parenthesisDepth);
+
       _output.End();
     }
   }

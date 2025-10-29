@@ -227,6 +227,31 @@ namespace EpsilonScript.Tests.Parser
             Create("5", TokenType.Integer, ElementType.Integer),
             Create("!=", TokenType.ComparisonNotEqual, ElementType.ComparisonNotEqual),
             Create("6", TokenType.Integer, ElementType.Integer)
+          ),
+
+          // Test unary operators after comparison operators: 1 < -2 && 10 > +5
+          CreateTestCase(
+            new[]
+            {
+              new Token("1", TokenType.Integer),
+              new Token("<", TokenType.ComparisonLessThan),
+              new Token("-", TokenType.MinusSign),
+              new Token("2", TokenType.Integer),
+              new Token("&&", TokenType.BooleanAndOperator),
+              new Token("10", TokenType.Integer),
+              new Token(">", TokenType.ComparisonGreaterThan),
+              new Token("+", TokenType.PlusSign),
+              new Token("5", TokenType.Integer)
+            },
+            Create("1", TokenType.Integer, ElementType.Integer),
+            Create("<", TokenType.ComparisonLessThan, ElementType.ComparisonLessThan),
+            Create("-", TokenType.MinusSign, ElementType.NegativeOperator),
+            Create("2", TokenType.Integer, ElementType.Integer),
+            Create("&&", TokenType.BooleanAndOperator, ElementType.BooleanAndOperator),
+            Create("10", TokenType.Integer, ElementType.Integer),
+            Create(">", TokenType.ComparisonGreaterThan, ElementType.ComparisonGreaterThan),
+            Create("+", TokenType.PlusSign, ElementType.PositiveOperator),
+            Create("5", TokenType.Integer, ElementType.Integer)
           )
         };
       }
@@ -307,6 +332,30 @@ namespace EpsilonScript.Tests.Parser
             Create("5", TokenType.Integer, ElementType.Integer),
             Create(")", TokenType.RightParenthesis, ElementType.RightParenthesis),
             Create(")", TokenType.RightParenthesis, ElementType.RightParenthesis)
+          ),
+
+          // Test function call followed by operators: func() + 1, func() * -2
+          CreateTestCase(
+            new[]
+            {
+              new Token("func", TokenType.Identifier),
+              new Token("(", TokenType.LeftParenthesis),
+              new Token(")", TokenType.RightParenthesis),
+              new Token("+", TokenType.PlusSign),
+              new Token("1", TokenType.Integer),
+              new Token("*", TokenType.MultiplyOperator),
+              new Token("-", TokenType.MinusSign),
+              new Token("2", TokenType.Integer)
+            },
+            Create("func", TokenType.Identifier, ElementType.Function),
+            Create("(", TokenType.LeftParenthesis, ElementType.FunctionStartParenthesis),
+            Create("", TokenType.None, ElementType.None),
+            Create(")", TokenType.RightParenthesis, ElementType.RightParenthesis),
+            Create("+", TokenType.PlusSign, ElementType.AddOperator),
+            Create("1", TokenType.Integer, ElementType.Integer),
+            Create("*", TokenType.MultiplyOperator, ElementType.MultiplyOperator),
+            Create("-", TokenType.MinusSign, ElementType.NegativeOperator),
+            Create("2", TokenType.Integer, ElementType.Integer)
           )
         };
       }

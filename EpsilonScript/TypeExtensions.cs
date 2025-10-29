@@ -21,17 +21,21 @@ namespace EpsilonScript
 
   internal static class ExtendedTypeExtensions
   {
-    // Bitmask: bits set for numeric types (1,2,5,6,7)
-    // Binary: 11100110 = positions 7,6,5,2,1
-    private const uint NumberMask = 0b11100110;
+    private const uint NumberMask =
+      (1U << (int)ExtendedType.Integer) |
+      (1U << (int)ExtendedType.Long) |
+      (1U << (int)ExtendedType.Float) |
+      (1U << (int)ExtendedType.Double) |
+      (1U << (int)ExtendedType.Decimal);
 
-    // Bitmask: bits set for integer types (1,5)
-    // Binary: 00100010 = positions 5,1
-    private const uint IntegerMask = 0b00100010;
+    private const uint IntegerMask =
+      (1U << (int)ExtendedType.Integer) |
+      (1U << (int)ExtendedType.Long);
 
-    // Bitmask: bits set for float types (2,6,7)
-    // Binary: 11000100 = positions 7,6,2
-    private const uint FloatMask = 0b11000100;
+    private const uint FloatMask =
+      (1U << (int)ExtendedType.Float) |
+      (1U << (int)ExtendedType.Double) |
+      (1U << (int)ExtendedType.Decimal);
 
     [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
     public static bool IsNumber(this ExtendedType t)

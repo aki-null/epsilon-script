@@ -25,17 +25,21 @@ namespace EpsilonScript.Tests.ScriptSystem
     }
 
     [Fact]
-    public void VariableValue_BooleanThrowsOnInvalidFloatAccess()
+    public void VariableValue_BooleanToFloat_Converts()
     {
-      var value = new VariableValue(true);
-      Assert.Throws<InvalidCastException>(() => value.FloatValue);
+      var valueTrue = new VariableValue(true);
+      var valueFalse = new VariableValue(false);
+      Assert.Equal(1.0f, valueTrue.FloatValue);
+      Assert.Equal(0.0f, valueFalse.FloatValue);
     }
 
     [Fact]
-    public void VariableValue_FloatThrowsOnBooleanAccess()
+    public void VariableValue_FloatToBoolean_Converts()
     {
-      var value = new VariableValue(1.0f);
-      Assert.Throws<InvalidCastException>(() => value.BooleanValue);
+      var valueNonZero = new VariableValue(1.0f);
+      var valueZero = new VariableValue(0.0f);
+      Assert.True(valueNonZero.BooleanValue);
+      Assert.False(valueZero.BooleanValue);
     }
 
     [Fact]

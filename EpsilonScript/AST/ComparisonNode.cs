@@ -43,7 +43,7 @@ namespace EpsilonScript.AST
     }
 
     [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-    private ExtendedType PromoteType(ExtendedType left, ExtendedType right)
+    private ExtendedType DetermineComparisonType(ExtendedType left, ExtendedType right)
     {
       if (left == ExtendedType.String || right == ExtendedType.String)
         return ExtendedType.String;
@@ -68,10 +68,24 @@ namespace EpsilonScript.AST
       {
         case ElementType.ComparisonEqual:
         case ElementType.ComparisonNotEqual:
-          if (_leftNode.ValueType == ExtendedType.Tuple || _rightNode.ValueType == ExtendedType.Tuple ||
-              _leftNode.IsNumeric != _rightNode.IsNumeric)
+          if (_leftNode.ValueType == ExtendedType.Tuple || _rightNode.ValueType == ExtendedType.Tuple)
           {
-            throw new RuntimeException("Cannot perform comparison for different value types");
+            throw new RuntimeException(
+              $"Cannot perform comparison on tuple types (left: {_leftNode.ValueType}, right: {_rightNode.ValueType})");
+          }
+
+          // Check for type compatibility: numeric types can only be compared with other numeric types
+          if (_leftNode.IsNumeric != _rightNode.IsNumeric)
+          {
+            throw new RuntimeException(
+              $"Cannot compare incompatible types: {_leftNode.ValueType} and {_rightNode.ValueType} (numeric types can only be compared with other numeric types)");
+          }
+
+          // Additional check for non-numeric types: String can only be compared with String
+          // (Boolean can be compared with Boolean, both are non-numeric, so first check allows it)
+          if (_leftNode.ValueType == ExtendedType.String && _rightNode.ValueType != ExtendedType.String)
+          {
+            throw new RuntimeException("String can only be compared against a string");
           }
 
           break;
@@ -81,22 +95,21 @@ namespace EpsilonScript.AST
         case ElementType.ComparisonGreaterThanOrEqualTo:
           if (!_leftNode.IsNumeric || !_rightNode.IsNumeric)
           {
-            throw new RuntimeException("Cannot find values to perform arithmetic comparision on non numeric types");
+            throw new RuntimeException(
+              $"Cannot perform arithmetic comparison on non-numeric types (left: {_leftNode.ValueType}, right: {_rightNode.ValueType})");
           }
 
           break;
         default:
           throw new ArgumentOutOfRangeException(nameof(_comparisonType), _comparisonType,
-            "Unsupported comparision type");
+            "Unsupported comparison type");
       }
 
-      if (_leftNode.ValueType == ExtendedType.String && _rightNode.ValueType != ExtendedType.String)
-      {
-        throw new RuntimeException("String can only be compared against a string");
-      }
+      _comparisonValueType = DetermineComparisonType(_leftNode.ValueType, _rightNode.ValueType);
 
-      _comparisonValueType = PromoteType(_leftNode.ValueType, _rightNode.ValueType);
-
+      // Perform comparison based on operator and promoted type.
+      // Note: Float/Double use fuzzy equality (IsNearlyEqual) to handle precision errors.
+      // All other types (Integer, Long, Decimal, Boolean, String) use exact equality.
       BooleanValue = (_comparisonType, _comparisonValueType) switch
       {
         // Equal comparisons
