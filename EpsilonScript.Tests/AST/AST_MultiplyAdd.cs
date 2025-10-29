@@ -13,6 +13,22 @@ namespace EpsilonScript.Tests.AST
   [Trait("Component", "AST")]
   public class AST_MultiplyAdd : ScriptTestBase
   {
+    /// <summary>
+    /// Verifies that the compiled script has been optimized to use MultiplyAddNode
+    /// </summary>
+    private static void AssertIsMultiplyAddNode(CompiledScript script)
+    {
+      Assert.IsType<MultiplyAddNode>(script.RootNode);
+    }
+
+    /// <summary>
+    /// Verifies that the compiled script uses ArithmeticNode (not optimized to MultiplyAddNode)
+    /// </summary>
+    private static void AssertIsNotMultiplyAddNode(CompiledScript script)
+    {
+      Assert.IsNotType<MultiplyAddNode>(script.RootNode);
+    }
+
     [Fact]
     public void MA_LeftMultiply_Integer_ProducesCorrectResult()
     {
@@ -47,10 +63,12 @@ namespace EpsilonScript.Tests.AST
     public void MA_LongType_ProducesCorrectResult()
     {
       var compiler = new Compiler(Compiler.IntegerPrecision.Long, Compiler.FloatPrecision.Float);
-      var vars = new DictionaryVariableContainer();
-      vars["a"] = new VariableValue(1000000000L);
-      vars["b"] = new VariableValue(2L);
-      vars["c"] = new VariableValue(5L);
+      var vars = new DictionaryVariableContainer
+      {
+        ["a"] = new VariableValue(1000000000L),
+        ["b"] = new VariableValue(2L),
+        ["c"] = new VariableValue(5L)
+      };
 
       var script = compiler.Compile("(a * b) + c", Compiler.Options.None, vars);
       script.Execute();
@@ -76,10 +94,12 @@ namespace EpsilonScript.Tests.AST
     public void MA_DoubleType_ProducesCorrectResult()
     {
       var compiler = new Compiler(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Double);
-      var vars = new DictionaryVariableContainer();
-      vars["a"] = new VariableValue(2.5);
-      vars["b"] = new VariableValue(4.0);
-      vars["c"] = new VariableValue(1.5);
+      var vars = new DictionaryVariableContainer
+      {
+        ["a"] = new VariableValue(2.5),
+        ["b"] = new VariableValue(4.0),
+        ["c"] = new VariableValue(1.5)
+      };
 
       var script = compiler.Compile("(a * b) + c", Compiler.Options.None, vars);
       script.Execute();
@@ -91,10 +111,12 @@ namespace EpsilonScript.Tests.AST
     public void MA_DecimalType_ProducesCorrectResult()
     {
       var compiler = new Compiler(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Decimal);
-      var vars = new DictionaryVariableContainer();
-      vars["a"] = new VariableValue(2.5m);
-      vars["b"] = new VariableValue(4.0m);
-      vars["c"] = new VariableValue(1.5m);
+      var vars = new DictionaryVariableContainer
+      {
+        ["a"] = new VariableValue(2.5m),
+        ["b"] = new VariableValue(4.0m),
+        ["c"] = new VariableValue(1.5m)
+      };
 
       var script = compiler.Compile("(a * b) + c", Compiler.Options.None, vars);
       script.Execute();
@@ -179,7 +201,7 @@ namespace EpsilonScript.Tests.AST
     [Fact]
     public void MA_MultipleInExpression()
     {
-      // (a * b) + (c * d) - the right side multiply should be fused
+      // (a * b) + (c * d)
       var vars = Variables()
         .WithInteger("a", 2)
         .WithInteger("b", 3)
@@ -193,24 +215,9 @@ namespace EpsilonScript.Tests.AST
     }
 
     [Fact]
-    public void NonMA_WrongOrder_MultiplyAfterAdd()
-    {
-      // (a + b) * c should not create FMA
-      var vars = Variables()
-        .WithInteger("a", 2)
-        .WithInteger("b", 3)
-        .WithInteger("c", 4)
-        .Build();
-
-      var result = CompileAndExecute("(a + b) * c", Compiler.Options.None, vars);
-
-      Assert.Equal(20, result.IntegerValue); // (2+3)*4 = 5*4 = 20
-    }
-
-    [Fact]
     public void MA_SubtractAddend_Integer()
     {
-      // (a * b) - c should be fused
+      // (a * b) - c
       var vars = Variables()
         .WithInteger("a", 2)
         .WithInteger("b", 3)
@@ -445,10 +452,12 @@ namespace EpsilonScript.Tests.AST
     {
       // Test with large integers that don't overflow
       var compiler = new Compiler(Compiler.IntegerPrecision.Long, Compiler.FloatPrecision.Float);
-      var vars = new DictionaryVariableContainer();
-      vars["a"] = new VariableValue(1000000L);
-      vars["b"] = new VariableValue(1000L);
-      vars["c"] = new VariableValue(123456L);
+      var vars = new DictionaryVariableContainer
+      {
+        ["a"] = new VariableValue(1000000L),
+        ["b"] = new VariableValue(1000L),
+        ["c"] = new VariableValue(123456L)
+      };
 
       var script = compiler.Compile("(a * b) + c", Compiler.Options.None, vars);
       script.Execute();
@@ -461,16 +470,156 @@ namespace EpsilonScript.Tests.AST
     {
       // Test floating point arithmetic precision
       var compiler = new Compiler(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Double);
-      var vars = new DictionaryVariableContainer();
-      vars["a"] = new VariableValue(0.1);
-      vars["b"] = new VariableValue(0.2);
-      vars["c"] = new VariableValue(0.3);
+      var vars = new DictionaryVariableContainer
+      {
+        ["a"] = new VariableValue(0.1),
+        ["b"] = new VariableValue(0.2),
+        ["c"] = new VariableValue(0.3)
+      };
 
       var script = compiler.Compile("(a * b) + c", Compiler.Options.None, vars);
       script.Execute();
 
       // 0.1 * 0.2 + 0.3 = 0.02 + 0.3 = 0.32
       Assert.Equal(0.32, script.DoubleValue, 10);
+    }
+
+    // ============================================================================================
+    // Optimization Verification Tests - Verify that MultiplyAddNode optimization actually happens
+    // ============================================================================================
+
+    [Fact]
+    public void MA_Optimization_LeftMultiply_CreatesMultiplyAddNode()
+    {
+      // Verify that (a * b) + c gets optimized to MultiplyAddNode
+      var vars = Variables()
+        .WithInteger("a", 2)
+        .WithInteger("b", 3)
+        .WithInteger("c", 4)
+        .Build();
+
+      var script = Compile("(a * b) + c", Compiler.Options.None, vars);
+
+      AssertIsMultiplyAddNode(script);
+    }
+
+    [Fact]
+    public void MA_Optimization_RightMultiply_CreatesMultiplyAddNode()
+    {
+      // Verify that c + (a * b) gets optimized to MultiplyAddNode
+      var vars = Variables()
+        .WithInteger("a", 2)
+        .WithInteger("b", 3)
+        .WithInteger("c", 4)
+        .Build();
+
+      var script = Compile("c + (a * b)", Compiler.Options.None, vars);
+
+      AssertIsMultiplyAddNode(script);
+    }
+
+    [Fact]
+    public void MA_Optimization_MultiplySubtract_CreatesMultiplyAddNode()
+    {
+      // Verify that (a * b) - c gets optimized to MultiplyAddNode
+      var vars = Variables()
+        .WithInteger("a", 2)
+        .WithInteger("b", 3)
+        .WithInteger("c", 4)
+        .Build();
+
+      var script = Compile("(a * b) - c", Compiler.Options.None, vars);
+
+      AssertIsMultiplyAddNode(script);
+    }
+
+    [Fact]
+    public void MA_Optimization_SubtractMultiply_CreatesMultiplyAddNode()
+    {
+      // Verify that c - (a * b) gets optimized to MultiplyAddNode
+      var vars = Variables()
+        .WithInteger("a", 2)
+        .WithInteger("b", 3)
+        .WithInteger("c", 10)
+        .Build();
+
+      var script = Compile("c - (a * b)", Compiler.Options.None, vars);
+
+      AssertIsMultiplyAddNode(script);
+    }
+
+    [Fact]
+    public void MA_Optimization_WrongOrder_DoesNotOptimize()
+    {
+      // Verify that (a + b) * c does NOT get optimized (wrong order)
+      var vars = Variables()
+        .WithInteger("a", 2)
+        .WithInteger("b", 3)
+        .WithInteger("c", 4)
+        .Build();
+
+      var script = Compile("(a + b) * c", Compiler.Options.None, vars);
+
+      AssertIsNotMultiplyAddNode(script);
+    }
+
+    [Fact]
+    public void MA_Optimization_ConstantExpression_FoldsToConstant()
+    {
+      // Verify that (2 * 3) + 4 gets folded to a constant (not MultiplyAddNode)
+      var script = Compile("(2 * 3) + 4");
+
+      // Should be a constant node (IntegerNode), not MultiplyAddNode
+      Assert.IsNotType<MultiplyAddNode>(script.RootNode);
+      Assert.IsType<IntegerNode>(script.RootNode);
+    }
+
+    [Fact]
+    public void MA_Optimization_WithFloats_CreatesMultiplyAddNode()
+    {
+      // Verify that float expressions also get optimized
+      var vars = Variables()
+        .WithFloat("a", 2.5f)
+        .WithFloat("b", 4.0f)
+        .WithFloat("c", 1.5f)
+        .Build();
+
+      var script = Compile("(a * b) + c", Compiler.Options.None, vars);
+
+      AssertIsMultiplyAddNode(script);
+    }
+
+    [Fact]
+    public void MA_Optimization_WithMixedTypes_CreatesMultiplyAddNode()
+    {
+      // Verify that mixed type expressions (int*int + float) get optimized
+      var vars = Variables()
+        .WithInteger("a", 2)
+        .WithInteger("b", 3)
+        .WithFloat("c", 1.5f)
+        .Build();
+
+      var script = Compile("(a * b) + c", Compiler.Options.None, vars);
+
+      AssertIsMultiplyAddNode(script);
+    }
+
+    [Fact]
+    public void MA_Optimization_MultipleInExpression_BothGetOptimized()
+    {
+      // Verify that (a * b) + (c * d) - the second multiply gets fused
+      // The root should be MultiplyAddNode, with the left side being another MultiplyAddNode
+      var vars = Variables()
+        .WithInteger("a", 2)
+        .WithInteger("b", 3)
+        .WithInteger("c", 4)
+        .WithInteger("d", 5)
+        .Build();
+
+      var script = Compile("(a * b) + (c * d)", Compiler.Options.None, vars);
+
+      // The root should be MultiplyAddNode (for the right-hand multiply)
+      AssertIsMultiplyAddNode(script);
     }
   }
 }

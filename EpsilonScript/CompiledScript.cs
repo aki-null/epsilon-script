@@ -9,6 +9,11 @@ namespace EpsilonScript
     public Type ValueType { get; private set; } = Type.Undefined;
     public bool IsConstant { get; }
 
+    /// <summary>
+    /// Internal property for testing purposes to verify AST structure and optimizations
+    /// </summary>
+    internal Node RootNode => _rootNode;
+
     public int IntegerValue => _rootNode.IntegerValue;
     public long LongValue => _rootNode.LongValue;
     public float FloatValue => _rootNode.FloatValue;
