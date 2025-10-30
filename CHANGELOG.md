@@ -119,3 +119,6 @@ Most existing code using `uint` variable identifiers will continue to work due t
 
 ## [1.0.0] - 2022-11-08
 - Initial stable release
+
+## [0.1.0] - 2020-03-06
+- Beta release
