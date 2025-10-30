@@ -117,5 +117,5 @@ Most existing code using `uint` variable identifiers will continue to work due t
 - ArithmeticNode provides specific error messages for boolean arithmetic operations
 - ArithmeticNode provides specific error messages for unsupported string operations
 
-## [1.0.0]
+## [1.0.0] - 2022-11-08
 - Initial stable release
