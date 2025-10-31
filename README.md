@@ -1,5 +1,7 @@
 # EpsilonScript
 
+[![Readme_ja](https://img.shields.io/badge/EpsilonScript-%E6%97%A5%E6%9C%AC%E8%AA%9E-E87A90)](https://github.com/aki-null/epsilon-script/blob/master/README_ja.md)
+
 EpsilonScript is an embeddable expression engine for C# with functions and allocation-free execution.
 
 It targets .NET Standard 2.1.
@@ -586,14 +588,14 @@ String concatenation causes heap allocations:
 ```
 where `i` is a variable.
 
-Constant string concatenation happens at compilation and produces no garbage:
+Constant string concatenation happens at compilation and allocates no memory:
 ```
 "Debug: " + 42 * 42
 ```
 
 ### Custom Functions
 
-Custom functions that allocate memory will produce garbage when called.
+Custom functions will allocate memory when called if they perform allocations.
 
 ## Motivation
 
