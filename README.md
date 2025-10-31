@@ -273,6 +273,8 @@ True
 
 EpsilonScript supports built-in functions and custom functions.
 
+**Important**: All custom functions must be pure functions with no side effects.
+
 #### Code
 
 ```c#
@@ -308,8 +310,6 @@ Built-in functions like `abs`, `min`, `max`, and `ifelse` use overloading.
 #### Constant Functions
 
 Custom functions can be marked as constant. Constant functions always return the same result for the same inputs. Results are cached at compilation time for performance.
-
-**Important**: All custom functions must be pure functions with no side effects.
 
 A constant function can be created by passing `true` to the `isConstant` constructor parameter:
 
