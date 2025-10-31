@@ -605,7 +605,7 @@ The usual options don't fit well. Pure data (Excel, JSON, Unity serialization) m
 
 EpsilonScript narrows the scope to just expressions. No loops. No variable declarations. Just evaluate an expression and return a result. This constraint is the point: designers can express complex calculations and conditions, but can't write code that spirals into maintenance problems.
 
-Expressions need to run fast because they run often—hundreds of times per frame in game loops. Compilation happens once, producing a reusable script that executes without reparsing or allocating memory. The variable container pattern means you compile "health - damage" once, then execute it for every entity that needs that calculation.
+Expressions need to run fast because they run often—hundreds of times per frame in game loops. Compilation happens once, producing a reusable script that executes without reparsing or allocating memory. The variable container pattern means you compile once, then execute it for every entity that needs that calculation.
 
 The syntax deliberately omits features that hurt readability. No ternary operator—use `ifelse(condition, true_value, false_value)` instead. No implicit behaviors that require remembering special cases. Programmers control exactly what functions exist and what they do. The result is expressions that everyone on the team can read.
 
