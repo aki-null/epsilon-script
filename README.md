@@ -172,15 +172,13 @@ Console.WriteLine(variables[valId].FloatValue);
 430.0
 ```
 
-The `VariableId` struct provides type safety and optimal performance by using unique integer identifiers internally while maintaining a simple string-based interface.
-
-The `Compiler.Options.Immutable` flag prevents expressions that modify variables from compiling.
+The `VariableId` struct provides type safety and optimal performance by using unique integer identifiers internally while maintaining a simple string-based interface. This is the recommended way to work with variables for performance-critical code.
 
 Variables cannot be defined within scripts. This prevents expressions from becoming too complex.
 
-#### Alternative: Direct String Usage
+#### String-based Variable Access
 
-For simpler code, you can use strings directly:
+For simpler code where performance is less critical, you can use strings directly without `VariableId`:
 
 ```c#
 var compiler = new Compiler();
@@ -188,6 +186,32 @@ var variables = new DictionaryVariableContainer { ["val"] = new VariableValue(43
 var script = compiler.Compile("val = val * 10.0", Compiler.Options.None, variables);
 script.Execute();
 Console.WriteLine(variables["val"].FloatValue);
+```
+
+Note: Direct string usage involves implicit conversion that is slower than using `VariableId`. Use `VariableId` when performance matters.
+
+#### Immutable Mode
+
+The compiler supports two modes for variable handling:
+
+Mutable Mode (Default):
+- Allows variable assignment and modification
+
+Immutable Mode:
+- Prevents all variable modification operations
+- Throws an exception at compile time if assignment operators are used
+
+```c#
+// Immutable mode - only reads variables
+var script1 = compiler.Compile("health - damage", Compiler.Options.Immutable, variables);
+script1.Execute(); // Works
+
+// Mutable mode - can modify variables
+var script2 = compiler.Compile("health -= damage", Compiler.Options.None, variables);
+script2.Execute(); // Works
+
+// Immutable mode with assignment - throws exception at compile time
+var script3 = compiler.Compile("health -= damage", Compiler.Options.Immutable, variables); // Exception!
 ```
 
 #### Variable Container Override
@@ -273,26 +297,37 @@ True
 
 EpsilonScript supports built-in functions and custom functions.
 
-**Important**: All custom functions must be pure functions with no side effects.
-
-#### Code
-
 ```c#
 var compiler = new Compiler();
 compiler.AddCustomFunction(
-    CustomFunction.Create("rand", (float d) => Random.Range(0.0f, d)));
-var script = compiler.Compile("rand(0, 10)", Compiler.Options.Immutable);
+    CustomFunction.Create("clamp", (float val, float min, float max) =>
+        Math.Max(min, Math.Min(max, val))));
+
+var variables = new DictionaryVariableContainer { ["damage"] = new VariableValue(50) };
+var script = compiler.Compile("clamp(damage * 1.5, 10, 100)", Compiler.Options.Immutable, variables);
 script.Execute();
-Console.WriteLine(script.FloatValue);
+Console.WriteLine(script.FloatValue); // 75
 ```
 
-#### Result
+#### Function Requirements
 
-```
-3.1
+Custom functions must not mutate state. Functions can read external data but cannot modify anything.
+
+```c#
+// Allowed: pure calculation
+CustomFunction.Create("square", (float x) => x * x)
+
+// Allowed: read-only external access
+CustomFunction.Create("get_health", () => player.Health)
+
+// Allowed: non-deterministic but no mutation
+CustomFunction.Create("rand", (float max) => Random.Range(0.0f, max))
+
+// Forbidden: mutates external state
+CustomFunction.Create("set_score", (int score) => { gameState.Score = score; return score; })
 ```
 
-Built-in functions include:
+### Built-in Functions
 
 - Trigonometric: `sin`, `cos`, `tan`, `asin`, `acos`, `atan`, `atan2`, `sinh`, `cosh`, `tanh`
 - Math: `sqrt`, `abs`, `floor`, `ceil`, `trunc`, `pow`, `min`, `max`

@@ -14,7 +14,7 @@
   - Mismatched parentheses (e.g., `(1`)
   - Empty grouping parentheses `()` (function calls `func()` remain valid)
   - Invalid assignment targets (e.g., `1 = 2`)
-  - **Impact**: Assignment errors now throw `ParserException` during compilation instead of `RuntimeException` during execution
+  - **Impact**: Invalid assignments (e.g., `1 = 2`) now throw `ParserException` during compilation instead of `RuntimeException` during execution
 - **BREAKING CHANGE**: `VariableValue.IntegerValue/LongValue` now throws `InvalidCastException` for NaN or Infinity
   - Previously returned `0`
 - **BREAKING CHANGE**: Boolean `VariableValue` can now be read as float/double/decimal types
