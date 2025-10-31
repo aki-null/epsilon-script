@@ -1,6 +1,6 @@
 # Changelog
 
-## [2.0.0] - 2025-XX-XX
+## [2.0.0] - 2025-10-31
 
 ### Added
 - **Contextual Custom Functions**: Functions can read variables from execution environment without explicit parameters
