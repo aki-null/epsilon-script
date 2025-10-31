@@ -607,7 +607,7 @@ Expressions need to run fast because they run often—hundreds of times per fram
 
 The syntax deliberately omits features that hurt readability. No ternary operator—use `ifelse(condition, true_value, false_value)` instead. No implicit behaviors that require remembering special cases. Programmers control exactly what functions exist and what they do. The result is expressions that everyone on the team can read.
 
-Within visual scripting systems, EpsilonScript handles the case where connecting nodes becomes tedious. Wiring up "base_damage * weapon_effectiveness(weapon, armor) * range_modifier" with individual nodes creates clutter. An expression node keeps the graph focused on control flow while delegating calculations to text, which is clearer for that purpose.
+Within visual scripting systems, EpsilonScript handles the case where connecting nodes becomes tedious. Wiring up `base_damage * weapon_effectiveness(weapon, armor) * range_modifier` with individual nodes creates clutter. An expression node keeps the graph focused on control flow while delegating calculations to text, which is clearer for that purpose.
 
 ## Development
 
