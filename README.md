@@ -30,8 +30,16 @@ Console.WriteLine(script.IntegerValue); // 75
 var script = compiler.Compile("health - damage", Compiler.Options.Immutable);
 
 // Execute with different containers
-var player1 = new DictionaryVariableContainer { ["health"] = new VariableValue(100), ["damage"] = new VariableValue(25) };
-var player2 = new DictionaryVariableContainer { ["health"] = new VariableValue(80), ["damage"] = new VariableValue(30) };
+var player1 = new DictionaryVariableContainer
+{
+    ["health"] = new VariableValue(100),
+    ["damage"] = new VariableValue(25)
+};
+var player2 = new DictionaryVariableContainer
+{
+    ["health"] = new VariableValue(80),
+    ["damage"] = new VariableValue(30)
+};
 
 script.Execute(player1);
 Console.WriteLine(script.IntegerValue); // 75
@@ -60,7 +68,9 @@ var variables = new DictionaryVariableContainer
     ["armor"] = new VariableValue("heavy")
 };
 
-var script = compiler.Compile("base_damage * weapon_effectiveness(weapon, armor)", Compiler.Options.Immutable);
+var script = compiler.Compile(
+    "base_damage * weapon_effectiveness(weapon, armor)",
+    Compiler.Options.Immutable);
 script.Execute(variables);
 Console.WriteLine(script.FloatValue); // 150
 ```
@@ -245,7 +255,10 @@ Comparison operators (`==`, `!=`, `<`, `<=`, `>`, `>=`) and logical operators (`
 var compiler = new Compiler();
 VariableId valId = "val";
 var variables = new DictionaryVariableContainer { [valId] = new VariableValue(43.0f) };
-var script = compiler.Compile("val >= 0.0 && val < 50.0", Compiler.Options.Immutable, variables);
+var script = compiler.Compile(
+    "val >= 0.0 && val < 50.0",
+    Compiler.Options.Immutable,
+    variables);
 script.Execute();
 Console.WriteLine(script.BooleanValue);
 ```
@@ -264,7 +277,8 @@ EpsilonScript supports built-in functions and custom functions.
 
 ```c#
 var compiler = new Compiler();
-compiler.AddCustomFunction(CustomFunction.Create("rand", (float d) => Random.Range(0.0f, d)));
+compiler.AddCustomFunction(
+    CustomFunction.Create("rand", (float d) => Random.Range(0.0f, d)));
 var script = compiler.Compile("rand(0, 10)", Compiler.Options.Immutable);
 script.Execute();
 Console.WriteLine(script.FloatValue);
@@ -442,7 +456,10 @@ var variables = new DictionaryVariableContainer
   [xId] = new VariableValue(5),
   [yId] = new VariableValue(10)
 };
-var script = compiler.Compile("x = x + 1; y = y * 2; x + y", Compiler.Options.None, variables);
+var script = compiler.Compile(
+    "x = x + 1; y = y * 2; x + y",
+    Compiler.Options.None,
+    variables);
 script.Execute();
 Console.WriteLine(script.IntegerValue); // 26 (x is 6, y is 20)
 ```
