@@ -24,11 +24,11 @@ namespace EpsilonScript.Tests.AST
     }
 
     [Fact]
-    internal void AST_Null_IsConstant_ReturnsTrue()
+    internal void AST_Null_IsPrecomputable_ReturnsTrue()
     {
       var node = new NullNode();
 
-      Assert.True(node.IsConstant); // Null is always constant
+      Assert.True(node.IsPrecomputable); // Null is always constant
     }
 
     [Fact]

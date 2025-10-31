@@ -14,34 +14,34 @@ namespace EpsilonScript.Function
 {
   public abstract partial class CustomFunction
   {
-    public static CustomFunction Create<TResult>(string name, Func<TResult> func, bool isConstant = false)
+    public static CustomFunction Create<TResult>(string name, Func<TResult> func, bool isDeterministic = false)
     {
-      return new CustomFunction<TResult>(name, func, isConstant);
+      return new CustomFunction<TResult>(name, func, isDeterministic);
     }
 
-    public static CustomFunction Create<T1, TResult>(string name, Func<T1, TResult> func, bool isConstant = false)
+    public static CustomFunction Create<T1, TResult>(string name, Func<T1, TResult> func, bool isDeterministic = false)
     {
-      return new CustomFunction<T1, TResult>(name, func, isConstant);
+      return new CustomFunction<T1, TResult>(name, func, isDeterministic);
     }
 
-    public static CustomFunction Create<T1, T2, TResult>(string name, Func<T1, T2, TResult> func, bool isConstant = false)
+    public static CustomFunction Create<T1, T2, TResult>(string name, Func<T1, T2, TResult> func, bool isDeterministic = false)
     {
-      return new CustomFunction<T1, T2, TResult>(name, func, isConstant);
+      return new CustomFunction<T1, T2, TResult>(name, func, isDeterministic);
     }
 
-    public static CustomFunction Create<T1, T2, T3, TResult>(string name, Func<T1, T2, T3, TResult> func, bool isConstant = false)
+    public static CustomFunction Create<T1, T2, T3, TResult>(string name, Func<T1, T2, T3, TResult> func, bool isDeterministic = false)
     {
-      return new CustomFunction<T1, T2, T3, TResult>(name, func, isConstant);
+      return new CustomFunction<T1, T2, T3, TResult>(name, func, isDeterministic);
     }
 
-    public static CustomFunction Create<T1, T2, T3, T4, TResult>(string name, Func<T1, T2, T3, T4, TResult> func, bool isConstant = false)
+    public static CustomFunction Create<T1, T2, T3, T4, TResult>(string name, Func<T1, T2, T3, T4, TResult> func, bool isDeterministic = false)
     {
-      return new CustomFunction<T1, T2, T3, T4, TResult>(name, func, isConstant);
+      return new CustomFunction<T1, T2, T3, T4, TResult>(name, func, isDeterministic);
     }
 
-    public static CustomFunction Create<T1, T2, T3, T4, T5, TResult>(string name, Func<T1, T2, T3, T4, T5, TResult> func, bool isConstant = false)
+    public static CustomFunction Create<T1, T2, T3, T4, T5, TResult>(string name, Func<T1, T2, T3, T4, T5, TResult> func, bool isDeterministic = false)
     {
-      return new CustomFunction<T1, T2, T3, T4, T5, TResult>(name, func, isConstant);
+      return new CustomFunction<T1, T2, T3, T4, T5, TResult>(name, func, isDeterministic);
     }
 
   }
@@ -57,8 +57,8 @@ namespace EpsilonScript.Function
   {
     private readonly Func<TResult> _func;
 
-    public CustomFunction(string name, Func<TResult> func, bool isConstant = false)
-      : base(name, isConstant, Array.Empty<Type>(), TypeTraits<TResult>.ValueType)
+    public CustomFunction(string name, Func<TResult> func, bool isDeterministic = false)
+      : base(name, isDeterministic, Array.Empty<Type>(), TypeTraits<TResult>.ValueType)
     {
       _func = func ?? throw new ArgumentNullException(nameof(func));
     }
@@ -127,8 +127,8 @@ namespace EpsilonScript.Function
     };
     private readonly Func<T1, TResult> _func;
 
-    public CustomFunction(string name, Func<T1, TResult> func, bool isConstant = false)
-      : base(name, isConstant, ParameterCache, TypeTraits<TResult>.ValueType)
+    public CustomFunction(string name, Func<T1, TResult> func, bool isDeterministic = false)
+      : base(name, isDeterministic, ParameterCache, TypeTraits<TResult>.ValueType)
     {
       _func = func ?? throw new ArgumentNullException(nameof(func));
     }
@@ -198,8 +198,8 @@ namespace EpsilonScript.Function
     };
     private readonly Func<T1, T2, TResult> _func;
 
-    public CustomFunction(string name, Func<T1, T2, TResult> func, bool isConstant = false)
-      : base(name, isConstant, ParameterCache, TypeTraits<TResult>.ValueType)
+    public CustomFunction(string name, Func<T1, T2, TResult> func, bool isDeterministic = false)
+      : base(name, isDeterministic, ParameterCache, TypeTraits<TResult>.ValueType)
     {
       _func = func ?? throw new ArgumentNullException(nameof(func));
     }
@@ -270,8 +270,8 @@ namespace EpsilonScript.Function
     };
     private readonly Func<T1, T2, T3, TResult> _func;
 
-    public CustomFunction(string name, Func<T1, T2, T3, TResult> func, bool isConstant = false)
-      : base(name, isConstant, ParameterCache, TypeTraits<TResult>.ValueType)
+    public CustomFunction(string name, Func<T1, T2, T3, TResult> func, bool isDeterministic = false)
+      : base(name, isDeterministic, ParameterCache, TypeTraits<TResult>.ValueType)
     {
       _func = func ?? throw new ArgumentNullException(nameof(func));
     }
@@ -343,8 +343,8 @@ namespace EpsilonScript.Function
     };
     private readonly Func<T1, T2, T3, T4, TResult> _func;
 
-    public CustomFunction(string name, Func<T1, T2, T3, T4, TResult> func, bool isConstant = false)
-      : base(name, isConstant, ParameterCache, TypeTraits<TResult>.ValueType)
+    public CustomFunction(string name, Func<T1, T2, T3, T4, TResult> func, bool isDeterministic = false)
+      : base(name, isDeterministic, ParameterCache, TypeTraits<TResult>.ValueType)
     {
       _func = func ?? throw new ArgumentNullException(nameof(func));
     }
@@ -417,8 +417,8 @@ namespace EpsilonScript.Function
     };
     private readonly Func<T1, T2, T3, T4, T5, TResult> _func;
 
-    public CustomFunction(string name, Func<T1, T2, T3, T4, T5, TResult> func, bool isConstant = false)
-      : base(name, isConstant, ParameterCache, TypeTraits<TResult>.ValueType)
+    public CustomFunction(string name, Func<T1, T2, T3, T4, T5, TResult> func, bool isDeterministic = false)
+      : base(name, isDeterministic, ParameterCache, TypeTraits<TResult>.ValueType)
     {
       _func = func ?? throw new ArgumentNullException(nameof(func));
     }

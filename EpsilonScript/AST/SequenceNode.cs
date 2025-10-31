@@ -10,8 +10,8 @@ namespace EpsilonScript.AST
     private Node _rightNode;
     private bool _isSingleNode;
 
-    public override bool IsConstant =>
-      _isSingleNode ? _rightNode.IsConstant : (_leftNode.IsConstant && _rightNode.IsConstant);
+    public override bool IsPrecomputable =>
+      _isSingleNode ? _rightNode.IsPrecomputable : (_leftNode.IsPrecomputable && _rightNode.IsPrecomputable);
 
     public override void Build(Stack<Node> rpnStack, Element element, Compiler.Options options,
       IVariableContainer variables, IDictionary<VariableId, CustomFunctionOverload> functions,
@@ -77,7 +77,7 @@ namespace EpsilonScript.AST
 
     public override Node Optimize()
     {
-      if (IsConstant)
+      if (IsPrecomputable)
       {
         Execute(null);
         return CreateValueNode();

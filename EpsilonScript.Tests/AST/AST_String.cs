@@ -27,7 +27,7 @@ namespace EpsilonScript.Tests.AST
 
       Assert.Equal(ExtendedType.String, node.ValueType);
       Assert.Equal(value, node.StringValue);
-      Assert.True(node.IsConstant);
+      Assert.True(node.IsPrecomputable);
     }
 
     [Fact]
@@ -38,7 +38,7 @@ namespace EpsilonScript.Tests.AST
       // Default constructor doesn't initialize the value
       Assert.Equal(ExtendedType.Undefined, node.ValueType);
       Assert.Null(node.StringValue);
-      Assert.True(node.IsConstant);
+      Assert.True(node.IsPrecomputable);
     }
 
     [Theory]
@@ -86,10 +86,10 @@ namespace EpsilonScript.Tests.AST
     }
 
     [Fact]
-    internal void AST_String_IsConstant_ReturnsTrue()
+    internal void AST_String_IsPrecomputable_ReturnsTrue()
     {
       var node = new StringNode("test");
-      Assert.True(node.IsConstant);
+      Assert.True(node.IsPrecomputable);
     }
 
     [Theory]

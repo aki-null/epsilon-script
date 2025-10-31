@@ -161,7 +161,8 @@ namespace EpsilonScript.Tests.AST
     [Theory]
     [InlineData(ElementType.BooleanAndOperator, "&&")]
     [InlineData(ElementType.BooleanOrOperator, "||")]
-    internal void AST_BooleanOperation_IsConstant_ReturnsCorrectValue(ElementType operatorType, string operatorSymbol)
+    internal void AST_BooleanOperation_IsPrecomputable_ReturnsCorrectValue(ElementType operatorType,
+      string operatorSymbol)
     {
       var node = new BooleanOperationNode();
       var rpn = CreateStack(new FakeBooleanNode(true), new FakeBooleanNode(false));
@@ -170,7 +171,7 @@ namespace EpsilonScript.Tests.AST
       node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
         Compiler.FloatPrecision.Float);
 
-      Assert.True(node.IsConstant); // Both operands are constant
+      Assert.True(node.IsPrecomputable); // Both operands are constant
     }
 
     private static TokenType GetTokenType(ElementType operatorType)

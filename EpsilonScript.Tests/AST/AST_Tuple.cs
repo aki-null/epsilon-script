@@ -126,7 +126,7 @@ namespace EpsilonScript.Tests.AST
     }
 
     [Fact]
-    internal void AST_Tuple_IsConstant_WithAllConstantChildren_ReturnsTrue()
+    internal void AST_Tuple_IsPrecomputable_WithAllConstantChildren_ReturnsTrue()
     {
       var node = new TupleNode();
       var rpn = CreateStack(new FakeIntegerNode(5), new FakeIntegerNode(10)); // Both constant
@@ -135,11 +135,11 @@ namespace EpsilonScript.Tests.AST
       node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
         Compiler.FloatPrecision.Float);
 
-      Assert.True(node.IsConstant); // All children are constant
+      Assert.True(node.IsPrecomputable); // All children are constant
     }
 
     [Fact]
-    internal void AST_Tuple_IsConstant_WithOneVariableChild_ReturnsFalse()
+    internal void AST_Tuple_IsPrecomputable_WithOneVariableChild_ReturnsFalse()
     {
       var node = new TupleNode();
       var rpn = CreateStack(new TestVariableNode(), new FakeIntegerNode(10)); // Left is variable
@@ -148,7 +148,7 @@ namespace EpsilonScript.Tests.AST
       node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
         Compiler.FloatPrecision.Float);
 
-      Assert.False(node.IsConstant); // One child is not constant
+      Assert.False(node.IsPrecomputable); // One child is not constant
     }
 
     [Fact]
@@ -267,7 +267,7 @@ namespace EpsilonScript.Tests.AST
 
     private class TestVariableNode : Node
     {
-      public override bool IsConstant => false; // Not constant
+      public override bool IsPrecomputable => false; // Not constant
 
       public TestVariableNode()
       {
@@ -291,14 +291,14 @@ namespace EpsilonScript.Tests.AST
 
     private class TestOptimizableNode : Node
     {
-      private readonly bool _isConstant;
+      private readonly bool _isPrecomputable;
       public bool WasOptimized { get; private set; }
 
-      public override bool IsConstant => _isConstant;
+      public override bool IsPrecomputable => _isPrecomputable;
 
       public TestOptimizableNode(bool isConstant)
       {
-        _isConstant = isConstant;
+        _isPrecomputable = isConstant;
         IntegerValue = 1;
         FloatValue = 1.0f;
         BooleanValue = true;

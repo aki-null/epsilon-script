@@ -8,7 +8,7 @@ namespace EpsilonScript.AST
 {
   internal class FunctionNode : Node
   {
-    public override bool IsConstant => _functionOverload.IsConstant && AreParametersConstant;
+    public override bool IsPrecomputable => _functionOverload.IsDeterministic && AreParametersPrecomputable;
 
     private CustomFunctionOverload _functionOverload;
     private List<Node> _parameters;
@@ -18,13 +18,13 @@ namespace EpsilonScript.AST
     private CustomFunction _cachedFunction;
     private PackedParameterTypes _cachedPackedTypes;
 
-    private bool AreParametersConstant
+    private bool AreParametersPrecomputable
     {
       get
       {
         foreach (var node in _parameters)
         {
-          if (!node.IsConstant)
+          if (!node.IsPrecomputable)
           {
             return false;
           }
@@ -114,7 +114,7 @@ namespace EpsilonScript.AST
     private void ExecuteFunction(IVariableContainer variablesOverride)
     {
       // Check if function requires context variables
-      if (_cachedFunction.HasContext)
+      if (_cachedFunction.IsContextual)
       {
         ExecuteFunctionWithContext(variablesOverride);
       }
@@ -197,7 +197,7 @@ namespace EpsilonScript.AST
       }
 
       // If function is constant and all parameters are constant, evaluate at compile time
-      if (IsConstant)
+      if (IsPrecomputable)
       {
         Execute(null);
         return CreateValueNode();

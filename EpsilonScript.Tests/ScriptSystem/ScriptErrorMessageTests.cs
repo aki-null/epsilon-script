@@ -415,12 +415,12 @@ namespace EpsilonScript.Tests.ScriptSystem
     public void ConstnessMismatch_ProvidesErrorMessage()
     {
       var compiler = CreateCompiler();
-      compiler.AddCustomFunction(CustomFunction.Create("func", (int x) => x, isConstant: true));
+      compiler.AddCustomFunction(CustomFunction.Create("func", (int x) => x, isDeterministic: true));
 
       var ex = Assert.Throws<ArgumentException>(() =>
-        compiler.AddCustomFunction(CustomFunction.Create("func", (float x) => x, isConstant: false)));
+        compiler.AddCustomFunction(CustomFunction.Create("func", (float x) => x, isDeterministic: false)));
 
-      Assert.Contains("const", ex.Message, StringComparison.OrdinalIgnoreCase);
+      Assert.Contains("determinism", ex.Message, StringComparison.OrdinalIgnoreCase);
     }
 
     #endregion

@@ -124,7 +124,7 @@ namespace EpsilonScript.Tests.AST
     }
 
     [Fact]
-    internal void AST_Variable_IsConstant_ReturnsFalse()
+    internal void AST_Variable_IsPrecomputable_ReturnsFalse()
     {
       var variableName = "testVar";
       var variableId = (VariableId)variableName;
@@ -139,7 +139,7 @@ namespace EpsilonScript.Tests.AST
       node.Build(rpn, element, Compiler.Options.None, variables, null, Compiler.IntegerPrecision.Integer,
         Compiler.FloatPrecision.Float);
 
-      Assert.False(node.IsConstant); // Variables are never constant
+      Assert.False(node.IsPrecomputable); // Variables are never constant
     }
 
     [Theory]

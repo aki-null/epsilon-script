@@ -120,7 +120,7 @@ namespace EpsilonScript.Tests.AST
     }
 
     [Fact]
-    internal void AST_Sequence_IsConstant_WithTwoConstantNodes_ReturnsTrue()
+    internal void AST_Sequence_IsPrecomputable_WithTwoConstantNodes_ReturnsTrue()
     {
       var node = new SequenceNode();
       var rpn = CreateStack(new FakeIntegerNode(5), new FakeIntegerNode(10)); // Both constant
@@ -129,11 +129,11 @@ namespace EpsilonScript.Tests.AST
       node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
         Compiler.FloatPrecision.Float);
 
-      Assert.True(node.IsConstant); // Both nodes are constant
+      Assert.True(node.IsPrecomputable); // Both nodes are constant
     }
 
     [Fact]
-    internal void AST_Sequence_IsConstant_WithOneVariableNode_ReturnsFalse()
+    internal void AST_Sequence_IsPrecomputable_WithOneVariableNode_ReturnsFalse()
     {
       var node = new SequenceNode();
       var rpn = CreateStack(new TestVariableNode(), new FakeIntegerNode(10)); // Left is variable
@@ -142,7 +142,7 @@ namespace EpsilonScript.Tests.AST
       node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
         Compiler.FloatPrecision.Float);
 
-      Assert.False(node.IsConstant); // Left node is not constant
+      Assert.False(node.IsPrecomputable); // Left node is not constant
     }
 
     [Fact]
@@ -328,7 +328,7 @@ namespace EpsilonScript.Tests.AST
 
     private class TestVariableNode : Node
     {
-      public override bool IsConstant => false; // Not constant
+      public override bool IsPrecomputable => false; // Not constant
 
       public TestVariableNode()
       {

@@ -42,7 +42,7 @@ namespace EpsilonScript.Tests.ScriptSystem
       script.Execute();
 
       Assert.Equal(1, counter.Count);
-      Assert.True(script.IsConstant);
+      Assert.True(script.IsPrecomputable);
       AssertNearlyEqual(10.0f, script.FloatValue);
     }
 
@@ -61,7 +61,7 @@ namespace EpsilonScript.Tests.ScriptSystem
       script.Execute();
       AssertNearlyEqual(2.0f, script.FloatValue);
       Assert.Equal(2, counter.Count);
-      Assert.False(script.IsConstant);
+      Assert.False(script.IsPrecomputable);
     }
 
     [Fact]

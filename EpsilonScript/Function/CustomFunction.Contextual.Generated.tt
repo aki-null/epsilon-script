@@ -127,10 +127,10 @@ namespace EpsilonScript.Function
       string name,
       <#= contextVarParams #>,
       <#= funcType #> func,
-      bool isConstant = false)
+      bool isDeterministic = false)
     {
       return new ContextualCustomFunction<#= classSuffix #><#= typeArgs #>(name, <#=
-        string.Join(", ", Enumerable.Range(1, contextCount).Select(i => $"contextVar{i}")) #>, func, isConstant);
+        string.Join(", ", Enumerable.Range(1, contextCount).Select(i => $"contextVar{i}")) #>, func, isDeterministic);
     }
 
 <#
@@ -193,8 +193,8 @@ namespace EpsilonScript.Function
       }
 #>
 
-    public <#= className #>(string name, <#= contextVarParams #>, <#= funcType #> func, bool isConstant)
-      : base(name, isConstant, <#=
+    public <#= className #>(string name, <#= contextVarParams #>, <#= funcType #> func, bool isDeterministic)
+      : base(name, isDeterministic, <#=
         hasParams ? "ParameterCache" : "Array.Empty<Type>()" #>, TypeTraits<TResult>.ValueType, hasContext: true)
     {
       _func = func ?? throw new ArgumentNullException(nameof(func));

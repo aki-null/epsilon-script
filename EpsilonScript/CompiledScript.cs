@@ -7,7 +7,7 @@ namespace EpsilonScript
     private readonly Node _rootNode;
     private bool _isResultCached;
     public Type ValueType { get; private set; } = Type.Undefined;
-    public bool IsConstant { get; }
+    public bool IsPrecomputable { get; }
 
     /// <summary>
     /// Internal property for testing purposes to verify AST structure and optimizations
@@ -32,14 +32,14 @@ namespace EpsilonScript
       _rootNode = rootNode;
       IntegerPrecision = integerPrecision;
       FloatPrecision = floatPrecision;
-      // Constness is cached, because this information is gathered from each AST node O(n)
-      IsConstant = rootNode.IsConstant;
+      // Precomputable status is cached, because this information is gathered from each AST node O(n)
+      IsPrecomputable = rootNode.IsPrecomputable;
     }
 
     public void Execute(IVariableContainer variablesOverride = null)
     {
-      // Do not execute this again if the script is completely constant, and it has been executed at least once.
-      if (IsConstant && _isResultCached)
+      // Do not execute this again if the script is precomputable and has been executed at least once.
+      if (IsPrecomputable && _isResultCached)
       {
         return;
       }

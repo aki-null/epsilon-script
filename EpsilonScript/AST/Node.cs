@@ -50,7 +50,7 @@ namespace EpsilonScript.AST
     }
 
     public bool IsNumeric => _type.IsNumber();
-    public virtual bool IsConstant => true;
+    public virtual bool IsPrecomputable => true;
 
     public int IntegerValue
     {
@@ -274,10 +274,10 @@ namespace EpsilonScript.AST
     // 1. Call child.Optimize() before returning or using children
     //    WRONG: return _childNode;
     //    RIGHT: return _childNode.Optimize();
-    // 2. Execute constant nodes before reading their values
-    //    WRONG: if (node.IsConstant && node.BooleanValue) ...
-    //    RIGHT: if (node.IsConstant) { node.Execute(null); if (node.BooleanValue) ... }
-    // 3. Common pattern: if (IsConstant) { Execute(null); return CreateValueNode(); }
+    // 2. Execute precomputable nodes before reading their values
+    //    WRONG: if (node.IsPrecomputable && node.BooleanValue) ...
+    //    RIGHT: if (node.IsPrecomputable) { node.Execute(null); if (node.BooleanValue) ... }
+    // 3. Common pattern: if (IsPrecomputable) { Execute(null); return CreateValueNode(); }
     public virtual Node Optimize()
     {
       return this;

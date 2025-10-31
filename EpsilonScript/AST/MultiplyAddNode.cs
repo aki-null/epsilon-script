@@ -27,7 +27,8 @@ namespace EpsilonScript.AST
     private readonly Type _configuredFloatType;
     private readonly OperationMode _mode;
 
-    public override bool IsConstant => _multiplier1.IsConstant && _multiplier2.IsConstant && _addend.IsConstant;
+    public override bool IsPrecomputable =>
+      _multiplier1.IsPrecomputable && _multiplier2.IsPrecomputable && _addend.IsPrecomputable;
 
     /// <summary>
     /// Constructor used during optimization phase to create multiply-add node
@@ -243,7 +244,7 @@ namespace EpsilonScript.AST
 
     public override Node Optimize()
     {
-      if (IsConstant)
+      if (IsPrecomputable)
       {
         Execute(null);
         return CreateValueNode();

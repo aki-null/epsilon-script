@@ -342,17 +342,28 @@ Functions can be overloaded with different signatures (parameter types and count
 
 Built-in functions like `abs`, `min`, `max`, and `ifelse` use overloading.
 
-#### Constant Functions
+#### Deterministic Functions
 
-Custom functions can be marked as constant. Constant functions always return the same result for the same inputs. Results are cached at compilation time for performance.
+Functions can be marked as **deterministic** for compile-time optimization. Deterministic functions always return the same result for the same inputs.
 
-A constant function can be created by passing `true` to the `isConstant` constructor parameter:
+Mark a function deterministic by passing `isDeterministic: true`:
 
 ```c#
-CustomFunction.Create("sin", (float v) => (float)System.Math.Sin(v), true)
+// Deterministic - same input always produces same output
+CustomFunction.Create("sin", (float v) => MathF.Sin(v), isDeterministic: true)
+
+CustomFunction.Create("clamp", (float val, float min, float max) =>
+    Math.Max(min, Math.Min(max, val)), isDeterministic: true)
 ```
 
-For example, `sin(3.141592 / 2)` is cached at compilation because `sin` is marked as constant.
+When all parameters are constant values (not variables), deterministic functions are evaluated at compile time:
+
+```c#
+compiler.AddCustomFunction(CustomFunction.Create("sin", (float v) => MathF.Sin(v), isDeterministic: true));
+
+// Evaluated at compile time - sin(1.5708) is cached as ~1.0
+var script = compiler.Compile("sin(3.141592 / 2) * 10");
+```
 
 #### Method Groups
 

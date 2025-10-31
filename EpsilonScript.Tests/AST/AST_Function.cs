@@ -212,13 +212,13 @@ namespace EpsilonScript.Tests.AST
     }
 
     [Fact]
-    internal void AST_Function_IsConstant_WithConstantFunction_ReturnsTrue()
+    internal void AST_Function_IsPrecomputable_WithConstantFunction_ReturnsTrue()
     {
       var functions = new Dictionary<VariableId, CustomFunctionOverload>();
       var functionName = "constFunc";
       var functionId = (VariableId)functionName;
 
-      var customFunction = CustomFunction.Create(functionName, (int x) => x * 2, true); // isConstant = true
+      var customFunction = CustomFunction.Create(functionName, (int x) => x * 2, isDeterministic: true);
       var overload = new CustomFunctionOverload(customFunction, Compiler.FloatPrecision.Float);
       functions[functionId] = overload;
 
@@ -230,11 +230,11 @@ namespace EpsilonScript.Tests.AST
       node.Build(rpn, element, Compiler.Options.None, null, functions, Compiler.IntegerPrecision.Integer,
         Compiler.FloatPrecision.Float);
 
-      Assert.True(node.IsConstant); // Both function and parameters are constant
+      Assert.True(node.IsPrecomputable); // Both function and parameters are constant
     }
 
     [Fact]
-    internal void AST_Function_IsConstant_WithNonConstantFunction_ReturnsFalse()
+    internal void AST_Function_IsPrecomputable_WithNonConstantFunction_ReturnsFalse()
     {
       var functions = new Dictionary<VariableId, CustomFunctionOverload>();
       var functionName = "nonConstFunc";
@@ -252,17 +252,17 @@ namespace EpsilonScript.Tests.AST
       node.Build(rpn, element, Compiler.Options.None, null, functions, Compiler.IntegerPrecision.Integer,
         Compiler.FloatPrecision.Float);
 
-      Assert.False(node.IsConstant); // Function is not constant
+      Assert.False(node.IsPrecomputable); // Function is not constant
     }
 
     [Fact]
-    internal void AST_Function_IsConstant_WithVariableParameter_ReturnsFalse()
+    internal void AST_Function_IsPrecomputable_WithVariableParameter_ReturnsFalse()
     {
       var functions = new Dictionary<VariableId, CustomFunctionOverload>();
       var functionName = "constFunc";
       var functionId = (VariableId)functionName;
 
-      var customFunction = CustomFunction.Create(functionName, (int x) => x * 2, true); // isConstant = true
+      var customFunction = CustomFunction.Create(functionName, (int x) => x * 2, isDeterministic: true);
       var overload = new CustomFunctionOverload(customFunction, Compiler.FloatPrecision.Float);
       functions[functionId] = overload;
 
@@ -274,7 +274,7 @@ namespace EpsilonScript.Tests.AST
       node.Build(rpn, element, Compiler.Options.None, null, functions, Compiler.IntegerPrecision.Integer,
         Compiler.FloatPrecision.Float);
 
-      Assert.False(node.IsConstant); // Parameter is not constant
+      Assert.False(node.IsPrecomputable); // Parameter is not constant
     }
 
     [Theory]
@@ -418,7 +418,7 @@ namespace EpsilonScript.Tests.AST
     }
 
     [Fact]
-    internal void AST_Function_WithZeroParameterConstantFunction_IsConstant()
+    internal void AST_Function_WithZeroParameterConstantFunction_IsPrecomputable()
     {
       var functions = new Dictionary<VariableId, CustomFunctionOverload>();
       var functionName = "getConstant";
@@ -440,7 +440,7 @@ namespace EpsilonScript.Tests.AST
         Compiler.FloatPrecision.Float);
       node.Execute(null);
 
-      Assert.True(node.IsConstant);
+      Assert.True(node.IsPrecomputable);
       Assert.Equal(100, node.IntegerValue);
     }
 
@@ -466,7 +466,7 @@ namespace EpsilonScript.Tests.AST
       node.Build(rpn, element, Compiler.Options.None, null, functions, Compiler.IntegerPrecision.Integer,
         Compiler.FloatPrecision.Float);
 
-      Assert.False(node.IsConstant);
+      Assert.False(node.IsPrecomputable);
     }
 
 
@@ -955,7 +955,7 @@ namespace EpsilonScript.Tests.AST
     // Helper class for testing non-constant parameters
     private class TestVariableNode : Node
     {
-      public override bool IsConstant => false; // Not constant
+      public override bool IsPrecomputable => false; // Not constant
 
       public TestVariableNode()
       {

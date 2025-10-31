@@ -11,7 +11,7 @@ namespace EpsilonScript.AST
     private Node _rightNode;
     private ElementType _assignmentType;
 
-    public override bool IsConstant => false;
+    public override bool IsPrecomputable => false;
 
     public override void Build(Stack<Node> rpnStack, Element element, Compiler.Options options,
       IVariableContainer variables, IDictionary<VariableId, CustomFunctionOverload> functions,

@@ -13,7 +13,7 @@ namespace EpsilonScript.AST
     private Type _configuredIntegerType;
     private Type _configuredFloatType;
 
-    public override bool IsConstant => _leftNode.IsConstant && _rightNode.IsConstant;
+    public override bool IsPrecomputable => _leftNode.IsPrecomputable && _rightNode.IsPrecomputable;
 
     private static string GetOperatorName(ElementType op)
     {
@@ -196,7 +196,7 @@ namespace EpsilonScript.AST
 
     public override Node Optimize()
     {
-      if (IsConstant)
+      if (IsPrecomputable)
       {
         Execute(null);
         return CreateValueNode();

@@ -29,7 +29,7 @@ namespace EpsilonScript.Tests.AST
 
       // Should be optimized to a constant false BooleanNode
       Assert.IsType<BooleanNode>(optimized);
-      Assert.True(optimized.IsConstant);
+      Assert.True(optimized.IsPrecomputable);
       Assert.Equal(ExtendedType.Boolean, optimized.ValueType);
       Assert.False(optimized.BooleanValue);
     }
@@ -68,7 +68,7 @@ namespace EpsilonScript.Tests.AST
 
       // Should be optimized to a constant true BooleanNode
       Assert.IsType<BooleanNode>(optimized);
-      Assert.True(optimized.IsConstant);
+      Assert.True(optimized.IsPrecomputable);
       Assert.Equal(ExtendedType.Boolean, optimized.ValueType);
       Assert.True(optimized.BooleanValue);
     }
@@ -107,7 +107,7 @@ namespace EpsilonScript.Tests.AST
 
       // Should be optimized to false since EpsilonScript functions have no side effects
       Assert.IsType<BooleanNode>(optimized);
-      Assert.True(optimized.IsConstant);
+      Assert.True(optimized.IsPrecomputable);
       Assert.Equal(ExtendedType.Boolean, optimized.ValueType);
       Assert.False(optimized.BooleanValue);
     }
@@ -146,7 +146,7 @@ namespace EpsilonScript.Tests.AST
 
       // Should be optimized to true since EpsilonScript functions have no side effects
       Assert.IsType<BooleanNode>(optimized);
-      Assert.True(optimized.IsConstant);
+      Assert.True(optimized.IsPrecomputable);
       Assert.Equal(ExtendedType.Boolean, optimized.ValueType);
       Assert.True(optimized.BooleanValue);
     }
@@ -185,7 +185,7 @@ namespace EpsilonScript.Tests.AST
 
       // Should be optimized to a constant boolean value
       Assert.IsType<BooleanNode>(optimized);
-      Assert.True(optimized.IsConstant);
+      Assert.True(optimized.IsPrecomputable);
       Assert.Equal(ExtendedType.Boolean, optimized.ValueType);
       Assert.False(optimized.BooleanValue);
     }
@@ -206,7 +206,7 @@ namespace EpsilonScript.Tests.AST
 
       // Should be optimized to a constant boolean value
       Assert.IsType<BooleanNode>(optimized);
-      Assert.True(optimized.IsConstant);
+      Assert.True(optimized.IsPrecomputable);
       Assert.Equal(ExtendedType.Boolean, optimized.ValueType);
       Assert.True(optimized.BooleanValue);
     }
@@ -263,7 +263,7 @@ namespace EpsilonScript.Tests.AST
 
       // Should be optimized to constant false since both are constant
       Assert.IsType<BooleanNode>(optimized);
-      Assert.True(optimized.IsConstant);
+      Assert.True(optimized.IsPrecomputable);
       Assert.Equal(ExtendedType.Boolean, optimized.ValueType);
       Assert.False(optimized.BooleanValue);
     }
@@ -284,7 +284,7 @@ namespace EpsilonScript.Tests.AST
 
       // Should be optimized to constant true since both are constant
       Assert.IsType<BooleanNode>(optimized);
-      Assert.True(optimized.IsConstant);
+      Assert.True(optimized.IsPrecomputable);
       Assert.Equal(ExtendedType.Boolean, optimized.ValueType);
       Assert.True(optimized.BooleanValue);
     }
@@ -308,7 +308,7 @@ namespace EpsilonScript.Tests.AST
         Compiler.FloatPrecision.Float);
       var optimized1 = node1.Optimize();
 
-      Assert.True(optimized1.IsConstant);
+      Assert.True(optimized1.IsPrecomputable);
       Assert.Equal(ExtendedType.Boolean, optimized1.ValueType);
       Assert.True(optimized1.BooleanValue); // Should be true (5 == 5) && true = true
 
@@ -323,7 +323,7 @@ namespace EpsilonScript.Tests.AST
         Compiler.FloatPrecision.Float);
       var optimized2 = node2.Optimize();
 
-      Assert.True(optimized2.IsConstant);
+      Assert.True(optimized2.IsPrecomputable);
       Assert.Equal(ExtendedType.Boolean, optimized2.ValueType);
       Assert.True(optimized2.BooleanValue); // Should be true: (10 > 5) || false = true
     }
@@ -343,7 +343,7 @@ namespace EpsilonScript.Tests.AST
         Compiler.FloatPrecision.Float);
       var optimized = node.Optimize();
 
-      Assert.True(optimized.IsConstant);
+      Assert.True(optimized.IsPrecomputable);
       Assert.Equal(ExtendedType.Boolean, optimized.ValueType);
       Assert.True(optimized.BooleanValue); // Should be true: true && true = true
     }
@@ -385,7 +385,7 @@ namespace EpsilonScript.Tests.AST
         BooleanValue = true; // Set a boolean value to ensure type is Boolean
       }
 
-      public override bool IsConstant => false; // Not constant initially
+      public override bool IsPrecomputable => false; // Not constant initially
 
       public override Node Optimize()
       {
@@ -417,7 +417,7 @@ namespace EpsilonScript.Tests.AST
         BooleanValue = false;
       }
 
-      public override bool IsConstant => true;
+      public override bool IsPrecomputable => true;
 
       public override void Execute(IVariableContainer variablesOverride)
       {
@@ -443,7 +443,7 @@ namespace EpsilonScript.Tests.AST
         FloatValue = IntegerValue;
       }
 
-      public override bool IsConstant => false; // This makes it non-constant
+      public override bool IsPrecomputable => false; // This makes it non-constant
 
       public override void Build(Stack<Node> rpnStack, Element element, Compiler.Options options,
         IVariableContainer variables, IDictionary<VariableId, CustomFunctionOverload> functions,

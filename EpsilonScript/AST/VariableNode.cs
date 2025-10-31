@@ -12,7 +12,7 @@ namespace EpsilonScript.AST
     private Type _configuredIntegerType;
     private Type _configuredFloatType;
 
-    public override bool IsConstant => false;
+    public override bool IsPrecomputable => false;
 
     public override void Build(Stack<Node> rpnStack, Element element, Compiler.Options options,
       IVariableContainer variables, IDictionary<VariableId, CustomFunctionOverload> functions,

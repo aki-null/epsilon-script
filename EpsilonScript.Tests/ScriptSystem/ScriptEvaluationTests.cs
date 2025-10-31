@@ -11,7 +11,7 @@ namespace EpsilonScript.Tests.ScriptSystem
     {
       var result = CompileAndExecute("(1 + 2 + 3 * 2) * 2", Compiler.Options.Immutable);
       Assert.Equal(Type.Integer, result.Type);
-      Assert.True(result.IsConstant);
+      Assert.True(result.IsPrecomputable);
       Assert.Equal(18, result.IntegerValue);
     }
 
@@ -20,7 +20,7 @@ namespace EpsilonScript.Tests.ScriptSystem
     {
       var result = CompileAndExecute("10 + -2 * -(20.2 - 10)", Compiler.Options.Immutable);
       Assert.Equal(Type.Float, result.Type);
-      Assert.True(result.IsConstant);
+      Assert.True(result.IsPrecomputable);
       AssertNearlyEqual(30.4f, result.FloatValue);
     }
 
@@ -29,7 +29,7 @@ namespace EpsilonScript.Tests.ScriptSystem
     {
       var result = CompileAndExecute("(10 + 2.5) / 2", Compiler.Options.Immutable);
       Assert.Equal(Type.Float, result.Type);
-      Assert.True(result.IsConstant);
+      Assert.True(result.IsPrecomputable);
       AssertNearlyEqual(6.25f, result.FloatValue);
     }
 

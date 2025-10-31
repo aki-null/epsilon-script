@@ -7,13 +7,13 @@ namespace EpsilonScript.Function
     private readonly CustomFunctionOverloadNode _rootNode;
 
     public VariableId Name { get; }
-    public bool IsConstant { get; }
+    public bool IsDeterministic { get; }
     private Compiler.FloatPrecision ConfiguredFloatType { get; }
 
     public CustomFunctionOverload(CustomFunction function, Compiler.FloatPrecision floatPrecision)
     {
       Name = function.Name;
-      IsConstant = function.IsConstant;
+      IsDeterministic = function.IsDeterministic;
       ConfiguredFloatType = floatPrecision;
       _rootNode = new CustomFunctionOverloadNode();
       _rootNode.Build(function);
@@ -21,9 +21,9 @@ namespace EpsilonScript.Function
 
     public void Add(CustomFunction function)
     {
-      if (IsConstant != function.IsConstant)
+      if (IsDeterministic != function.IsDeterministic)
       {
-        throw new ArgumentException("All functions with the same name must have the same constness");
+        throw new ArgumentException("All functions with the same name must have the same determinism");
       }
 
       _rootNode.Build(function);

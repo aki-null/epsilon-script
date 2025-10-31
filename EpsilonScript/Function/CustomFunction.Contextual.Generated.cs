@@ -22,36 +22,36 @@ namespace EpsilonScript.Function
       string name,
       VariableId contextVar1,
       Func<T1, TResult> func,
-      bool isConstant = false)
+      bool isDeterministic = false)
     {
-      return new ContextualCustomFunction<T1, TResult>(name, contextVar1, func, isConstant);
+      return new ContextualCustomFunction<T1, TResult>(name, contextVar1, func, isDeterministic);
     }
 
     public static CustomFunction CreateContextual<T1, T2, TResult>(
       string name,
       VariableId contextVar1,
       Func<T1, T2, TResult> func,
-      bool isConstant = false)
+      bool isDeterministic = false)
     {
-      return new ContextualCustomFunction<T1, T2, TResult>(name, contextVar1, func, isConstant);
+      return new ContextualCustomFunction<T1, T2, TResult>(name, contextVar1, func, isDeterministic);
     }
 
     public static CustomFunction CreateContextual<T1, T2, T3, TResult>(
       string name,
       VariableId contextVar1,
       Func<T1, T2, T3, TResult> func,
-      bool isConstant = false)
+      bool isDeterministic = false)
     {
-      return new ContextualCustomFunction<T1, T2, T3, TResult>(name, contextVar1, func, isConstant);
+      return new ContextualCustomFunction<T1, T2, T3, TResult>(name, contextVar1, func, isDeterministic);
     }
 
     public static CustomFunction CreateContextual<T1, T2, T3, T4, TResult>(
       string name,
       VariableId contextVar1,
       Func<T1, T2, T3, T4, TResult> func,
-      bool isConstant = false)
+      bool isDeterministic = false)
     {
-      return new ContextualCustomFunction<T1, T2, T3, T4, TResult>(name, contextVar1, func, isConstant);
+      return new ContextualCustomFunction<T1, T2, T3, T4, TResult>(name, contextVar1, func, isDeterministic);
     }
 
     // =========================================================================
@@ -62,36 +62,36 @@ namespace EpsilonScript.Function
       string name,
       VariableId contextVar1, VariableId contextVar2,
       Func<T1, T2, TResult> func,
-      bool isConstant = false)
+      bool isDeterministic = false)
     {
-      return new ContextualCustomFunction2<T1, T2, TResult>(name, contextVar1, contextVar2, func, isConstant);
+      return new ContextualCustomFunction2<T1, T2, TResult>(name, contextVar1, contextVar2, func, isDeterministic);
     }
 
     public static CustomFunction CreateContextual<T1, T2, T3, TResult>(
       string name,
       VariableId contextVar1, VariableId contextVar2,
       Func<T1, T2, T3, TResult> func,
-      bool isConstant = false)
+      bool isDeterministic = false)
     {
-      return new ContextualCustomFunction2<T1, T2, T3, TResult>(name, contextVar1, contextVar2, func, isConstant);
+      return new ContextualCustomFunction2<T1, T2, T3, TResult>(name, contextVar1, contextVar2, func, isDeterministic);
     }
 
     public static CustomFunction CreateContextual<T1, T2, T3, T4, TResult>(
       string name,
       VariableId contextVar1, VariableId contextVar2,
       Func<T1, T2, T3, T4, TResult> func,
-      bool isConstant = false)
+      bool isDeterministic = false)
     {
-      return new ContextualCustomFunction2<T1, T2, T3, T4, TResult>(name, contextVar1, contextVar2, func, isConstant);
+      return new ContextualCustomFunction2<T1, T2, T3, T4, TResult>(name, contextVar1, contextVar2, func, isDeterministic);
     }
 
     public static CustomFunction CreateContextual<T1, T2, T3, T4, T5, TResult>(
       string name,
       VariableId contextVar1, VariableId contextVar2,
       Func<T1, T2, T3, T4, T5, TResult> func,
-      bool isConstant = false)
+      bool isDeterministic = false)
     {
-      return new ContextualCustomFunction2<T1, T2, T3, T4, T5, TResult>(name, contextVar1, contextVar2, func, isConstant);
+      return new ContextualCustomFunction2<T1, T2, T3, T4, T5, TResult>(name, contextVar1, contextVar2, func, isDeterministic);
     }
 
     // =========================================================================
@@ -102,36 +102,36 @@ namespace EpsilonScript.Function
       string name,
       VariableId contextVar1, VariableId contextVar2, VariableId contextVar3,
       Func<T1, T2, T3, TResult> func,
-      bool isConstant = false)
+      bool isDeterministic = false)
     {
-      return new ContextualCustomFunction3<T1, T2, T3, TResult>(name, contextVar1, contextVar2, contextVar3, func, isConstant);
+      return new ContextualCustomFunction3<T1, T2, T3, TResult>(name, contextVar1, contextVar2, contextVar3, func, isDeterministic);
     }
 
     public static CustomFunction CreateContextual<T1, T2, T3, T4, TResult>(
       string name,
       VariableId contextVar1, VariableId contextVar2, VariableId contextVar3,
       Func<T1, T2, T3, T4, TResult> func,
-      bool isConstant = false)
+      bool isDeterministic = false)
     {
-      return new ContextualCustomFunction3<T1, T2, T3, T4, TResult>(name, contextVar1, contextVar2, contextVar3, func, isConstant);
+      return new ContextualCustomFunction3<T1, T2, T3, T4, TResult>(name, contextVar1, contextVar2, contextVar3, func, isDeterministic);
     }
 
     public static CustomFunction CreateContextual<T1, T2, T3, T4, T5, TResult>(
       string name,
       VariableId contextVar1, VariableId contextVar2, VariableId contextVar3,
       Func<T1, T2, T3, T4, T5, TResult> func,
-      bool isConstant = false)
+      bool isDeterministic = false)
     {
-      return new ContextualCustomFunction3<T1, T2, T3, T4, T5, TResult>(name, contextVar1, contextVar2, contextVar3, func, isConstant);
+      return new ContextualCustomFunction3<T1, T2, T3, T4, T5, TResult>(name, contextVar1, contextVar2, contextVar3, func, isDeterministic);
     }
 
     public static CustomFunction CreateContextual<T1, T2, T3, T4, T5, T6, TResult>(
       string name,
       VariableId contextVar1, VariableId contextVar2, VariableId contextVar3,
       Func<T1, T2, T3, T4, T5, T6, TResult> func,
-      bool isConstant = false)
+      bool isDeterministic = false)
     {
-      return new ContextualCustomFunction3<T1, T2, T3, T4, T5, T6, TResult>(name, contextVar1, contextVar2, contextVar3, func, isConstant);
+      return new ContextualCustomFunction3<T1, T2, T3, T4, T5, T6, TResult>(name, contextVar1, contextVar2, contextVar3, func, isDeterministic);
     }
 
   }
@@ -148,8 +148,8 @@ namespace EpsilonScript.Function
     private readonly Func<T1, TResult> _func;
     private readonly VariableId _contextVar1;
 
-    public ContextualCustomFunction(string name, VariableId contextVar1, Func<T1, TResult> func, bool isConstant)
-      : base(name, isConstant, Array.Empty<Type>(), TypeTraits<TResult>.ValueType, hasContext: true)
+    public ContextualCustomFunction(string name, VariableId contextVar1, Func<T1, TResult> func, bool isDeterministic)
+      : base(name, isDeterministic, Array.Empty<Type>(), TypeTraits<TResult>.ValueType, hasContext: true)
     {
       _func = func ?? throw new ArgumentNullException(nameof(func));
       _contextVar1 = contextVar1;
@@ -222,8 +222,8 @@ namespace EpsilonScript.Function
     private readonly Func<T1, T2, TResult> _func;
     private readonly VariableId _contextVar1;
 
-    public ContextualCustomFunction(string name, VariableId contextVar1, Func<T1, T2, TResult> func, bool isConstant)
-      : base(name, isConstant, ParameterCache, TypeTraits<TResult>.ValueType, hasContext: true)
+    public ContextualCustomFunction(string name, VariableId contextVar1, Func<T1, T2, TResult> func, bool isDeterministic)
+      : base(name, isDeterministic, ParameterCache, TypeTraits<TResult>.ValueType, hasContext: true)
     {
       _func = func ?? throw new ArgumentNullException(nameof(func));
       _contextVar1 = contextVar1;
@@ -297,8 +297,8 @@ namespace EpsilonScript.Function
     private readonly Func<T1, T2, T3, TResult> _func;
     private readonly VariableId _contextVar1;
 
-    public ContextualCustomFunction(string name, VariableId contextVar1, Func<T1, T2, T3, TResult> func, bool isConstant)
-      : base(name, isConstant, ParameterCache, TypeTraits<TResult>.ValueType, hasContext: true)
+    public ContextualCustomFunction(string name, VariableId contextVar1, Func<T1, T2, T3, TResult> func, bool isDeterministic)
+      : base(name, isDeterministic, ParameterCache, TypeTraits<TResult>.ValueType, hasContext: true)
     {
       _func = func ?? throw new ArgumentNullException(nameof(func));
       _contextVar1 = contextVar1;
@@ -373,8 +373,8 @@ namespace EpsilonScript.Function
     private readonly Func<T1, T2, T3, T4, TResult> _func;
     private readonly VariableId _contextVar1;
 
-    public ContextualCustomFunction(string name, VariableId contextVar1, Func<T1, T2, T3, T4, TResult> func, bool isConstant)
-      : base(name, isConstant, ParameterCache, TypeTraits<TResult>.ValueType, hasContext: true)
+    public ContextualCustomFunction(string name, VariableId contextVar1, Func<T1, T2, T3, T4, TResult> func, bool isDeterministic)
+      : base(name, isDeterministic, ParameterCache, TypeTraits<TResult>.ValueType, hasContext: true)
     {
       _func = func ?? throw new ArgumentNullException(nameof(func));
       _contextVar1 = contextVar1;
@@ -448,8 +448,8 @@ namespace EpsilonScript.Function
     private readonly VariableId _contextVar1;
     private readonly VariableId _contextVar2;
 
-    public ContextualCustomFunction2(string name, VariableId contextVar1, VariableId contextVar2, Func<T1, T2, TResult> func, bool isConstant)
-      : base(name, isConstant, Array.Empty<Type>(), TypeTraits<TResult>.ValueType, hasContext: true)
+    public ContextualCustomFunction2(string name, VariableId contextVar1, VariableId contextVar2, Func<T1, T2, TResult> func, bool isDeterministic)
+      : base(name, isDeterministic, Array.Empty<Type>(), TypeTraits<TResult>.ValueType, hasContext: true)
     {
       _func = func ?? throw new ArgumentNullException(nameof(func));
       _contextVar1 = contextVar1;
@@ -529,8 +529,8 @@ namespace EpsilonScript.Function
     private readonly VariableId _contextVar1;
     private readonly VariableId _contextVar2;
 
-    public ContextualCustomFunction2(string name, VariableId contextVar1, VariableId contextVar2, Func<T1, T2, T3, TResult> func, bool isConstant)
-      : base(name, isConstant, ParameterCache, TypeTraits<TResult>.ValueType, hasContext: true)
+    public ContextualCustomFunction2(string name, VariableId contextVar1, VariableId contextVar2, Func<T1, T2, T3, TResult> func, bool isDeterministic)
+      : base(name, isDeterministic, ParameterCache, TypeTraits<TResult>.ValueType, hasContext: true)
     {
       _func = func ?? throw new ArgumentNullException(nameof(func));
       _contextVar1 = contextVar1;
@@ -611,8 +611,8 @@ namespace EpsilonScript.Function
     private readonly VariableId _contextVar1;
     private readonly VariableId _contextVar2;
 
-    public ContextualCustomFunction2(string name, VariableId contextVar1, VariableId contextVar2, Func<T1, T2, T3, T4, TResult> func, bool isConstant)
-      : base(name, isConstant, ParameterCache, TypeTraits<TResult>.ValueType, hasContext: true)
+    public ContextualCustomFunction2(string name, VariableId contextVar1, VariableId contextVar2, Func<T1, T2, T3, T4, TResult> func, bool isDeterministic)
+      : base(name, isDeterministic, ParameterCache, TypeTraits<TResult>.ValueType, hasContext: true)
     {
       _func = func ?? throw new ArgumentNullException(nameof(func));
       _contextVar1 = contextVar1;
@@ -694,8 +694,8 @@ namespace EpsilonScript.Function
     private readonly VariableId _contextVar1;
     private readonly VariableId _contextVar2;
 
-    public ContextualCustomFunction2(string name, VariableId contextVar1, VariableId contextVar2, Func<T1, T2, T3, T4, T5, TResult> func, bool isConstant)
-      : base(name, isConstant, ParameterCache, TypeTraits<TResult>.ValueType, hasContext: true)
+    public ContextualCustomFunction2(string name, VariableId contextVar1, VariableId contextVar2, Func<T1, T2, T3, T4, T5, TResult> func, bool isDeterministic)
+      : base(name, isDeterministic, ParameterCache, TypeTraits<TResult>.ValueType, hasContext: true)
     {
       _func = func ?? throw new ArgumentNullException(nameof(func));
       _contextVar1 = contextVar1;
@@ -776,8 +776,8 @@ namespace EpsilonScript.Function
     private readonly VariableId _contextVar2;
     private readonly VariableId _contextVar3;
 
-    public ContextualCustomFunction3(string name, VariableId contextVar1, VariableId contextVar2, VariableId contextVar3, Func<T1, T2, T3, TResult> func, bool isConstant)
-      : base(name, isConstant, Array.Empty<Type>(), TypeTraits<TResult>.ValueType, hasContext: true)
+    public ContextualCustomFunction3(string name, VariableId contextVar1, VariableId contextVar2, VariableId contextVar3, Func<T1, T2, T3, TResult> func, bool isDeterministic)
+      : base(name, isDeterministic, Array.Empty<Type>(), TypeTraits<TResult>.ValueType, hasContext: true)
     {
       _func = func ?? throw new ArgumentNullException(nameof(func));
       _contextVar1 = contextVar1;
@@ -864,8 +864,8 @@ namespace EpsilonScript.Function
     private readonly VariableId _contextVar2;
     private readonly VariableId _contextVar3;
 
-    public ContextualCustomFunction3(string name, VariableId contextVar1, VariableId contextVar2, VariableId contextVar3, Func<T1, T2, T3, T4, TResult> func, bool isConstant)
-      : base(name, isConstant, ParameterCache, TypeTraits<TResult>.ValueType, hasContext: true)
+    public ContextualCustomFunction3(string name, VariableId contextVar1, VariableId contextVar2, VariableId contextVar3, Func<T1, T2, T3, T4, TResult> func, bool isDeterministic)
+      : base(name, isDeterministic, ParameterCache, TypeTraits<TResult>.ValueType, hasContext: true)
     {
       _func = func ?? throw new ArgumentNullException(nameof(func));
       _contextVar1 = contextVar1;
@@ -953,8 +953,8 @@ namespace EpsilonScript.Function
     private readonly VariableId _contextVar2;
     private readonly VariableId _contextVar3;
 
-    public ContextualCustomFunction3(string name, VariableId contextVar1, VariableId contextVar2, VariableId contextVar3, Func<T1, T2, T3, T4, T5, TResult> func, bool isConstant)
-      : base(name, isConstant, ParameterCache, TypeTraits<TResult>.ValueType, hasContext: true)
+    public ContextualCustomFunction3(string name, VariableId contextVar1, VariableId contextVar2, VariableId contextVar3, Func<T1, T2, T3, T4, T5, TResult> func, bool isDeterministic)
+      : base(name, isDeterministic, ParameterCache, TypeTraits<TResult>.ValueType, hasContext: true)
     {
       _func = func ?? throw new ArgumentNullException(nameof(func));
       _contextVar1 = contextVar1;
@@ -1043,8 +1043,8 @@ namespace EpsilonScript.Function
     private readonly VariableId _contextVar2;
     private readonly VariableId _contextVar3;
 
-    public ContextualCustomFunction3(string name, VariableId contextVar1, VariableId contextVar2, VariableId contextVar3, Func<T1, T2, T3, T4, T5, T6, TResult> func, bool isConstant)
-      : base(name, isConstant, ParameterCache, TypeTraits<TResult>.ValueType, hasContext: true)
+    public ContextualCustomFunction3(string name, VariableId contextVar1, VariableId contextVar2, VariableId contextVar3, Func<T1, T2, T3, T4, T5, T6, TResult> func, bool isDeterministic)
+      : base(name, isDeterministic, ParameterCache, TypeTraits<TResult>.ValueType, hasContext: true)
     {
       _func = func ?? throw new ArgumentNullException(nameof(func));
       _contextVar1 = contextVar1;

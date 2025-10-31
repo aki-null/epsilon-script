@@ -8,7 +8,7 @@ namespace EpsilonScript.AST
   {
     private Node _childNode;
 
-    public override bool IsConstant => _childNode.IsConstant;
+    public override bool IsPrecomputable => _childNode.IsPrecomputable;
 
     public override void Build(Stack<Node> rpnStack, Element element, Compiler.Options options,
       IVariableContainer variables, IDictionary<VariableId, CustomFunctionOverload> functions,
@@ -35,7 +35,7 @@ namespace EpsilonScript.AST
 
     public override Node Optimize()
     {
-      if (IsConstant)
+      if (IsPrecomputable)
       {
         Execute(null);
         return CreateValueNode();

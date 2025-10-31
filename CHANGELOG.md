@@ -1,6 +1,6 @@
 # Changelog
 
-## [1.4.0] - 2025-XX-XX
+## [2.0.0] - 2025-XX-XX
 
 ### Added
 - **Contextual Custom Functions**: Functions can read variables from execution environment without explicit parameters
@@ -8,6 +8,9 @@
   - Supports up to 3 context variables and 3 script parameters
 
 ### Changed
+- **BREAKING CHANGE**: `CustomFunction.Create()` parameter renamed from `isConstant` to `isDeterministic`
+  - `CustomFunction.IsConstant` property renamed to `IsDeterministic`
+- **BREAKING CHANGE**: `CompiledScript.IsConstant` property renamed to `IsPrecomputable`
 - **BREAKING CHANGE - Parser Validation**: Syntax errors now detected earlier during compilation
   - Adjacent values without operators (e.g., `1 2`, `x y`)
   - Trailing and leading operators (e.g., `1 +`, `+ 1`)

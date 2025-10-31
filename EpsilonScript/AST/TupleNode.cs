@@ -6,13 +6,13 @@ namespace EpsilonScript.AST
 {
   internal class TupleNode : Node
   {
-    public override bool IsConstant
+    public override bool IsPrecomputable
     {
       get
       {
         foreach (var child in TupleValue)
         {
-          if (!child.IsConstant)
+          if (!child.IsPrecomputable)
           {
             return false;
           }

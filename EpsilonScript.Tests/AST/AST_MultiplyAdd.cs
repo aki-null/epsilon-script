@@ -163,7 +163,7 @@ namespace EpsilonScript.Tests.AST
       var result = CompileAndExecute("(2 * 3) + 4");
 
       Assert.Equal(10, result.IntegerValue);
-      Assert.True(result.IsConstant);
+      Assert.True(result.IsPrecomputable);
     }
 
     [Fact]
@@ -373,7 +373,7 @@ namespace EpsilonScript.Tests.AST
       var result = CompileAndExecute("(2 * 3) - 4");
 
       Assert.Equal(2, result.IntegerValue);
-      Assert.True(result.IsConstant);
+      Assert.True(result.IsPrecomputable);
     }
 
     [Fact]
@@ -383,7 +383,7 @@ namespace EpsilonScript.Tests.AST
       var result = CompileAndExecute("10 - (2 * 3)");
 
       Assert.Equal(4, result.IntegerValue);
-      Assert.True(result.IsConstant);
+      Assert.True(result.IsPrecomputable);
     }
 
     [Fact]

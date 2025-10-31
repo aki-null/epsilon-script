@@ -8,7 +8,7 @@ namespace EpsilonScript.Function
   {
     public Type[] ParameterTypes { get; }
 
-    protected CustomFunction(string name, bool isConstant, Type[] parameterTypes, Type returnType,
+    protected CustomFunction(string name, bool isDeterministic, Type[] parameterTypes, Type returnType,
       bool hasContext = false)
     {
       if (string.IsNullOrEmpty(name))
@@ -17,16 +17,16 @@ namespace EpsilonScript.Function
       }
 
       Name = name;
-      IsConstant = isConstant;
+      IsDeterministic = isDeterministic;
       ParameterTypes = parameterTypes ?? Array.Empty<Type>();
       ReturnType = returnType;
-      HasContext = hasContext;
+      IsContextual = hasContext;
     }
 
     public VariableId Name { get; }
-    public bool IsConstant { get; }
+    public bool IsDeterministic { get; }
     public Type ReturnType { get; }
-    public bool HasContext { get; }
+    public bool IsContextual { get; }
 
     private protected void EnsureParameterCount(List<Node> parameters)
     {

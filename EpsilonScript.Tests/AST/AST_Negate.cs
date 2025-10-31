@@ -95,7 +95,7 @@ namespace EpsilonScript.Tests.AST
     [Theory]
     [InlineData(true)]
     [InlineData(false)]
-    internal void AST_Negate_IsConstant_ReflectsChildConstantness(bool childValue)
+    internal void AST_Negate_IsPrecomputable_ReflectsChildConstantness(bool childValue)
     {
       var node = new NegateNode();
       var childNode = new FakeBooleanNode(childValue); // FakeNode is constant
@@ -105,11 +105,11 @@ namespace EpsilonScript.Tests.AST
       node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
         Compiler.FloatPrecision.Float);
 
-      Assert.True(node.IsConstant); // Child is constant, so negate should be constant
+      Assert.True(node.IsPrecomputable); // Child is constant, so negate should be constant
     }
 
     [Fact]
-    internal void AST_Negate_IsConstant_WithVariableChild_ReturnsFalse()
+    internal void AST_Negate_IsPrecomputable_WithVariableChild_ReturnsFalse()
     {
       var node = new NegateNode();
       var childNode = new TestVariableNode(); // Variable node is not constant
@@ -119,7 +119,7 @@ namespace EpsilonScript.Tests.AST
       node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
         Compiler.FloatPrecision.Float);
 
-      Assert.False(node.IsConstant); // Child is not constant, so negate should not be constant
+      Assert.False(node.IsPrecomputable); // Child is not constant, so negate should not be constant
     }
 
     [Theory]
@@ -200,7 +200,7 @@ namespace EpsilonScript.Tests.AST
     // Helper class for testing non-constant nodes
     private class TestVariableNode : Node
     {
-      public override bool IsConstant => false; // Not constant
+      public override bool IsPrecomputable => false; // Not constant
 
       public TestVariableNode()
       {

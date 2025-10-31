@@ -87,9 +87,9 @@ namespace EpsilonScript.Function
     var funcParams = TypeParams(paramCount);
     var hasParams = paramCount > 0;
 #>
-    public static CustomFunction Create<#= typeArgs #>(string name, Func<<#= hasParams ? $"{funcParams}, " : string.Empty #>TResult> func, bool isConstant = false)
+    public static CustomFunction Create<#= typeArgs #>(string name, Func<<#= hasParams ? $"{funcParams}, " : string.Empty #>TResult> func, bool isDeterministic = false)
     {
-      return new CustomFunction<#= typeArgs #>(name, func, isConstant);
+      return new CustomFunction<#= typeArgs #>(name, func, isDeterministic);
     }
 
 <#
@@ -133,8 +133,8 @@ namespace EpsilonScript.Function
 #>
     private readonly Func<<#= hasParams ? $"{funcParams}, " : string.Empty #>TResult> _func;
 
-    public CustomFunction(string name, Func<<#= hasParams ? $"{funcParams}, " : string.Empty #>TResult> func, bool isConstant = false)
-      : base(name, isConstant, <#=
+    public CustomFunction(string name, Func<<#= hasParams ? $"{funcParams}, " : string.Empty #>TResult> func, bool isDeterministic = false)
+      : base(name, isDeterministic, <#=
       hasParams ? "ParameterCache" : "Array.Empty<Type>()" #>, TypeTraits<TResult>.ValueType)
     {
       _func = func ?? throw new ArgumentNullException(nameof(func));

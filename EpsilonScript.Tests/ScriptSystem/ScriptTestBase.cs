@@ -74,7 +74,7 @@ namespace EpsilonScript.Tests.ScriptSystem
       public DictionaryVariableContainer Variables { get; }
 
       public Type Type => Script.ValueType;
-      public bool IsConstant => Script.IsConstant;
+      public bool IsPrecomputable => Script.IsPrecomputable;
       public int IntegerValue => Script.IntegerValue;
       public float FloatValue => Script.FloatValue;
       public bool BooleanValue => Script.BooleanValue;
