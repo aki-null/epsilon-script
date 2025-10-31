@@ -327,7 +327,7 @@ CustomFunction.Create("rand", (float max) => Random.Range(0.0f, max))
 CustomFunction.Create("set_score", (int score) => { gameState.Score = score; return score; })
 ```
 
-### Built-in Functions
+#### Built-in Functions
 
 - Trigonometric: `sin`, `cos`, `tan`, `asin`, `acos`, `atan`, `atan2`, `sinh`, `cosh`, `tanh`
 - Math: `sqrt`, `abs`, `floor`, `ceil`, `trunc`, `pow`, `min`, `max`
