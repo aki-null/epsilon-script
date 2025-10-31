@@ -126,7 +126,7 @@ Alternatively, add it to your `Packages/manifest.json`:
 ```
 
 ## Project State
-All features should be stable for production use.
+All features are stable.
 
 See [changelog](CHANGELOG.md) for release notes and version history.
 
