@@ -211,7 +211,8 @@ var script2 = compiler.Compile("health -= damage", Compiler.Options.None, variab
 script2.Execute(); // Works
 
 // Immutable mode with assignment - throws exception at compile time
-var script3 = compiler.Compile("health -= damage", Compiler.Options.Immutable, variables); // Exception!
+var script3 = compiler.Compile(
+    "health -= damage", Compiler.Options.Immutable, variables); // Exception!
 ```
 
 #### Variable Container Override
@@ -304,7 +305,8 @@ compiler.AddCustomFunction(
         Math.Max(min, Math.Min(max, val))));
 
 var variables = new DictionaryVariableContainer { ["damage"] = new VariableValue(50) };
-var script = compiler.Compile("clamp(damage * 1.5, 10, 100)", Compiler.Options.Immutable, variables);
+var script = compiler.Compile(
+    "clamp(damage * 1.5, 10, 100)", Compiler.Options.Immutable, variables);
 script.Execute();
 Console.WriteLine(script.FloatValue); // 75
 ```
@@ -359,7 +361,8 @@ CustomFunction.Create("clamp", (float val, float min, float max) =>
 When all parameters are constant values (not variables), deterministic functions are evaluated at compile time:
 
 ```c#
-compiler.AddCustomFunction(CustomFunction.Create("sin", (float v) => MathF.Sin(v), isDeterministic: true));
+compiler.AddCustomFunction(
+    CustomFunction.Create("sin", (float v) => MathF.Sin(v), isDeterministic: true));
 
 // Evaluated at compile time - sin(1.5708) is cached as ~1.0
 var script = compiler.Compile("sin(3.141592 / 2) * 10");
