@@ -90,8 +90,8 @@ Console.WriteLine(script.FloatValue); // 150
   - [Expression Sequencing](#expression-sequencing)
 - [Numeric Precision](#numeric-precision)
 - [Heap Allocations](#heap-allocations)
-- [Use Cases](#use-cases)
-- [Context](#context)
+- [Motivation](#motivation)
+- [Development](#development)
 
 ## Features
 - Mathematical expressions
@@ -595,15 +595,19 @@ Constant string concatenation happens at compilation and produces no garbage:
 
 Custom functions that allocate memory will produce garbage when called.
 
-## Use Cases
+## Motivation
 
-### Condition Validator
+Game designers need to express logic. A quest might require "the player fought no monsters and has the key". Damage calculation might depend on weapon type and armor type. These conditions are too complex for simple data tables but don't need full scripting languages.
 
-Game designers often need to express conditions. For example, a character might act differently based on player actions:
+The usual options don't fit well. Pure data (Excel, JSON, Unity serialization) means asking programmers to add new columns or special cases for each new rule. Full scripting languages (Lua, Python) give designers freedom to write anything—including infinite loops, performance problems, or code that breaks game systems in subtle ways.
 
-```
-monsters_fought == 0 && has_key
-```
+EpsilonScript narrows the scope to just expressions. No loops. No variable declarations. Just evaluate an expression and return a result. This constraint is the point: designers can express complex calculations and conditions, but can't write code that spirals into maintenance problems.
+
+Expressions need to run fast because they run often—hundreds of times per frame in game loops. Compilation happens once, producing a reusable script that executes without reparsing or allocating memory. The variable container pattern means you compile "health - damage" once, then execute it for every entity that needs that calculation.
+
+The syntax deliberately omits features that hurt readability. No ternary operator—use `ifelse(condition, true_value, false_value)` instead. No implicit behaviors that require remembering special cases. Programmers control exactly what functions exist and what they do. The result is expressions that everyone on the team can read.
+
+Within visual scripting systems, EpsilonScript handles the case where connecting nodes becomes tedious. Wiring up "base_damage * weapon_effectiveness(weapon, armor) * range_modifier" with individual nodes creates clutter. An expression node keeps the graph focused on control flow while delegating calculations to text, which is clearer for that purpose.
 
 ## Development
 
@@ -634,13 +638,3 @@ cd EpsilonScript/Function
 t4 CustomFunction.Generated.tt
 t4 CustomFunction.Contextual.Generated.tt
 ```
-
-## Context
-
-Scripting engines like Lua provide maximum freedom but aren't always feasible. Games need frequent updates with minimal regression risk.
-
-Data-driven approaches (Excel, Google Sheets, Unity serialization) offer control but make complex expressions cumbersome or impossible. EpsilonScript provides expression power in a controlled environment.
-
-Node-based visual scripting can make complex expressions difficult to read and understand. Text expressions are faster to write and easier to read.
-
-Features that complicate reading are avoided. For example, the ternary operator isn't implemented—use the `ifelse` function for clearer syntax.
