@@ -4,38 +4,65 @@ EpsilonScript is an embeddable expression engine for C# with functions and alloc
 
 It targets .NET Standard 2.1.
 
+**Basic expressions:**
 ```c#
-// Setup: Add custom functions to access game state
 var compiler = new Compiler();
-compiler.AddCustomFunction(CustomFunction.Create("player_level", () => Player.Level));
-compiler.AddCustomFunction(CustomFunction.Create("has_item", (string item) => Inventory.Contains(item)));
+var script = compiler.Compile("10 + 20 * 2");
+script.Execute();
+Console.WriteLine(script.IntegerValue); // 50
+```
 
-// Compile expressions once, execute many times with zero allocations
-var unlockCondition = compiler.Compile(
-    "player_level() >= 10 && has_item(\"ancient_key\")",
-    Compiler.Options.Immutable);
-
-// Execute expression
-unlockCondition.Execute();
-if (unlockCondition.BooleanValue)
-{
-    UnlockSecretArea();
-}
-
-// Dynamic damage calculation with variables
+**With variables:**
+```c#
 var variables = new DictionaryVariableContainer
 {
-    ["base_damage"] = new VariableValue(50),
-    ["critical_multiplier"] = new VariableValue(1.5f)
+    ["health"] = new VariableValue(100),
+    ["damage"] = new VariableValue(25)
+};
+var script = compiler.Compile("health - damage", Compiler.Options.Immutable, variables);
+script.Execute();
+Console.WriteLine(script.IntegerValue); // 75
+```
+
+**Swapping variable containers:**
+```c#
+// Compile once
+var script = compiler.Compile("health - damage", Compiler.Options.Immutable);
+
+// Execute with different containers
+var player1 = new DictionaryVariableContainer { ["health"] = new VariableValue(100), ["damage"] = new VariableValue(25) };
+var player2 = new DictionaryVariableContainer { ["health"] = new VariableValue(80), ["damage"] = new VariableValue(30) };
+
+script.Execute(player1);
+Console.WriteLine(script.IntegerValue); // 75
+
+script.Execute(player2);
+Console.WriteLine(script.IntegerValue); // 50
+```
+
+**With custom functions:**
+```c#
+// Weapon effectiveness table - too complex to express inline
+compiler.AddCustomFunction(CustomFunction.Create("weapon_effectiveness",
+    (string weaponType, string armorType) => (weaponType, armorType) switch
+    {
+        ("hammer", "heavy") => 1.5f,
+        ("hammer", "light") => 0.8f,
+        ("sword", "heavy") => 0.8f,
+        ("sword", "light") => 1.2f,
+        _ => 1.0f
+    }));
+
+var variables = new DictionaryVariableContainer
+{
+    ["base_damage"] = new VariableValue(100),
+    ["weapon"] = new VariableValue("hammer"),
+    ["armor"] = new VariableValue("heavy")
 };
 
-var damageFormula = compiler.Compile(
-    "base_damage * critical_multiplier * (1.0 + player_level() / 100.0)",
-    Compiler.Options.Immutable,
-    variables);
-
-damageFormula.Execute();
-int damage = (int)damageFormula.FloatValue; // 82 at level 10
+var script = compiler.Compile("base_damage * weapon_effectiveness(weapon, armor)", Compiler.Options.Immutable);
+script.Execute(variables);
+Console.WriteLine(script.FloatValue); // 150
 ```
 
 ## Table of Contents
