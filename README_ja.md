@@ -109,7 +109,7 @@ Console.WriteLine(script.FloatValue); // 150
 Unity Package Managerからパッケージを追加できます:
 
 1. **Window > Package Manager**を開きます
-2. 左上の**+**ボタンをクリックします
+2. 左上の **+** ボタンをクリックします
 3. **Add package from git URL**を選択します
 4. 以下のURLを入力します: `https://github.com/aki-null/epsilon-script-unity.git`
 
