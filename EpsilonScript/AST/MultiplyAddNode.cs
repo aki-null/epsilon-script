@@ -26,6 +26,7 @@ namespace EpsilonScript.AST
     private readonly Type _configuredIntegerType;
     private readonly Type _configuredFloatType;
     private readonly OperationMode _mode;
+    private bool _noAllocMode;
 
     public override bool IsPrecomputable =>
       _multiplier1.IsPrecomputable && _multiplier2.IsPrecomputable && _addend.IsPrecomputable;
@@ -198,6 +199,13 @@ namespace EpsilonScript.AST
           // This maintains compatibility with ArithmeticNode: only "string + X" is allowed, not "X + string"
           if (_mode == OperationMode.AddMultiply && _addend.ValueType == ExtendedType.String)
           {
+            // NoAlloc validation: Block runtime string concatenation
+            if (_noAllocMode)
+            {
+              throw new RuntimeException(
+                "String concatenation is not allowed in NoAlloc mode (causes runtime heap allocation)");
+            }
+
             // Compute product based on multiply type, then format to string
             switch (multiplyType)
             {
@@ -255,6 +263,14 @@ namespace EpsilonScript.AST
       _addend = _addend.Optimize();
 
       return this;
+    }
+
+    public override void ConfigureNoAlloc()
+    {
+      _noAllocMode = true;
+      _multiplier1?.ConfigureNoAlloc();
+      _multiplier2?.ConfigureNoAlloc();
+      _addend?.ConfigureNoAlloc();
     }
   }
 }

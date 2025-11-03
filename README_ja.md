@@ -574,26 +574,43 @@ Console.WriteLine(script.DoubleValue); // 26.25
 
 ## ヒープアロケーション
 
-ゲーム開発では、ヒープへのメモリ割り当てがパフォーマンス上の懸念事項になります。
-
 EpsilonScriptは、コンパイル後の実行時にはメモリ割り当てが発生しないよう設計されていますが、いくつか例外があります:
 
-### 文字列の連結
-
-変数を含む文字列の連結では、ヒープ割り当てが発生します:
-```
-"Debug: " + i
-```
-ここで`i`は変数です。
-
-定数同士の連結はコンパイル時に処理されるため、メモリ割り当ては発生しません:
-```
-"Debug: " + 42 * 42
+文字列連結で変数を含む場合はメモリを割り当てます:
+```csharp
+"Debug: " + variable  // 実行時にメモリ割り当て
 ```
 
-### カスタム関数
+`ToString()`呼び出しによる型変換はメモリを割り当てます:
+```csharp
+stringVar = 42  // ToString()を呼び出し、メモリ割り当て
+```
 
-カスタム関数内でメモリ割り当てを行う場合、呼び出し時にメモリ割り当てが発生します。
+カスタム関数は、実装次第でメモリを割り当てます。
+
+定数式はコンパイル時に最適化され、メモリを割り当てません:
+```csharp
+"BUILD_FLAG_" + 4  // "BUILD_FLAG_4"に最適化、実行時にメモリ割り当てなし
+```
+
+### ゼロアロケーションの強制
+
+`Compiler.Options.NoAlloc`を使用すると、メモリ割り当てを行う操作の実行時にRuntimeExceptionをスローします:
+
+```csharp
+// メモリ割り当てなし:
+var script = compiler.Compile("x * 2 + 1", Compiler.Options.NoAlloc, variables);
+script.Execute();
+
+// RuntimeExceptionをスロー:
+compiler.Compile("\"Debug: \" + variable", Compiler.Options.NoAlloc, variables).Execute();
+compiler.Compile("stringVar = 42", Compiler.Options.NoAlloc, variables).Execute();
+
+// 例外なし - 定数に最適化される:
+compiler.Compile("\"BUILD_FLAG_\" + 4", Compiler.Options.NoAlloc).Execute();
+```
+
+NoAllocモードはカスタム関数の内部を検証しません。
 
 ## 設計思想
 

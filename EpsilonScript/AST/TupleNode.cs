@@ -67,5 +67,16 @@ namespace EpsilonScript.AST
 
       return this;
     }
+
+    public override void ConfigureNoAlloc()
+    {
+      if (TupleValue != null)
+      {
+        foreach (var child in TupleValue)
+        {
+          child?.ConfigureNoAlloc();
+        }
+      }
+    }
   }
 }

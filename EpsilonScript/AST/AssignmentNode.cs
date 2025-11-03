@@ -10,6 +10,7 @@ namespace EpsilonScript.AST
     private Node _leftNode;
     private Node _rightNode;
     private ElementType _assignmentType;
+    private bool _noAllocMode;
 
     public override bool IsPrecomputable => false;
 
@@ -41,6 +42,14 @@ namespace EpsilonScript.AST
       }
 
       var variable = _leftNode.Variable;
+
+      // NoAlloc validation: Block assignments that cause ToString() allocation
+      // Assigning non-string to string variable calls ToString() in VariableValue setter
+      if (_noAllocMode && variable.Type == Type.String && _rightNode.ValueType != ExtendedType.String)
+      {
+        throw new RuntimeException(
+          "Assigning non-string value to string variable causes allocation (ToString()) in NoAlloc mode");
+      }
 
       switch (_assignmentType)
       {
@@ -226,6 +235,13 @@ namespace EpsilonScript.AST
         default:
           throw new ArgumentOutOfRangeException(nameof(variable.Type), variable.Type, "Unsupported variable type");
       }
+    }
+
+    public override void ConfigureNoAlloc()
+    {
+      _noAllocMode = true;
+      _leftNode?.ConfigureNoAlloc();
+      _rightNode?.ConfigureNoAlloc();
     }
   }
 }

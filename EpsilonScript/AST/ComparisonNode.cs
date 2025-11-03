@@ -222,5 +222,11 @@ namespace EpsilonScript.AST
       _rightNode = _rightNode.Optimize();
       return this;
     }
+
+    public override void ConfigureNoAlloc()
+    {
+      _leftNode?.ConfigureNoAlloc();
+      _rightNode?.ConfigureNoAlloc();
+    }
   }
 }

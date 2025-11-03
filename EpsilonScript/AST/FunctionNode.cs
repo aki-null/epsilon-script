@@ -205,5 +205,16 @@ namespace EpsilonScript.AST
 
       return this;
     }
+
+    public override void ConfigureNoAlloc()
+    {
+      if (_parameters != null)
+      {
+        foreach (var param in _parameters)
+        {
+          param?.ConfigureNoAlloc();
+        }
+      }
+    }
   }
 }

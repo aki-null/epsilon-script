@@ -133,5 +133,10 @@ namespace EpsilonScript.AST
       _childNode = _childNode.Optimize();
       return this;
     }
+
+    public override void ConfigureNoAlloc()
+    {
+      _childNode?.ConfigureNoAlloc();
+    }
   }
 }

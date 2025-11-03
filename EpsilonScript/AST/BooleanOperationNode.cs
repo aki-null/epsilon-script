@@ -190,5 +190,11 @@ namespace EpsilonScript.AST
 
       return this;
     }
+
+    public override void ConfigureNoAlloc()
+    {
+      _leftNode?.ConfigureNoAlloc();
+      _rightNode?.ConfigureNoAlloc();
+    }
   }
 }

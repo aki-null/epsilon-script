@@ -1,6 +1,11 @@
 # Changelog
 
-## [2.0.1] - 2025-XX-XX
+## [2.1.0] - 2025-XX-XX
+
+### Added
+- **NoAlloc Compiler Option**: Blocks runtime heap allocations
+  - `Compiler.Options.NoAlloc` flag throws `RuntimeException` for string concatenation and `ToString()` calls
+  - Compile-time constants are optimized away and allowed
 
 ### Fixed
 - **Comparison Validation**: Boolean vs String comparisons now properly rejected in both directions

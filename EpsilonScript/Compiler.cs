@@ -8,11 +8,26 @@ namespace EpsilonScript
 {
   public class Compiler
   {
+    /// <summary>
+    /// Compiler options that control script compilation behavior.
+    /// These flags can be combined using bitwise OR operations.
+    /// </summary>
     [Flags]
     public enum Options : short
     {
+      /// <summary>No options enabled (default).</summary>
       None = 0,
-      Immutable = 1,
+
+      /// <summary>
+      /// Prevents variable assignments. Scripts become immutable expressions.
+      /// </summary>
+      Immutable = 1 << 0,
+
+      /// <summary>
+      /// Blocks runtime heap allocations (string allocations).
+      /// Compile-time constants are optimized and allowed.
+      /// </summary>
+      NoAlloc = 1 << 1,
     }
 
     public enum IntegerPrecision
@@ -211,6 +226,12 @@ namespace EpsilonScript
       new Lexer.Lexer().Execute(source, _tokenParser);
       var rootNode = _astBuilder.Result;
       rootNode = rootNode.Optimize();
+
+      // Configure NoAlloc validation after optimization completes
+      if ((options & Options.NoAlloc) == Options.NoAlloc)
+      {
+        rootNode.ConfigureNoAlloc();
+      }
 
       _astBuilder.Reset();
       _rpnConverter.Reset();

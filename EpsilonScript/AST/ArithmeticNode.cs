@@ -12,6 +12,7 @@ namespace EpsilonScript.AST
     private ElementType _operator;
     private Type _configuredIntegerType;
     private Type _configuredFloatType;
+    private bool _noAllocMode;
 
     public override bool IsPrecomputable => _leftNode.IsPrecomputable && _rightNode.IsPrecomputable;
 
@@ -81,6 +82,13 @@ namespace EpsilonScript.AST
       }
 
       ValueType = PromoteType(_leftNode.ValueType, _rightNode.ValueType);
+
+      // NoAlloc validation: Block runtime string concatenation
+      if (_noAllocMode && ValueType == ExtendedType.String)
+      {
+        throw new RuntimeException(
+          "String concatenation is not allowed in NoAlloc mode (causes runtime heap allocation)");
+      }
 
       var targetType = ValueType;
       switch (targetType)
@@ -261,6 +269,13 @@ namespace EpsilonScript.AST
         default:
           return this;
       }
+    }
+
+    public override void ConfigureNoAlloc()
+    {
+      _noAllocMode = true;
+      _leftNode?.ConfigureNoAlloc();
+      _rightNode?.ConfigureNoAlloc();
     }
   }
 }

@@ -283,6 +283,15 @@ namespace EpsilonScript.AST
       return this;
     }
 
+    /// <summary>
+    /// Configures NoAlloc validation on this node and all child nodes recursively.
+    /// Called after optimization phase completes to enable runtime allocation checking.
+    /// </summary>
+    public virtual void ConfigureNoAlloc()
+    {
+      // Base implementation does nothing - leaf nodes don't need validation
+    }
+
     protected Node CreateValueNode()
     {
       return ValueType switch

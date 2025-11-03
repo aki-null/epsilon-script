@@ -576,26 +576,43 @@ If parameter types don't match, you'll get a runtime error. Integer arguments au
 
 ## Heap Allocations
 
-Heap allocations are a concern for games.
-
 EpsilonScript avoids allocations after compilation, with a few exceptions:
 
-### String Concatenations
-
-String concatenation causes heap allocations:
-```
-"Debug: " + i
-```
-where `i` is a variable.
-
-Constant string concatenation happens at compilation and allocates no memory:
-```
-"Debug: " + 42 * 42
+String concatenation with variables allocates:
+```csharp
+"Debug: " + variable  // Allocates at runtime
 ```
 
-### Custom Functions
+`ToString()` calls from type conversions allocate:
+```csharp
+stringVar = 42  // Calls ToString(), allocates
+```
 
-Custom functions will allocate memory when called if they perform allocations.
+Custom functions allocate if their implementation allocates.
+
+Constant expressions are optimized at compile time and don't allocate:
+```csharp
+"BUILD_FLAG_" + 4  // Optimized to "BUILD_FLAG_4", no runtime allocation
+```
+
+### Enforcing Zero Allocations
+
+Use `Compiler.Options.NoAlloc` to throw RuntimeException when allocating operations are executed:
+
+```csharp
+// No allocations:
+var script = compiler.Compile("x * 2 + 1", Compiler.Options.NoAlloc, variables);
+script.Execute();
+
+// Throws RuntimeException:
+compiler.Compile("\"Debug: \" + variable", Compiler.Options.NoAlloc, variables).Execute();
+compiler.Compile("stringVar = 42", Compiler.Options.NoAlloc, variables).Execute();
+
+// No exception - optimized to constant:
+compiler.Compile("\"BUILD_FLAG_\" + 4", Compiler.Options.NoAlloc).Execute();
+```
+
+NoAlloc mode does not validate custom function internals.
 
 ## Motivation
 
