@@ -1,5 +1,11 @@
 # Changelog
 
+## [2.0.1] - 2025-XX-XX
+
+### Fixed
+- **Comparison Validation**: Boolean vs String comparisons now properly rejected in both directions
+  - Previously `true == "hello"` incorrectly succeeded without throwing exception
+
 ## [2.0.0] - 2025-10-31
 
 ### Added

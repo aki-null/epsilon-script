@@ -68,24 +68,36 @@ namespace EpsilonScript.AST
       {
         case ElementType.ComparisonEqual:
         case ElementType.ComparisonNotEqual:
-          if (_leftNode.ValueType == ExtendedType.Tuple || _rightNode.ValueType == ExtendedType.Tuple)
+          var leftType = _leftNode.ValueType;
+          var rightType = _rightNode.ValueType;
+
+          // Check for tuple types (not comparable)
+          if (leftType == ExtendedType.Tuple || rightType == ExtendedType.Tuple)
           {
             throw new RuntimeException(
-              $"Cannot perform comparison on tuple types (left: {_leftNode.ValueType}, right: {_rightNode.ValueType})");
+              $"Cannot perform comparison on tuple types (left: {leftType}, right: {rightType})");
           }
 
-          // Check for type compatibility: numeric types can only be compared with other numeric types
-          if (_leftNode.IsNumeric != _rightNode.IsNumeric)
+          // Valid comparisons: both numeric, or exact same non-numeric type (String==String, Boolean==Boolean)
+          if (leftType != rightType)
           {
-            throw new RuntimeException(
-              $"Cannot compare incompatible types: {_leftNode.ValueType} and {_rightNode.ValueType} (numeric types can only be compared with other numeric types)");
-          }
+            // Types differ - only valid if both are numeric (allows Integer==Float, etc.)
+            var leftIsNumeric = _leftNode.IsNumeric;
+            var rightIsNumeric = _rightNode.IsNumeric;
 
-          // Additional check for non-numeric types: String can only be compared with String
-          // (Boolean can be compared with Boolean, both are non-numeric, so first check allows it)
-          if (_leftNode.ValueType == ExtendedType.String && _rightNode.ValueType != ExtendedType.String)
-          {
-            throw new RuntimeException("String can only be compared against a string");
+            if (!leftIsNumeric || !rightIsNumeric)
+            {
+              // Provide detailed error message based on which type is non-numeric
+              if (leftIsNumeric || rightIsNumeric)
+              {
+                // One is numeric, one is not
+                throw new RuntimeException(
+                  $"Cannot compare incompatible types: {leftType} and {rightType} (numeric types can only be compared with other numeric types)");
+              }
+
+              // Both are non-numeric but different (e.g., Boolean vs String)
+              throw new RuntimeException($"Cannot compare incompatible types: {leftType} and {rightType}");
+            }
           }
 
           break;
