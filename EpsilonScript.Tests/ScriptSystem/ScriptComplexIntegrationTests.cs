@@ -9,7 +9,7 @@ namespace EpsilonScript.Tests.ScriptSystem
   public class ScriptComplexIntegrationTests : ScriptTestBase
   {
     [Fact]
-    public void ScriptSystem_ComplexArithmeticExpression_EvaluatesCorrectly()
+    public void ComplexArithmeticExpression_EvaluatesCorrectly()
     {
       // Test complex arithmetic: ((5 + 3) * 2 - 4) / 3
       var result = CompileAndExecute("((5 + 3) * 2 - 4) / 3", Compiler.Options.Immutable);
@@ -18,7 +18,7 @@ namespace EpsilonScript.Tests.ScriptSystem
     }
 
     [Fact]
-    public void ScriptSystem_ComplexBooleanExpression_EvaluatesCorrectly()
+    public void ComplexBooleanExpression_EvaluatesCorrectly()
     {
       // Test complex boolean: (x > 5 && y < 10) || (z == 0)
       var variables = Variables()
@@ -33,7 +33,7 @@ namespace EpsilonScript.Tests.ScriptSystem
     }
 
     [Fact]
-    public void ScriptSystem_ComplexMixedTypes_WithStringConcatenation()
+    public void ComplexMixedTypes_WithStringConcatenation()
     {
       // Test mixed types with string concatenation: "Result: " + (5 * 3)
       var result = CompileAndExecute("\"Result: \" + (5 * 3)", Compiler.Options.Immutable);
@@ -42,7 +42,7 @@ namespace EpsilonScript.Tests.ScriptSystem
     }
 
     [Fact]
-    public void ScriptSystem_NestedFunctionCalls_EvaluatesCorrectly()
+    public void NestedFunctionCalls_EvaluatesCorrectly()
     {
       // Test nested function calls with custom functions
       // This test verifies that the script compiler can handle function registration
@@ -59,7 +59,7 @@ namespace EpsilonScript.Tests.ScriptSystem
     }
 
     [Fact]
-    public void ScriptSystem_ComplexSequenceWithAssignments_EvaluatesCorrectly()
+    public void ComplexSequenceWithAssignments_EvaluatesCorrectly()
     {
       // Test sequence with multiple assignments: x = 5; y = x * 2; x + y
       var variables = Variables()
@@ -73,7 +73,7 @@ namespace EpsilonScript.Tests.ScriptSystem
     }
 
     [Fact]
-    public void ScriptSystem_DeepNestedExpressions_HandlesCorrectly()
+    public void DeepNestedExpressions_HandlesCorrectly()
     {
       // Test deeply nested expressions: ((((1 + 2) * 3) + 4) * 5)
       var result = CompileAndExecute("((((1 + 2) * 3) + 4) * 5)", Compiler.Options.Immutable);
@@ -82,7 +82,7 @@ namespace EpsilonScript.Tests.ScriptSystem
     }
 
     [Fact]
-    public void ScriptSystem_ComplexFloatPrecisionExpression_HandlesCorrectly()
+    public void ComplexFloatPrecisionExpression_HandlesCorrectly()
     {
       // Test complex float operations with precision considerations
       var result = CompileAndExecute("(0.1 + 0.2) * 10.0", Compiler.Options.Immutable);
@@ -92,7 +92,7 @@ namespace EpsilonScript.Tests.ScriptSystem
     }
 
     [Fact]
-    public void ScriptSystem_ComplexConditionalLogic_EvaluatesCorrectly()
+    public void ComplexConditionalLogic_EvaluatesCorrectly()
     {
       // Test complex conditional: (age >= 18 && hasLicense) || isEmergency
       var variables = Variables()
@@ -107,7 +107,7 @@ namespace EpsilonScript.Tests.ScriptSystem
     }
 
     [Fact]
-    public void ScriptSystem_LargeExpressionWithManyOperators_PerformsWell()
+    public void LargeExpressionWithManyOperators_PerformsWell()
     {
       // Test performance with a large expression
       var largeExpression = string.Join(" + ", Enumerable.Range(1, 50).Select(i => i.ToString()));
@@ -122,7 +122,7 @@ namespace EpsilonScript.Tests.ScriptSystem
     [InlineData("(1 + 2) * 3", 9)] // Tests parentheses
     [InlineData("10 - 5 - 2", 3)] // Tests left associativity
     [InlineData("2 + 3 * 4 - 1", 13)] // Tests mixed precedence
-    public void ScriptSystem_OperatorPrecedenceAndAssociativity_EvaluatesCorrectly(string expression, int expected)
+    public void OperatorPrecedenceAndAssociativity_EvaluatesCorrectly(string expression, int expected)
     {
       var result = CompileAndExecute(expression, Compiler.Options.Immutable);
 
@@ -130,7 +130,7 @@ namespace EpsilonScript.Tests.ScriptSystem
     }
 
     [Fact]
-    public void ScriptSystem_ComplexStringManipulation_EvaluatesCorrectly()
+    public void ComplexStringManipulation_EvaluatesCorrectly()
     {
       var result = CompileAndExecute("\"Hello\" + \" \" + \"World\" + \"!\"", Compiler.Options.Immutable);
 

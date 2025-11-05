@@ -1,3 +1,4 @@
+using EpsilonScript.Tests.TestInfrastructure;
 using Xunit;
 
 namespace EpsilonScript.Tests.ScriptSystem

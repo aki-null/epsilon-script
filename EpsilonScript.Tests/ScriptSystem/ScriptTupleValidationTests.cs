@@ -339,7 +339,7 @@ namespace EpsilonScript.Tests.ScriptSystem
       var ex = Assert.Throws<ParserException>(() =>
         compiler.Compile("(1, 2)"));
 
-      Assert.Contains("Tuples", ex.Message);
+      Assert.Contains("function parameters", ex.Message);
     }
 
     #endregion

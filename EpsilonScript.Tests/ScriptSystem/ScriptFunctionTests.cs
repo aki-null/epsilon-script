@@ -1,6 +1,7 @@
 using System;
 using Xunit;
 using EpsilonScript.Function;
+using EpsilonScript.Tests.TestInfrastructure;
 
 namespace EpsilonScript.Tests.ScriptSystem
 {
