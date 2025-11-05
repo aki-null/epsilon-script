@@ -105,16 +105,16 @@ namespace EpsilonScript.Tests.ScriptSystem
     public void Function_Nested_10Levels_Works()
     {
       var functions = new CustomFunction[10];
-      for (int i = 0; i < 10; i++)
+      for (var i = 0; i < 10; i++)
       {
-        int level = i; // Capture for closure
+        var level = i; // Capture for closure
         functions[i] = CustomFunction.Create(
           $"level{i}",
           (int x) => x + level);
       }
 
       var expr = "10";
-      for (int i = 0; i < 10; i++)
+      for (var i = 0; i < 10; i++)
       {
         expr = $"level{i}({expr})";
       }

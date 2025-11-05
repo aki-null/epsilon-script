@@ -16,7 +16,7 @@ namespace EpsilonScript.AST
 
     public override bool IsPrecomputable => _leftNode.IsPrecomputable && _rightNode.IsPrecomputable;
 
-    public override void Build(Stack<Node> rpnStack, Element element, Compiler.Options options,
+    protected override void BuildCore(Stack<Node> rpnStack, Element element, Compiler.Options options,
       IVariableContainer variables, IDictionary<VariableId, CustomFunctionOverload> functions,
       Compiler.IntegerPrecision intPrecision, Compiler.FloatPrecision floatPrecision)
     {
@@ -37,7 +37,7 @@ namespace EpsilonScript.AST
           _leftNode.Execute(variablesOverride);
           if (_leftNode.ValueType != ExtendedType.Boolean)
           {
-            throw new RuntimeException(OperationTypeErrorMessage);
+            throw CreateRuntimeException(OperationTypeErrorMessage);
           }
 
           if (_leftNode.BooleanValue)
@@ -49,7 +49,7 @@ namespace EpsilonScript.AST
           _rightNode.Execute(variablesOverride);
           if (_rightNode.ValueType != ExtendedType.Boolean)
           {
-            throw new RuntimeException(OperationTypeErrorMessage);
+            throw CreateRuntimeException(OperationTypeErrorMessage);
           }
 
           BooleanValue = _rightNode.BooleanValue;
@@ -58,7 +58,7 @@ namespace EpsilonScript.AST
           _leftNode.Execute(variablesOverride);
           if (_leftNode.ValueType != ExtendedType.Boolean)
           {
-            throw new RuntimeException(OperationTypeErrorMessage);
+            throw CreateRuntimeException(OperationTypeErrorMessage);
           }
 
           if (!_leftNode.BooleanValue)
@@ -70,7 +70,7 @@ namespace EpsilonScript.AST
           _rightNode.Execute(variablesOverride);
           if (_rightNode.ValueType != ExtendedType.Boolean)
           {
-            throw new RuntimeException(OperationTypeErrorMessage);
+            throw CreateRuntimeException(OperationTypeErrorMessage);
           }
 
           BooleanValue = _rightNode.BooleanValue;
@@ -189,6 +189,12 @@ namespace EpsilonScript.AST
       }
 
       return this;
+    }
+
+    public override void Validate()
+    {
+      _leftNode?.Validate();
+      _rightNode?.Validate();
     }
 
     public override void ConfigureNoAlloc()

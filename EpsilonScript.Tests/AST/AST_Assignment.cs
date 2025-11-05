@@ -88,6 +88,7 @@ namespace EpsilonScript.Tests.AST
           new object[] { ElementType.AssignmentSubtractOperator, "-=", Type.Integer, 10, 3, 7, ExtendedType.Integer },
           new object[] { ElementType.AssignmentMultiplyOperator, "*=", Type.Integer, 6, 2, 12, ExtendedType.Integer },
           new object[] { ElementType.AssignmentDivideOperator, "/=", Type.Integer, 12, 3, 4, ExtendedType.Integer },
+          new object[] { ElementType.AssignmentModuloOperator, "%=", Type.Integer, 10, 3, 1, ExtendedType.Integer },
 
           // Float compound assignments
           new object[] { ElementType.AssignmentAddOperator, "+=", Type.Float, 10.5f, 5.2f, 15.7f, ExtendedType.Float },
@@ -95,7 +96,9 @@ namespace EpsilonScript.Tests.AST
             { ElementType.AssignmentSubtractOperator, "-=", Type.Float, 10.5f, 3.2f, 7.3f, ExtendedType.Float },
           new object[]
             { ElementType.AssignmentMultiplyOperator, "*=", Type.Float, 6.5f, 2.0f, 13.0f, ExtendedType.Float },
-          new object[] { ElementType.AssignmentDivideOperator, "/=", Type.Float, 12.0f, 3.0f, 4.0f, ExtendedType.Float }
+          new object[]
+            { ElementType.AssignmentDivideOperator, "/=", Type.Float, 12.0f, 3.0f, 4.0f, ExtendedType.Float },
+          new object[] { ElementType.AssignmentModuloOperator, "%=", Type.Float, 10.5f, 3.0f, 1.5f, ExtendedType.Float }
         };
       }
     }
@@ -254,6 +257,7 @@ namespace EpsilonScript.Tests.AST
         ElementType.AssignmentSubtractOperator => TokenType.AssignmentSubtractOperator,
         ElementType.AssignmentMultiplyOperator => TokenType.AssignmentMultiplyOperator,
         ElementType.AssignmentDivideOperator => TokenType.AssignmentDivideOperator,
+        ElementType.AssignmentModuloOperator => TokenType.AssignmentModuloOperator,
         _ => throw new ArgumentOutOfRangeException(nameof(operatorType))
       };
     }

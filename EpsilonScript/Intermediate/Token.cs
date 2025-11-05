@@ -6,23 +6,32 @@ namespace EpsilonScript.Intermediate
   {
     public readonly ReadOnlyMemory<char> Text;
     public readonly TokenType Type;
-    public readonly int LineNumber;
+    public readonly SourceLocation Location;
 
-    public Token(ReadOnlyMemory<char> text, TokenType type, int lineNumber = -1)
+    public Token(ReadOnlyMemory<char> text, TokenType type, SourceLocation location)
     {
       Text = text;
       Type = type;
-      LineNumber = lineNumber;
+      Location = location;
     }
 
-    // For unit tests
-    public Token(string text, TokenType type, int lineNumber = -1) : this(text.AsMemory(), type, lineNumber)
+    public Token(ReadOnlyMemory<char> text, TokenType type)
+      : this(text, type, SourceLocation.Unknown)
+    {
+    }
+
+    // For unit tests and backwards compatibility - string overload
+    public Token(string text, TokenType type, int lineNumber = -1, int characterIndex = -1)
+      : this(text.AsMemory(), type, new SourceLocation(lineNumber, characterIndex))
     {
     }
 
     public override string ToString()
     {
-      return LineNumber < 0 ? $"{Type} ({Text.ToString()})" : $"{Type} ({Text.ToString()}) at line {LineNumber}";
+      if (!Location.IsValid)
+        return $"{Type} ({Text.ToString()})";
+
+      return $"{Type} ({Text.ToString()}) at {Location}";
     }
 
     public static bool operator ==(Token lhs, Token rhs)

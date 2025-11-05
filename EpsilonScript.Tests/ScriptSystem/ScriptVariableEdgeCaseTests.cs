@@ -133,7 +133,7 @@ namespace EpsilonScript.Tests.ScriptSystem
     public void VariableContainer_ManyVariables_100_Works()
     {
       var container = new DictionaryVariableContainer();
-      for (int i = 0; i < 100; i++)
+      for (var i = 0; i < 100; i++)
       {
         container[$"var{i}"] = new VariableValue(i);
       }
@@ -146,7 +146,7 @@ namespace EpsilonScript.Tests.ScriptSystem
     public void VariableContainer_ManyVariables_1000_Works()
     {
       var container = new DictionaryVariableContainer();
-      for (int i = 0; i < 1000; i++)
+      for (var i = 0; i < 1000; i++)
       {
         container[$"variable{i}"] = new VariableValue(i * 2);
       }

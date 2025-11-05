@@ -30,6 +30,7 @@ namespace EpsilonScript.Intermediate
     AssignmentSubtractOperator,
     AssignmentMultiplyOperator,
     AssignmentDivideOperator,
+    AssignmentModuloOperator,
     AddOperator,
     SubtractOperator,
     MultiplyOperator,
@@ -73,6 +74,7 @@ namespace EpsilonScript.Intermediate
       (1UL << (int)ElementType.AssignmentSubtractOperator) |
       (1UL << (int)ElementType.AssignmentMultiplyOperator) |
       (1UL << (int)ElementType.AssignmentDivideOperator) |
+      (1UL << (int)ElementType.AssignmentModuloOperator) |
       (1UL << (int)ElementType.Comma) |
       (1UL << (int)ElementType.Semicolon);
 
@@ -96,7 +98,8 @@ namespace EpsilonScript.Intermediate
       (1UL << (int)ElementType.AssignmentAddOperator) |
       (1UL << (int)ElementType.AssignmentSubtractOperator) |
       (1UL << (int)ElementType.AssignmentMultiplyOperator) |
-      (1UL << (int)ElementType.AssignmentDivideOperator);
+      (1UL << (int)ElementType.AssignmentDivideOperator) |
+      (1UL << (int)ElementType.AssignmentModuloOperator);
 
     /// <summary>
     /// Static constructor to validate that all ElementType enum values fit within 64-bit masks.
@@ -107,7 +110,7 @@ namespace EpsilonScript.Intermediate
       // Verify all enum values fit in ulong bit mask (0-63)
       foreach (ElementType value in Enum.GetValues(typeof(ElementType)))
       {
-        int intValue = (int)value;
+        var intValue = (int)value;
         if (intValue < 0 || intValue >= 64)
         {
           throw new InvalidOperationException(
@@ -183,6 +186,7 @@ namespace EpsilonScript.Intermediate
         case ElementType.AssignmentSubtractOperator:
         case ElementType.AssignmentMultiplyOperator:
         case ElementType.AssignmentDivideOperator:
+        case ElementType.AssignmentModuloOperator:
           return 2;
         case ElementType.Comma:
           return 1;
@@ -232,6 +236,7 @@ namespace EpsilonScript.Intermediate
         case ElementType.AssignmentSubtractOperator:
         case ElementType.AssignmentMultiplyOperator:
         case ElementType.AssignmentDivideOperator:
+        case ElementType.AssignmentModuloOperator:
           return Intermediate.Associativity.Right;
         case ElementType.Comma:
         case ElementType.Semicolon:

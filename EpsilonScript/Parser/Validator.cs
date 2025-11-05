@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using EpsilonScript.Intermediate;
 
 namespace EpsilonScript.Parser
@@ -19,13 +20,15 @@ namespace EpsilonScript.Parser
     /// <param name="previousToken">The previous token (if any)</param>
     /// <param name="previousElementType">The element type of the previous token (if any)</param>
     /// <param name="parenthesisDepth">Current parenthesis nesting depth</param>
+    /// <param name="parenthesisTypeStack">Stack tracking whether each open paren is for grouping or function calls</param>
     /// <exception cref="ParserException">Thrown when any validation rule fails</exception>
     public static void Validate(
       Token currentToken,
       ElementType currentElementType,
       Token? previousToken,
       ElementType? previousElementType,
-      int parenthesisDepth)
+      int parenthesisDepth,
+      Stack<ParenthesisType> parenthesisTypeStack)
     {
       // Check value-related rules first (most common)
       if (currentElementType.IsValue())
@@ -51,7 +54,7 @@ namespace EpsilonScript.Parser
           break;
 
         case ElementType.Comma:
-          ValidateCommaPlacement(currentToken, previousElementType);
+          ValidateCommaPlacement(currentToken, previousElementType, parenthesisTypeStack);
           break;
 
         case ElementType.LeftParenthesis:
@@ -184,15 +187,19 @@ namespace EpsilonScript.Parser
     /// <summary>
     /// Validates comma placement in function arguments.
     ///
-    /// Rule: Commas separate function arguments and cannot be leading, trailing, or doubled.
+    /// Rule: Commas can only be used to separate function parameters, not in grouping parentheses.
     ///
-    /// Valid:   "func(1, 2, 3)"      (separating arguments)
-    /// Invalid: ", 1"                (leading comma)
-    /// Invalid: "func(, 1)"          (comma after opening paren)
-    /// Invalid: "func(1,)"           (trailing comma)
-    /// Invalid: "func(1,, 2)"        (double comma)
+    /// Valid:   "func(1, 2, 3)"      (separating arguments in function call)
+    /// Invalid: "(1, 2)"              (comma in grouping parentheses - creates tuple)
+    /// Invalid: "x = (1, 2)"          (comma in grouping context)
+    /// Invalid: "!(1, 2)"             (comma in grouping context)
+    /// Invalid: ", 1"                 (leading comma)
+    /// Invalid: "func(, 1)"           (comma after opening paren)
+    /// Invalid: "func(1,)"            (trailing comma)
+    /// Invalid: "func(1,, 2)"         (double comma)
     /// </summary>
-    private static void ValidateCommaPlacement(Token currentToken, ElementType? previousElementType)
+    private static void ValidateCommaPlacement(Token currentToken, ElementType? previousElementType,
+      Stack<ParenthesisType> parenthesisTypeStack)
     {
       // Rule 1: Cannot start expression with comma
       if (!previousElementType.HasValue)
@@ -201,13 +208,21 @@ namespace EpsilonScript.Parser
           "Expression cannot start with a comma (commas separate function arguments)");
       }
 
-      // Rule 2: Cannot have comma right after opening paren
+      // Rule 2: Comma can only appear inside function calls, not grouping parentheses
+      // This prevents tuples from being created in invalid contexts
+      if (parenthesisTypeStack.Count > 0 && parenthesisTypeStack.Peek() == ParenthesisType.Grouping)
+      {
+        throw new ParserException(currentToken,
+          "Comma can only be used to separate function parameters");
+      }
+
+      // Rule 3: Cannot have comma right after opening paren
       if (previousElementType == ElementType.FunctionStartParenthesis)
       {
         throw new ParserException(currentToken, "Unexpected comma - missing expression");
       }
 
-      // Rule 3: Cannot have double comma
+      // Rule 4: Cannot have double comma
       if (previousElementType == ElementType.Comma)
       {
         throw new ParserException(currentToken, "Unexpected comma - missing expression");

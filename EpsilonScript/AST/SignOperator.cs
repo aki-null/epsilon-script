@@ -12,7 +12,7 @@ namespace EpsilonScript.AST
 
     public override bool IsPrecomputable => _childNode.IsPrecomputable;
 
-    public override void Build(Stack<Node> rpnStack, Element element, Compiler.Options options,
+    protected override void BuildCore(Stack<Node> rpnStack, Element element, Compiler.Options options,
       IVariableContainer variables, IDictionary<VariableId, CustomFunctionOverload> functions,
       Compiler.IntegerPrecision intPrecision, Compiler.FloatPrecision floatPrecision)
     {
@@ -30,7 +30,7 @@ namespace EpsilonScript.AST
 
       if (!_childNode.IsNumeric)
       {
-        throw new RuntimeException("Sign of a non-numeric value cannot be changed");
+        throw CreateRuntimeException("Sign of a non-numeric value cannot be changed");
       }
 
       switch (_childNode.ValueType)
@@ -132,6 +132,11 @@ namespace EpsilonScript.AST
 
       _childNode = _childNode.Optimize();
       return this;
+    }
+
+    public override void Validate()
+    {
+      _childNode?.Validate();
     }
 
     public override void ConfigureNoAlloc()

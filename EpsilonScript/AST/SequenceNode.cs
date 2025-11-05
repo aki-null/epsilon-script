@@ -13,7 +13,7 @@ namespace EpsilonScript.AST
     public override bool IsPrecomputable =>
       _isSingleNode ? _rightNode.IsPrecomputable : (_leftNode.IsPrecomputable && _rightNode.IsPrecomputable);
 
-    public override void Build(Stack<Node> rpnStack, Element element, Compiler.Options options,
+    protected override void BuildCore(Stack<Node> rpnStack, Element element, Compiler.Options options,
       IVariableContainer variables, IDictionary<VariableId, CustomFunctionOverload> functions,
       Compiler.IntegerPrecision intPrecision, Compiler.FloatPrecision floatPrecision)
     {
@@ -91,6 +91,12 @@ namespace EpsilonScript.AST
       _leftNode = _leftNode.Optimize();
       _rightNode = _rightNode.Optimize();
       return this;
+    }
+
+    public override void Validate()
+    {
+      _leftNode?.Validate();
+      _rightNode?.Validate();
     }
 
     public override void ConfigureNoAlloc()

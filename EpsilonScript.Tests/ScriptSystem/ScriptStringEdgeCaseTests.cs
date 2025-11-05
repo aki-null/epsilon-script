@@ -329,7 +329,7 @@ namespace EpsilonScript.Tests.ScriptSystem
     [Fact]
     public void String_WithQuotesInVariable_Works()
     {
-      // Can't include quotes in string literals per spec, but can in variables
+      // Cannot include quotes in string literals directly, but can in variables
       var variables = Variables().WithString("quoted", "He said \"hello\"").Build();
       var result = CompileAndExecute("quoted", Compiler.Options.Immutable, variables);
 
@@ -352,6 +352,73 @@ namespace EpsilonScript.Tests.ScriptSystem
       var result = CompileAndExecute("nullchar", Compiler.Options.Immutable, variables);
 
       Assert.Contains("\0", result.StringValue);
+    }
+
+    #endregion
+
+    #region Single Quote String Literals
+
+    [Fact]
+    public void String_SingleQuote_Basic()
+    {
+      var result = CompileAndExecute("'hello'", Compiler.Options.Immutable);
+      Assert.Equal("hello", result.StringValue);
+    }
+
+    [Fact]
+    public void String_SingleQuote_Empty()
+    {
+      var result = CompileAndExecute("''", Compiler.Options.Immutable);
+      Assert.Equal("", result.StringValue);
+    }
+
+    [Fact]
+    public void String_SingleQuote_EqualsDoubleQuote()
+    {
+      var result = CompileAndExecute("'hello' == \"hello\"", Compiler.Options.Immutable);
+      Assert.True(result.BooleanValue);
+    }
+
+    [Fact]
+    public void String_SingleQuote_WithDoubleQuotesInside()
+    {
+      var result = CompileAndExecute("'He said \"hello\"'", Compiler.Options.Immutable);
+      Assert.Equal("He said \"hello\"", result.StringValue);
+    }
+
+    [Fact]
+    public void String_DoubleQuote_WithSingleQuotesInside()
+    {
+      var result = CompileAndExecute("\"It's working\"", Compiler.Options.Immutable);
+      Assert.Equal("It's working", result.StringValue);
+    }
+
+    [Fact]
+    public void String_SingleQuote_Concatenation()
+    {
+      var result = CompileAndExecute("'Hello ' + 'World'", Compiler.Options.Immutable);
+      Assert.Equal("Hello World", result.StringValue);
+    }
+
+    [Fact]
+    public void String_SingleAndDoubleQuote_Concatenation()
+    {
+      var result = CompileAndExecute("'Hello ' + \"World\"", Compiler.Options.Immutable);
+      Assert.Equal("Hello World", result.StringValue);
+    }
+
+    [Fact]
+    public void String_SingleQuote_Unicode()
+    {
+      var result = CompileAndExecute("'こんにちは世界'", Compiler.Options.Immutable);
+      Assert.Equal("こんにちは世界", result.StringValue);
+    }
+
+    [Fact]
+    public void String_Backslashes_AreLiteral()
+    {
+      var result = CompileAndExecute(@"'C:\Users\Name'", Compiler.Options.Immutable);
+      Assert.Equal(@"C:\Users\Name", result.StringValue);
     }
 
     #endregion

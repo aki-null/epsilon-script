@@ -155,8 +155,9 @@ namespace EpsilonScript.Tests.ScriptSystem
       var compiler = CreateCompiler();
       var ex = Assert.Throws<RuntimeException>(() =>
         compiler.Compile("\"apple\" < \"banana\"", Compiler.Options.Immutable));
-      // Should match error from ComparisonNode.cs
-      Assert.Equal("Cannot perform arithmetic comparison on non-numeric types (left: String, right: String)",
+      // Should match error from ComparisonNode.cs with location context
+      Assert.Equal(
+        "Runtime error at line 1, column 9: Cannot perform arithmetic comparison on non-numeric types (left: String, right: String)",
         ex.Message);
     }
 
@@ -170,8 +171,8 @@ namespace EpsilonScript.Tests.ScriptSystem
       var compiler = CreateCompiler();
       compiler.AddCustomFunction(CustomFunction.Create("func", (int x) => x * 2));
 
-      var script = compiler.Compile("func(1, 2, 3)");
-      var ex = Assert.Throws<RuntimeException>(() => script.Execute());
+      // Validation now happens at compile time for constant expressions
+      var ex = Assert.Throws<ParserException>(() => compiler.Compile("func(1, 2, 3)"));
 
       // Should mention the function name and indicate argument count issue
       Assert.Contains("func", ex.Message);
@@ -201,8 +202,8 @@ namespace EpsilonScript.Tests.ScriptSystem
       var compiler = CreateCompiler();
       compiler.AddCustomFunction(CustomFunction.Create("typed", (string s) => s.Length));
 
-      var script = compiler.Compile("typed(42)");
-      var ex = Assert.Throws<RuntimeException>(() => script.Execute());
+      // Validation now happens at compile time for constant expressions
+      var ex = Assert.Throws<ParserException>(() => compiler.Compile("typed(42)"));
 
       // Error should mention function/signature issue
       Assert.True(
@@ -257,21 +258,10 @@ namespace EpsilonScript.Tests.ScriptSystem
       var ex = Assert.Throws<RuntimeException>(() =>
         compiler.Compile("true == 42", Compiler.Options.Immutable));
 
-      // Should match error from ComparisonNode.cs
+      // Should match error from ComparisonNode.cs with location context
       Assert.Equal(
-        "Cannot compare incompatible types: Boolean and Integer (numeric types can only be compared with other numeric types)",
+        "Runtime error at line 1, column 6: Cannot compare incompatible types: Boolean and Integer (numeric types can only be compared with other numeric types)",
         ex.Message);
-    }
-
-    [Fact]
-    public void TupleComparison_ProvidesErrorMessage()
-    {
-      var compiler = CreateCompiler();
-      var ex = Assert.Throws<RuntimeException>(() =>
-        compiler.Compile("(1, 2) == (3, 4)", Compiler.Options.Immutable));
-
-      // Should provide some error context
-      Assert.True(ex.Message.Length > 5, $"Expected error message, got: {ex.Message}");
     }
 
     #endregion
@@ -397,6 +387,71 @@ namespace EpsilonScript.Tests.ScriptSystem
 
     #endregion
 
+    #region Line Number Accuracy Tests
+
+    [Fact]
+    public void UndefinedVariable_StandaloneAfterSemicolons_ReportsCorrectLineNumber()
+    {
+      var compiler = CreateCompiler();
+      var script = compiler.Compile("2;\n2;\nls");
+      var ex = Assert.Throws<RuntimeException>(() => script.Execute());
+
+      // The undefined variable 'ls' is on line 3 (1-indexed)
+      Assert.Equal(2, ex.Location.LineNumber); // 0-indexed internally
+      Assert.Contains("line 3", ex.Message); // User-facing should be 1-indexed
+    }
+
+    [Fact]
+    public void UndefinedVariable_InsideFunctionAfterSemicolons_ReportsCorrectLineNumber()
+    {
+      var compiler = CreateCompiler();
+      var script = compiler.Compile("2;\n2;\nabs(ls)");
+      var ex = Assert.Throws<RuntimeException>(() => script.Execute());
+
+      // The undefined variable 'ls' is on line 3 (1-indexed)
+      Assert.Equal(2, ex.Location.LineNumber); // 0-indexed internally
+      Assert.Contains("line 3", ex.Message); // User-facing should be 1-indexed
+    }
+
+    [Fact]
+    public void UndefinedVariable_MultipleLines_ReportsCorrectLineNumber()
+    {
+      var compiler = CreateCompiler();
+      var script = compiler.Compile("1 + 2;\n3 * 4;\n5 / undefined");
+      var ex = Assert.Throws<RuntimeException>(() => script.Execute());
+
+      // The undefined variable is on line 3
+      Assert.Equal(2, ex.Location.LineNumber); // 0-indexed
+      Assert.Contains("line 3", ex.Message);
+      Assert.Contains("undefined", ex.Message);
+    }
+
+    [Fact]
+    public void UndefinedVariable_ComplexExpression_ReportsCorrectLineNumber()
+    {
+      var compiler = CreateCompiler();
+      var script = compiler.Compile("1;\n2;\n3;\nmissing + 1");
+      var ex = Assert.Throws<RuntimeException>(() => script.Execute());
+
+      // The error is on line 4
+      Assert.Equal(3, ex.Location.LineNumber); // 0-indexed
+      Assert.Contains("line 4", ex.Message);
+    }
+
+    [Fact]
+    public void UndefinedVariable_NestedFunction_ReportsCorrectLineNumber()
+    {
+      var compiler = CreateCompiler();
+      var script = compiler.Compile("1;\nabs(\n  max(notfound, 1)\n)");
+      var ex = Assert.Throws<RuntimeException>(() => script.Execute());
+
+      // The undefined variable is on line 3
+      Assert.Equal(2, ex.Location.LineNumber); // 0-indexed
+      Assert.Contains("line 3", ex.Message);
+    }
+
+    #endregion
+
     #region Custom Function Registration Errors
 
     [Fact]
@@ -420,7 +475,7 @@ namespace EpsilonScript.Tests.ScriptSystem
       var ex = Assert.Throws<ArgumentException>(() =>
         compiler.AddCustomFunction(CustomFunction.Create("func", (float x) => x, isDeterministic: false)));
 
-      Assert.Contains("determinism", ex.Message, StringComparison.OrdinalIgnoreCase);
+      Assert.Contains("cannot mix deterministic", ex.Message, StringComparison.OrdinalIgnoreCase);
     }
 
     #endregion

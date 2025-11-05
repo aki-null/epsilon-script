@@ -21,7 +21,8 @@ namespace EpsilonScript.Tests.AST
       var functionId = (VariableId)functionName;
 
       var customFunction = CustomFunction.Create(functionName, (int x) => x * 2);
-      var overload = new CustomFunctionOverload(customFunction, Compiler.FloatPrecision.Float);
+      var overload = new CustomFunctionOverload(customFunction,
+        Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float);
       functions[functionId] = overload;
 
       var node = new FunctionNode();
@@ -47,7 +48,8 @@ namespace EpsilonScript.Tests.AST
       var functionId = (VariableId)functionName;
 
       var customFunction = CustomFunction.Create(functionName, (float x) => x * 2.5f);
-      var overload = new CustomFunctionOverload(customFunction, Compiler.FloatPrecision.Float);
+      var overload = new CustomFunctionOverload(customFunction,
+        Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float);
       functions[functionId] = overload;
 
       var node = new FunctionNode();
@@ -72,7 +74,8 @@ namespace EpsilonScript.Tests.AST
       var functionId = (VariableId)functionName;
 
       var customFunction = CustomFunction.Create(functionName, (bool x) => !x);
-      var overload = new CustomFunctionOverload(customFunction, Compiler.FloatPrecision.Float);
+      var overload = new CustomFunctionOverload(customFunction,
+        Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float);
       functions[functionId] = overload;
 
       var node = new FunctionNode();
@@ -98,7 +101,8 @@ namespace EpsilonScript.Tests.AST
       var functionId = (VariableId)functionName;
 
       var customFunction = CustomFunction.Create(functionName, (string x) => x.ToUpperInvariant());
-      var overload = new CustomFunctionOverload(customFunction, Compiler.FloatPrecision.Float);
+      var overload = new CustomFunctionOverload(customFunction,
+        Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float);
       functions[functionId] = overload;
 
       var node = new FunctionNode();
@@ -122,7 +126,8 @@ namespace EpsilonScript.Tests.AST
       var functionId = (VariableId)functionName;
 
       var customFunction = CustomFunction.Create(functionName, (int x, int y) => x + y);
-      var overload = new CustomFunctionOverload(customFunction, Compiler.FloatPrecision.Float);
+      var overload = new CustomFunctionOverload(customFunction,
+        Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float);
       functions[functionId] = overload;
 
       // Create tuple parameter node
@@ -172,7 +177,8 @@ namespace EpsilonScript.Tests.AST
       var functionId = (VariableId)functionName;
 
       var customFunction = CustomFunction.Create(functionName, (int x) => x);
-      var overload = new CustomFunctionOverload(customFunction, Compiler.FloatPrecision.Float);
+      var overload = new CustomFunctionOverload(customFunction,
+        Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float);
       functions[functionId] = overload;
 
       var node = new FunctionNode();
@@ -196,7 +202,8 @@ namespace EpsilonScript.Tests.AST
 
       // Function expects int but we'll pass string
       var customFunction = CustomFunction.Create(functionName, (int x) => x * 2);
-      var overload = new CustomFunctionOverload(customFunction, Compiler.FloatPrecision.Float);
+      var overload = new CustomFunctionOverload(customFunction,
+        Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float);
       functions[functionId] = overload;
 
       var node = new FunctionNode();
@@ -208,7 +215,8 @@ namespace EpsilonScript.Tests.AST
         Compiler.FloatPrecision.Float);
 
       var exception = Assert.Throws<RuntimeException>(() => node.Execute(null));
-      Assert.Contains("function with given type signature is undefined", exception.Message);
+      Assert.Contains("No overload of function", exception.Message);
+      Assert.Contains("matches parameter types", exception.Message);
     }
 
     [Fact]
@@ -219,7 +227,8 @@ namespace EpsilonScript.Tests.AST
       var functionId = (VariableId)functionName;
 
       var customFunction = CustomFunction.Create(functionName, (int x) => x * 2, isDeterministic: true);
-      var overload = new CustomFunctionOverload(customFunction, Compiler.FloatPrecision.Float);
+      var overload = new CustomFunctionOverload(customFunction,
+        Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float);
       functions[functionId] = overload;
 
       var node = new FunctionNode();
@@ -241,7 +250,8 @@ namespace EpsilonScript.Tests.AST
       var functionId = (VariableId)functionName;
 
       var customFunction = CustomFunction.Create(functionName, (int x) => x * 2, false); // isConstant = false
-      var overload = new CustomFunctionOverload(customFunction, Compiler.FloatPrecision.Float);
+      var overload = new CustomFunctionOverload(customFunction,
+        Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float);
       functions[functionId] = overload;
 
       var node = new FunctionNode();
@@ -263,7 +273,8 @@ namespace EpsilonScript.Tests.AST
       var functionId = (VariableId)functionName;
 
       var customFunction = CustomFunction.Create(functionName, (int x) => x * 2, isDeterministic: true);
-      var overload = new CustomFunctionOverload(customFunction, Compiler.FloatPrecision.Float);
+      var overload = new CustomFunctionOverload(customFunction,
+        Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float);
       functions[functionId] = overload;
 
       var node = new FunctionNode();
@@ -287,7 +298,8 @@ namespace EpsilonScript.Tests.AST
       var functionId = (VariableId)functionName;
 
       var customFunction = CustomFunction.Create(functionName, (int x) => x + 1);
-      var overload = new CustomFunctionOverload(customFunction, Compiler.FloatPrecision.Float);
+      var overload = new CustomFunctionOverload(customFunction,
+        Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float);
       functions[functionId] = overload;
 
       var node = new FunctionNode();
@@ -311,7 +323,8 @@ namespace EpsilonScript.Tests.AST
       var functionId = (VariableId)functionName;
 
       var customFunction = CustomFunction.Create(functionName, () => 42);
-      var overload = new CustomFunctionOverload(customFunction, Compiler.FloatPrecision.Float);
+      var overload = new CustomFunctionOverload(customFunction,
+        Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float);
       functions[functionId] = overload;
 
       var node = new FunctionNode();
@@ -340,7 +353,8 @@ namespace EpsilonScript.Tests.AST
       var functionId = (VariableId)functionName;
 
       var customFunction = CustomFunction.Create(functionName, () => 3.14159f);
-      var overload = new CustomFunctionOverload(customFunction, Compiler.FloatPrecision.Float);
+      var overload = new CustomFunctionOverload(customFunction,
+        Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float);
       functions[functionId] = overload;
 
       var node = new FunctionNode();
@@ -369,7 +383,8 @@ namespace EpsilonScript.Tests.AST
       var functionId = (VariableId)functionName;
 
       var customFunction = CustomFunction.Create(functionName, () => true);
-      var overload = new CustomFunctionOverload(customFunction, Compiler.FloatPrecision.Float);
+      var overload = new CustomFunctionOverload(customFunction,
+        Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float);
       functions[functionId] = overload;
 
       var node = new FunctionNode();
@@ -398,7 +413,8 @@ namespace EpsilonScript.Tests.AST
       var functionId = (VariableId)functionName;
 
       var customFunction = CustomFunction.Create(functionName, () => "v1.2.0");
-      var overload = new CustomFunctionOverload(customFunction, Compiler.FloatPrecision.Float);
+      var overload = new CustomFunctionOverload(customFunction,
+        Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float);
       functions[functionId] = overload;
 
       var node = new FunctionNode();
@@ -425,7 +441,8 @@ namespace EpsilonScript.Tests.AST
       var functionId = (VariableId)functionName;
 
       var customFunction = CustomFunction.Create(functionName, () => 100, true);
-      var overload = new CustomFunctionOverload(customFunction, Compiler.FloatPrecision.Float);
+      var overload = new CustomFunctionOverload(customFunction,
+        Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float);
       functions[functionId] = overload;
 
       var node = new FunctionNode();
@@ -452,7 +469,8 @@ namespace EpsilonScript.Tests.AST
       var functionId = (VariableId)functionName;
 
       var customFunction = CustomFunction.Create(functionName, () => DateTime.Now.Millisecond, false);
-      var overload = new CustomFunctionOverload(customFunction, Compiler.FloatPrecision.Float);
+      var overload = new CustomFunctionOverload(customFunction,
+        Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float);
       functions[functionId] = overload;
 
       var node = new FunctionNode();
@@ -479,7 +497,8 @@ namespace EpsilonScript.Tests.AST
       var zeroParamName = "getZero";
       var zeroParamId = (VariableId)zeroParamName;
       var zeroParamFunction = CustomFunction.Create(zeroParamName, () => 0);
-      var zeroParamOverload = new CustomFunctionOverload(zeroParamFunction, Compiler.FloatPrecision.Float);
+      var zeroParamOverload = new CustomFunctionOverload(zeroParamFunction,
+        Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float);
       functions[zeroParamId] = zeroParamOverload;
 
       // Add a one-parameter function with the same name (overload)
@@ -522,7 +541,8 @@ namespace EpsilonScript.Tests.AST
       var functionId = (VariableId)functionName;
 
       var customFunction = CustomFunction.Create(functionName, (int x) => x * x, true); // Constant function
-      var overload = new CustomFunctionOverload(customFunction, Compiler.FloatPrecision.Float);
+      var overload = new CustomFunctionOverload(customFunction,
+        Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float);
       functions[functionId] = overload;
 
       var node = new FunctionNode();
@@ -549,7 +569,8 @@ namespace EpsilonScript.Tests.AST
       var functionId = (VariableId)functionName;
 
       var customFunction = CustomFunction.Create(functionName, (int x) => x * 2, false); // Non-constant function
-      var overload = new CustomFunctionOverload(customFunction, Compiler.FloatPrecision.Float);
+      var overload = new CustomFunctionOverload(customFunction,
+        Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float);
       functions[functionId] = overload;
 
       var node = new FunctionNode();
@@ -574,7 +595,8 @@ namespace EpsilonScript.Tests.AST
       var functionId = (VariableId)functionName;
 
       var customFunction = CustomFunction.Create(functionName, (int x) => x * 2, true); // Constant function
-      var overload = new CustomFunctionOverload(customFunction, Compiler.FloatPrecision.Float);
+      var overload = new CustomFunctionOverload(customFunction,
+        Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float);
       functions[functionId] = overload;
 
       var node = new FunctionNode();
@@ -599,7 +621,8 @@ namespace EpsilonScript.Tests.AST
       var functionId = (VariableId)functionName;
 
       var customFunction = CustomFunction.Create(functionName, (float x) => x / 2.0f, true); // Constant function
-      var overload = new CustomFunctionOverload(customFunction, Compiler.FloatPrecision.Float);
+      var overload = new CustomFunctionOverload(customFunction,
+        Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float);
       functions[functionId] = overload;
 
       var node = new FunctionNode();
@@ -625,7 +648,8 @@ namespace EpsilonScript.Tests.AST
       var functionId = (VariableId)functionName;
 
       var customFunction = CustomFunction.Create(functionName, (bool x) => !x, true); // Constant function
-      var overload = new CustomFunctionOverload(customFunction, Compiler.FloatPrecision.Float);
+      var overload = new CustomFunctionOverload(customFunction,
+        Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float);
       functions[functionId] = overload;
 
       var node = new FunctionNode();
@@ -652,7 +676,8 @@ namespace EpsilonScript.Tests.AST
 
       var customFunction =
         CustomFunction.Create(functionName, (string x) => x.ToUpperInvariant(), true); // Constant function
-      var overload = new CustomFunctionOverload(customFunction, Compiler.FloatPrecision.Float);
+      var overload = new CustomFunctionOverload(customFunction,
+        Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float);
       functions[functionId] = overload;
 
       var node = new FunctionNode();
@@ -678,7 +703,8 @@ namespace EpsilonScript.Tests.AST
       var functionId = (VariableId)functionName;
 
       var customFunction = CustomFunction.Create(functionName, (int x, int y) => x + y, true); // Constant function
-      var overload = new CustomFunctionOverload(customFunction, Compiler.FloatPrecision.Float);
+      var overload = new CustomFunctionOverload(customFunction,
+        Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float);
       functions[functionId] = overload;
 
       // Create tuple parameter node
@@ -713,7 +739,8 @@ namespace EpsilonScript.Tests.AST
       var functionId = (VariableId)functionName;
 
       var customFunction = CustomFunction.Create(functionName, (long x) => x * 2L);
-      var overload = new CustomFunctionOverload(customFunction, Compiler.FloatPrecision.Float);
+      var overload =
+        new CustomFunctionOverload(customFunction, Compiler.IntegerPrecision.Long, Compiler.FloatPrecision.Float);
       functions[functionId] = overload;
 
       var node = new FunctionNode();
@@ -737,7 +764,8 @@ namespace EpsilonScript.Tests.AST
       var functionId = (VariableId)functionName;
 
       var customFunction = CustomFunction.Create(functionName, (double x) => x * 2.5);
-      var overload = new CustomFunctionOverload(customFunction, Compiler.FloatPrecision.Double);
+      var overload = new CustomFunctionOverload(customFunction,
+        Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Double);
       functions[functionId] = overload;
 
       var node = new FunctionNode();
@@ -761,7 +789,8 @@ namespace EpsilonScript.Tests.AST
       var functionId = (VariableId)functionName;
 
       var customFunction = CustomFunction.Create(functionName, (decimal x) => x * 2.5m);
-      var overload = new CustomFunctionOverload(customFunction, Compiler.FloatPrecision.Decimal);
+      var overload = new CustomFunctionOverload(customFunction,
+        Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Decimal);
       functions[functionId] = overload;
 
       var node = new FunctionNode();
@@ -787,7 +816,8 @@ namespace EpsilonScript.Tests.AST
       var functionId = (VariableId)functionName;
 
       var customFunction = CustomFunction.Create(functionName, (long x, long y) => x + y, true);
-      var overload = new CustomFunctionOverload(customFunction, Compiler.FloatPrecision.Float);
+      var overload =
+        new CustomFunctionOverload(customFunction, Compiler.IntegerPrecision.Long, Compiler.FloatPrecision.Float);
       functions[functionId] = overload;
 
       var tupleNode = new TupleNode();
@@ -817,7 +847,8 @@ namespace EpsilonScript.Tests.AST
       var functionId = (VariableId)functionName;
 
       var customFunction = CustomFunction.Create(functionName, (double x, double y) => x + y, true);
-      var overload = new CustomFunctionOverload(customFunction, Compiler.FloatPrecision.Double);
+      var overload = new CustomFunctionOverload(customFunction,
+        Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Double);
       functions[functionId] = overload;
 
       var tupleNode = new TupleNode();
@@ -848,7 +879,8 @@ namespace EpsilonScript.Tests.AST
       var functionId = (VariableId)functionName;
 
       var customFunction = CustomFunction.Create(functionName, (decimal x, decimal y) => x + y, true);
-      var overload = new CustomFunctionOverload(customFunction, Compiler.FloatPrecision.Decimal);
+      var overload = new CustomFunctionOverload(customFunction,
+        Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Decimal);
       functions[functionId] = overload;
 
       var tupleNode = new TupleNode();
@@ -871,83 +903,98 @@ namespace EpsilonScript.Tests.AST
     }
 
     [Fact]
-    internal void AST_Function_WithMixedIntAndLong_OverloadResolution()
+    internal void AST_Function_AddingIntFunctionToLongPrecisionCompiler_ThrowsArgumentException()
     {
-      var functions = new Dictionary<VariableId, CustomFunctionOverload>();
       var functionName = "overloaded";
-      var functionId = (VariableId)functionName;
-
-      // Add int overload
       var intFunction = CustomFunction.Create(functionName, (int x) => x * 2);
-      var overload = new CustomFunctionOverload(intFunction, Compiler.FloatPrecision.Float);
-      functions[functionId] = overload;
 
-      // Add long overload
-      var longFunction = CustomFunction.Create(functionName, (long x) => x * 3L);
-      overload.Add(longFunction);
+      var ex = Assert.Throws<ArgumentException>(() =>
+        new CustomFunctionOverload(intFunction, Compiler.IntegerPrecision.Long, Compiler.FloatPrecision.Float));
 
-      // Test int parameter
-      var intNode = new FunctionNode();
-      var intRpn = CreateStack(new FakeIntegerNode(10));
-      var token = new Token(functionName, TokenType.Identifier);
-      var element = new Element(token, ElementType.Function);
-
-      intNode.Build(intRpn, element, Compiler.Options.None, null, functions, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Float);
-      intNode.Execute(null);
-
-      Assert.Equal(ExtendedType.Integer, intNode.ValueType);
-      Assert.Equal(20, intNode.IntegerValue); // int overload: x * 2
-
-      // Test long parameter
-      var longNode = new FunctionNode();
-      var longRpn = CreateStack(new FakeLongNode(10L));
-      longNode.Build(longRpn, element, Compiler.Options.None, null, functions, Compiler.IntegerPrecision.Long,
-        Compiler.FloatPrecision.Float);
-      longNode.Execute(null);
-
-      Assert.Equal(ExtendedType.Long, longNode.ValueType);
-      Assert.Equal(30L, longNode.LongValue); // long overload: x * 3
+      Assert.Contains("Cannot add function with Integer parameter", ex.Message);
+      Assert.Contains("Long precision", ex.Message);
     }
 
     [Fact]
-    internal void AST_Function_WithMixedFloatAndDouble_OverloadResolution()
+    internal void AST_Function_AddingLongFunctionToIntegerPrecisionCompiler_ThrowsArgumentException()
     {
-      var functions = new Dictionary<VariableId, CustomFunctionOverload>();
       var functionName = "overloaded";
-      var functionId = (VariableId)functionName;
+      var longFunction = CustomFunction.Create(functionName, (long x) => x * 3L);
 
-      // Add float overload
+      var ex = Assert.Throws<ArgumentException>(() =>
+        new CustomFunctionOverload(longFunction, Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float));
+
+      Assert.Contains("Cannot add function with Long parameter", ex.Message);
+      Assert.Contains("Integer precision", ex.Message);
+    }
+
+    [Fact]
+    internal void AST_Function_AddingLongOverloadToIntFunction_ThrowsArgumentException()
+    {
+      var functionName = "overloaded";
+      var intFunction = CustomFunction.Create(functionName, (int x) => x * 2);
+      var longFunction = CustomFunction.Create(functionName, (long x) => x * 3L);
+
+      var intOverload = new CustomFunctionOverload(intFunction,
+        Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float);
+
+      var ex = Assert.Throws<ArgumentException>(() => intOverload.Add(longFunction));
+
+      Assert.Contains("Cannot add function with Long parameter", ex.Message);
+    }
+
+    [Fact]
+    internal void AST_Function_AddingFloatFunctionToDoublePrecisionCompiler_ThrowsArgumentException()
+    {
+      var functionName = "overloaded";
       var floatFunction = CustomFunction.Create(functionName, (float x) => x * 2.0f);
-      var overload = new CustomFunctionOverload(floatFunction, Compiler.FloatPrecision.Float);
-      functions[functionId] = overload;
 
-      // Add double overload
+      var ex = Assert.Throws<ArgumentException>(() =>
+        new CustomFunctionOverload(floatFunction, Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Double));
+
+      Assert.Contains("Cannot add function with Float parameter", ex.Message);
+      Assert.Contains("Double precision", ex.Message);
+    }
+
+    [Fact]
+    internal void AST_Function_AddingDoubleFunctionToFloatPrecisionCompiler_ThrowsArgumentException()
+    {
+      var functionName = "overloaded";
       var doubleFunction = CustomFunction.Create(functionName, (double x) => x * 3.0);
-      overload.Add(doubleFunction);
 
-      // Test float parameter
-      var floatNode = new FunctionNode();
-      var floatRpn = CreateStack(new FakeFloatNode(1.5f));
-      var token = new Token(functionName, TokenType.Identifier);
-      var element = new Element(token, ElementType.Function);
+      var ex = Assert.Throws<ArgumentException>(() =>
+        new CustomFunctionOverload(doubleFunction, Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float));
 
-      floatNode.Build(floatRpn, element, Compiler.Options.None, null, functions, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Float);
-      floatNode.Execute(null);
+      Assert.Contains("Cannot add function with Double parameter", ex.Message);
+      Assert.Contains("Float precision", ex.Message);
+    }
 
-      Assert.Equal(ExtendedType.Float, floatNode.ValueType);
-      Assert.True(EpsilonScript.Math.IsNearlyEqual(3.0f, floatNode.FloatValue)); // float overload: x * 2
+    [Fact]
+    internal void AST_Function_AddingDecimalFunctionToFloatPrecisionCompiler_ThrowsArgumentException()
+    {
+      var functionName = "overloaded";
+      var decimalFunction = CustomFunction.Create(functionName, (decimal x) => x * 3.0m);
 
-      // Test double parameter
-      var doubleNode = new FunctionNode();
-      var doubleRpn = CreateStack(new FakeDoubleNode(1.5));
-      doubleNode.Build(doubleRpn, element, Compiler.Options.None, null, functions, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Double);
-      doubleNode.Execute(null);
+      var ex = Assert.Throws<ArgumentException>(() =>
+        new CustomFunctionOverload(decimalFunction, Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float));
 
-      Assert.Equal(ExtendedType.Double, doubleNode.ValueType);
-      Assert.Equal(4.5, doubleNode.DoubleValue); // double overload: x * 3
+      Assert.Contains("Cannot add function with Decimal parameter", ex.Message);
+      Assert.Contains("Float precision", ex.Message);
+    }
+
+    [Fact]
+    internal void AST_Function_AddingDoubleOverloadToFloatFunction_ThrowsArgumentException()
+    {
+      var functionName = "overloaded";
+      var floatFunction = CustomFunction.Create(functionName, (float x) => x * 2.0f);
+      var doubleFunction = CustomFunction.Create(functionName, (double x) => x * 3.0);
+
+      var floatOverload = new CustomFunctionOverload(floatFunction,
+        Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float);
+
+      var ex = Assert.Throws<ArgumentException>(() => floatOverload.Add(doubleFunction));
+
+      Assert.Contains("Cannot add function with Double parameter", ex.Message);
     }
 
     #endregion
@@ -964,7 +1011,7 @@ namespace EpsilonScript.Tests.AST
         BooleanValue = true;
       }
 
-      public override void Build(Stack<Node> rpnStack, Element element, Compiler.Options options,
+      protected override void BuildCore(Stack<Node> rpnStack, Element element, Compiler.Options options,
         IVariableContainer variables, IDictionary<VariableId, CustomFunctionOverload> functions,
         Compiler.IntegerPrecision intPrecision, Compiler.FloatPrecision floatPrecision)
       {

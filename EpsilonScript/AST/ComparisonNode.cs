@@ -16,7 +16,7 @@ namespace EpsilonScript.AST
 
     public override bool IsPrecomputable => _leftNode.IsPrecomputable && _rightNode.IsPrecomputable;
 
-    public override void Build(Stack<Node> rpnStack, Element element, Compiler.Options options,
+    protected override void BuildCore(Stack<Node> rpnStack, Element element, Compiler.Options options,
       IVariableContainer variables,
       IDictionary<VariableId, CustomFunctionOverload> functions,
       Compiler.IntegerPrecision intPrecision, Compiler.FloatPrecision floatPrecision)
@@ -74,7 +74,7 @@ namespace EpsilonScript.AST
           // Check for tuple types (not comparable)
           if (leftType == ExtendedType.Tuple || rightType == ExtendedType.Tuple)
           {
-            throw new RuntimeException(
+            throw CreateRuntimeException(
               $"Cannot perform comparison on tuple types (left: {leftType}, right: {rightType})");
           }
 
@@ -91,12 +91,12 @@ namespace EpsilonScript.AST
               if (leftIsNumeric || rightIsNumeric)
               {
                 // One is numeric, one is not
-                throw new RuntimeException(
+                throw CreateRuntimeException(
                   $"Cannot compare incompatible types: {leftType} and {rightType} (numeric types can only be compared with other numeric types)");
               }
 
               // Both are non-numeric but different (e.g., Boolean vs String)
-              throw new RuntimeException($"Cannot compare incompatible types: {leftType} and {rightType}");
+              throw CreateRuntimeException($"Cannot compare incompatible types: {leftType} and {rightType}");
             }
           }
 
@@ -107,7 +107,7 @@ namespace EpsilonScript.AST
         case ElementType.ComparisonGreaterThanOrEqualTo:
           if (!_leftNode.IsNumeric || !_rightNode.IsNumeric)
           {
-            throw new RuntimeException(
+            throw CreateRuntimeException(
               $"Cannot perform arithmetic comparison on non-numeric types (left: {_leftNode.ValueType}, right: {_rightNode.ValueType})");
           }
 
@@ -221,6 +221,12 @@ namespace EpsilonScript.AST
       _leftNode = _leftNode.Optimize();
       _rightNode = _rightNode.Optimize();
       return this;
+    }
+
+    public override void Validate()
+    {
+      _leftNode?.Validate();
+      _rightNode?.Validate();
     }
 
     public override void ConfigureNoAlloc()

@@ -8,14 +8,13 @@ namespace EpsilonScript.Function
 
     public VariableId Name { get; }
     public bool IsDeterministic { get; }
-    private Compiler.FloatPrecision ConfiguredFloatType { get; }
 
-    public CustomFunctionOverload(CustomFunction function, Compiler.FloatPrecision floatPrecision)
+    public CustomFunctionOverload(CustomFunction function, Compiler.IntegerPrecision intPrecision,
+      Compiler.FloatPrecision floatPrecision)
     {
       Name = function.Name;
       IsDeterministic = function.IsDeterministic;
-      ConfiguredFloatType = floatPrecision;
-      _rootNode = new CustomFunctionOverloadNode();
+      _rootNode = new CustomFunctionOverloadNode(intPrecision, floatPrecision);
       _rootNode.Build(function);
     }
 
@@ -23,7 +22,10 @@ namespace EpsilonScript.Function
     {
       if (IsDeterministic != function.IsDeterministic)
       {
-        throw new ArgumentException("All functions with the same name must have the same determinism");
+        throw new ArgumentException(
+          $"Function '{Name}': cannot mix deterministic and non-deterministic overloads. " +
+          $"Existing overloads are {(IsDeterministic ? "deterministic" : "non-deterministic")}, " +
+          $"but trying to add: {function}");
       }
 
       _rootNode.Build(function);
@@ -31,7 +33,14 @@ namespace EpsilonScript.Function
 
     internal CustomFunction Find(PackedParameterTypes packedTypes)
     {
-      return _rootNode.Find(packedTypes, ConfiguredFloatType);
+      return _rootNode.Find(packedTypes);
+    }
+
+    internal System.Collections.Generic.List<CustomFunction> GetAllOverloads()
+    {
+      var functions = new System.Collections.Generic.List<CustomFunction>();
+      _rootNode.CollectAllFunctions(functions);
+      return functions;
     }
   }
 }

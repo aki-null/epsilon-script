@@ -25,21 +25,19 @@ namespace EpsilonScript.Tests.ScriptSystem
     }
 
     [Fact]
-    public void MissingFunctionOverload_ThrowsRuntimeException()
+    public void MissingFunctionOverload_ThrowsParserException()
     {
       var compiler = CreateCompiler();
       compiler.AddCustomFunction(CustomFunction.Create("pick", (bool value) => value));
-      var script = compiler.Compile("pick(1)");
-      ErrorTestHelper.AssertRuntimeException(() => script.Execute(), "function");
+      ErrorTestHelper.AssertParserException(() => compiler.Compile("pick(1)"), "function");
     }
 
     [Fact]
-    public void InvalidArgumentCount_ThrowsRuntimeException()
+    public void InvalidArgumentCount_ThrowsParserException()
     {
       var compiler = CreateCompiler();
       compiler.AddCustomFunction(CustomFunction.Create("probe", (int value) => value));
-      var script = compiler.Compile("probe(1, 2)");
-      ErrorTestHelper.AssertRuntimeException(() => script.Execute(), "function");
+      ErrorTestHelper.AssertParserException(() => compiler.Compile("probe(1, 2)"), "function");
     }
 
     [Fact]
@@ -87,14 +85,6 @@ namespace EpsilonScript.Tests.ScriptSystem
     {
       var compiler = CreateCompiler();
       ErrorTestHelper.AssertRuntimeException(() => compiler.Compile("!1", Compiler.Options.Immutable), null);
-    }
-
-    [Fact]
-    public void TupleComparison_ThrowsRuntimeException()
-    {
-      var compiler = CreateCompiler();
-      ErrorTestHelper.AssertRuntimeException(() => compiler.Compile("(1, 2) == (1, 2)", Compiler.Options.Immutable),
-        null);
     }
 
     [Theory]

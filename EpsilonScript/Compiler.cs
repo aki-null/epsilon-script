@@ -227,6 +227,9 @@ namespace EpsilonScript
       var rootNode = _astBuilder.Result;
       rootNode = rootNode.Optimize();
 
+      // Validate AST after optimization (when types are resolved for constant expressions)
+      rootNode.Validate();
+
       // Configure NoAlloc validation after optimization completes
       if ((options & Options.NoAlloc) == Options.NoAlloc)
       {
@@ -247,7 +250,7 @@ namespace EpsilonScript
       }
       else
       {
-        _functions[func.Name] = new CustomFunctionOverload(func, DefaultFloatType);
+        _functions[func.Name] = new CustomFunctionOverload(func, DefaultIntegerType, DefaultFloatType);
       }
     }
 

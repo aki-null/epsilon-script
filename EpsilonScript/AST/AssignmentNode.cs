@@ -14,7 +14,7 @@ namespace EpsilonScript.AST
 
     public override bool IsPrecomputable => false;
 
-    public override void Build(Stack<Node> rpnStack, Element element, Compiler.Options options,
+    protected override void BuildCore(Stack<Node> rpnStack, Element element, Compiler.Options options,
       IVariableContainer variables, IDictionary<VariableId, CustomFunctionOverload> functions,
       Compiler.IntegerPrecision intPrecision, Compiler.FloatPrecision floatPrecision)
     {
@@ -38,7 +38,7 @@ namespace EpsilonScript.AST
 
       if (_leftNode.Variable == null)
       {
-        throw new RuntimeException("A left hand side of an assignment operator must be a variable");
+        throw CreateRuntimeException("A left hand side of an assignment operator must be a variable");
       }
 
       var variable = _leftNode.Variable;
@@ -47,7 +47,7 @@ namespace EpsilonScript.AST
       // Assigning non-string to string variable calls ToString() in VariableValue setter
       if (_noAllocMode && variable.Type == Type.String && _rightNode.ValueType != ExtendedType.String)
       {
-        throw new RuntimeException(
+        throw CreateRuntimeException(
           "Assigning non-string value to string variable causes allocation (ToString()) in NoAlloc mode");
       }
 
@@ -74,12 +74,12 @@ namespace EpsilonScript.AST
             case Type.Boolean:
               if (_rightNode.ValueType.IsFloat())
               {
-                throw new RuntimeException("A float value cannot be assigned to a boolean variable");
+                throw CreateRuntimeException("A float value cannot be assigned to a boolean variable");
               }
 
               if (_rightNode.IsNumeric)
               {
-                throw new RuntimeException("A numeric value cannot be assigned to a boolean variable");
+                throw CreateRuntimeException("A numeric value cannot be assigned to a boolean variable");
               }
 
               variable.BooleanValue = _rightNode.BooleanValue;
@@ -95,7 +95,7 @@ namespace EpsilonScript.AST
         case ElementType.AssignmentAddOperator:
           if (!_rightNode.IsNumeric)
           {
-            throw new RuntimeException("An arithmetic operation can only be performed on a numeric value");
+            throw CreateRuntimeException("An arithmetic operation can only be performed on a numeric value");
           }
 
           switch (variable.Type)
@@ -123,7 +123,7 @@ namespace EpsilonScript.AST
         case ElementType.AssignmentSubtractOperator:
           if (!_rightNode.IsNumeric)
           {
-            throw new RuntimeException("An arithmetic operation can only be performed on a numeric value");
+            throw CreateRuntimeException("An arithmetic operation can only be performed on a numeric value");
           }
 
           switch (variable.Type)
@@ -151,7 +151,7 @@ namespace EpsilonScript.AST
         case ElementType.AssignmentMultiplyOperator:
           if (!_rightNode.IsNumeric)
           {
-            throw new RuntimeException("An arithmetic operation can only be performed on a numeric value");
+            throw CreateRuntimeException("An arithmetic operation can only be performed on a numeric value");
           }
 
           switch (variable.Type)
@@ -179,7 +179,7 @@ namespace EpsilonScript.AST
         case ElementType.AssignmentDivideOperator:
           if (!_rightNode.IsNumeric)
           {
-            throw new RuntimeException("An arithmetic operation can only be performed on a numeric value");
+            throw CreateRuntimeException("An arithmetic operation can only be performed on a numeric value");
           }
 
           switch (variable.Type)
@@ -198,6 +198,34 @@ namespace EpsilonScript.AST
               break;
             case Type.Decimal:
               variable.DecimalValue /= _rightNode.DecimalValue;
+              break;
+            default:
+              throw new ArgumentOutOfRangeException(nameof(variable.Type), variable.Type, "Unsupported variable type");
+          }
+
+          break;
+        case ElementType.AssignmentModuloOperator:
+          if (!_rightNode.IsNumeric)
+          {
+            throw CreateRuntimeException("An arithmetic operation can only be performed on a numeric value");
+          }
+
+          switch (variable.Type)
+          {
+            case Type.Integer:
+              variable.IntegerValue %= _rightNode.IntegerValue;
+              break;
+            case Type.Long:
+              variable.LongValue %= _rightNode.LongValue;
+              break;
+            case Type.Float:
+              variable.FloatValue %= _rightNode.FloatValue;
+              break;
+            case Type.Double:
+              variable.DoubleValue %= _rightNode.DoubleValue;
+              break;
+            case Type.Decimal:
+              variable.DecimalValue %= _rightNode.DecimalValue;
               break;
             default:
               throw new ArgumentOutOfRangeException(nameof(variable.Type), variable.Type, "Unsupported variable type");
@@ -235,6 +263,12 @@ namespace EpsilonScript.AST
         default:
           throw new ArgumentOutOfRangeException(nameof(variable.Type), variable.Type, "Unsupported variable type");
       }
+    }
+
+    public override void Validate()
+    {
+      _leftNode?.Validate();
+      _rightNode?.Validate();
     }
 
     public override void ConfigureNoAlloc()

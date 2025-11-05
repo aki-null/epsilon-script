@@ -5,6 +5,23 @@ using EpsilonScript.Intermediate;
 namespace EpsilonScript.Parser
 {
   /// <summary>
+  /// Type of parenthesis context - used to track whether parentheses are
+  /// for grouping expressions or function calls.
+  /// </summary>
+  internal enum ParenthesisType
+  {
+    /// <summary>
+    /// Regular grouping parenthesis for expressions like (1 + 2)
+    /// </summary>
+    Grouping,
+
+    /// <summary>
+    /// Function call parenthesis like func(args)
+    /// </summary>
+    Function
+  }
+
+  /// <summary>
   /// Parses tokens into elements while validating syntax rules.
   ///
   /// Architecture Note:
@@ -27,22 +44,6 @@ namespace EpsilonScript.Parser
       Init = 0,
       Process,
       End
-    }
-
-    /// <summary>
-    /// Type of parenthesis context
-    /// </summary>
-    private enum ParenthesisType
-    {
-      /// <summary>
-      /// Regular grouping parenthesis for expressions like (1 + 2)
-      /// </summary>
-      Grouping,
-
-      /// <summary>
-      /// Function call parenthesis like func(args)
-      /// </summary>
-      Function
     }
 
     private State _state;
@@ -95,7 +96,8 @@ namespace EpsilonScript.Parser
         currentElementType: type,
         previousToken: _previousToken,
         previousElementType: _previousElementType,
-        parenthesisDepth: _parenthesisDepth
+        parenthesisDepth: _parenthesisDepth,
+        parenthesisTypeStack: _parenthesisTypeStack
       );
 
       _output.Push(new Element(token, type));
@@ -202,6 +204,9 @@ namespace EpsilonScript.Parser
         case TokenType.AssignmentDivideOperator:
           mappedType = ElementType.AssignmentDivideOperator;
           break;
+        case TokenType.AssignmentModuloOperator:
+          mappedType = ElementType.AssignmentModuloOperator;
+          break;
         case TokenType.PlusSign:
           mappedType = ElementType.AddOperator;
           break;
@@ -298,8 +303,8 @@ namespace EpsilonScript.Parser
             // This is needed so a function element has something to build its parameter list on even if no parameters
             // were specified.
             // Note: _currentToken is guaranteed valid here because FunctionStartParenthesis can only be set
-            // after processing a valid function token, so _currentToken.LineNumber is safe to use
-            PushElement(new Token(ReadOnlyMemory<char>.Empty, TokenType.None, _currentToken.LineNumber),
+            // after processing a valid function token, so _currentToken.Location is safe to use
+            PushElement(new Token(ReadOnlyMemory<char>.Empty, TokenType.None, _currentToken.Location),
               ElementType.None);
           }
 

@@ -33,6 +33,7 @@ namespace EpsilonScript.Tests.ScriptSystem
     [InlineData("val -= 7", 10, 3)]
     [InlineData("val *= 2", 7, 14)]
     [InlineData("val /= 4", 20, 5)]
+    [InlineData("val %= 3", 10, 1)]
     public void IntegerAssignments_UpdateVariable(string expression, int startValue, int expected)
     {
       var variables = Variables().WithInteger("val", startValue).Build();
@@ -48,6 +49,7 @@ namespace EpsilonScript.Tests.ScriptSystem
     [InlineData("val -= 2.25", 8.5f, 6.25f)]
     [InlineData("val *= 2", 3.25f, 6.5f)]
     [InlineData("val /= 2", 6.5f, 3.25f)]
+    [InlineData("val %= 3", 10.5f, 1.5f)]
     public void FloatAssignments_UpdateVariable(string expression, float startValue, float expected)
     {
       var variables = Variables().WithFloat("val", startValue).Build();

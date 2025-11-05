@@ -150,7 +150,7 @@ namespace EpsilonScript.Tests.ScriptSystem
       var exception = Assert.Throws<ArgumentException>(() =>
         compiler.AddCustomFunction(CustomFunction.Create("probe", (float value) => value, isDeterministic: false)));
 
-      Assert.Contains("determinism", exception.Message, StringComparison.OrdinalIgnoreCase);
+      Assert.Contains("cannot mix deterministic", exception.Message, StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact]

@@ -100,32 +100,17 @@ namespace EpsilonScript.Tests.ScriptSystem
 
     #endregion
 
-    #region Compound Assignment Operators (Per Spec: No %= operator)
+    #region Compound Assignment Operators
 
     /// <summary>
-    /// Per LANGUAGE.md: "There is no %= (modulo assignment) operator in the language"
-    /// This should fail during parsing as unrecognized operator
-    /// </summary>
-    [Fact]
-    public void ModuloAssignment_NotSupported()
-    {
-      var variables = Variables().WithInteger("x", 10).Build();
-      var compiler = CreateCompiler();
-
-      // The lexer will see %, then =, which may parse but should fail
-      // Let's see what happens
-      Assert.ThrowsAny<System.Exception>(() =>
-        compiler.Compile("x %= 3", Compiler.Options.None, variables));
-    }
-
-    /// <summary>
-    /// Verify that other compound assignment operators work
+    /// Verify that compound assignment operators work
     /// </summary>
     [Theory]
     [InlineData("x += 5", 15)]
     [InlineData("x -= 3", 7)]
     [InlineData("x *= 2", 20)]
     [InlineData("x /= 2", 5)]
+    [InlineData("x %= 3", 1)]
     public void CompoundAssignment_SupportedOperators_Work(string expression, int expected)
     {
       var variables = Variables().WithInteger("x", 10).Build();

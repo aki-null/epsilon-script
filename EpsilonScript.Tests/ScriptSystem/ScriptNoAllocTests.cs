@@ -207,7 +207,7 @@ namespace EpsilonScript.Tests.ScriptSystem
       var script = compiler.Compile("\"X\" + \"Y\"", Compiler.Options.NoAlloc);
 
       // Multiple executions should all work (optimized to constant)
-      for (int i = 0; i < 100; i++)
+      for (var i = 0; i < 100; i++)
       {
         script.Execute();
         Assert.Equal("XY", script.StringValue);

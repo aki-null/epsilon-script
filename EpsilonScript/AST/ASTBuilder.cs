@@ -95,6 +95,7 @@ namespace EpsilonScript.AST
         case ElementType.AssignmentSubtractOperator:
         case ElementType.AssignmentMultiplyOperator:
         case ElementType.AssignmentDivideOperator:
+        case ElementType.AssignmentModuloOperator:
           return new AssignmentNode();
         case ElementType.AddOperator:
         case ElementType.SubtractOperator:

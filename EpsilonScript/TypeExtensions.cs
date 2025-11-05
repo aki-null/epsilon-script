@@ -37,6 +37,24 @@ namespace EpsilonScript
       (1U << (int)ExtendedType.Double) |
       (1U << (int)ExtendedType.Decimal);
 
+    public static string ToDebugString(this ExtendedType t)
+    {
+      return t switch
+      {
+        ExtendedType.Undefined => "void",
+        ExtendedType.Integer => "int",
+        ExtendedType.Long => "long",
+        ExtendedType.Float => "float",
+        ExtendedType.Double => "double",
+        ExtendedType.Decimal => "decimal",
+        ExtendedType.Boolean => "bool",
+        ExtendedType.String => "string",
+        ExtendedType.Null => "null",
+        ExtendedType.Tuple => "tuple",
+        _ => throw new System.ArgumentOutOfRangeException(nameof(t), $"Unknown type: {t}"),
+      };
+    }
+
     [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
     public static bool IsNumber(this ExtendedType t)
     {

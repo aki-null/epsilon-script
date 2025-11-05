@@ -151,7 +151,7 @@ Console.WriteLine(script.IntegerValue);
 
 ### 変数
 
-変数の読み取りと代入(`=`)が可能です。複合代入演算子(`+=`、`-=`、`*=`、`/=`)もサポートされています。
+変数の読み取りと代入(`=`)が可能です。複合代入演算子(`+=`、`-=`、`*=`、`/=`、`%=`)もサポートされています。
 
 変数は`IVariableContainer`に格納されます。簡単に使える実装として`DictionaryVariableContainer`が用意されています。
 
@@ -379,7 +379,7 @@ public int GetScore(string level) => CalculateScore(level);
 compiler.AddCustomFunction(CustomFunction.Create<string, int>("score", GetScore));
 ```
 
-**注意:** パラメータを持つメソッドグループを使う場合は、ジェネリック型パラメータを明示する必要があります。ただし、パラメータなしのメソッドグループは明示不要です:
+注意: パラメータを持つメソッドグループを使う場合は、ジェネリック型パラメータを明示する必要があります。ただし、パラメータなしのメソッドグループは明示不要です:
 
 ```c#
 public int GetConstant() => 42;
@@ -429,6 +429,17 @@ var script = compiler.Compile("IsAfter(5)", Compiler.Options.Immutable, variable
 ### 文字列
 
 文字列もサポートされており、主に関数の引数として使用します。
+
+文字列リテラルはダブルクォート（`"..."`）またはシングルクォート（`'...'`）のどちらでも記述できます:
+
+```
+"Hello World"
+'Hello World'
+"It's working"
+'He said "hello"'
+```
+
+注意: エスケープシーケンスはサポートされていません。バックスラッシュやその他の特殊文字はそのまま扱われます。これにより、パスを簡単に記述できます。
 
 #### コード
 

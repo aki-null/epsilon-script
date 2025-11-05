@@ -37,21 +37,36 @@ This document provides a specification for the EpsilonScript language.
 
 ### String Literals
 ```bnf
-<string>           ::= '"' {<any_char_except_quote>} '"'
-<any_char_except_quote> ::= <any character except '"' or EOF>
+<string>                    ::= <double_quoted_string> | <single_quoted_string>
+<double_quoted_string>      ::= '"' {<any_char_except_dquote>} '"'
+<single_quoted_string>      ::= "'" {<any_char_except_squote>} "'"
+<any_char_except_dquote>    ::= <any character except '"' or EOF>
+<any_char_except_squote>    ::= <any character except "'" or EOF>
 ```
-**Important**: No escape sequences are supported. You cannot include quotes inside strings.
+
+String literals can use either double quotes (`"..."`) or single quotes (`'...'`). Both are semantically identical.
+
+**Important**: No escape sequences are supported. All characters including backslashes are treated literally. This makes it easy to write paths and patterns without escaping.
+
+Examples:
+```
+"Hello World"              // Double-quoted string
+'Hello World'              // Single-quoted string (equivalent)
+"It's working"             // Single quote inside double quotes
+'He said "hello"'          // Double quotes inside single quotes
+'C:\Users\Name'            // Backslashes are literal (no escaping needed)
+'\t is not a tab'          // Literal backslash + t (not a tab character)
+```
 
 ### Operators and Punctuation
 ```bnf
 <arithmetic_op>    ::= "+" | "-" | "*" | "/" | "%"
 <comparison_op>    ::= "==" | "!=" | "<" | "<=" | ">" | ">="
 <logical_op>       ::= "&&" | "||"
-<assignment_op>    ::= "=" | "+=" | "-=" | "*=" | "/="
+<assignment_op>    ::= "=" | "+=" | "-=" | "*=" | "/=" | "%="
 <unary_op>         ::= "!" | "+" | "-"
 <punctuation>      ::= "(" | ")" | "," | ";"
 ```
-**Note**: There is no `%=` (modulo assignment) operator in the language.
 
 ## Syntactic Grammar
 
@@ -108,7 +123,7 @@ This document provides a specification for the EpsilonScript language.
 | 5 | ==, !=, <, <=, >, >= | Left | Comparison |
 | 4 | && | Left | Logical AND |
 | 3 | \|\| | Left | Logical OR |
-| 2 | =, +=, -=, *=, /= | Right | Assignment |
+| 2 | =, +=, -=, *=, /=, %= | Right | Assignment |
 | 1 | , | Left | Comma (tuple creation) |
 | 0 (lowest) | ; | Left | Semicolon (sequence) |
 
@@ -148,9 +163,8 @@ This document provides a specification for the EpsilonScript language.
 
 4. **Assignment Operations**:
    - Simple assignment (=): Type coercion follows variable's declared type
-   - Compound assignments (+=, -=, *=, /=): Only work with numeric types
+   - Compound assignments (+=, -=, *=, /=, %=): Only work with numeric types
      - String += String is NOT supported (use simple concatenation)
-   - No %= operator exists
 
 ## Semantic Rules
 

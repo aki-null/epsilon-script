@@ -109,5 +109,34 @@ namespace EpsilonScript.Tests.Lexer
       // Should match the exact error message from Lexer.cs
       Assert.Equal("OR boolean operator requires two vertical bar characters '||'", ex.Message);
     }
+
+    [Fact]
+    public void UnterminatedSingleQuoteString_ProvidesErrorMessage()
+    {
+      var ex = ExpectLexerException("'unterminated");
+
+      // Should match the exact error message from Lexer.cs
+      Assert.Equal("String literal does not have a closing single quotation mark", ex.Message);
+    }
+
+    [Fact]
+    public void MismatchedQuotes_SingleToDouble_ProvidesErrorMessage()
+    {
+      // Starting with single quote, ending with double quote should error
+      var ex = ExpectLexerException("'hello\"");
+
+      // Should fail as unterminated single quote (double quote is not the closing quote)
+      Assert.Equal("String literal does not have a closing single quotation mark", ex.Message);
+    }
+
+    [Fact]
+    public void MismatchedQuotes_DoubleToSingle_ProvidesErrorMessage()
+    {
+      // Starting with double quote, ending with single quote should error
+      var ex = ExpectLexerException("\"hello'");
+
+      // Should fail as unterminated double quote (single quote is not the closing quote)
+      Assert.Equal("String literal does not have a closing double quotation mark", ex.Message);
+    }
   }
 }

@@ -25,6 +25,7 @@ namespace EpsilonScript.Tests.AST
         ElementType.AssignmentSubtractOperator => TokenType.AssignmentSubtractOperator,
         ElementType.AssignmentMultiplyOperator => TokenType.AssignmentMultiplyOperator,
         ElementType.AssignmentDivideOperator => TokenType.AssignmentDivideOperator,
+        ElementType.AssignmentModuloOperator => TokenType.AssignmentModuloOperator,
         _ => throw new ArgumentOutOfRangeException(nameof(operatorType))
       };
     }
@@ -145,6 +146,7 @@ namespace EpsilonScript.Tests.AST
     [InlineData(ElementType.AssignmentSubtractOperator, "-=")]
     [InlineData(ElementType.AssignmentMultiplyOperator, "*=")]
     [InlineData(ElementType.AssignmentDivideOperator, "/=")]
+    [InlineData(ElementType.AssignmentModuloOperator, "%=")]
     internal void AST_Assignment_CompoundAssignments_PreserveDoublePrecision(
       ElementType operatorType, string operatorSymbol)
     {
@@ -171,6 +173,7 @@ namespace EpsilonScript.Tests.AST
         ElementType.AssignmentSubtractOperator => 1.0 - 1.23456789012345,
         ElementType.AssignmentMultiplyOperator => 1.0 * 1.23456789012345,
         ElementType.AssignmentDivideOperator => 1.0 / 1.23456789012345,
+        ElementType.AssignmentModuloOperator => 1.0 % 1.23456789012345,
         _ => throw new ArgumentException("Unsupported operator")
       };
 
@@ -183,6 +186,7 @@ namespace EpsilonScript.Tests.AST
     [InlineData(ElementType.AssignmentSubtractOperator, "-=")]
     [InlineData(ElementType.AssignmentMultiplyOperator, "*=")]
     [InlineData(ElementType.AssignmentDivideOperator, "/=")]
+    [InlineData(ElementType.AssignmentModuloOperator, "%=")]
     internal void AST_Assignment_CompoundAssignments_PreserveDecimalPrecision(
       ElementType operatorType, string operatorSymbol)
     {
@@ -210,6 +214,7 @@ namespace EpsilonScript.Tests.AST
         ElementType.AssignmentSubtractOperator => 1.0m - rightValue,
         ElementType.AssignmentMultiplyOperator => 1.0m * rightValue,
         ElementType.AssignmentDivideOperator => 1.0m / rightValue,
+        ElementType.AssignmentModuloOperator => 1.0m % rightValue,
         _ => throw new ArgumentException("Unsupported operator")
       };
 
@@ -246,6 +251,7 @@ namespace EpsilonScript.Tests.AST
     [InlineData(ElementType.AssignmentSubtractOperator, "-=")]
     [InlineData(ElementType.AssignmentMultiplyOperator, "*=")]
     [InlineData(ElementType.AssignmentDivideOperator, "/=")]
+    [InlineData(ElementType.AssignmentModuloOperator, "%=")]
     internal void AST_Assignment_CompoundAssignments_PreserveLongPrecision(
       ElementType operatorType, string operatorSymbol)
     {
@@ -273,6 +279,7 @@ namespace EpsilonScript.Tests.AST
         ElementType.AssignmentSubtractOperator => 1000000000000L - rightValue,
         ElementType.AssignmentMultiplyOperator => 1000000000000L * rightValue,
         ElementType.AssignmentDivideOperator => 1000000000000L / rightValue,
+        ElementType.AssignmentModuloOperator => 1000000000000L % rightValue,
         _ => throw new ArgumentException("Unsupported operator")
       };
 

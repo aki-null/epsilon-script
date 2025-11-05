@@ -77,5 +77,18 @@ namespace EpsilonScript.Function
     {
       return left._packed != right._packed;
     }
+
+    public override string ToString()
+    {
+      if (Count == 0) return string.Empty;
+
+      var types = new string[Count];
+      for (var i = 0; i < Count; i++)
+      {
+        types[i] = GetTypeAt(i).ToDebugString();
+      }
+
+      return string.Join(", ", types);
+    }
   }
 }

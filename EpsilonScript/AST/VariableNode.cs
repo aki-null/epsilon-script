@@ -14,7 +14,7 @@ namespace EpsilonScript.AST
 
     public override bool IsPrecomputable => false;
 
-    public override void Build(Stack<Node> rpnStack, Element element, Compiler.Options options,
+    protected override void BuildCore(Stack<Node> rpnStack, Element element, Compiler.Options options,
       IVariableContainer variables, IDictionary<VariableId, CustomFunctionOverload> functions,
       Compiler.IntegerPrecision intPrecision, Compiler.FloatPrecision floatPrecision)
     {
@@ -38,7 +38,7 @@ namespace EpsilonScript.AST
       {
         if (_variables == null || !_variables.TryGetValue(_variableName, out variable))
         {
-          throw new RuntimeException($"Undefined variable: {_variableName}");
+          throw CreateRuntimeException($"Undefined variable: {_variableName}");
         }
       }
 

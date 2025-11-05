@@ -10,7 +10,7 @@ namespace EpsilonScript.AST
 
     public override bool IsPrecomputable => _childNode.IsPrecomputable;
 
-    public override void Build(Stack<Node> rpnStack, Element element, Compiler.Options options,
+    protected override void BuildCore(Stack<Node> rpnStack, Element element, Compiler.Options options,
       IVariableContainer variables, IDictionary<VariableId, CustomFunctionOverload> functions,
       Compiler.IntegerPrecision intPrecision, Compiler.FloatPrecision floatPrecision)
     {
@@ -27,7 +27,7 @@ namespace EpsilonScript.AST
       _childNode.Execute(variablesOverride);
       if (_childNode.ValueType != ExtendedType.Boolean)
       {
-        throw new RuntimeException("Cannot negate a non-boolean value");
+        throw CreateRuntimeException("Cannot negate a non-boolean value");
       }
 
       BooleanValue = !_childNode.BooleanValue;
@@ -43,6 +43,11 @@ namespace EpsilonScript.AST
 
       _childNode = _childNode.Optimize();
       return this;
+    }
+
+    public override void Validate()
+    {
+      _childNode?.Validate();
     }
 
     public override void ConfigureNoAlloc()

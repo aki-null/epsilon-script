@@ -28,14 +28,18 @@ namespace EpsilonScript.AST
     private readonly OperationMode _mode;
     private bool _noAllocMode;
 
+    // Secondary location - for the multiply operation
+    // Primary location (base.Location) stores the add/subtract operation
+    private readonly SourceLocation _multiplyLocation;
+
     public override bool IsPrecomputable =>
       _multiplier1.IsPrecomputable && _multiplier2.IsPrecomputable && _addend.IsPrecomputable;
 
     /// <summary>
-    /// Constructor used during optimization phase to create multiply-add node
+    /// Constructor used during optimization phase to create multiply-add node.
     /// </summary>
-    public MultiplyAddNode(Node multiplier1, Node multiplier2, Node addend,
-      Type configuredIntegerType, Type configuredFloatType, OperationMode mode)
+    public MultiplyAddNode(OperationMode mode, Node multiplier1, Node multiplier2, Node addend,
+      ArithmeticNode multiplyNode, ArithmeticNode addSubtractNode, Type configuredIntegerType, Type configuredFloatType)
     {
       _multiplier1 = multiplier1;
       _multiplier2 = multiplier2;
@@ -43,9 +47,15 @@ namespace EpsilonScript.AST
       _configuredIntegerType = configuredIntegerType;
       _configuredFloatType = configuredFloatType;
       _mode = mode;
+
+      // Primary location: the add/subtract operation (top-level operation)
+      Location = addSubtractNode.Location;
+
+      // Secondary location: the multiply operation (nested operation)
+      _multiplyLocation = multiplyNode.Location;
     }
 
-    public override void Build(Stack<Node> rpnStack, Element element, Compiler.Options options,
+    protected override void BuildCore(Stack<Node> rpnStack, Element element, Compiler.Options options,
       IVariableContainer variables, IDictionary<VariableId, CustomFunctionOverload> functions,
       Compiler.IntegerPrecision intPrecision, Compiler.FloatPrecision floatPrecision)
     {
@@ -73,24 +83,28 @@ namespace EpsilonScript.AST
       _addend.Execute(variablesOverride);
 
       // Check for boolean operands upfront
-      if (_multiplier1.ValueType == ExtendedType.Boolean || _multiplier2.ValueType == ExtendedType.Boolean ||
-          _addend.ValueType == ExtendedType.Boolean)
+      if (_multiplier1.ValueType == ExtendedType.Boolean || _multiplier2.ValueType == ExtendedType.Boolean)
       {
-        throw new RuntimeException("Boolean values cannot be used in arithmetic operations");
+        throw new RuntimeException("Boolean values cannot be used in arithmetic operations", _multiplyLocation);
+      }
+
+      if (_addend.ValueType == ExtendedType.Boolean)
+      {
+        throw new RuntimeException("Boolean values cannot be used in arithmetic operations", Location);
       }
 
       // Validate types - matches original ArithmeticNode behavior
       // Multiply must be numeric * numeric (strings not supported in multiply)
       if (!_multiplier1.IsNumeric || !_multiplier2.IsNumeric)
       {
-        throw new RuntimeException("Multiply operation can only be performed on numeric values");
+        throw new RuntimeException("Multiply operation can only be performed on numeric values", _multiplyLocation);
       }
 
       // For add/subtract: addend can be string only if mode is Add and addend is on the LEFT
       // This matches original ArithmeticNode behavior: "string + X" is allowed, "X + string" is not
       if (!_addend.IsNumeric && _addend.ValueType != ExtendedType.String)
       {
-        throw new RuntimeException("An arithmetic operation can only be performed on numeric values");
+        throw new RuntimeException("An arithmetic operation can only be performed on numeric values", Location);
       }
 
       // String validation: strings only allowed in AddMultiply pattern (c + (a*b))
@@ -102,11 +116,11 @@ namespace EpsilonScript.AST
         {
           if (_mode == OperationMode.MultiplySubtract || _mode == OperationMode.SubtractMultiply)
           {
-            throw new RuntimeException("String operations only support concatenation (+), not subtraction");
+            throw new RuntimeException("String operations only support concatenation (+), not subtraction", Location);
           }
           else // MultiplyAdd
           {
-            throw new RuntimeException("An arithmetic operation can only be performed on numeric values");
+            throw new RuntimeException("An arithmetic operation can only be performed on numeric values", Location);
           }
         }
       }
@@ -203,7 +217,7 @@ namespace EpsilonScript.AST
             if (_noAllocMode)
             {
               throw new RuntimeException(
-                "String concatenation is not allowed in NoAlloc mode (causes runtime heap allocation)");
+                "String concatenation is not allowed in NoAlloc mode (causes runtime heap allocation)", Location);
             }
 
             // Compute product based on multiply type, then format to string
@@ -240,7 +254,8 @@ namespace EpsilonScript.AST
           }
           else
           {
-            throw new RuntimeException("String operations only support concatenation with string on left side");
+            throw new RuntimeException("String operations only support concatenation with string on left side",
+              Location);
           }
 
           break;
@@ -263,6 +278,13 @@ namespace EpsilonScript.AST
       _addend = _addend.Optimize();
 
       return this;
+    }
+
+    public override void Validate()
+    {
+      _multiplier1?.Validate();
+      _multiplier2?.Validate();
+      _addend?.Validate();
     }
 
     public override void ConfigureNoAlloc()

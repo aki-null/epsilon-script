@@ -29,6 +29,26 @@ namespace EpsilonScript.AST
     private decimal _decimalValue;
     private string _stringValue;
 
+    // Location context for runtime error reporting
+    internal SourceLocation Location = SourceLocation.Unknown;
+
+    /// <summary>
+    /// Captures location information from a token for runtime error reporting.
+    /// Call this in Build() methods to store location context without holding token references.
+    /// </summary>
+    protected void CaptureLocation(in Token token)
+    {
+      Location = token.Location;
+    }
+
+    /// <summary>
+    /// Creates a RuntimeException with this node's location context.
+    /// </summary>
+    protected RuntimeException CreateRuntimeException(string message)
+    {
+      return new RuntimeException(message, Location);
+    }
+
     public string StringValue
     {
       get => _stringValue;
@@ -77,7 +97,7 @@ namespace EpsilonScript.AST
           case ExtendedType.Undefined:
             return 0;
           default:
-            throw new RuntimeException($"Cannot convert {_type} to integer");
+            throw new InvalidOperationException($"Cannot convert {_type} to integer");
         }
       }
 
@@ -114,7 +134,7 @@ namespace EpsilonScript.AST
           case ExtendedType.Undefined:
             return 0L;
           default:
-            throw new RuntimeException($"Cannot convert {_type} to long");
+            throw new InvalidOperationException($"Cannot convert {_type} to long");
         }
       }
 
@@ -148,7 +168,7 @@ namespace EpsilonScript.AST
           case ExtendedType.Undefined:
             return 0.0f;
           default:
-            throw new RuntimeException($"Cannot convert {_type} to float");
+            throw new InvalidOperationException($"Cannot convert {_type} to float");
         }
       }
 
@@ -182,7 +202,7 @@ namespace EpsilonScript.AST
           case ExtendedType.Undefined:
             return 0.0;
           default:
-            throw new RuntimeException($"Cannot convert {_type} to double");
+            throw new InvalidOperationException($"Cannot convert {_type} to double");
         }
       }
 
@@ -216,7 +236,7 @@ namespace EpsilonScript.AST
           case ExtendedType.Undefined:
             return 0m;
           default:
-            throw new RuntimeException($"Cannot convert {_type} to decimal");
+            throw new InvalidOperationException($"Cannot convert {_type} to decimal");
         }
       }
 
@@ -250,7 +270,7 @@ namespace EpsilonScript.AST
           case ExtendedType.Undefined:
             return false;
           default:
-            throw new RuntimeException($"Cannot convert {_type} to boolean");
+            throw new InvalidOperationException($"Cannot convert {_type} to boolean");
         }
       }
 
@@ -262,7 +282,23 @@ namespace EpsilonScript.AST
       }
     }
 
-    public abstract void Build(Stack<Node> rpnStack, Element element, Compiler.Options options,
+    /// <summary>
+    /// Template method that automatically captures location and delegates to BuildCore().
+    /// Subclasses should override BuildCore() instead of this method.
+    /// </summary>
+    public void Build(Stack<Node> rpnStack, Element element, Compiler.Options options,
+      IVariableContainer variables, IDictionary<VariableId, CustomFunctionOverload> functions,
+      Compiler.IntegerPrecision intPrecision, Compiler.FloatPrecision floatPrecision)
+    {
+      CaptureLocation(element.Token);
+      BuildCore(rpnStack, element, options, variables, functions, intPrecision, floatPrecision);
+    }
+
+    /// <summary>
+    /// Core build implementation. Override this method to implement node-specific construction logic.
+    /// Location is automatically captured before this method is called.
+    /// </summary>
+    protected abstract void BuildCore(Stack<Node> rpnStack, Element element, Compiler.Options options,
       IVariableContainer variables, IDictionary<VariableId, CustomFunctionOverload> functions,
       Compiler.IntegerPrecision intPrecision, Compiler.FloatPrecision floatPrecision);
 
@@ -284,6 +320,16 @@ namespace EpsilonScript.AST
     }
 
     /// <summary>
+    /// Validates the AST node after optimization completes.
+    /// Called after optimization phase when types are fully resolved for constant expressions.
+    /// Override in nodes that need post-optimization validation (e.g., function signature checking).
+    /// </summary>
+    public virtual void Validate()
+    {
+      // Base implementation does nothing - leaf nodes don't need validation
+    }
+
+    /// <summary>
     /// Configures NoAlloc validation on this node and all child nodes recursively.
     /// Called after optimization phase completes to enable runtime allocation checking.
     /// </summary>
@@ -294,7 +340,7 @@ namespace EpsilonScript.AST
 
     protected Node CreateValueNode()
     {
-      return ValueType switch
+      Node node = ValueType switch
       {
         ExtendedType.Integer => new IntegerNode(IntegerValue),
         ExtendedType.Long => new IntegerNode(LongValue),
@@ -305,6 +351,10 @@ namespace EpsilonScript.AST
         ExtendedType.String => new StringNode(StringValue),
         _ => throw new ArgumentOutOfRangeException(nameof(ValueType), ValueType, "Unsupported value type")
       };
+
+      // Preserve location information from the original node
+      node.Location = Location;
+      return node;
     }
 
     public override string ToString()

@@ -24,6 +24,7 @@ namespace EpsilonScript.Intermediate
     AssignmentSubtractOperator,
     AssignmentMultiplyOperator,
     AssignmentDivideOperator,
+    AssignmentModuloOperator,
     PlusSign,
     MinusSign,
     MultiplyOperator,

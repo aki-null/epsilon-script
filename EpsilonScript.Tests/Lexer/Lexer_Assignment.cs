@@ -48,6 +48,11 @@ namespace EpsilonScript.Tests.Lexer
             "/=",
             new Token("/=", TokenType.AssignmentDivideOperator)
           },
+          new object[]
+          {
+            "%=",
+            new Token("%=", TokenType.AssignmentModuloOperator)
+          },
           // Multiple assignment operators
           new object[]
           {

@@ -29,7 +29,7 @@ namespace EpsilonScript.AST
       };
     }
 
-    public override void Build(Stack<Node> rpnStack, Element element, Compiler.Options options,
+    protected override void BuildCore(Stack<Node> rpnStack, Element element, Compiler.Options options,
       IVariableContainer variables, IDictionary<VariableId, CustomFunctionOverload> functions,
       Compiler.IntegerPrecision intPrecision, Compiler.FloatPrecision floatPrecision)
     {
@@ -74,11 +74,11 @@ namespace EpsilonScript.AST
       {
         if (_leftNode.ValueType == ExtendedType.Boolean || _rightNode.ValueType == ExtendedType.Boolean)
         {
-          throw new RuntimeException(
+          throw CreateRuntimeException(
             $"Boolean values cannot be used in arithmetic operations ({GetOperatorName(_operator)})");
         }
 
-        throw new RuntimeException("An arithmetic operation can only be performed on numeric values");
+        throw CreateRuntimeException("An arithmetic operation can only be performed on numeric values");
       }
 
       ValueType = PromoteType(_leftNode.ValueType, _rightNode.ValueType);
@@ -86,7 +86,7 @@ namespace EpsilonScript.AST
       // NoAlloc validation: Block runtime string concatenation
       if (_noAllocMode && ValueType == ExtendedType.String)
       {
-        throw new RuntimeException(
+        throw CreateRuntimeException(
           "String concatenation is not allowed in NoAlloc mode (causes runtime heap allocation)");
       }
 
@@ -191,7 +191,7 @@ namespace EpsilonScript.AST
           }
           else
           {
-            throw new RuntimeException(
+            throw CreateRuntimeException(
               $"String operations only support concatenation (+), not {GetOperatorName(_operator)}");
           }
 
@@ -218,57 +218,39 @@ namespace EpsilonScript.AST
         {
           _operator: ElementType.MultiplyOperator
         } left:
-          return new MultiplyAddNode(
-            left._leftNode,
-            left._rightNode,
-            _rightNode,
-            _configuredIntegerType,
-            _configuredFloatType,
-            MultiplyAddNode.OperationMode.MultiplyAdd
-          ).Optimize();
+          return new MultiplyAddNode(MultiplyAddNode.OperationMode.MultiplyAdd, left._leftNode, left._rightNode,
+            _rightNode, left, this, _configuredIntegerType, _configuredFloatType).Optimize();
         // Pattern: c + (a * b)
         case ElementType.AddOperator when _rightNode is ArithmeticNode
         {
           _operator: ElementType.MultiplyOperator
         } right:
-          return new MultiplyAddNode(
-            right._leftNode,
-            right._rightNode,
-            _leftNode,
-            _configuredIntegerType,
-            _configuredFloatType,
-            MultiplyAddNode.OperationMode.AddMultiply
-          ).Optimize();
+          return new MultiplyAddNode(MultiplyAddNode.OperationMode.AddMultiply, right._leftNode, right._rightNode,
+            _leftNode, right, this, _configuredIntegerType, _configuredFloatType).Optimize();
         // Try Multiply-Subtract optimization for subtraction operations
         // Pattern: (a * b) - c
         case ElementType.SubtractOperator when _leftNode is ArithmeticNode
         {
           _operator: ElementType.MultiplyOperator
         } left:
-          return new MultiplyAddNode(
-            left._leftNode,
-            left._rightNode,
-            _rightNode,
-            _configuredIntegerType,
-            _configuredFloatType,
-            MultiplyAddNode.OperationMode.MultiplySubtract
-          ).Optimize();
+          return new MultiplyAddNode(MultiplyAddNode.OperationMode.MultiplySubtract, left._leftNode, left._rightNode,
+            _rightNode, left, this, _configuredIntegerType, _configuredFloatType).Optimize();
         // Pattern: c - (a * b)
         case ElementType.SubtractOperator when _rightNode is ArithmeticNode
         {
           _operator: ElementType.MultiplyOperator
         } right:
-          return new MultiplyAddNode(
-            right._leftNode,
-            right._rightNode,
-            _leftNode,
-            _configuredIntegerType,
-            _configuredFloatType,
-            MultiplyAddNode.OperationMode.SubtractMultiply
-          ).Optimize();
+          return new MultiplyAddNode(MultiplyAddNode.OperationMode.SubtractMultiply, right._leftNode, right._rightNode,
+            _leftNode, right, this, _configuredIntegerType, _configuredFloatType).Optimize();
         default:
           return this;
       }
+    }
+
+    public override void Validate()
+    {
+      _leftNode?.Validate();
+      _rightNode?.Validate();
     }
 
     public override void ConfigureNoAlloc()

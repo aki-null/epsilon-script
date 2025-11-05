@@ -153,7 +153,7 @@ Console.WriteLine(script.IntegerValue);
 
 ### Variables
 
-Variables can be read and assigned (`=`). Compound assignment operators (`+=`, `-=`, `*=`, `/=`) are also supported.
+Variables can be read and assigned (`=`). Compound assignment operators (`+=`, `-=`, `*=`, `/=`, `%=`) are also supported.
 
 Variables are stored in an `IVariableContainer`. Use `DictionaryVariableContainer` for a simple implementation.
 
@@ -381,7 +381,7 @@ public int GetScore(string level) => CalculateScore(level);
 compiler.AddCustomFunction(CustomFunction.Create<string, int>("score", GetScore));
 ```
 
-**Note:** Method groups with parameters require explicit generic type parameters. However, zero-parameter method groups work without explicit generics:
+Note: Method groups with parameters require explicit generic type parameters. However, zero-parameter method groups work without explicit generics:
 
 ```c#
 public int GetConstant() => 42;
@@ -431,6 +431,17 @@ Supports up to 3 context variables and 3 script parameters.
 ### Strings
 
 Strings are supported, primarily for function parameters.
+
+String literals can use either double quotes (`"..."`) or single quotes (`'...'`):
+
+```
+"Hello World"
+'Hello World'
+"It's working"
+'He said "hello"'
+```
+
+Note: No escape sequences are supported. Backslashes and other special characters are treated as literal characters. This makes it easy to write paths.
 
 #### Code
 

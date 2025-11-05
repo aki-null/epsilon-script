@@ -394,7 +394,7 @@ namespace EpsilonScript.Tests.AST
         return new FakeComparisonNode(5, 5, _value);
       }
 
-      public override void Build(Stack<Node> rpnStack, Element element, Compiler.Options options,
+      protected override void BuildCore(Stack<Node> rpnStack, Element element, Compiler.Options options,
         IVariableContainer variables, IDictionary<VariableId, CustomFunctionOverload> functions,
         Compiler.IntegerPrecision intPrecision, Compiler.FloatPrecision floatPrecision)
       {
@@ -425,7 +425,7 @@ namespace EpsilonScript.Tests.AST
         BooleanValue = _expectedResult;
       }
 
-      public override void Build(Stack<Node> rpnStack, Element element, Compiler.Options options,
+      protected override void BuildCore(Stack<Node> rpnStack, Element element, Compiler.Options options,
         IVariableContainer variables, IDictionary<VariableId, CustomFunctionOverload> functions,
         Compiler.IntegerPrecision intPrecision, Compiler.FloatPrecision floatPrecision)
       {
@@ -445,7 +445,7 @@ namespace EpsilonScript.Tests.AST
 
       public override bool IsPrecomputable => false; // This makes it non-constant
 
-      public override void Build(Stack<Node> rpnStack, Element element, Compiler.Options options,
+      protected override void BuildCore(Stack<Node> rpnStack, Element element, Compiler.Options options,
         IVariableContainer variables, IDictionary<VariableId, CustomFunctionOverload> functions,
         Compiler.IntegerPrecision intPrecision, Compiler.FloatPrecision floatPrecision)
       {
