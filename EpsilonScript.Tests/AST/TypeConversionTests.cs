@@ -1,6 +1,5 @@
 using System;
-using EpsilonScript.AST;
-using EpsilonScript.Tests.TestInfrastructure;
+using EpsilonScript.AST.Literal;
 using Xunit;
 
 namespace EpsilonScript.Tests.AST

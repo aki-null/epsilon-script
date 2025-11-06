@@ -1,6 +1,11 @@
 using System;
 using System.Collections.Generic;
-using EpsilonScript.Function;
+using EpsilonScript.AST.Arithmetic;
+using EpsilonScript.AST.Assignment;
+using EpsilonScript.AST.Boolean;
+using EpsilonScript.AST.Comparison;
+using EpsilonScript.AST.Literal;
+using EpsilonScript.AST.Sign;
 using EpsilonScript.Intermediate;
 
 namespace EpsilonScript.AST
@@ -10,16 +15,13 @@ namespace EpsilonScript.AST
     public Node Result { get; private set; }
 
     private readonly Stack<Node> _rpnStack = new Stack<Node>();
-
+    private readonly CompilerContext _context;
     private Compiler.Options _options;
     private IVariableContainer _variables;
-    private Compiler.IntegerPrecision _intPrecision;
-    private Compiler.FloatPrecision _floatPrecision;
-    private readonly IDictionary<VariableId, CustomFunctionOverload> _functions;
 
-    public AstBuilder(IDictionary<VariableId, CustomFunctionOverload> functions)
+    public AstBuilder(CompilerContext context)
     {
-      _functions = functions;
+      _context = context;
     }
 
     public void Reset()
@@ -27,24 +29,19 @@ namespace EpsilonScript.AST
       _rpnStack.Clear();
       _options = Compiler.Options.None;
       _variables = null;
-      _intPrecision = Compiler.IntegerPrecision.Integer;
-      _floatPrecision = Compiler.FloatPrecision.Float;
       Result = null;
     }
 
-    public void Configure(Compiler.Options options, IVariableContainer variables,
-      Compiler.IntegerPrecision intPrecision, Compiler.FloatPrecision floatPrecision)
+    public void Configure(Compiler.Options options, IVariableContainer variables)
     {
       _options = options;
       _variables = variables;
-      _intPrecision = intPrecision;
-      _floatPrecision = floatPrecision;
     }
 
     public void Push(Element element)
     {
       var node = CreateNode(element.Type);
-      node.Build(_rpnStack, element, _options, _variables, _functions, _intPrecision, _floatPrecision);
+      node.Build(_rpnStack, element, _context, _options, _variables);
       _rpnStack.Push(node);
     }
 
@@ -73,36 +70,52 @@ namespace EpsilonScript.AST
         case ElementType.Semicolon:
           return new SequenceNode();
         case ElementType.ComparisonEqual:
+          return new EqualComparisonNode();
         case ElementType.ComparisonNotEqual:
+          return new NotEqualComparisonNode();
         case ElementType.ComparisonLessThan:
+          return new LessThanComparisonNode();
         case ElementType.ComparisonGreaterThan:
+          return new GreaterThanComparisonNode();
         case ElementType.ComparisonLessThanOrEqualTo:
+          return new LessThanOrEqualComparisonNode();
         case ElementType.ComparisonGreaterThanOrEqualTo:
-          return new ComparisonNode();
+          return new GreaterThanOrEqualComparisonNode();
         case ElementType.NegateOperator:
           return new NegateNode();
         case ElementType.PositiveOperator:
+          return new PositiveSignNode();
         case ElementType.NegativeOperator:
-          return new SignOperator();
+          return new NegativeSignNode();
         case ElementType.BooleanOrOperator:
+          return new BooleanOrNode();
         case ElementType.BooleanAndOperator:
-          return new BooleanOperationNode();
+          return new BooleanAndNode();
         case ElementType.BooleanLiteralTrue:
         case ElementType.BooleanLiteralFalse:
           return new BooleanNode();
         case ElementType.AssignmentOperator:
+          return new DirectAssignmentNode();
         case ElementType.AssignmentAddOperator:
+          return new AddAssignmentNode();
         case ElementType.AssignmentSubtractOperator:
+          return new SubtractAssignmentNode();
         case ElementType.AssignmentMultiplyOperator:
+          return new MultiplyAssignmentNode();
         case ElementType.AssignmentDivideOperator:
+          return new DivideAssignmentNode();
         case ElementType.AssignmentModuloOperator:
-          return new AssignmentNode();
+          return new ModuloAssignmentNode();
         case ElementType.AddOperator:
+          return new AddNode();
         case ElementType.SubtractOperator:
+          return new SubtractNode();
         case ElementType.MultiplyOperator:
+          return new MultiplyNode();
         case ElementType.DivideOperator:
+          return new DivideNode();
         case ElementType.ModuloOperator:
-          return new ArithmeticNode();
+          return new ModuloNode();
         case ElementType.Integer:
           return new IntegerNode();
         case ElementType.Float:

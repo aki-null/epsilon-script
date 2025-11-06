@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using EpsilonScript.AST;
+using EpsilonScript.AST.Literal;
 using EpsilonScript.Intermediate;
 using Xunit;
 using EpsilonScript.Tests.TestInfrastructure;
@@ -17,8 +17,8 @@ namespace EpsilonScript.Tests.AST
     {
       var node = new IntegerNode();
       var rpn = CreateStack();
-      node.Build(rpn, element, Compiler.Options.None, null,
-        null, Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float);
+      var context = new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, null);
+      node.Build(rpn, element, context, Compiler.Options.None, null);
       Assert.Equal(expectedNodeType, node.ValueType);
       Assert.Equal(expectedInt, node.IntegerValue);
       Assert.True(EpsilonScript.Math.IsNearlyEqual(expectedFloat, node.FloatValue));

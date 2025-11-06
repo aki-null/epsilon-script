@@ -1,8 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Runtime.CompilerServices;
-using EpsilonScript.Function;
+using EpsilonScript.AST.Literal;
 using EpsilonScript.Intermediate;
 
 namespace EpsilonScript.AST
@@ -286,21 +285,19 @@ namespace EpsilonScript.AST
     /// Template method that automatically captures location and delegates to BuildCore().
     /// Subclasses should override BuildCore() instead of this method.
     /// </summary>
-    public void Build(Stack<Node> rpnStack, Element element, Compiler.Options options,
-      IVariableContainer variables, IDictionary<VariableId, CustomFunctionOverload> functions,
-      Compiler.IntegerPrecision intPrecision, Compiler.FloatPrecision floatPrecision)
+    public void Build(Stack<Node> rpnStack, Element element, CompilerContext context,
+      Compiler.Options options, IVariableContainer variables)
     {
       CaptureLocation(element.Token);
-      BuildCore(rpnStack, element, options, variables, functions, intPrecision, floatPrecision);
+      BuildCore(rpnStack, element, context, options, variables);
     }
 
     /// <summary>
     /// Core build implementation. Override this method to implement node-specific construction logic.
     /// Location is automatically captured before this method is called.
     /// </summary>
-    protected abstract void BuildCore(Stack<Node> rpnStack, Element element, Compiler.Options options,
-      IVariableContainer variables, IDictionary<VariableId, CustomFunctionOverload> functions,
-      Compiler.IntegerPrecision intPrecision, Compiler.FloatPrecision floatPrecision);
+    protected abstract void BuildCore(Stack<Node> rpnStack, Element element, CompilerContext context,
+      Compiler.Options options, IVariableContainer variables);
 
     public virtual void Execute(IVariableContainer variablesOverride)
     {
@@ -355,24 +352,6 @@ namespace EpsilonScript.AST
       // Preserve location information from the original node
       node.Location = Location;
       return node;
-    }
-
-    public override string ToString()
-    {
-      return ValueType switch
-      {
-        ExtendedType.Undefined => "Undefined",
-        ExtendedType.Null => "null",
-        ExtendedType.Integer => IntegerValue.ToString(),
-        ExtendedType.Long => LongValue.ToString(),
-        ExtendedType.Float => FloatValue.ToString(CultureInfo.InvariantCulture),
-        ExtendedType.Double => DoubleValue.ToString(CultureInfo.InvariantCulture),
-        ExtendedType.Decimal => DecimalValue.ToString(CultureInfo.InvariantCulture),
-        ExtendedType.Boolean => BooleanValue ? "true" : "false",
-        ExtendedType.Tuple => "Tuple",
-        ExtendedType.String => StringValue,
-        _ => throw new ArgumentOutOfRangeException(nameof(ValueType), ValueType, "Unsupported value type")
-      };
     }
   }
 }

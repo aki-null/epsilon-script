@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using EpsilonScript.AST;
+using EpsilonScript.AST.Literal;
 using EpsilonScript.Intermediate;
 using Xunit;
 using EpsilonScript.Tests.TestInfrastructure;
@@ -23,7 +23,7 @@ namespace EpsilonScript.Tests.AST
     public void ArithmeticNode_WithLongPrecision_PerformsLongArithmetic(
       long left, long right, string operatorSymbol, long expectedResult)
     {
-      var node = new ArithmeticNode();
+      var node = CreateArithmeticNode(operatorSymbol);
       var leftNode = new FakeLongNode(left);
       var rightNode = new FakeLongNode(right);
       var rpn = CreateStack(leftNode, rightNode);
@@ -32,8 +32,9 @@ namespace EpsilonScript.Tests.AST
       var tokenType = GetTokenTypeFromOperator(operatorSymbol);
       var element = new Element(new Token(operatorSymbol, tokenType), operatorType);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null,
-        Compiler.IntegerPrecision.Long, Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Long, Compiler.FloatPrecision.Float, null), Compiler.Options.None,
+        null);
       node.Execute(null);
 
       Assert.Equal(ExtendedType.Long, node.ValueType);
@@ -44,14 +45,15 @@ namespace EpsilonScript.Tests.AST
     public void ArithmeticNode_WithLongPrecision_OverflowWraps()
     {
       // Test overflow behavior with long arithmetic
-      var node = new ArithmeticNode();
+      var node = CreateArithmeticNode(ElementType.AddOperator);
       var leftNode = new FakeLongNode(long.MaxValue);
       var rightNode = new FakeLongNode(1L);
       var rpn = CreateStack(leftNode, rightNode);
       var element = new Element(new Token("+", TokenType.PlusSign), ElementType.AddOperator);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null,
-        Compiler.IntegerPrecision.Long, Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Long, Compiler.FloatPrecision.Float, null), Compiler.Options.None,
+        null);
       node.Execute(null);
 
       Assert.Equal(ExtendedType.Long, node.ValueType);
@@ -64,7 +66,7 @@ namespace EpsilonScript.Tests.AST
     [InlineData("%")]
     public void ArithmeticNode_WithLongPrecision_DivideByZero_ThrowsException(string operatorSymbol)
     {
-      var node = new ArithmeticNode();
+      var node = CreateArithmeticNode(operatorSymbol);
       var leftNode = new FakeLongNode(5000000000L);
       var rightNode = new FakeLongNode(0L);
       var rpn = CreateStack(leftNode, rightNode);
@@ -73,8 +75,9 @@ namespace EpsilonScript.Tests.AST
       var tokenType = GetTokenTypeFromOperator(operatorSymbol);
       var element = new Element(new Token(operatorSymbol, tokenType), operatorType);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null,
-        Compiler.IntegerPrecision.Long, Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Long, Compiler.FloatPrecision.Float, null), Compiler.Options.None,
+        null);
 
       Assert.Throws<DivideByZeroException>(() => node.Execute(null));
     }
@@ -92,7 +95,7 @@ namespace EpsilonScript.Tests.AST
     public void ArithmeticNode_WithDoublePrecision_PerformsDoubleArithmetic(
       double left, double right, string operatorSymbol, double expectedResult)
     {
-      var node = new ArithmeticNode();
+      var node = CreateArithmeticNode(operatorSymbol);
       var leftNode = new FakeDoubleNode(left);
       var rightNode = new FakeDoubleNode(right);
       var rpn = CreateStack(leftNode, rightNode);
@@ -101,8 +104,9 @@ namespace EpsilonScript.Tests.AST
       var tokenType = GetTokenTypeFromOperator(operatorSymbol);
       var element = new Element(new Token(operatorSymbol, tokenType), operatorType);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null,
-        Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Double);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Double, null),
+        Compiler.Options.None, null);
       node.Execute(null);
 
       Assert.Equal(ExtendedType.Double, node.ValueType);
@@ -113,14 +117,15 @@ namespace EpsilonScript.Tests.AST
     public void ArithmeticNode_WithDoublePrecision_MaintainsPrecision()
     {
       // Test that double maintains more precision than float
-      var node = new ArithmeticNode();
+      var node = CreateArithmeticNode(ElementType.AddOperator);
       var leftNode = new FakeDoubleNode(0.1);
       var rightNode = new FakeDoubleNode(0.2);
       var rpn = CreateStack(leftNode, rightNode);
       var element = new Element(new Token("+", TokenType.PlusSign), ElementType.AddOperator);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null,
-        Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Double);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Double, null),
+        Compiler.Options.None, null);
       node.Execute(null);
 
       Assert.Equal(ExtendedType.Double, node.ValueType);
@@ -133,7 +138,7 @@ namespace EpsilonScript.Tests.AST
     [InlineData("%")]
     public void ArithmeticNode_WithDoublePrecision_DivideByZero_ThrowsException(string operatorSymbol)
     {
-      var node = new ArithmeticNode();
+      var node = CreateArithmeticNode(operatorSymbol);
       var leftNode = new FakeDoubleNode(5.5);
       var rightNode = new FakeDoubleNode(0.0);
       var rpn = CreateStack(leftNode, rightNode);
@@ -142,8 +147,9 @@ namespace EpsilonScript.Tests.AST
       var tokenType = GetTokenTypeFromOperator(operatorSymbol);
       var element = new Element(new Token(operatorSymbol, tokenType), operatorType);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null,
-        Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Double);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Double, null),
+        Compiler.Options.None, null);
 
       Assert.Throws<DivideByZeroException>(() => node.Execute(null));
     }
@@ -157,7 +163,7 @@ namespace EpsilonScript.Tests.AST
     public void ArithmeticNode_WithDecimalPrecision_PerformsDecimalArithmetic(
       decimal left, decimal right, string operatorSymbol, decimal expectedResult)
     {
-      var node = new ArithmeticNode();
+      var node = CreateArithmeticNode(operatorSymbol);
       var leftNode = new FakeDecimalNode(left);
       var rightNode = new FakeDecimalNode(right);
       var rpn = CreateStack(leftNode, rightNode);
@@ -166,8 +172,9 @@ namespace EpsilonScript.Tests.AST
       var tokenType = GetTokenTypeFromOperator(operatorSymbol);
       var element = new Element(new Token(operatorSymbol, tokenType), operatorType);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null,
-        Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Decimal);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Decimal, null),
+        Compiler.Options.None, null);
       node.Execute(null);
 
       Assert.Equal(ExtendedType.Decimal, node.ValueType);
@@ -196,14 +203,15 @@ namespace EpsilonScript.Tests.AST
     public void ArithmeticNode_WithDecimalPrecision_MaintainsHighPrecision()
     {
       // Test that decimal maintains exact precision
-      var node = new ArithmeticNode();
+      var node = CreateArithmeticNode(ElementType.AddOperator);
       var leftNode = new FakeDecimalNode(0.1m);
       var rightNode = new FakeDecimalNode(0.2m);
       var rpn = CreateStack(leftNode, rightNode);
       var element = new Element(new Token("+", TokenType.PlusSign), ElementType.AddOperator);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null,
-        Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Decimal);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Decimal, null),
+        Compiler.Options.None, null);
       node.Execute(null);
 
       Assert.Equal(ExtendedType.Decimal, node.ValueType);
@@ -216,7 +224,7 @@ namespace EpsilonScript.Tests.AST
     [InlineData("%")]
     public void ArithmeticNode_WithDecimalPrecision_DivideByZero_ThrowsException(string operatorSymbol)
     {
-      var node = new ArithmeticNode();
+      var node = CreateArithmeticNode(operatorSymbol);
       var leftNode = new FakeDecimalNode(5.5m);
       var rightNode = new FakeDecimalNode(0.0m);
       var rpn = CreateStack(leftNode, rightNode);
@@ -225,8 +233,9 @@ namespace EpsilonScript.Tests.AST
       var tokenType = GetTokenTypeFromOperator(operatorSymbol);
       var element = new Element(new Token(operatorSymbol, tokenType), operatorType);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null,
-        Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Decimal);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Decimal, null),
+        Compiler.Options.None, null);
 
       Assert.Throws<DivideByZeroException>(() => node.Execute(null));
     }
@@ -236,7 +245,7 @@ namespace EpsilonScript.Tests.AST
     [InlineData("*")]
     public void ArithmeticNode_WithDecimalPrecision_Overflow_ThrowsException(string operatorSymbol)
     {
-      var node = new ArithmeticNode();
+      var node = CreateArithmeticNode(operatorSymbol);
       var leftNode = new FakeDecimalNode(decimal.MaxValue);
       var rightNode = new FakeDecimalNode(operatorSymbol == "+" ? 1m : 2m);
       var rpn = CreateStack(leftNode, rightNode);
@@ -245,8 +254,9 @@ namespace EpsilonScript.Tests.AST
       var tokenType = GetTokenTypeFromOperator(operatorSymbol);
       var element = new Element(new Token(operatorSymbol, tokenType), operatorType);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null,
-        Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Decimal);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Decimal, null),
+        Compiler.Options.None, null);
 
       Assert.Throws<OverflowException>(() => node.Execute(null));
     }
@@ -259,14 +269,15 @@ namespace EpsilonScript.Tests.AST
     public void ArithmeticNode_WithLongPrecision_PromotesToLong()
     {
       // When integer precision is Long, int + int should produce long
-      var node = new ArithmeticNode();
+      var node = CreateArithmeticNode(ElementType.AddOperator);
       var leftNode = new IntegerNode(10);
       var rightNode = new IntegerNode(20);
       var rpn = CreateStack(leftNode, rightNode);
       var element = new Element(new Token("+", TokenType.PlusSign), ElementType.AddOperator);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null,
-        Compiler.IntegerPrecision.Long, Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Long, Compiler.FloatPrecision.Float, null), Compiler.Options.None,
+        null);
       node.Execute(null);
 
       // Result should be promoted to Long based on precision setting
@@ -278,14 +289,15 @@ namespace EpsilonScript.Tests.AST
     public void ArithmeticNode_WithDoublePrecision_PromotesToDouble()
     {
       // When float precision is Double, operations should produce double
-      var node = new ArithmeticNode();
+      var node = CreateArithmeticNode(ElementType.AddOperator);
       var leftNode = new FloatNode(1.5);
       var rightNode = new FloatNode(2.5);
       var rpn = CreateStack(leftNode, rightNode);
       var element = new Element(new Token("+", TokenType.PlusSign), ElementType.AddOperator);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null,
-        Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Double);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Double, null),
+        Compiler.Options.None, null);
       node.Execute(null);
 
       // Result should be promoted to Double based on precision setting
@@ -297,14 +309,15 @@ namespace EpsilonScript.Tests.AST
     public void ArithmeticNode_WithDecimalPrecision_PromotesToDecimal()
     {
       // When float precision is Decimal, operations should produce decimal
-      var node = new ArithmeticNode();
+      var node = CreateArithmeticNode(ElementType.AddOperator);
       var leftNode = new FloatNode(1.5m);
       var rightNode = new FloatNode(2.5m);
       var rpn = CreateStack(leftNode, rightNode);
       var element = new Element(new Token("+", TokenType.PlusSign), ElementType.AddOperator);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null,
-        Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Decimal);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Decimal, null),
+        Compiler.Options.None, null);
       node.Execute(null);
 
       // Result should be promoted to Decimal based on precision setting
@@ -316,14 +329,15 @@ namespace EpsilonScript.Tests.AST
     public void ArithmeticNode_MixedIntAndFloat_PromotesToFloatPrecision()
     {
       // When mixing int and float, result should use configured float precision
-      var node = new ArithmeticNode();
+      var node = CreateArithmeticNode(ElementType.AddOperator);
       var leftNode = new IntegerNode(10);
       var rightNode = new FloatNode(2.5);
       var rpn = CreateStack(leftNode, rightNode);
       var element = new Element(new Token("+", TokenType.PlusSign), ElementType.AddOperator);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null,
-        Compiler.IntegerPrecision.Long, Compiler.FloatPrecision.Double);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Long, Compiler.FloatPrecision.Double, null),
+        Compiler.Options.None, null);
       node.Execute(null);
 
       // Result should be Double (the configured float precision)

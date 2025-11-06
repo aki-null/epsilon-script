@@ -44,9 +44,10 @@ namespace EpsilonScript.Tests.TestInfrastructure
       IDictionary<VariableId, CustomFunctionOverload> functions, string expectedMessageFragment = null)
       where TException : Exception
     {
+      var context = new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float,
+        functions);
       var exception = Assert.Throws<TException>(() =>
-        node.Build(rpnStack, element, options, variables, functions, Compiler.IntegerPrecision.Integer,
-          Compiler.FloatPrecision.Float));
+        node.Build(rpnStack, element, context, options, variables));
 
       if (!string.IsNullOrEmpty(expectedMessageFragment))
       {

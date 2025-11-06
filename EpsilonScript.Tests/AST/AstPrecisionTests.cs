@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using EpsilonScript.AST;
+using EpsilonScript.AST.Literal;
 using EpsilonScript.Intermediate;
 using Xunit;
 using EpsilonScript.Tests.TestInfrastructure;
@@ -27,8 +27,9 @@ namespace EpsilonScript.Tests.AST
       var rpn = CreateStack();
       var element = new Element(new Token(literal, TokenType.Integer), ElementType.Integer);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null,
-        Compiler.IntegerPrecision.Long, Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Long, Compiler.FloatPrecision.Float, null), Compiler.Options.None,
+        null);
 
       Assert.Equal(ExtendedType.Long, node.ValueType);
       Assert.Equal(expectedValue, node.LongValue);
@@ -45,8 +46,9 @@ namespace EpsilonScript.Tests.AST
       var rpn = CreateStack();
       var element = new Element(new Token(literal, TokenType.Integer), ElementType.Integer);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null,
-        Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, null),
+        Compiler.Options.None, null);
 
       Assert.Equal(ExtendedType.Integer, node.ValueType);
       Assert.Equal(expectedValue, node.IntegerValue);
@@ -63,8 +65,9 @@ namespace EpsilonScript.Tests.AST
       var element = new Element(new Token(literal, TokenType.Integer), ElementType.Integer);
 
       Assert.Throws<System.OverflowException>(() =>
-        node.Build(rpn, element, Compiler.Options.None, null, null,
-          Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float));
+        node.Build(rpn, element,
+          new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, null),
+          Compiler.Options.None, null));
     }
 
     [Fact]
@@ -98,8 +101,9 @@ namespace EpsilonScript.Tests.AST
       var rpn = CreateStack();
       var element = new Element(new Token(literal, TokenType.Float), ElementType.Float);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null,
-        Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, null),
+        Compiler.Options.None, null);
 
       Assert.Equal(ExtendedType.Float, node.ValueType);
       Assert.True(EpsilonScript.Math.IsNearlyEqual(expectedValue, node.FloatValue));
@@ -117,8 +121,9 @@ namespace EpsilonScript.Tests.AST
       var rpn = CreateStack();
       var element = new Element(new Token(literal, TokenType.Float), ElementType.Float);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null,
-        Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Double);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Double, null),
+        Compiler.Options.None, null);
 
       Assert.Equal(ExtendedType.Double, node.ValueType);
       Assert.Equal(expectedValue, node.DoubleValue);
@@ -132,8 +137,9 @@ namespace EpsilonScript.Tests.AST
       var rpn = CreateStack();
       var element = new Element(new Token(literal, TokenType.Float), ElementType.Float);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null,
-        Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Decimal);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Decimal, null),
+        Compiler.Options.None, null);
 
       Assert.Equal(ExtendedType.Decimal, node.ValueType);
       Assert.Equal(expectedValue, node.DecimalValue);
@@ -190,13 +196,15 @@ namespace EpsilonScript.Tests.AST
 
       var floatNode = new FloatNode();
       var floatElement = new Element(new Token(literal, TokenType.Float), ElementType.Float);
-      floatNode.Build(CreateStack(), floatElement, Compiler.Options.None, null, null,
-        Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float);
+      floatNode.Build(CreateStack(), floatElement,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, null),
+        Compiler.Options.None, null);
 
       var doubleNode = new FloatNode();
       var doubleElement = new Element(new Token(literal, TokenType.Float), ElementType.Float);
-      doubleNode.Build(CreateStack(), doubleElement, Compiler.Options.None, null, null,
-        Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Double);
+      doubleNode.Build(CreateStack(), doubleElement,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Double, null),
+        Compiler.Options.None, null);
 
       // Double should maintain more precision
       Assert.Equal(0.1234567890123456, doubleNode.DoubleValue, precision: 15);
@@ -212,13 +220,15 @@ namespace EpsilonScript.Tests.AST
 
       var decimalNode = new FloatNode();
       var decimalElement = new Element(new Token(literal, TokenType.Float), ElementType.Float);
-      decimalNode.Build(CreateStack(), decimalElement, Compiler.Options.None, null, null,
-        Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Decimal);
+      decimalNode.Build(CreateStack(), decimalElement,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Decimal, null),
+        Compiler.Options.None, null);
 
       var doubleNode = new FloatNode();
       var doubleElement = new Element(new Token(literal, TokenType.Float), ElementType.Float);
-      doubleNode.Build(CreateStack(), doubleElement, Compiler.Options.None, null, null,
-        Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Double);
+      doubleNode.Build(CreateStack(), doubleElement,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Double, null),
+        Compiler.Options.None, null);
 
       // Decimal should maintain exact value
       Assert.Equal(0.1234567890123456789012345678m, decimalNode.DecimalValue);
@@ -239,8 +249,9 @@ namespace EpsilonScript.Tests.AST
       var rpn = CreateStack();
       var element = new Element(new Token(literal, TokenType.Integer), ElementType.Integer);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null,
-        Compiler.IntegerPrecision.Long, Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Long, Compiler.FloatPrecision.Float, null), Compiler.Options.None,
+        null);
 
       Assert.Equal(ExtendedType.Long, node.ValueType);
       Assert.Equal(long.Parse(literal), node.LongValue);
@@ -255,8 +266,9 @@ namespace EpsilonScript.Tests.AST
       var rpn = CreateStack();
       var element = new Element(new Token(literal, TokenType.Integer), ElementType.Integer);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null,
-        Compiler.IntegerPrecision.Long, Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Long, Compiler.FloatPrecision.Float, null), Compiler.Options.None,
+        null);
 
       Assert.Equal(ExtendedType.Long, node.ValueType);
       Assert.Equal(long.Parse(literal), node.LongValue);
@@ -271,8 +283,9 @@ namespace EpsilonScript.Tests.AST
       var rpn = CreateStack();
       var element = new Element(new Token(literal, TokenType.Float), ElementType.Float);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null,
-        Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Double);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Double, null),
+        Compiler.Options.None, null);
 
       Assert.Equal(ExtendedType.Double, node.ValueType);
       Assert.Equal(double.Parse(literal), node.DoubleValue);

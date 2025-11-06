@@ -1,8 +1,7 @@
 using System.Collections.Generic;
-using EpsilonScript.Function;
 using EpsilonScript.Intermediate;
 
-namespace EpsilonScript.AST
+namespace EpsilonScript.AST.Literal
 {
   internal class FloatNode : Node
   {
@@ -25,11 +24,10 @@ namespace EpsilonScript.AST
       DecimalValue = value;
     }
 
-    protected override void BuildCore(Stack<Node> rpnStack, Element element, Compiler.Options options,
-      IVariableContainer variables, IDictionary<VariableId, CustomFunctionOverload> functions,
-      Compiler.IntegerPrecision intPrecision, Compiler.FloatPrecision floatPrecision)
+    protected override void BuildCore(Stack<Node> rpnStack, Element element, CompilerContext context,
+      Compiler.Options options, IVariableContainer variables)
     {
-      switch (floatPrecision)
+      switch (context.FloatPrecision)
       {
         case Compiler.FloatPrecision.Float:
           FloatValue = float.Parse(element.Token.Text.Span);

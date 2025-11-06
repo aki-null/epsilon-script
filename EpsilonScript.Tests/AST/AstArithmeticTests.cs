@@ -18,10 +18,11 @@ namespace EpsilonScript.Tests.AST
       ExtendedType expectedNodeType,
       int expectedInt, float expectedFloat, bool expectedBool, string expectedString)
     {
-      var node = new ArithmeticNode();
+      var node = CreateArithmeticNode(element.Type);
       var rpn = CreateStack(leftNode, rightNode);
-      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, null),
+        Compiler.Options.None, null);
       node.Execute(null);
       Assert.Equal(expectedNodeType, node.ValueType);
       Assert.Equal(expectedInt, node.IntegerValue);
@@ -574,12 +575,13 @@ namespace EpsilonScript.Tests.AST
     internal void IntegerDivisionByZero_ThrowsDivideByZeroException(ElementType operatorType,
       string operatorSymbol)
     {
-      var node = new ArithmeticNode();
+      var node = CreateArithmeticNode(operatorSymbol);
       var rpn = CreateStack(new FakeIntegerNode(5), new FakeIntegerNode(0));
       var element = new Element(new Token(operatorSymbol, GetTokenType(operatorType)), operatorType);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, null),
+        Compiler.Options.None, null);
 
       Assert.Throws<DivideByZeroException>(() => node.Execute(null));
     }
@@ -587,12 +589,13 @@ namespace EpsilonScript.Tests.AST
     [Fact]
     internal void FloatDivisionByZero_ThrowsDivideByZeroException()
     {
-      var node = new ArithmeticNode();
+      var node = CreateArithmeticNode(ElementType.DivideOperator);
       var rpn = CreateStack(new FakeFloatNode(5.0f), new FakeFloatNode(0.0f));
       var element = new Element(new Token("/", TokenType.DivideOperator), ElementType.DivideOperator);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, null),
+        Compiler.Options.None, null);
 
       ErrorTestHelper.ExecuteNodeExpectingError<DivideByZeroException>(node);
     }
@@ -600,12 +603,13 @@ namespace EpsilonScript.Tests.AST
     [Fact]
     internal void FloatModuloByZero_ThrowsDivideByZeroException()
     {
-      var node = new ArithmeticNode();
+      var node = CreateArithmeticNode(ElementType.ModuloOperator);
       var rpn = CreateStack(new FakeFloatNode(5.0f), new FakeFloatNode(0.0f));
       var element = new Element(new Token("%", TokenType.ModuloOperator), ElementType.ModuloOperator);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, null),
+        Compiler.Options.None, null);
 
       Assert.Throws<DivideByZeroException>(() => node.Execute(null));
     }
@@ -616,12 +620,13 @@ namespace EpsilonScript.Tests.AST
     internal void MixedTypeDivisionByZero_ThrowsDivideByZeroException(ElementType operatorType,
       string operatorSymbol)
     {
-      var node = new ArithmeticNode();
+      var node = CreateArithmeticNode(operatorSymbol);
       var rpn = CreateStack(new FakeIntegerNode(5), new FakeFloatNode(0.0f));
       var element = new Element(new Token(operatorSymbol, GetTokenType(operatorType)), operatorType);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, null),
+        Compiler.Options.None, null);
 
       Assert.Throws<DivideByZeroException>(() => node.Execute(null));
     }

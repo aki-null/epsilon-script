@@ -26,8 +26,9 @@ namespace EpsilonScript.Tests.AST
       var token = new Token(variableName, TokenType.Identifier);
       var element = new Element(token, ElementType.Variable);
 
-      node.Build(rpn, element, Compiler.Options.None, variables, null, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, null),
+        Compiler.Options.None, variables);
       node.Execute(null);
 
       Assert.Equal(GetExpectedValueType(variableType), node.ValueType);
@@ -46,8 +47,9 @@ namespace EpsilonScript.Tests.AST
       var token = new Token(variableName, TokenType.Identifier);
       var element = new Element(token, ElementType.Variable);
 
-      node.Build(rpn, element, Compiler.Options.None, variables, null, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, null),
+        Compiler.Options.None, variables);
 
       ErrorTestHelper.ExecuteNodeExpectingError<RuntimeException>(node, null, "Undefined variable");
     }
@@ -71,8 +73,9 @@ namespace EpsilonScript.Tests.AST
       var token = new Token(variableName, TokenType.Identifier);
       var element = new Element(token, ElementType.Variable);
 
-      node.Build(rpn, element, Compiler.Options.None, variables, null, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, null),
+        Compiler.Options.None, variables);
       node.Execute(variableOverride);
 
       Assert.Equal(GetExpectedValueType(variableType), node.ValueType);
@@ -90,8 +93,9 @@ namespace EpsilonScript.Tests.AST
       var token = new Token(variableName, TokenType.Identifier);
       var element = new Element(token, ElementType.Variable);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, null),
+        Compiler.Options.None, null);
 
       ErrorTestHelper.ExecuteNodeExpectingError<RuntimeException>(node, null, "Undefined variable");
     }
@@ -115,8 +119,9 @@ namespace EpsilonScript.Tests.AST
       var token = new Token(variableName, TokenType.Identifier);
       var element = new Element(token, ElementType.Variable);
 
-      node.Build(rpn, element, Compiler.Options.None, variables, null, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, null),
+        Compiler.Options.None, variables);
       node.Execute(null);
 
       Assert.Equal(ExtendedType.Integer, node.ValueType);
@@ -136,8 +141,9 @@ namespace EpsilonScript.Tests.AST
       var token = new Token(variableName, TokenType.Identifier);
       var element = new Element(token, ElementType.Variable);
 
-      node.Build(rpn, element, Compiler.Options.None, variables, null, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, null),
+        Compiler.Options.None, variables);
 
       Assert.False(node.IsPrecomputable); // Variables are never constant
     }
@@ -158,8 +164,9 @@ namespace EpsilonScript.Tests.AST
       var token = new Token(variableName, TokenType.Identifier);
       var element = new Element(token, ElementType.Variable);
 
-      node.Build(rpn, element, Compiler.Options.None, variables, null, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, null),
+        Compiler.Options.None, variables);
 
       // First execution
       node.Execute(null);
@@ -186,8 +193,9 @@ namespace EpsilonScript.Tests.AST
       var token = new Token(variableName, TokenType.Identifier);
       var element = new Element(token, ElementType.Variable);
 
-      node.Build(rpn, element, Compiler.Options.None, variables, null, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, null),
+        Compiler.Options.None, variables);
 
       ErrorTestHelper.ExecuteNodeExpectingError<ArgumentOutOfRangeException>(node);
     }

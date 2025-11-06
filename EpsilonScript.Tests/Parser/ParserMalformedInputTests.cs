@@ -1,8 +1,6 @@
 using EpsilonScript.Intermediate;
 using EpsilonScript.Tests.TestInfrastructure;
-using EpsilonScript.Tests.TestInfrastructure.Fakes;
 using System;
-using System.Collections.Generic;
 using Xunit;
 
 namespace EpsilonScript.Tests.Parser

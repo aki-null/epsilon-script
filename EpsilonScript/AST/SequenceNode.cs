@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using EpsilonScript.Function;
 using EpsilonScript.Intermediate;
 
 namespace EpsilonScript.AST
@@ -13,9 +12,8 @@ namespace EpsilonScript.AST
     public override bool IsPrecomputable =>
       _isSingleNode ? _rightNode.IsPrecomputable : (_leftNode.IsPrecomputable && _rightNode.IsPrecomputable);
 
-    protected override void BuildCore(Stack<Node> rpnStack, Element element, Compiler.Options options,
-      IVariableContainer variables, IDictionary<VariableId, CustomFunctionOverload> functions,
-      Compiler.IntegerPrecision intPrecision, Compiler.FloatPrecision floatPrecision)
+    protected override void BuildCore(Stack<Node> rpnStack, Element element, CompilerContext context,
+      Compiler.Options options, IVariableContainer variables)
     {
       if (!rpnStack.TryPop(out _rightNode))
       {

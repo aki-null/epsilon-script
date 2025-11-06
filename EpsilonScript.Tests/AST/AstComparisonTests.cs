@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using EpsilonScript.AST;
+using EpsilonScript.AST.Literal;
 using EpsilonScript.Intermediate;
 using Xunit;
 using EpsilonScript.Tests.TestInfrastructure;
@@ -30,7 +31,7 @@ namespace EpsilonScript.Tests.AST
     public void ComparisonNode_IntegerValues_ComparesCorrectly(
       int left, int right, string operatorSymbol, bool expectedResult)
     {
-      var node = new ComparisonNode();
+      var node = CreateComparisonNode(operatorSymbol);
       var leftNode = new FakeIntegerNode(left);
       var rightNode = new FakeIntegerNode(right);
       var rpn = CreateStack(leftNode, rightNode);
@@ -38,8 +39,9 @@ namespace EpsilonScript.Tests.AST
       var (tokenType, elementType) = GetOperatorTypes(operatorSymbol);
       var element = new Element(new Token(operatorSymbol, tokenType), elementType);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null,
-        Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, null),
+        Compiler.Options.None, null);
       node.Execute(null);
 
       Assert.Equal(ExtendedType.Boolean, node.ValueType);
@@ -49,12 +51,13 @@ namespace EpsilonScript.Tests.AST
     [Fact]
     public void ComparisonNode_ConstantOptimization_BecomesBoolean()
     {
-      Node node = new ComparisonNode();
+      Node node = CreateComparisonNode("==");
       var leftNode = new FakeIntegerNode(10);
       var rightNode = new FakeIntegerNode(10);
       var rpn = CreateStack(leftNode, rightNode);
       node.Build(rpn, new Element(new Token("==", TokenType.ComparisonEqual), ElementType.ComparisonEqual),
-        Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float);
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, null),
+        Compiler.Options.None, null);
       node = node.Optimize();
 
       Assert.IsType<BooleanNode>(node);
@@ -77,7 +80,7 @@ namespace EpsilonScript.Tests.AST
     public void ComparisonNode_LongPrecision_ComparesLongValues(
       long left, long right, string operatorSymbol, bool expectedResult)
     {
-      var node = new ComparisonNode();
+      var node = CreateComparisonNode(operatorSymbol);
       var leftNode = new FakeLongNode(left);
       var rightNode = new FakeLongNode(right);
       var rpn = CreateStack(leftNode, rightNode);
@@ -85,8 +88,9 @@ namespace EpsilonScript.Tests.AST
       var (tokenType, elementType) = GetOperatorTypes(operatorSymbol);
       var element = new Element(new Token(operatorSymbol, tokenType), elementType);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null,
-        Compiler.IntegerPrecision.Long, Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Long, Compiler.FloatPrecision.Float, null), Compiler.Options.None,
+        null);
       node.Execute(null);
 
       Assert.Equal(ExtendedType.Boolean, node.ValueType);
@@ -96,14 +100,15 @@ namespace EpsilonScript.Tests.AST
     [Fact]
     public void ComparisonNode_LongPrecision_HandlesMaxValues()
     {
-      var node = new ComparisonNode();
+      var node = CreateComparisonNode(">");
       var leftNode = new FakeLongNode(9223372036854775806L); // Near long.MaxValue
       var rightNode = new FakeLongNode(9223372036854775805L);
       var rpn = CreateStack(leftNode, rightNode);
       var element = new Element(new Token(">", TokenType.ComparisonGreaterThan), ElementType.ComparisonGreaterThan);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null,
-        Compiler.IntegerPrecision.Long, Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Long, Compiler.FloatPrecision.Float, null), Compiler.Options.None,
+        null);
       node.Execute(null);
 
       Assert.Equal(ExtendedType.Boolean, node.ValueType);
@@ -117,12 +122,13 @@ namespace EpsilonScript.Tests.AST
     [Fact]
     public void ComparisonNode_FloatInteger_MixedTypes()
     {
-      var node = new ComparisonNode();
+      var node = CreateComparisonNode(">");
       var leftNode = new FakeFloatNode(10.5f);
       var rightNode = new FakeIntegerNode(10);
       var rpn = CreateStack(leftNode, rightNode);
       node.Build(rpn, new Element(new Token(">", TokenType.ComparisonGreaterThan), ElementType.ComparisonGreaterThan),
-        Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float);
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, null),
+        Compiler.Options.None, null);
       node.Execute(null);
 
       Assert.Equal(ExtendedType.Boolean, node.ValueType);
@@ -137,7 +143,7 @@ namespace EpsilonScript.Tests.AST
     public void ComparisonNode_DoublePrecision_ComparesDoubleValues(
       double left, double right, string operatorSymbol, bool expectedResult)
     {
-      var node = new ComparisonNode();
+      var node = CreateComparisonNode(operatorSymbol);
       var leftNode = new FakeDoubleNode(left);
       var rightNode = new FakeDoubleNode(right);
       var rpn = CreateStack(leftNode, rightNode);
@@ -145,8 +151,9 @@ namespace EpsilonScript.Tests.AST
       var (tokenType, elementType) = GetOperatorTypes(operatorSymbol);
       var element = new Element(new Token(operatorSymbol, tokenType), elementType);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null,
-        Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Double);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Double, null),
+        Compiler.Options.None, null);
       node.Execute(null);
 
       Assert.Equal(ExtendedType.Boolean, node.ValueType);
@@ -157,14 +164,15 @@ namespace EpsilonScript.Tests.AST
     public void ComparisonNode_DoublePrecision_UsesULPsComparison()
     {
       // Double equality uses ULPs comparison (within 2 ULPs)
-      var node = new ComparisonNode();
+      var node = CreateComparisonNode("==");
       var leftNode = new FakeDoubleNode(1.0);
       var rightNode = new FakeDoubleNode(1.0 + double.Epsilon); // One ULP difference
       var rpn = CreateStack(leftNode, rightNode);
       var element = new Element(new Token("==", TokenType.ComparisonEqual), ElementType.ComparisonEqual);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null,
-        Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Double);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Double, null),
+        Compiler.Options.None, null);
       node.Execute(null);
 
       Assert.Equal(ExtendedType.Boolean, node.ValueType);
@@ -174,14 +182,15 @@ namespace EpsilonScript.Tests.AST
     [Fact]
     public void ComparisonNode_DoublePrecision_RejectsLargerDifferences()
     {
-      var node = new ComparisonNode();
+      var node = CreateComparisonNode("==");
       var leftNode = new FakeDoubleNode(1.0);
       var rightNode = new FakeDoubleNode(1.0 + 1e-9); // Large difference (many ULPs)
       var rpn = CreateStack(leftNode, rightNode);
       var element = new Element(new Token("==", TokenType.ComparisonEqual), ElementType.ComparisonEqual);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null,
-        Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Double);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Double, null),
+        Compiler.Options.None, null);
       node.Execute(null);
 
       Assert.Equal(ExtendedType.Boolean, node.ValueType);
@@ -197,7 +206,7 @@ namespace EpsilonScript.Tests.AST
     public void ComparisonNode_DecimalPrecision_ComparesDecimalValues(
       decimal left, decimal right, string operatorSymbol, bool expectedResult)
     {
-      var node = new ComparisonNode();
+      var node = CreateComparisonNode(operatorSymbol);
       var leftNode = new FakeDecimalNode(left);
       var rightNode = new FakeDecimalNode(right);
       var rpn = CreateStack(leftNode, rightNode);
@@ -205,8 +214,9 @@ namespace EpsilonScript.Tests.AST
       var (tokenType, elementType) = GetOperatorTypes(operatorSymbol);
       var element = new Element(new Token(operatorSymbol, tokenType), elementType);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null,
-        Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Decimal);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Decimal, null),
+        Compiler.Options.None, null);
       node.Execute(null);
 
       Assert.Equal(ExtendedType.Boolean, node.ValueType);
@@ -228,14 +238,15 @@ namespace EpsilonScript.Tests.AST
     public void ComparisonNode_DecimalPrecision_UsesExactEquality()
     {
       // Decimal uses exact equality (no ULPs tolerance like float/double)
-      var node = new ComparisonNode();
+      var node = CreateComparisonNode("==");
       var leftNode = new FakeDecimalNode(1000.0m);
       var rightNode = new FakeDecimalNode(1000.1m); // Small difference
       var rpn = CreateStack(leftNode, rightNode);
       var element = new Element(new Token("==", TokenType.ComparisonEqual), ElementType.ComparisonEqual);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null,
-        Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Decimal);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Decimal, null),
+        Compiler.Options.None, null);
       node.Execute(null);
 
       Assert.Equal(ExtendedType.Boolean, node.ValueType);
@@ -249,14 +260,15 @@ namespace EpsilonScript.Tests.AST
       var a = 1.0m / 3.0m;
       var b = a * 3.0m;
 
-      var node = new ComparisonNode();
+      var node = CreateComparisonNode("==");
       var leftNode = new FakeDecimalNode(b);
       var rightNode = new FakeDecimalNode(1.0m);
       var rpn = CreateStack(leftNode, rightNode);
       var element = new Element(new Token("==", TokenType.ComparisonEqual), ElementType.ComparisonEqual);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null,
-        Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Decimal);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Decimal, null),
+        Compiler.Options.None, null);
       node.Execute(null);
 
       Assert.Equal(ExtendedType.Boolean, node.ValueType);
@@ -270,14 +282,15 @@ namespace EpsilonScript.Tests.AST
       var original = 1000.0m;
       var result = (original / 10.0m) * 10.0m;
 
-      var node = new ComparisonNode();
+      var node = CreateComparisonNode("==");
       var leftNode = new FakeDecimalNode(result);
       var rightNode = new FakeDecimalNode(original);
       var rpn = CreateStack(leftNode, rightNode);
       var element = new Element(new Token("==", TokenType.ComparisonEqual), ElementType.ComparisonEqual);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null,
-        Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Decimal);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Decimal, null),
+        Compiler.Options.None, null);
       node.Execute(null);
 
       Assert.Equal(ExtendedType.Boolean, node.ValueType);
@@ -291,14 +304,15 @@ namespace EpsilonScript.Tests.AST
       var original = 12345.6789m;
       var result = (original + 9876.5432m) - 9876.5432m;
 
-      var node = new ComparisonNode();
+      var node = CreateComparisonNode("==");
       var leftNode = new FakeDecimalNode(result);
       var rightNode = new FakeDecimalNode(original);
       var rpn = CreateStack(leftNode, rightNode);
       var element = new Element(new Token("==", TokenType.ComparisonEqual), ElementType.ComparisonEqual);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null,
-        Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Decimal);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Decimal, null),
+        Compiler.Options.None, null);
       node.Execute(null);
 
       Assert.Equal(ExtendedType.Boolean, node.ValueType);
@@ -311,14 +325,15 @@ namespace EpsilonScript.Tests.AST
       var nearMax = decimal.MaxValue / 2;
       var result = (nearMax + 1000m) - 1000m;
 
-      var node = new ComparisonNode();
+      var node = CreateComparisonNode("==");
       var leftNode = new FakeDecimalNode(result);
       var rightNode = new FakeDecimalNode(nearMax);
       var rpn = CreateStack(leftNode, rightNode);
       var element = new Element(new Token("==", TokenType.ComparisonEqual), ElementType.ComparisonEqual);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null,
-        Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Decimal);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Decimal, null),
+        Compiler.Options.None, null);
       node.Execute(null);
 
       Assert.Equal(ExtendedType.Boolean, node.ValueType);
@@ -332,14 +347,15 @@ namespace EpsilonScript.Tests.AST
       var original = 0.0000000000000000000000000001m;
       var result = (original / 3.0m) * 3.0m;
 
-      var node = new ComparisonNode();
+      var node = CreateComparisonNode("==");
       var leftNode = new FakeDecimalNode(result);
       var rightNode = new FakeDecimalNode(original);
       var rpn = CreateStack(leftNode, rightNode);
       var element = new Element(new Token("==", TokenType.ComparisonEqual), ElementType.ComparisonEqual);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null,
-        Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Decimal);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Decimal, null),
+        Compiler.Options.None, null);
       node.Execute(null);
 
       Assert.Equal(ExtendedType.Boolean, node.ValueType);
@@ -353,12 +369,13 @@ namespace EpsilonScript.Tests.AST
     [Fact]
     public void ComparisonNode_StringEqual()
     {
-      var node = new ComparisonNode();
+      var node = CreateComparisonNode("==");
       var leftNode = new FakeStringNode("Hello World");
       var rightNode = new FakeStringNode("Hello World");
       var rpn = CreateStack(leftNode, rightNode);
       node.Build(rpn, new Element(new Token("==", TokenType.ComparisonEqual), ElementType.ComparisonEqual),
-        Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float);
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, null),
+        Compiler.Options.None, null);
       node.Execute(null);
 
       Assert.Equal(ExtendedType.Boolean, node.ValueType);
@@ -368,12 +385,13 @@ namespace EpsilonScript.Tests.AST
     [Fact]
     public void ComparisonNode_StringNotEqual()
     {
-      var node = new ComparisonNode();
+      var node = CreateComparisonNode("==");
       var leftNode = new FakeStringNode("Hello World");
       var rightNode = new FakeStringNode("こんにちは世界");
       var rpn = CreateStack(leftNode, rightNode);
       node.Build(rpn, new Element(new Token("==", TokenType.ComparisonEqual), ElementType.ComparisonEqual),
-        Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float);
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, null),
+        Compiler.Options.None, null);
       node.Execute(null);
 
       Assert.Equal(ExtendedType.Boolean, node.ValueType);
@@ -383,12 +401,13 @@ namespace EpsilonScript.Tests.AST
     [Fact]
     public void ComparisonNode_StringVsNumber_ThrowsRuntimeException()
     {
-      var node = new ComparisonNode();
+      var node = CreateComparisonNode("==");
       var leftNode = new FakeStringNode("Hello World");
       var rightNode = new FakeIntegerNode(0);
       var rpn = CreateStack(leftNode, rightNode);
       node.Build(rpn, new Element(new Token("==", TokenType.ComparisonEqual), ElementType.ComparisonEqual),
-        Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float);
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, null),
+        Compiler.Options.None, null);
 
       Assert.Throws<RuntimeException>(() => node.Execute(null));
     }
@@ -400,12 +419,13 @@ namespace EpsilonScript.Tests.AST
     [Fact]
     public void ComparisonNode_BooleanEqual()
     {
-      var node = new ComparisonNode();
+      var node = CreateComparisonNode("==");
       var leftNode = new FakeBooleanNode(true);
       var rightNode = new FakeBooleanNode(true);
       var rpn = CreateStack(leftNode, rightNode);
       node.Build(rpn, new Element(new Token("==", TokenType.ComparisonEqual), ElementType.ComparisonEqual),
-        Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float);
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, null),
+        Compiler.Options.None, null);
       node.Execute(null);
 
       Assert.Equal(ExtendedType.Boolean, node.ValueType);
@@ -415,12 +435,13 @@ namespace EpsilonScript.Tests.AST
     [Fact]
     public void ComparisonNode_BooleanNotEqual()
     {
-      var node = new ComparisonNode();
+      var node = CreateComparisonNode("!=");
       var leftNode = new FakeBooleanNode(true);
       var rightNode = new FakeBooleanNode(false);
       var rpn = CreateStack(leftNode, rightNode);
       node.Build(rpn, new Element(new Token("!=", TokenType.ComparisonNotEqual), ElementType.ComparisonNotEqual),
-        Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float);
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, null),
+        Compiler.Options.None, null);
       node.Execute(null);
 
       Assert.Equal(ExtendedType.Boolean, node.ValueType);
@@ -434,14 +455,15 @@ namespace EpsilonScript.Tests.AST
     [InlineData(">=")]
     public void ComparisonNode_BooleanOrderingOperators_ThrowsRuntimeException(string operatorSymbol)
     {
-      var node = new ComparisonNode();
+      var node = CreateComparisonNode(operatorSymbol);
       var leftNode = new FakeBooleanNode(true);
       var rightNode = new FakeBooleanNode(false);
       var rpn = CreateStack(leftNode, rightNode);
 
       var (tokenType, elementType) = GetOperatorTypes(operatorSymbol);
       node.Build(rpn, new Element(new Token(operatorSymbol, tokenType), elementType),
-        Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float);
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, null),
+        Compiler.Options.None, null);
 
       Assert.Throws<RuntimeException>(() => node.Execute(null));
     }
@@ -453,14 +475,15 @@ namespace EpsilonScript.Tests.AST
     [Fact]
     public void ComparisonNode_IntWithLongPrecision_PromotesToLong()
     {
-      var node = new ComparisonNode();
+      var node = CreateComparisonNode("<");
       var leftNode = new IntegerNode(100);
       var rightNode = new IntegerNode(200);
       var rpn = CreateStack(leftNode, rightNode);
       var element = new Element(new Token("<", TokenType.ComparisonLessThan), ElementType.ComparisonLessThan);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null,
-        Compiler.IntegerPrecision.Long, Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Long, Compiler.FloatPrecision.Float, null), Compiler.Options.None,
+        null);
       node.Execute(null);
 
       Assert.Equal(ExtendedType.Boolean, node.ValueType);
@@ -470,14 +493,15 @@ namespace EpsilonScript.Tests.AST
     [Fact]
     public void ComparisonNode_FloatWithDoublePrecision_PromotesToDouble()
     {
-      var node = new ComparisonNode();
+      var node = CreateComparisonNode("<");
       var leftNode = new FloatNode(1.5);
       var rightNode = new FloatNode(2.5);
       var rpn = CreateStack(leftNode, rightNode);
       var element = new Element(new Token("<", TokenType.ComparisonLessThan), ElementType.ComparisonLessThan);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null,
-        Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Double);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Double, null),
+        Compiler.Options.None, null);
       node.Execute(null);
 
       Assert.Equal(ExtendedType.Boolean, node.ValueType);

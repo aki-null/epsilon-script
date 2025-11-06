@@ -41,12 +41,13 @@ namespace EpsilonScript.Tests.AST
       // Create Double node with high precision value
       var rightNode = new FakeDoubleNode(1.23456789012345);
 
-      var node = new AssignmentNode();
+      var node = CreateAssignmentNode(ElementType.AssignmentOperator);
       var rpn = CreateStack(leftNode, rightNode);
       var element = new Element(CreateToken("=", TokenType.AssignmentOperator), ElementType.AssignmentOperator);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, null),
+        Compiler.Options.None, null);
       node.Execute(null);
 
       // Double value should be converted to float precision
@@ -64,12 +65,13 @@ namespace EpsilonScript.Tests.AST
       // Create Decimal node with very high precision
       var rightNode = new FakeDecimalNode(1.234567890123456789m);
 
-      var node = new AssignmentNode();
+      var node = CreateAssignmentNode(ElementType.AssignmentOperator);
       var rpn = CreateStack(leftNode, rightNode);
       var element = new Element(CreateToken("=", TokenType.AssignmentOperator), ElementType.AssignmentOperator);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, null),
+        Compiler.Options.None, null);
       node.Execute(null);
 
       // Decimal value should be converted to float precision
@@ -98,12 +100,13 @@ namespace EpsilonScript.Tests.AST
         _ => throw new ArgumentException("Unsupported precision")
       };
 
-      var node = new AssignmentNode();
+      var node = CreateAssignmentNode(ElementType.AssignmentOperator);
       var rpn = CreateStack(leftNode, rightNode);
       var element = new Element(CreateToken("=", TokenType.AssignmentOperator), ElementType.AssignmentOperator);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
-        floatPrecision);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, floatPrecision, null),
+        Compiler.Options.None, null);
       node.Execute(null);
 
       // Double variable receives value with precision limited by right-hand side type
@@ -129,12 +132,13 @@ namespace EpsilonScript.Tests.AST
       var highPrecisionValue = 1.234567890123456789012345678m;
       var rightNode = new FakeDecimalNode(highPrecisionValue);
 
-      var node = new AssignmentNode();
+      var node = CreateAssignmentNode(ElementType.AssignmentOperator);
       var rpn = CreateStack(leftNode, rightNode);
       var element = new Element(CreateToken("=", TokenType.AssignmentOperator), ElementType.AssignmentOperator);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Decimal);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Decimal, null),
+        Compiler.Options.None, null);
       node.Execute(null);
 
       // Decimal variable should preserve full decimal precision
@@ -158,12 +162,13 @@ namespace EpsilonScript.Tests.AST
       // Create right node with double precision value
       var rightNode = new FakeDoubleNode(1.23456789012345);
 
-      var node = new AssignmentNode();
+      var node = CreateAssignmentNode(operatorSymbol);
       var rpn = CreateStack(leftNode, rightNode);
       var element = new Element(CreateToken(operatorSymbol, GetTokenType(operatorType)), operatorType);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Double);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Double, null),
+        Compiler.Options.None, null);
       node.Execute(null);
 
       // Calculate expected value
@@ -199,12 +204,13 @@ namespace EpsilonScript.Tests.AST
       var rightValue = 1.234567890123456789m;
       var rightNode = new FakeDecimalNode(rightValue);
 
-      var node = new AssignmentNode();
+      var node = CreateAssignmentNode(operatorSymbol);
       var rpn = CreateStack(leftNode, rightNode);
       var element = new Element(CreateToken(operatorSymbol, GetTokenType(operatorType)), operatorType);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Decimal);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Decimal, null),
+        Compiler.Options.None, null);
       node.Execute(null);
 
       // Calculate expected value
@@ -234,12 +240,13 @@ namespace EpsilonScript.Tests.AST
       var largeValue = 987654321012345678L;
       var rightNode = new FakeLongNode(largeValue);
 
-      var node = new AssignmentNode();
+      var node = CreateAssignmentNode(ElementType.AssignmentOperator);
       var rpn = CreateStack(leftNode, rightNode);
       var element = new Element(CreateToken("=", TokenType.AssignmentOperator), ElementType.AssignmentOperator);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Long,
-        Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Long, Compiler.FloatPrecision.Float, null), Compiler.Options.None,
+        null);
       node.Execute(null);
 
       // Long variable should preserve full long precision
@@ -264,12 +271,13 @@ namespace EpsilonScript.Tests.AST
       var rightValue = 123456789L;
       var rightNode = new FakeLongNode(rightValue);
 
-      var node = new AssignmentNode();
+      var node = CreateAssignmentNode(operatorSymbol);
       var rpn = CreateStack(leftNode, rightNode);
       var element = new Element(CreateToken(operatorSymbol, GetTokenType(operatorType)), operatorType);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Long,
-        Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Long, Compiler.FloatPrecision.Float, null), Compiler.Options.None,
+        null);
       node.Execute(null);
 
       // Calculate expected value
@@ -298,12 +306,13 @@ namespace EpsilonScript.Tests.AST
       // Create Double node
       var rightNode = new FakeDoubleNode(1.23456789012345);
 
-      var node = new AssignmentNode();
+      var node = CreateAssignmentNode(ElementType.AssignmentAddOperator);
       var rpn = CreateStack(leftNode, rightNode);
       var element = new Element(CreateToken("+=", TokenType.AssignmentAddOperator), ElementType.AssignmentAddOperator);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, null),
+        Compiler.Options.None, null);
       node.Execute(null);
 
       // Double value should be converted to float for compound assignment
@@ -322,12 +331,13 @@ namespace EpsilonScript.Tests.AST
       // Create Long node with value that fits in int
       var rightNode = new FakeLongNode(2147483647L); // int.MaxValue
 
-      var node = new AssignmentNode();
+      var node = CreateAssignmentNode(ElementType.AssignmentOperator);
       var rpn = CreateStack(leftNode, rightNode);
       var element = new Element(CreateToken("=", TokenType.AssignmentOperator), ElementType.AssignmentOperator);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, null),
+        Compiler.Options.None, null);
       node.Execute(null);
 
       // Long value should be cast to int (truncated but no overflow here)

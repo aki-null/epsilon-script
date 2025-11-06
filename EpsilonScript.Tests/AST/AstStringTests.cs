@@ -1,4 +1,5 @@
 using EpsilonScript.AST;
+using EpsilonScript.AST.Literal;
 using EpsilonScript.Intermediate;
 using Xunit;
 using EpsilonScript.Tests.TestInfrastructure;
@@ -60,8 +61,9 @@ namespace EpsilonScript.Tests.AST
       var token = new Token(tokenText, TokenType.String);
       var element = new Element(token, ElementType.String);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, null),
+        Compiler.Options.None, null);
 
       Assert.Equal(ExtendedType.String, node.ValueType);
       Assert.Equal(expectedValue, node.StringValue);
@@ -78,8 +80,9 @@ namespace EpsilonScript.Tests.AST
       var token = new Token(tokenText, TokenType.String);
       var element = new Element(token, ElementType.String);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, null),
+        Compiler.Options.None, null);
 
       Assert.Equal(ExtendedType.String, node.ValueType);
       Assert.Equal(expectedValue, node.StringValue);
@@ -102,7 +105,8 @@ namespace EpsilonScript.Tests.AST
       var token = new Token("\"test value\"", TokenType.String);
       var element = new Element(token, ElementType.String);
 
-      node.Build(rpn, element, options, null, null, Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, null), options, null);
 
       Assert.Equal(ExtendedType.String, node.ValueType);
       Assert.Equal("test value", node.StringValue);
@@ -146,8 +150,9 @@ namespace EpsilonScript.Tests.AST
       var token = new Token(tokenText, TokenType.String);
       var element = new Element(token, ElementType.String);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, null),
+        Compiler.Options.None, null);
 
       Assert.Equal(ExtendedType.String, node.ValueType);
       Assert.Equal(expectedValue, node.StringValue);

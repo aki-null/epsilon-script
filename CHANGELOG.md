@@ -22,6 +22,7 @@
   - Function calls that fail now show available overloads and parameter type mismatches
 - **Function Validation Timing**: Type mismatches in function calls with constant parameters now detected at compile time
 - **Custom Function Registration**: Functions with mismatched precision now rejected at registration with `ArgumentException`
+- **String Formatting**: Improved performance with reduced allocations
 
 ### Fixed
 - **Comparison Validation**: Boolean vs String comparisons now properly rejected in both directions

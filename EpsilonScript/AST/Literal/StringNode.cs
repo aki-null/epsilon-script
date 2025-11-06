@@ -1,8 +1,7 @@
 using System.Collections.Generic;
-using EpsilonScript.Function;
 using EpsilonScript.Intermediate;
 
-namespace EpsilonScript.AST
+namespace EpsilonScript.AST.Literal
 {
   internal class StringNode : Node
   {
@@ -15,9 +14,8 @@ namespace EpsilonScript.AST
       StringValue = value;
     }
 
-    protected override void BuildCore(Stack<Node> rpnStack, Element element, Compiler.Options options,
-      IVariableContainer variables, IDictionary<VariableId, CustomFunctionOverload> functions,
-      Compiler.IntegerPrecision intPrecision, Compiler.FloatPrecision floatPrecision)
+    protected override void BuildCore(Stack<Node> rpnStack, Element element, CompilerContext context,
+      Compiler.Options options, IVariableContainer variables)
     {
       var span = element.Token.Text;
       // Slicing accounts for quotation marks

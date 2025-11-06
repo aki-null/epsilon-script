@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using EpsilonScript.AST;
-using EpsilonScript.Function;
 using EpsilonScript.Intermediate;
 using Xunit;
 using EpsilonScript.Tests.TestInfrastructure;
@@ -18,12 +17,13 @@ namespace EpsilonScript.Tests.AST
     internal void BooleanOperation_Succeeds(ElementType operatorType, string operatorSymbol,
       bool leftValue, bool rightValue, bool expectedResult, int expectedInteger, float expectedFloat)
     {
-      var node = new BooleanOperationNode();
+      var node = CreateBooleanOperationNode(operatorSymbol);
       var rpn = CreateStack(new FakeBooleanNode(leftValue), new FakeBooleanNode(rightValue));
       var element = new Element(new Token(operatorSymbol, GetTokenType(operatorType)), operatorType);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, null),
+        Compiler.Options.None, null);
       node.Execute(null);
 
       Assert.Equal(ExtendedType.Boolean, node.ValueType);
@@ -59,12 +59,13 @@ namespace EpsilonScript.Tests.AST
       var leftNode = new FakeBooleanNode(false);
       var rightNode = new TrackingBooleanNode(true);
 
-      var node = new BooleanOperationNode();
+      var node = CreateBooleanOperationNode("&&");
       var rpn = CreateStack(leftNode, rightNode);
       var element = new Element(new Token("&&", TokenType.BooleanAndOperator), ElementType.BooleanAndOperator);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, null),
+        Compiler.Options.None, null);
       node.Execute(null);
 
       Assert.Equal(ExtendedType.Boolean, node.ValueType);
@@ -78,12 +79,13 @@ namespace EpsilonScript.Tests.AST
       var leftNode = new FakeBooleanNode(true);
       var rightNode = new TrackingBooleanNode(false);
 
-      var node = new BooleanOperationNode();
+      var node = CreateBooleanOperationNode("||");
       var rpn = CreateStack(leftNode, rightNode);
       var element = new Element(new Token("||", TokenType.BooleanOrOperator), ElementType.BooleanOrOperator);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, null),
+        Compiler.Options.None, null);
       node.Execute(null);
 
       Assert.Equal(ExtendedType.Boolean, node.ValueType);
@@ -100,12 +102,13 @@ namespace EpsilonScript.Tests.AST
       var leftNode = new FakeIntegerNode(1); // Non-boolean
       var rightNode = new FakeBooleanNode(true);
 
-      var node = new BooleanOperationNode();
+      var node = CreateBooleanOperationNode(operatorSymbol);
       var rpn = CreateStack(leftNode, rightNode);
       var element = new Element(new Token(operatorSymbol, GetTokenType(operatorType)), operatorType);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, null),
+        Compiler.Options.None, null);
 
       ErrorTestHelper.ExecuteNodeExpectingError<RuntimeException>(node, null,
         "Boolean operation can only be performed on boolean values");
@@ -120,12 +123,13 @@ namespace EpsilonScript.Tests.AST
       var leftNode = new FakeBooleanNode(leftValue);
       var rightNode = new FakeIntegerNode(1); // Non-boolean
 
-      var node = new BooleanOperationNode();
+      var node = CreateBooleanOperationNode(operatorSymbol);
       var rpn = CreateStack(leftNode, rightNode);
       var element = new Element(new Token(operatorSymbol, GetTokenType(operatorType)), operatorType);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, null),
+        Compiler.Options.None, null);
 
       ErrorTestHelper.ExecuteNodeExpectingError<RuntimeException>(node, null,
         "Boolean operation can only be performed on boolean values");
@@ -137,7 +141,7 @@ namespace EpsilonScript.Tests.AST
     internal void BooleanOperation_StackUnderflow_ThrowsParserException(ElementType operatorType,
       string operatorSymbol)
     {
-      var node = new BooleanOperationNode();
+      var node = CreateBooleanOperationNode(operatorSymbol);
       var rpn = CreateStack(new FakeBooleanNode(true)); // Only one node, need two
       var element = new Element(new Token(operatorSymbol, GetTokenType(operatorType)), operatorType);
 
@@ -146,16 +150,10 @@ namespace EpsilonScript.Tests.AST
     }
 
     [Fact]
-    internal void BooleanOperation_UnsupportedOperator_ThrowsArgumentOutOfRangeException()
+    internal void BooleanOperation_UnsupportedOperator_ThrowsArgumentException()
     {
-      var node = new BooleanOperationNode();
-      var rpn = CreateStack(new FakeBooleanNode(true), new FakeBooleanNode(false));
-      var element = new Element(new Token("+", TokenType.PlusSign), ElementType.AddOperator); // Wrong operator type
-
-      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Float);
-
-      ErrorTestHelper.ExecuteNodeExpectingError<ArgumentOutOfRangeException>(node);
+      // Factory method should reject unsupported operators
+      Assert.Throws<ArgumentException>(() => CreateBooleanOperationNode("+"));
     }
 
     [Theory]
@@ -164,12 +162,13 @@ namespace EpsilonScript.Tests.AST
     internal void BooleanOperation_IsPrecomputable_ReturnsCorrectValue(ElementType operatorType,
       string operatorSymbol)
     {
-      var node = new BooleanOperationNode();
+      var node = CreateBooleanOperationNode(operatorSymbol);
       var rpn = CreateStack(new FakeBooleanNode(true), new FakeBooleanNode(false));
       var element = new Element(new Token(operatorSymbol, GetTokenType(operatorType)), operatorType);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, null),
+        Compiler.Options.None, null);
 
       Assert.True(node.IsPrecomputable); // Both operands are constant
     }
@@ -198,9 +197,8 @@ namespace EpsilonScript.Tests.AST
         FloatValue = IntegerValue;
       }
 
-      protected override void BuildCore(Stack<Node> rpnStack, Element element, Compiler.Options options,
-        IVariableContainer variables, IDictionary<VariableId, CustomFunctionOverload> functions,
-        Compiler.IntegerPrecision intPrecision, Compiler.FloatPrecision floatPrecision)
+      protected override void BuildCore(Stack<Node> rpnStack, Element element, CompilerContext context,
+        Compiler.Options options, IVariableContainer variables)
       {
         throw new NotImplementedException("Fake nodes cannot be built from RPN stack");
       }

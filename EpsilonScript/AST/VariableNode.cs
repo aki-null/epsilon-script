@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using EpsilonScript.Function;
 using EpsilonScript.Intermediate;
 
 namespace EpsilonScript.AST
@@ -9,27 +8,20 @@ namespace EpsilonScript.AST
   {
     private VariableId _variableName;
     private IVariableContainer _variables;
-    private Type _configuredIntegerType;
-    private Type _configuredFloatType;
+    private ExtendedType _configuredIntegerType;
+    private ExtendedType _configuredFloatType;
 
     public override bool IsPrecomputable => false;
 
-    protected override void BuildCore(Stack<Node> rpnStack, Element element, Compiler.Options options,
-      IVariableContainer variables, IDictionary<VariableId, CustomFunctionOverload> functions,
-      Compiler.IntegerPrecision intPrecision, Compiler.FloatPrecision floatPrecision)
+    protected override void BuildCore(Stack<Node> rpnStack, Element element, CompilerContext context,
+      Compiler.Options options, IVariableContainer variables)
     {
       _variableName = element.Token.Text.ToString();
       _variables = variables;
 
       // Store configured types for auto-conversion
-      _configuredIntegerType = intPrecision == Compiler.IntegerPrecision.Integer ? Type.Integer : Type.Long;
-      _configuredFloatType = floatPrecision switch
-      {
-        Compiler.FloatPrecision.Float => Type.Float,
-        Compiler.FloatPrecision.Double => Type.Double,
-        Compiler.FloatPrecision.Decimal => Type.Decimal,
-        _ => Type.Float
-      };
+      _configuredIntegerType = context.ConfiguredIntegerType;
+      _configuredFloatType = context.ConfiguredFloatType;
     }
 
     public override void Execute(IVariableContainer variablesOverride)
@@ -51,7 +43,7 @@ namespace EpsilonScript.AST
         case Type.Integer:
         case Type.Long:
           // Integer types: convert to configured integer precision
-          if (_configuredIntegerType == Type.Integer)
+          if (_configuredIntegerType == ExtendedType.Integer)
           {
             IntegerValue = variable.IntegerValue;
           }
@@ -68,13 +60,13 @@ namespace EpsilonScript.AST
           // Float types: convert to configured float precision
           switch (_configuredFloatType)
           {
-            case Type.Float:
+            case ExtendedType.Float:
               FloatValue = variable.FloatValue;
               break;
-            case Type.Double:
+            case ExtendedType.Double:
               DoubleValue = variable.DoubleValue;
               break;
-            case Type.Decimal:
+            case ExtendedType.Decimal:
               DecimalValue = variable.DecimalValue;
               break;
           }

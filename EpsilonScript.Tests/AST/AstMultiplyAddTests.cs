@@ -1,10 +1,6 @@
-using System;
-using System.Collections.Generic;
-using EpsilonScript.AST;
-using EpsilonScript.Function;
-using EpsilonScript.Intermediate;
+using EpsilonScript.AST.Arithmetic;
+using EpsilonScript.AST.Literal;
 using Xunit;
-using EpsilonScript.Tests.TestInfrastructure;
 using EpsilonScript.Tests.ScriptSystem;
 
 namespace EpsilonScript.Tests.AST
@@ -14,19 +10,20 @@ namespace EpsilonScript.Tests.AST
   public class AstMultiplyAddTests : ScriptTestBase
   {
     /// <summary>
-    /// Verifies that the compiled script has been optimized to use MultiplyAddNode
+    /// Verifies that the compiled script has been optimized to use a multiply-add operation node
     /// </summary>
     private static void AssertIsMultiplyAddNode(CompiledScript script)
     {
-      Assert.IsType<MultiplyAddNode>(script.RootNode);
+      Assert.IsAssignableFrom<MultiplyAddOperationNode>(script.RootNode);
     }
 
     /// <summary>
-    /// Verifies that the compiled script uses ArithmeticNode (not optimized to MultiplyAddNode)
+    /// Verifies that the compiled script uses ArithmeticNode (not optimized to a multiply-add operation)
     /// </summary>
     private static void AssertIsNotMultiplyAddNode(CompiledScript script)
     {
-      Assert.IsNotType<MultiplyAddNode>(script.RootNode);
+      Assert.False(script.RootNode is MultiplyAddOperationNode,
+        $"Expected node to NOT be a multiply-add operation, but got {script.RootNode.GetType().Name}");
     }
 
     [Fact]
@@ -232,7 +229,7 @@ namespace EpsilonScript.Tests.AST
     [Fact]
     public void MA_SubtractFromAddend_Integer()
     {
-      // c - (a * b) should be fused
+      // c - (a * b) should be combined
       var vars = Variables()
         .WithInteger("a", 2)
         .WithInteger("b", 3)
@@ -566,11 +563,11 @@ namespace EpsilonScript.Tests.AST
     [Fact]
     public void MA_Optimization_ConstantExpression_FoldsToConstant()
     {
-      // Verify that (2 * 3) + 4 gets folded to a constant (not MultiplyAddNode)
+      // Verify that (2 * 3) + 4 gets folded to a constant (not a multiply-add operation)
       var script = Compile("(2 * 3) + 4");
 
-      // Should be a constant node (IntegerNode), not MultiplyAddNode
-      Assert.IsNotType<MultiplyAddNode>(script.RootNode);
+      // Should be a constant node (IntegerNode), not a multiply-add operation node
+      Assert.False(script.RootNode is MultiplyAddOperationNode);
       Assert.IsType<IntegerNode>(script.RootNode);
     }
 
@@ -607,7 +604,7 @@ namespace EpsilonScript.Tests.AST
     [Fact]
     public void MA_Optimization_MultipleInExpression_BothGetOptimized()
     {
-      // Verify that (a * b) + (c * d) - the second multiply gets fused
+      // Verify that (a * b) + (c * d) - the second multiply gets combined
       // The root should be MultiplyAddNode, with the left side being another MultiplyAddNode
       var vars = Variables()
         .WithInteger("a", 2)

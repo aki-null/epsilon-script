@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using EpsilonScript.Function;
 using EpsilonScript.Intermediate;
 
 namespace EpsilonScript.AST
@@ -22,9 +21,8 @@ namespace EpsilonScript.AST
       }
     }
 
-    protected override void BuildCore(Stack<Node> rpnStack, Element element, Compiler.Options options,
-      IVariableContainer variables, IDictionary<VariableId, CustomFunctionOverload> functions,
-      Compiler.IntegerPrecision intPrecision, Compiler.FloatPrecision floatPrecision)
+    protected override void BuildCore(Stack<Node> rpnStack, Element element, CompilerContext context,
+      Compiler.Options options, IVariableContainer variables)
     {
       ValueType = ExtendedType.Tuple;
       TupleValue = new List<Node>();

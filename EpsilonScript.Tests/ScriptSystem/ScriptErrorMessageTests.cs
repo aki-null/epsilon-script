@@ -1,5 +1,4 @@
 using EpsilonScript.Function;
-using EpsilonScript.Tests.TestInfrastructure;
 using System;
 using Xunit;
 

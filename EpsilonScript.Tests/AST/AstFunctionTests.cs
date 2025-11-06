@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using EpsilonScript.AST;
+using EpsilonScript.AST.Literal;
 using EpsilonScript.Function;
 using EpsilonScript.Intermediate;
 using Xunit;
@@ -30,8 +31,9 @@ namespace EpsilonScript.Tests.AST
       var token = new Token(functionName, TokenType.Identifier);
       var element = new Element(token, ElementType.Function);
 
-      node.Build(rpn, element, Compiler.Options.None, null, functions, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, functions),
+        Compiler.Options.None, null);
       node.Execute(null);
 
       Assert.Equal(ExtendedType.Integer, node.ValueType);
@@ -57,8 +59,9 @@ namespace EpsilonScript.Tests.AST
       var token = new Token(functionName, TokenType.Identifier);
       var element = new Element(token, ElementType.Function);
 
-      node.Build(rpn, element, Compiler.Options.None, null, functions, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, functions),
+        Compiler.Options.None, null);
       node.Execute(null);
 
       Assert.Equal(ExtendedType.Float, node.ValueType);
@@ -83,8 +86,9 @@ namespace EpsilonScript.Tests.AST
       var token = new Token(functionName, TokenType.Identifier);
       var element = new Element(token, ElementType.Function);
 
-      node.Build(rpn, element, Compiler.Options.None, null, functions, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, functions),
+        Compiler.Options.None, null);
       node.Execute(null);
 
       Assert.Equal(ExtendedType.Boolean, node.ValueType);
@@ -110,8 +114,9 @@ namespace EpsilonScript.Tests.AST
       var token = new Token(functionName, TokenType.Identifier);
       var element = new Element(token, ElementType.Function);
 
-      node.Build(rpn, element, Compiler.Options.None, null, functions, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, functions),
+        Compiler.Options.None, null);
       node.Execute(null);
 
       Assert.Equal(ExtendedType.String, node.ValueType);
@@ -134,16 +139,17 @@ namespace EpsilonScript.Tests.AST
       var tupleNode = new TupleNode();
       var tupleRpn = CreateStack(new FakeIntegerNode(3), new FakeIntegerNode(7));
       var tupleElement = new Element(new Token(",", TokenType.Comma), ElementType.Comma);
-      tupleNode.Build(tupleRpn, tupleElement, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Float);
+      var tupleContext = new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, null);
+      tupleNode.Build(tupleRpn, tupleElement, tupleContext, Compiler.Options.None, null);
 
       var node = new FunctionNode();
       var rpn = CreateStack(tupleNode);
       var token = new Token(functionName, TokenType.Identifier);
       var element = new Element(token, ElementType.Function);
 
-      node.Build(rpn, element, Compiler.Options.None, null, functions, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, functions),
+        Compiler.Options.None, null);
       node.Execute(null);
 
       Assert.Equal(ExtendedType.Integer, node.ValueType);
@@ -162,8 +168,10 @@ namespace EpsilonScript.Tests.AST
       var element = new Element(token, ElementType.Function);
 
       var exception = Assert.Throws<ParserException>(() =>
-        node.Build(rpn, element, Compiler.Options.None, null, functions, Compiler.IntegerPrecision.Integer,
-          Compiler.FloatPrecision.Float));
+        node.Build(rpn, element,
+          new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float,
+            new Dictionary<VariableId, CustomFunctionOverload>()),
+          Compiler.Options.None, null));
 
       Assert.Contains("Undefined function", exception.Message);
       Assert.Contains(functionName, exception.Message);
@@ -187,8 +195,9 @@ namespace EpsilonScript.Tests.AST
       var element = new Element(token, ElementType.Function);
 
       var exception = Assert.Throws<ParserException>(() =>
-        node.Build(rpn, element, Compiler.Options.None, null, functions, Compiler.IntegerPrecision.Integer,
-          Compiler.FloatPrecision.Float));
+        node.Build(rpn, element,
+          new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, functions),
+          Compiler.Options.None, null));
 
       Assert.Contains("Cannot find parameters for calling function", exception.Message);
     }
@@ -211,8 +220,9 @@ namespace EpsilonScript.Tests.AST
       var token = new Token(functionName, TokenType.Identifier);
       var element = new Element(token, ElementType.Function);
 
-      node.Build(rpn, element, Compiler.Options.None, null, functions, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, functions),
+        Compiler.Options.None, null);
 
       var exception = Assert.Throws<RuntimeException>(() => node.Execute(null));
       Assert.Contains("No overload of function", exception.Message);
@@ -236,8 +246,9 @@ namespace EpsilonScript.Tests.AST
       var token = new Token(functionName, TokenType.Identifier);
       var element = new Element(token, ElementType.Function);
 
-      node.Build(rpn, element, Compiler.Options.None, null, functions, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, functions),
+        Compiler.Options.None, null);
 
       Assert.True(node.IsPrecomputable); // Both function and parameters are constant
     }
@@ -259,8 +270,9 @@ namespace EpsilonScript.Tests.AST
       var token = new Token(functionName, TokenType.Identifier);
       var element = new Element(token, ElementType.Function);
 
-      node.Build(rpn, element, Compiler.Options.None, null, functions, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, functions),
+        Compiler.Options.None, null);
 
       Assert.False(node.IsPrecomputable); // Function is not constant
     }
@@ -282,8 +294,9 @@ namespace EpsilonScript.Tests.AST
       var token = new Token(functionName, TokenType.Identifier);
       var element = new Element(token, ElementType.Function);
 
-      node.Build(rpn, element, Compiler.Options.None, null, functions, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, functions),
+        Compiler.Options.None, null);
 
       Assert.False(node.IsPrecomputable); // Parameter is not constant
     }
@@ -307,8 +320,9 @@ namespace EpsilonScript.Tests.AST
       var token = new Token(functionName, TokenType.Identifier);
       var element = new Element(token, ElementType.Function);
 
-      node.Build(rpn, element, options, null, functions, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Float);
+      var optionsContext = new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float,
+        functions);
+      node.Build(rpn, element, optionsContext, options, null);
       node.Execute(null);
 
       Assert.Equal(ExtendedType.Integer, node.ValueType);
@@ -329,14 +343,16 @@ namespace EpsilonScript.Tests.AST
 
       var node = new FunctionNode();
       var nullNode = new NullNode();
-      nullNode.Build(new Stack<Node>(), new Element(new Token(), ElementType.None), Compiler.Options.None, null, null,
-        Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float);
+      var nullContext = new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, null);
+      nullNode.Build(new Stack<Node>(), new Element(new Token(), ElementType.None), nullContext, Compiler.Options.None,
+        null);
       var rpn = CreateStack(nullNode);
       var token = new Token(functionName, TokenType.Identifier);
       var element = new Element(token, ElementType.Function);
 
-      node.Build(rpn, element, Compiler.Options.None, null, functions, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, functions),
+        Compiler.Options.None, null);
       node.Execute(null);
 
       Assert.Equal(ExtendedType.Integer, node.ValueType);
@@ -359,14 +375,16 @@ namespace EpsilonScript.Tests.AST
 
       var node = new FunctionNode();
       var nullNode = new NullNode();
-      nullNode.Build(new Stack<Node>(), new Element(new Token(), ElementType.None), Compiler.Options.None, null, null,
-        Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float);
+      var nullContext2 = new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, null);
+      nullNode.Build(new Stack<Node>(), new Element(new Token(), ElementType.None), nullContext2, Compiler.Options.None,
+        null);
       var rpn = CreateStack(nullNode);
       var token = new Token(functionName, TokenType.Identifier);
       var element = new Element(token, ElementType.Function);
 
-      node.Build(rpn, element, Compiler.Options.None, null, functions, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, functions),
+        Compiler.Options.None, null);
       node.Execute(null);
 
       Assert.Equal(ExtendedType.Float, node.ValueType);
@@ -389,14 +407,16 @@ namespace EpsilonScript.Tests.AST
 
       var node = new FunctionNode();
       var nullNode = new NullNode();
-      nullNode.Build(new Stack<Node>(), new Element(new Token(), ElementType.None), Compiler.Options.None, null, null,
-        Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float);
+      var nullContext3 = new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, null);
+      nullNode.Build(new Stack<Node>(), new Element(new Token(), ElementType.None), nullContext3, Compiler.Options.None,
+        null);
       var rpn = CreateStack(nullNode);
       var token = new Token(functionName, TokenType.Identifier);
       var element = new Element(token, ElementType.Function);
 
-      node.Build(rpn, element, Compiler.Options.None, null, functions, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, functions),
+        Compiler.Options.None, null);
       node.Execute(null);
 
       Assert.Equal(ExtendedType.Boolean, node.ValueType);
@@ -419,14 +439,16 @@ namespace EpsilonScript.Tests.AST
 
       var node = new FunctionNode();
       var nullNode = new NullNode();
-      nullNode.Build(new Stack<Node>(), new Element(new Token(), ElementType.None), Compiler.Options.None, null, null,
-        Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float);
+      var nullContext4 = new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, null);
+      nullNode.Build(new Stack<Node>(), new Element(new Token(), ElementType.None), nullContext4, Compiler.Options.None,
+        null);
       var rpn = CreateStack(nullNode);
       var token = new Token(functionName, TokenType.Identifier);
       var element = new Element(token, ElementType.Function);
 
-      node.Build(rpn, element, Compiler.Options.None, null, functions, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, functions),
+        Compiler.Options.None, null);
       node.Execute(null);
 
       Assert.Equal(ExtendedType.String, node.ValueType);
@@ -447,14 +469,16 @@ namespace EpsilonScript.Tests.AST
 
       var node = new FunctionNode();
       var nullNode = new NullNode();
-      nullNode.Build(new Stack<Node>(), new Element(new Token(), ElementType.None), Compiler.Options.None, null, null,
-        Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float);
+      var nullContext5 = new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, null);
+      nullNode.Build(new Stack<Node>(), new Element(new Token(), ElementType.None), nullContext5, Compiler.Options.None,
+        null);
       var rpn = CreateStack(nullNode);
       var token = new Token(functionName, TokenType.Identifier);
       var element = new Element(token, ElementType.Function);
 
-      node.Build(rpn, element, Compiler.Options.None, null, functions, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, functions),
+        Compiler.Options.None, null);
       node.Execute(null);
 
       Assert.True(node.IsPrecomputable);
@@ -475,14 +499,16 @@ namespace EpsilonScript.Tests.AST
 
       var node = new FunctionNode();
       var nullNode = new NullNode();
-      nullNode.Build(new Stack<Node>(), new Element(new Token(), ElementType.None), Compiler.Options.None, null, null,
-        Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float);
+      var nullContext6 = new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, null);
+      nullNode.Build(new Stack<Node>(), new Element(new Token(), ElementType.None), nullContext6, Compiler.Options.None,
+        null);
       var rpn = CreateStack(nullNode);
       var token = new Token(functionName, TokenType.Identifier);
       var element = new Element(token, ElementType.Function);
 
-      node.Build(rpn, element, Compiler.Options.None, null, functions, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, functions),
+        Compiler.Options.None, null);
 
       Assert.False(node.IsPrecomputable);
     }
@@ -508,14 +534,15 @@ namespace EpsilonScript.Tests.AST
       // Test zero-parameter call
       var node1 = new FunctionNode();
       var nullNode1 = new NullNode();
-      nullNode1.Build(new Stack<Node>(), new Element(new Token(), ElementType.None), Compiler.Options.None, null, null,
-        Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float);
+      var nullContext7 = new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, null);
+      nullNode1.Build(new Stack<Node>(), new Element(new Token(), ElementType.None), nullContext7,
+        Compiler.Options.None, null);
       var rpn1 = CreateStack(nullNode1);
       var token1 = new Token(zeroParamName, TokenType.Identifier);
       var element1 = new Element(token1, ElementType.Function);
 
-      node1.Build(rpn1, element1, Compiler.Options.None, null, functions, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Float);
+      var context1 = new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, functions);
+      node1.Build(rpn1, element1, context1, Compiler.Options.None, null);
       node1.Execute(null);
 
       Assert.Equal(0, node1.IntegerValue); // Zero-parameter version
@@ -526,8 +553,8 @@ namespace EpsilonScript.Tests.AST
       var token2 = new Token(zeroParamName, TokenType.Identifier);
       var element2 = new Element(token2, ElementType.Function);
 
-      node2.Build(rpn2, element2, Compiler.Options.None, null, functions, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Float);
+      var context2 = new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, functions);
+      node2.Build(rpn2, element2, context2, Compiler.Options.None, null);
       node2.Execute(null);
 
       Assert.Equal(105, node2.IntegerValue); // One-parameter version (5 + 100)
@@ -550,8 +577,9 @@ namespace EpsilonScript.Tests.AST
       var token = new Token(functionName, TokenType.Identifier);
       var element = new Element(token, ElementType.Function);
 
-      node.Build(rpn, element, Compiler.Options.None, null, functions, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, functions),
+        Compiler.Options.None, null);
 
       // Optimize should evaluate the constant function and return a value node
       var optimized = node.Optimize();
@@ -578,8 +606,9 @@ namespace EpsilonScript.Tests.AST
       var token = new Token(functionName, TokenType.Identifier);
       var element = new Element(token, ElementType.Function);
 
-      node.Build(rpn, element, Compiler.Options.None, null, functions, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, functions),
+        Compiler.Options.None, null);
 
       // Optimize should not fold non-constant functions
       var optimized = node.Optimize();
@@ -604,8 +633,9 @@ namespace EpsilonScript.Tests.AST
       var token = new Token(functionName, TokenType.Identifier);
       var element = new Element(token, ElementType.Function);
 
-      node.Build(rpn, element, Compiler.Options.None, null, functions, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, functions),
+        Compiler.Options.None, null);
 
       // Optimize should not fold if parameters are not constant
       var optimized = node.Optimize();
@@ -630,8 +660,9 @@ namespace EpsilonScript.Tests.AST
       var token = new Token(functionName, TokenType.Identifier);
       var element = new Element(token, ElementType.Function);
 
-      node.Build(rpn, element, Compiler.Options.None, null, functions, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, functions),
+        Compiler.Options.None, null);
 
       // Optimize should evaluate and return a float node
       var optimized = node.Optimize();
@@ -657,8 +688,9 @@ namespace EpsilonScript.Tests.AST
       var token = new Token(functionName, TokenType.Identifier);
       var element = new Element(token, ElementType.Function);
 
-      node.Build(rpn, element, Compiler.Options.None, null, functions, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, functions),
+        Compiler.Options.None, null);
 
       // Optimize should evaluate and return a boolean node
       var optimized = node.Optimize();
@@ -685,8 +717,9 @@ namespace EpsilonScript.Tests.AST
       var token = new Token(functionName, TokenType.Identifier);
       var element = new Element(token, ElementType.Function);
 
-      node.Build(rpn, element, Compiler.Options.None, null, functions, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, functions),
+        Compiler.Options.None, null);
 
       // Optimize should evaluate and return a string node
       var optimized = node.Optimize();
@@ -711,16 +744,17 @@ namespace EpsilonScript.Tests.AST
       var tupleNode = new TupleNode();
       var tupleRpn = CreateStack(new FakeIntegerNode(3), new FakeIntegerNode(7));
       var tupleElement = new Element(new Token(",", TokenType.Comma), ElementType.Comma);
-      tupleNode.Build(tupleRpn, tupleElement, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Float);
+      var tupleContext = new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, null);
+      tupleNode.Build(tupleRpn, tupleElement, tupleContext, Compiler.Options.None, null);
 
       var node = new FunctionNode();
       var rpn = CreateStack(tupleNode);
       var token = new Token(functionName, TokenType.Identifier);
       var element = new Element(token, ElementType.Function);
 
-      node.Build(rpn, element, Compiler.Options.None, null, functions, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, functions),
+        Compiler.Options.None, null);
 
       // Optimize should evaluate and return an integer node
       var optimized = node.Optimize();
@@ -748,8 +782,9 @@ namespace EpsilonScript.Tests.AST
       var token = new Token(functionName, TokenType.Identifier);
       var element = new Element(token, ElementType.Function);
 
-      node.Build(rpn, element, Compiler.Options.None, null, functions, Compiler.IntegerPrecision.Long,
-        Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, functions),
+        Compiler.Options.None, null);
       node.Execute(null);
 
       Assert.Equal(ExtendedType.Long, node.ValueType);
@@ -773,8 +808,9 @@ namespace EpsilonScript.Tests.AST
       var token = new Token(functionName, TokenType.Identifier);
       var element = new Element(token, ElementType.Function);
 
-      node.Build(rpn, element, Compiler.Options.None, null, functions, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Double);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, functions),
+        Compiler.Options.None, null);
       node.Execute(null);
 
       Assert.Equal(ExtendedType.Double, node.ValueType);
@@ -799,8 +835,9 @@ namespace EpsilonScript.Tests.AST
       var token = new Token(functionName, TokenType.Identifier);
       var element = new Element(token, ElementType.Function);
 
-      node.Build(rpn, element, Compiler.Options.None, null, functions, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Decimal);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, functions),
+        Compiler.Options.None, null);
       node.Execute(null);
 
       Assert.Equal(ExtendedType.Decimal, node.ValueType);
@@ -823,16 +860,17 @@ namespace EpsilonScript.Tests.AST
       var tupleNode = new TupleNode();
       var tupleRpn = CreateStack(new FakeLongNode(5000000000L), new FakeLongNode(3000000000L));
       var tupleElement = new Element(new Token(",", TokenType.Comma), ElementType.Comma);
-      tupleNode.Build(tupleRpn, tupleElement, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Long,
-        Compiler.FloatPrecision.Float);
+      var tupleContext2 = new CompilerContext(Compiler.IntegerPrecision.Long, Compiler.FloatPrecision.Float, null);
+      tupleNode.Build(tupleRpn, tupleElement, tupleContext2, Compiler.Options.None, null);
 
       var node = new FunctionNode();
       var rpn = CreateStack(tupleNode);
       var token = new Token(functionName, TokenType.Identifier);
       var element = new Element(token, ElementType.Function);
 
-      node.Build(rpn, element, Compiler.Options.None, null, functions, Compiler.IntegerPrecision.Long,
-        Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, functions),
+        Compiler.Options.None, null);
       node.Execute(null);
 
       Assert.Equal(ExtendedType.Long, node.ValueType);
@@ -855,16 +893,17 @@ namespace EpsilonScript.Tests.AST
       var tupleRpn =
         CreateStack(new FakeDoubleNode(3.141592653589793), new FakeDoubleNode(2.718281828459045));
       var tupleElement = new Element(new Token(",", TokenType.Comma), ElementType.Comma);
-      tupleNode.Build(tupleRpn, tupleElement, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Double);
+      var tupleContext3 = new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Double, null);
+      tupleNode.Build(tupleRpn, tupleElement, tupleContext3, Compiler.Options.None, null);
 
       var node = new FunctionNode();
       var rpn = CreateStack(tupleNode);
       var token = new Token(functionName, TokenType.Identifier);
       var element = new Element(token, ElementType.Function);
 
-      node.Build(rpn, element, Compiler.Options.None, null, functions, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Double);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, functions),
+        Compiler.Options.None, null);
       node.Execute(null);
 
       Assert.Equal(ExtendedType.Double, node.ValueType);
@@ -886,16 +925,17 @@ namespace EpsilonScript.Tests.AST
       var tupleNode = new TupleNode();
       var tupleRpn = CreateStack(new FakeDecimalNode(0.1m), new FakeDecimalNode(0.2m));
       var tupleElement = new Element(new Token(",", TokenType.Comma), ElementType.Comma);
-      tupleNode.Build(tupleRpn, tupleElement, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Decimal);
+      var tupleContext4 = new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Decimal, null);
+      tupleNode.Build(tupleRpn, tupleElement, tupleContext4, Compiler.Options.None, null);
 
       var node = new FunctionNode();
       var rpn = CreateStack(tupleNode);
       var token = new Token(functionName, TokenType.Identifier);
       var element = new Element(token, ElementType.Function);
 
-      node.Build(rpn, element, Compiler.Options.None, null, functions, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Decimal);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, functions),
+        Compiler.Options.None, null);
       node.Execute(null);
 
       Assert.Equal(ExtendedType.Decimal, node.ValueType);
@@ -1011,9 +1051,8 @@ namespace EpsilonScript.Tests.AST
         BooleanValue = true;
       }
 
-      protected override void BuildCore(Stack<Node> rpnStack, Element element, Compiler.Options options,
-        IVariableContainer variables, IDictionary<VariableId, CustomFunctionOverload> functions,
-        Compiler.IntegerPrecision intPrecision, Compiler.FloatPrecision floatPrecision)
+      protected override void BuildCore(Stack<Node> rpnStack, Element element, CompilerContext context,
+        Compiler.Options options, IVariableContainer variables)
       {
         throw new NotImplementedException("Test node should not be built from RPN");
       }

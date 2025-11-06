@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using EpsilonScript.AST;
-using EpsilonScript.Function;
+using EpsilonScript.AST.Boolean;
 using EpsilonScript.Intermediate;
 using Xunit;
 using EpsilonScript.Tests.TestInfrastructure;
@@ -21,8 +21,9 @@ namespace EpsilonScript.Tests.AST
       var rpn = CreateStack(new FakeBooleanNode(inputValue));
       var element = new Element(new Token("!", TokenType.NegateOperator), ElementType.NegateOperator);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, null),
+        Compiler.Options.None, null);
       node.Execute(null);
 
       Assert.Equal(ExtendedType.Boolean, node.ValueType);
@@ -42,8 +43,9 @@ namespace EpsilonScript.Tests.AST
       var rpn = CreateStack(new FakeIntegerNode(value));
       var element = new Element(new Token("!", TokenType.NegateOperator), ElementType.NegateOperator);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, null),
+        Compiler.Options.None, null);
 
       ErrorTestHelper.ExecuteNodeExpectingError<RuntimeException>(node, null, "Cannot negate a non-boolean value");
     }
@@ -58,8 +60,9 @@ namespace EpsilonScript.Tests.AST
       var rpn = CreateStack(new FakeFloatNode(value));
       var element = new Element(new Token("!", TokenType.NegateOperator), ElementType.NegateOperator);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, null),
+        Compiler.Options.None, null);
 
       ErrorTestHelper.ExecuteNodeExpectingError<RuntimeException>(node, null, "Cannot negate a non-boolean value");
     }
@@ -75,8 +78,9 @@ namespace EpsilonScript.Tests.AST
       var rpn = CreateStack(new FakeStringNode(value));
       var element = new Element(new Token("!", TokenType.NegateOperator), ElementType.NegateOperator);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, null),
+        Compiler.Options.None, null);
 
       ErrorTestHelper.ExecuteNodeExpectingError<RuntimeException>(node, null, "Cannot negate a non-boolean value");
     }
@@ -102,8 +106,9 @@ namespace EpsilonScript.Tests.AST
       var rpn = CreateStack(childNode);
       var element = new Element(new Token("!", TokenType.NegateOperator), ElementType.NegateOperator);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, null),
+        Compiler.Options.None, null);
 
       Assert.True(node.IsPrecomputable); // Child is constant, so negate should be constant
     }
@@ -116,8 +121,9 @@ namespace EpsilonScript.Tests.AST
       var rpn = CreateStack(childNode);
       var element = new Element(new Token("!", TokenType.NegateOperator), ElementType.NegateOperator);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, null),
+        Compiler.Options.None, null);
 
       Assert.False(node.IsPrecomputable); // Child is not constant, so negate should not be constant
     }
@@ -131,8 +137,9 @@ namespace EpsilonScript.Tests.AST
       var rpn = CreateStack(new FakeBooleanNode(inputValue));
       var element = new Element(new Token("!", TokenType.NegateOperator), ElementType.NegateOperator);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, null),
+        Compiler.Options.None, null);
 
       var optimizedNode = node.Optimize();
 
@@ -150,8 +157,9 @@ namespace EpsilonScript.Tests.AST
       var rpn = CreateStack(childNode);
       var element = new Element(new Token("!", TokenType.NegateOperator), ElementType.NegateOperator);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, null),
+        Compiler.Options.None, null);
 
       var optimizedNode = node.Optimize();
 
@@ -168,7 +176,8 @@ namespace EpsilonScript.Tests.AST
       var rpn = CreateStack(new FakeBooleanNode(true));
       var element = new Element(new Token("!", TokenType.NegateOperator), ElementType.NegateOperator);
 
-      node.Build(rpn, element, options, null, null, Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float);
+      var context = new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, null);
+      node.Build(rpn, element, context, options, null);
       node.Execute(null);
 
       Assert.Equal(ExtendedType.Boolean, node.ValueType);
@@ -182,14 +191,14 @@ namespace EpsilonScript.Tests.AST
       var innerNegate = new NegateNode();
       var innerRpn = CreateStack(new FakeBooleanNode(true));
       var innerElement = new Element(new Token("!", TokenType.NegateOperator), ElementType.NegateOperator);
-      innerNegate.Build(innerRpn, innerElement, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Float);
+      var innerContext = new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, null);
+      innerNegate.Build(innerRpn, innerElement, innerContext, Compiler.Options.None, null);
 
       var outerNegate = new NegateNode();
       var outerRpn = CreateStack(innerNegate);
       var outerElement = new Element(new Token("!", TokenType.NegateOperator), ElementType.NegateOperator);
-      outerNegate.Build(outerRpn, outerElement, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Float);
+      var outerContext = new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, null);
+      outerNegate.Build(outerRpn, outerElement, outerContext, Compiler.Options.None, null);
 
       outerNegate.Execute(null);
 
@@ -209,9 +218,8 @@ namespace EpsilonScript.Tests.AST
         FloatValue = 1.0f;
       }
 
-      protected override void BuildCore(Stack<Node> rpnStack, Element element, Compiler.Options options,
-        IVariableContainer variables, IDictionary<VariableId, CustomFunctionOverload> functions,
-        Compiler.IntegerPrecision intPrecision, Compiler.FloatPrecision floatPrecision)
+      protected override void BuildCore(Stack<Node> rpnStack, Element element, CompilerContext context,
+        Compiler.Options options, IVariableContainer variables)
       {
         throw new NotImplementedException("Test node should not be built from RPN");
       }

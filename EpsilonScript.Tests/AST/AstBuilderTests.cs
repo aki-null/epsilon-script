@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using EpsilonScript.AST;
 using EpsilonScript.Intermediate;
-using EpsilonScript.Tests.TestInfrastructure;
 using Xunit;
 
 namespace EpsilonScript.Tests.AST
@@ -12,9 +11,10 @@ namespace EpsilonScript.Tests.AST
     [MemberData(nameof(SuccessData))]
     internal void AST_Build_Succeeds(List<Element> elements, ExtendedType expectedType)
     {
-      var builder = new AstBuilder(null);
-      builder.Configure(Compiler.Options.Immutable, null, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Float);
+      var context = new CompilerContext(Compiler.IntegerPrecision.Integer,
+        Compiler.FloatPrecision.Float, null);
+      var builder = new AstBuilder(context);
+      builder.Configure(Compiler.Options.Immutable, null);
       foreach (var element in elements)
       {
         builder.Push(element);
@@ -35,9 +35,10 @@ namespace EpsilonScript.Tests.AST
     {
       Assert.Throws<RuntimeException>(() =>
       {
-        var builder = new AstBuilder(null);
-        builder.Configure(Compiler.Options.Immutable, null, Compiler.IntegerPrecision.Integer,
-          Compiler.FloatPrecision.Float);
+        var context = new CompilerContext(Compiler.IntegerPrecision.Integer,
+          Compiler.FloatPrecision.Float, null);
+        var builder = new AstBuilder(context);
+        builder.Configure(Compiler.Options.Immutable, null);
         foreach (var element in elements)
         {
           builder.Push(element);

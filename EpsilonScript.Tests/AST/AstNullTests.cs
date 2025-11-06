@@ -1,4 +1,5 @@
 using EpsilonScript.AST;
+using EpsilonScript.AST.Literal;
 using EpsilonScript.Intermediate;
 using Xunit;
 using EpsilonScript.Tests.TestInfrastructure;
@@ -15,8 +16,9 @@ namespace EpsilonScript.Tests.AST
       var rpn = CreateStack();
       var element = new Element(new Token("null", TokenType.Identifier), ElementType.None);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, null),
+        Compiler.Options.None, null);
 
       Assert.Null(node.TupleValue);
       Assert.Null(node.StringValue);
@@ -38,8 +40,9 @@ namespace EpsilonScript.Tests.AST
       var rpn = CreateStack();
       var element = new Element(new Token("null", TokenType.Identifier), ElementType.None);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, null),
+        Compiler.Options.None, null);
 
       // Execute should not throw or change anything
       node.Execute(null);
@@ -58,7 +61,8 @@ namespace EpsilonScript.Tests.AST
       var rpn = CreateStack();
       var element = new Element(new Token("null", TokenType.Identifier), ElementType.None);
 
-      node.Build(rpn, element, options, null, null, Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, null), options, null);
       node.Execute(null);
 
       Assert.Null(node.TupleValue);
@@ -73,8 +77,9 @@ namespace EpsilonScript.Tests.AST
       var rpn = CreateStack();
       var element = new Element(new Token("null", TokenType.Identifier), ElementType.None);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, null),
+        Compiler.Options.None, null);
 
       var optimizedNode = node.Optimize();
 
@@ -93,8 +98,9 @@ namespace EpsilonScript.Tests.AST
       var element = new Element(new Token("null", TokenType.Identifier), ElementType.None);
 
       // Should not throw an exception
-      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, null),
+        Compiler.Options.None, null);
 
       Assert.Null(node.TupleValue);
       Assert.Null(node.StringValue);
@@ -109,8 +115,9 @@ namespace EpsilonScript.Tests.AST
       var element = new Element(new Token("null", TokenType.Identifier), ElementType.None);
 
       // Should not consume from stack or throw an exception
-      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, null),
+        Compiler.Options.None, null);
 
       Assert.Null(node.TupleValue);
       Assert.Null(node.StringValue);
@@ -127,8 +134,9 @@ namespace EpsilonScript.Tests.AST
       var rpn = CreateStack();
       var element = new Element(new Token("null", TokenType.Identifier), ElementType.None);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, null),
+        Compiler.Options.None, null);
 
       Assert.Equal(0, node.IntegerValue);
       Assert.Equal(0.0f, node.FloatValue);
@@ -145,8 +153,9 @@ namespace EpsilonScript.Tests.AST
       var rpn = CreateStack();
       var element = new Element(new Token("null", TokenType.Identifier), ElementType.None);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, null),
+        Compiler.Options.None, null);
 
       // Execute multiple times
       node.Execute(null);
@@ -166,8 +175,9 @@ namespace EpsilonScript.Tests.AST
       var rpn = CreateStack();
       var element = new Element(new Token("null", TokenType.Identifier), ElementType.None);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, null),
+        Compiler.Options.None, null);
       node.Execute(null); // null variable container should be fine
 
       Assert.Null(node.TupleValue);

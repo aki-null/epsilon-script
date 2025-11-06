@@ -65,7 +65,9 @@ namespace EpsilonScript
       // Register built-in functions with appropriate precision
       RegisterBuiltInFunctions();
 
-      _astBuilder = new AstBuilder(_functions);
+      var context =
+        new CompilerContext(integerPrecision, floatPrecision, _functions);
+      _astBuilder = new AstBuilder(context);
       _rpnConverter = new RpnConverter(_astBuilder);
       _tokenParser = new TokenParser(_rpnConverter);
     }
@@ -221,7 +223,7 @@ namespace EpsilonScript
       _rpnConverter.Reset();
       _tokenParser.Reset();
 
-      _astBuilder.Configure(options, variables, DefaultIntegerType, DefaultFloatType);
+      _astBuilder.Configure(options, variables);
 
       new Lexer.Lexer().Execute(source, _tokenParser);
       var rootNode = _astBuilder.Result;

@@ -34,9 +34,8 @@ namespace EpsilonScript.AST
       }
     }
 
-    protected override void BuildCore(Stack<Node> rpnStack, Element element, Compiler.Options options,
-      IVariableContainer variables, IDictionary<VariableId, CustomFunctionOverload> functions,
-      Compiler.IntegerPrecision intPrecision, Compiler.FloatPrecision floatPrecision)
+    protected override void BuildCore(Stack<Node> rpnStack, Element element, CompilerContext context,
+      Compiler.Options options, IVariableContainer variables)
     {
       // Unfortunately function name string needs to be allocated here to make a dictionary lookup
       VariableId functionName = element.Token.Text.ToString();
@@ -44,7 +43,7 @@ namespace EpsilonScript.AST
       // Store compile-time variables for contextual functions
       _variables = variables;
 
-      if (!functions.TryGetValue(functionName, out _functionOverload))
+      if (!context.Functions.TryGetValue(functionName, out _functionOverload))
       {
         throw new ParserException(element.Token, $"Undefined function: {functionName}");
       }
@@ -258,12 +257,11 @@ namespace EpsilonScript.AST
 
     public override void ConfigureNoAlloc()
     {
-      if (_parameters != null)
+      if (_parameters == null) return;
+
+      foreach (var param in _parameters)
       {
-        foreach (var param in _parameters)
-        {
-          param?.ConfigureNoAlloc();
-        }
+        param?.ConfigureNoAlloc();
       }
     }
   }

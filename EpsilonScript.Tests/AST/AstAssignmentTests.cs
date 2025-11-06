@@ -22,12 +22,13 @@ namespace EpsilonScript.Tests.AST
       var leftNode = new FakeVariableNode(variable);
       var rightNode = CreateValueNode(assignValue);
 
-      var node = new AssignmentNode();
+      var node = CreateAssignmentNode(operatorSymbol);
       var rpn = CreateStack(leftNode, rightNode);
       var element = new Element(new Token(operatorSymbol, GetTokenType(operatorType)), operatorType);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, null),
+        Compiler.Options.None, null);
       node.Execute(null);
 
       Assert.Equal(expectedValueType, node.ValueType);
@@ -65,12 +66,13 @@ namespace EpsilonScript.Tests.AST
       var leftNode = new FakeVariableNode(variable);
       var rightNode = CreateValueNode(operandValue);
 
-      var node = new AssignmentNode();
+      var node = CreateAssignmentNode(operatorSymbol);
       var rpn = CreateStack(leftNode, rightNode);
       var element = new Element(new Token(operatorSymbol, GetTokenType(operatorType)), operatorType);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, null),
+        Compiler.Options.None, null);
       node.Execute(null);
 
       Assert.Equal(expectedValueType, node.ValueType);
@@ -110,7 +112,7 @@ namespace EpsilonScript.Tests.AST
       var leftNode = new FakeVariableNode(variable);
       var rightNode = new FakeIntegerNode(42);
 
-      var node = new AssignmentNode();
+      var node = CreateAssignmentNode(ElementType.AssignmentOperator);
       var rpn = CreateStack(leftNode, rightNode);
       var element = new Element(new Token("=", TokenType.AssignmentOperator), ElementType.AssignmentOperator);
 
@@ -125,12 +127,13 @@ namespace EpsilonScript.Tests.AST
       var leftNode = new FakeIntegerNode(10); // Not a variable
       var rightNode = new FakeIntegerNode(42);
 
-      var node = new AssignmentNode();
+      var node = CreateAssignmentNode(ElementType.AssignmentOperator);
       var rpn = CreateStack(leftNode, rightNode);
       var element = new Element(new Token("=", TokenType.AssignmentOperator), ElementType.AssignmentOperator);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, null),
+        Compiler.Options.None, null);
 
       ErrorTestHelper.ExecuteNodeExpectingError<RuntimeException>(node, null, ErrorMessages.LeftHandSideMustBeVariable);
     }
@@ -142,12 +145,13 @@ namespace EpsilonScript.Tests.AST
       var leftNode = new FakeVariableNode(variable);
       var rightNode = new FakeFloatNode(3.14f);
 
-      var node = new AssignmentNode();
+      var node = CreateAssignmentNode(ElementType.AssignmentOperator);
       var rpn = CreateStack(leftNode, rightNode);
       var element = new Element(new Token("=", TokenType.AssignmentOperator), ElementType.AssignmentOperator);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, null),
+        Compiler.Options.None, null);
 
       ErrorTestHelper.ExecuteNodeExpectingError<RuntimeException>(node, null,
         ErrorMessages.FloatValueCannotBeAssignedToBooleanVariable);
@@ -165,12 +169,13 @@ namespace EpsilonScript.Tests.AST
       var leftNode = new FakeVariableNode(variable);
       var rightNode = new FakeStringNode("not a number");
 
-      var node = new AssignmentNode();
+      var node = CreateAssignmentNode(operatorSymbol);
       var rpn = CreateStack(leftNode, rightNode);
       var element = new Element(new Token(operatorSymbol, GetTokenType(operatorType)), operatorType);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, null),
+        Compiler.Options.None, null);
 
       ErrorTestHelper.ExecuteNodeExpectingError<RuntimeException>(node, null,
         ErrorMessages.ArithmeticOperationOnlyOnNumericValue);
@@ -188,12 +193,13 @@ namespace EpsilonScript.Tests.AST
       var leftNode = new FakeVariableNode(variable);
       var rightNode = new FakeIntegerNode(5);
 
-      var node = new AssignmentNode();
+      var node = CreateAssignmentNode(operatorSymbol);
       var rpn = CreateStack(leftNode, rightNode);
       var element = new Element(new Token(operatorSymbol, GetTokenType(operatorType)), operatorType);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, null),
+        Compiler.Options.None, null);
 
       ErrorTestHelper.ExecuteNodeExpectingError<ArgumentOutOfRangeException>(node);
     }

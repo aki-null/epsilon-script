@@ -210,7 +210,7 @@ namespace EpsilonScript.Tests.AST
       Assert.Equal(0, ex.Location.LineNumber);
       Assert.Equal(7, ex.Location.CharacterIndex); // 0-indexed: x + (y * bad)
       // Error message should indicate the problem is with the multiply operation
-      Assert.Contains("arithmetic operation", ex.Message);
+      Assert.Contains("Multiply operation", ex.Message);
       Assert.Contains("numeric values", ex.Message);
     }
 

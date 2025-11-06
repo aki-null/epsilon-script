@@ -1,5 +1,5 @@
 using System;
-using EpsilonScript.AST;
+using EpsilonScript.AST.Literal;
 using EpsilonScript.Intermediate;
 using Xunit;
 using EpsilonScript.Tests.TestInfrastructure;
@@ -21,8 +21,9 @@ namespace EpsilonScript.Tests.AST
       var rpn = CreateStack();
       var element = new Element(new Token(value, TokenType.Integer), ElementType.Integer);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, null),
+        Compiler.Options.None, null);
 
       Assert.Equal(ExtendedType.Integer, node.ValueType);
       Assert.Equal(int.Parse(value), node.IntegerValue);
@@ -57,8 +58,9 @@ namespace EpsilonScript.Tests.AST
       var rpn = CreateStack();
       var element = new Element(new Token(value, TokenType.Float), ElementType.Float);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, null),
+        Compiler.Options.None, null);
 
       Assert.Equal(ExtendedType.Float, node.ValueType);
       var expectedFloat = float.Parse(value);
@@ -77,12 +79,13 @@ namespace EpsilonScript.Tests.AST
     internal void AST_Arithmetic_IntegerMaxValue_Addition_AllowsOverflow()
     {
       // Test int.MaxValue + 1 should wrap to int.MinValue (overflow behavior)
-      var node = new ArithmeticNode();
+      var node = CreateArithmeticNode(ElementType.AddOperator);
       var rpn = CreateStack(new FakeIntegerNode(int.MaxValue), new FakeIntegerNode(1));
       var element = new Element(new Token("+", TokenType.PlusSign), ElementType.AddOperator);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, null),
+        Compiler.Options.None, null);
       node.Execute(null);
 
       Assert.Equal(ExtendedType.Integer, node.ValueType);
@@ -93,12 +96,13 @@ namespace EpsilonScript.Tests.AST
     internal void AST_Arithmetic_IntegerMinValue_Subtraction_AllowsOverflow()
     {
       // Test int.MinValue - 1 should wrap to int.MaxValue (overflow behavior)
-      var node = new ArithmeticNode();
+      var node = CreateArithmeticNode(ElementType.SubtractOperator);
       var rpn = CreateStack(new FakeIntegerNode(int.MinValue), new FakeIntegerNode(1));
       var element = new Element(new Token("-", TokenType.MinusSign), ElementType.SubtractOperator);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, null),
+        Compiler.Options.None, null);
       node.Execute(null);
 
       Assert.Equal(ExtendedType.Integer, node.ValueType);
@@ -109,12 +113,13 @@ namespace EpsilonScript.Tests.AST
     internal void AST_Arithmetic_IntegerMaxValue_Multiplication_AllowsOverflow()
     {
       // Test int.MaxValue * 2 should overflow (wraparound behavior)
-      var node = new ArithmeticNode();
+      var node = CreateArithmeticNode(ElementType.MultiplyOperator);
       var rpn = CreateStack(new FakeIntegerNode(int.MaxValue), new FakeIntegerNode(2));
       var element = new Element(new Token("*", TokenType.MultiplyOperator), ElementType.MultiplyOperator);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, null),
+        Compiler.Options.None, null);
       node.Execute(null);
 
       Assert.Equal(ExtendedType.Integer, node.ValueType);
@@ -126,12 +131,13 @@ namespace EpsilonScript.Tests.AST
     internal void AST_Arithmetic_FloatMaxValue_Addition_ReturnsInfinity()
     {
       // Test float.MaxValue + float.MaxValue = Infinity
-      var node = new ArithmeticNode();
+      var node = CreateArithmeticNode(ElementType.AddOperator);
       var rpn = CreateStack(new FakeFloatNode(float.MaxValue), new FakeFloatNode(float.MaxValue));
       var element = new Element(new Token("+", TokenType.PlusSign), ElementType.AddOperator);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, null),
+        Compiler.Options.None, null);
       node.Execute(null);
 
       Assert.Equal(ExtendedType.Float, node.ValueType);
@@ -142,12 +148,13 @@ namespace EpsilonScript.Tests.AST
     internal void AST_Arithmetic_FloatMinValue_Subtraction_ReturnsNegativeInfinity()
     {
       // Test (-float.MaxValue) - float.MaxValue = -Infinity
-      var node = new ArithmeticNode();
+      var node = CreateArithmeticNode(ElementType.SubtractOperator);
       var rpn = CreateStack(new FakeFloatNode(-float.MaxValue), new FakeFloatNode(float.MaxValue));
       var element = new Element(new Token("-", TokenType.MinusSign), ElementType.SubtractOperator);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, null),
+        Compiler.Options.None, null);
       node.Execute(null);
 
       Assert.Equal(ExtendedType.Float, node.ValueType);
@@ -158,12 +165,13 @@ namespace EpsilonScript.Tests.AST
     internal void AST_Arithmetic_FloatMaxValue_Multiplication_ReturnsInfinity()
     {
       // Test float.MaxValue * 2 = Infinity
-      var node = new ArithmeticNode();
+      var node = CreateArithmeticNode(ElementType.MultiplyOperator);
       var rpn = CreateStack(new FakeFloatNode(float.MaxValue), new FakeFloatNode(2.0f));
       var element = new Element(new Token("*", TokenType.MultiplyOperator), ElementType.MultiplyOperator);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, null),
+        Compiler.Options.None, null);
       node.Execute(null);
 
       Assert.Equal(ExtendedType.Float, node.ValueType);
@@ -174,12 +182,13 @@ namespace EpsilonScript.Tests.AST
     internal void AST_Arithmetic_FloatEpsilon_Addition_PreservesValue()
     {
       // Test 1.0f + float.Epsilon behavior
-      var node = new ArithmeticNode();
+      var node = CreateArithmeticNode(ElementType.AddOperator);
       var rpn = CreateStack(new FakeFloatNode(1.0f), new FakeFloatNode(float.Epsilon));
       var element = new Element(new Token("+", TokenType.PlusSign), ElementType.AddOperator);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, null),
+        Compiler.Options.None, null);
       node.Execute(null);
 
       Assert.Equal(ExtendedType.Float, node.ValueType);
@@ -196,12 +205,13 @@ namespace EpsilonScript.Tests.AST
     [InlineData(int.MinValue, -2)]
     internal void AST_Arithmetic_IntegerBoundary_Division_Succeeds(int dividend, int divisor)
     {
-      var node = new ArithmeticNode();
+      var node = CreateArithmeticNode(ElementType.DivideOperator);
       var rpn = CreateStack(new FakeIntegerNode(dividend), new FakeIntegerNode(divisor));
       var element = new Element(new Token("/", TokenType.DivideOperator), ElementType.DivideOperator);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, null),
+        Compiler.Options.None, null);
       node.Execute(null);
 
       Assert.Equal(ExtendedType.Integer, node.ValueType);
@@ -217,12 +227,13 @@ namespace EpsilonScript.Tests.AST
     [InlineData(int.MinValue, 3, -2)]
     internal void AST_Arithmetic_IntegerBoundary_Modulo_Succeeds(int dividend, int divisor, int expectedRemainder)
     {
-      var node = new ArithmeticNode();
+      var node = CreateArithmeticNode(ElementType.ModuloOperator);
       var rpn = CreateStack(new FakeIntegerNode(dividend), new FakeIntegerNode(divisor));
       var element = new Element(new Token("%", TokenType.ModuloOperator), ElementType.ModuloOperator);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, null),
+        Compiler.Options.None, null);
       node.Execute(null);
 
       Assert.Equal(ExtendedType.Integer, node.ValueType);
@@ -236,12 +247,13 @@ namespace EpsilonScript.Tests.AST
     [InlineData(-float.MaxValue, -1.0f)]
     internal void AST_Arithmetic_FloatBoundary_Division_HandlesExtremes(float dividend, float divisor)
     {
-      var node = new ArithmeticNode();
+      var node = CreateArithmeticNode(ElementType.DivideOperator);
       var rpn = CreateStack(new FakeFloatNode(dividend), new FakeFloatNode(divisor));
       var element = new Element(new Token("/", TokenType.DivideOperator), ElementType.DivideOperator);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, null),
+        Compiler.Options.None, null);
       node.Execute(null);
 
       Assert.Equal(ExtendedType.Float, node.ValueType);
@@ -263,12 +275,13 @@ namespace EpsilonScript.Tests.AST
     internal void Comparison_IntegerBoundaryValues_Succeeds()
     {
       // Test int.MaxValue == int.MaxValue
-      var node = new ComparisonNode();
+      var node = CreateComparisonNode("==");
       var rpn = CreateStack(new FakeIntegerNode(int.MaxValue), new FakeIntegerNode(int.MaxValue));
       var element = new Element(new Token("==", TokenType.ComparisonEqual), ElementType.ComparisonEqual);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, null),
+        Compiler.Options.None, null);
       node.Execute(null);
 
       Assert.Equal(ExtendedType.Boolean, node.ValueType);
@@ -279,12 +292,13 @@ namespace EpsilonScript.Tests.AST
     internal void Comparison_FloatBoundaryValues_Succeeds()
     {
       // Test float.MaxValue == float.MaxValue
-      var node = new ComparisonNode();
+      var node = CreateComparisonNode("==");
       var rpn = CreateStack(new FakeFloatNode(float.MaxValue), new FakeFloatNode(float.MaxValue));
       var element = new Element(new Token("==", TokenType.ComparisonEqual), ElementType.ComparisonEqual);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, null),
+        Compiler.Options.None, null);
       node.Execute(null);
 
       Assert.Equal(ExtendedType.Boolean, node.ValueType);
@@ -304,8 +318,9 @@ namespace EpsilonScript.Tests.AST
       var rpn = CreateStack();
       var element = new Element(new Token(quotedValue, TokenType.String), ElementType.String);
 
-      node.Build(rpn, element, Compiler.Options.None, null, null, Compiler.IntegerPrecision.Integer,
-        Compiler.FloatPrecision.Float);
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, null),
+        Compiler.Options.None, null);
 
       Assert.Equal(ExtendedType.String, node.ValueType);
       Assert.Equal(value, node.StringValue);
