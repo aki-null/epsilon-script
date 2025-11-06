@@ -7,6 +7,9 @@ namespace EpsilonScript
   /// <summary>
   /// Compiler context containing immutable compiler configuration and reusable resources.
   /// </summary>
+  /// <remarks>
+  /// Thread Safety: NOT thread-safe. Contains mutable buffers that are reused during compilation and execution.
+  /// </remarks>
   internal sealed class CompilerContext
   {
     public Compiler.IntegerPrecision IntegerPrecision { get; }

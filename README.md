@@ -92,6 +92,7 @@ Console.WriteLine(script.FloatValue); // 150
   - [Expression Sequencing](#expression-sequencing)
 - [Numeric Precision](#numeric-precision)
 - [Heap Allocations](#heap-allocations)
+- [Thread Safety](#thread-safety)
 - [Motivation](#motivation)
 - [Development](#development)
 
@@ -624,6 +625,66 @@ compiler.Compile("\"BUILD_FLAG_\" + 4", Compiler.Options.NoAlloc).Execute();
 ```
 
 NoAlloc mode does not validate custom function internals.
+
+## Thread Safety
+
+EpsilonScript can be used in multithreaded environments where each thread creates its own compiler instance.
+
+### Recommended Pattern
+
+Each thread creates its own `Compiler`, `CompiledScript`, and `DictionaryVariableContainer`:
+
+```csharp
+Parallel.For(0, 100, i =>
+{
+    var compiler = new Compiler();
+    var variables = new DictionaryVariableContainer
+    {
+        ["x"] = new VariableValue(10),
+        ["y"] = new VariableValue(i)
+    };
+    var script = compiler.Compile("x + y", Compiler.Options.Immutable, variables);
+    script.Execute();
+    Console.WriteLine(script.IntegerValue);
+});
+```
+
+### Unsafe Usage
+
+**Sharing a Compiler across threads:**
+```csharp
+var compiler = new Compiler(); // UNSAFE: shared across threads
+Parallel.For(0, 100, i =>
+{
+    var variables = new DictionaryVariableContainer
+    {
+        ["x"] = new VariableValue(10),
+        ["y"] = new VariableValue(i)
+    };
+    var script = compiler.Compile("x + y", Compiler.Options.Immutable, variables); // Causes data races
+});
+```
+
+**Sharing a CompiledScript across threads:**
+```csharp
+var compiler = new Compiler();
+var script = compiler.Compile("x + y", Compiler.Options.Immutable); // UNSAFE: shared execution state
+Parallel.For(0, 100, i =>
+{
+    var variables = new DictionaryVariableContainer
+    {
+        ["x"] = new VariableValue(10),
+        ["y"] = new VariableValue(i)
+    };
+    script.Execute(variables); // May produce incorrect results
+});
+```
+
+### Guidelines
+
+- Create a new `Compiler` instance per thread
+- Create a new `CompiledScript` per thread
+- Create a new `DictionaryVariableContainer` per thread
 
 ## Motivation
 

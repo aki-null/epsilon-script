@@ -90,6 +90,7 @@ Console.WriteLine(script.FloatValue); // 150
   - [式の連続実行](#式の連続実行)
 - [数値精度](#数値精度)
 - [ヒープアロケーション](#ヒープアロケーション)
+- [スレッドセーフティ](#スレッドセーフティ)
 - [設計思想](#設計思想)
 - [開発](#開発)
 
@@ -622,6 +623,66 @@ compiler.Compile("\"BUILD_FLAG_\" + 4", Compiler.Options.NoAlloc).Execute();
 ```
 
 NoAllocモードはカスタム関数の内部を検証しません。
+
+## スレッドセーフティ
+
+EpsilonScriptは、各スレッドが独自のコンパイラインスタンスを作成することを前提としたマルチスレッド環境で使用できます。
+
+### 推奨パターン
+
+各スレッドで独自の`Compiler`、`CompiledScript`、および`DictionaryVariableContainer`を作成します:
+
+```csharp
+Parallel.For(0, 100, i =>
+{
+    var compiler = new Compiler();
+    var variables = new DictionaryVariableContainer
+    {
+        ["x"] = new VariableValue(10),
+        ["y"] = new VariableValue(i)
+    };
+    var script = compiler.Compile("x + y", Compiler.Options.Immutable, variables);
+    script.Execute();
+    Console.WriteLine(script.IntegerValue);
+});
+```
+
+### 危険なパターン
+
+**Compilerを複数スレッドで共有:**
+```csharp
+var compiler = new Compiler(); // 危険: 複数スレッドで共有されています
+Parallel.For(0, 100, i =>
+{
+    var variables = new DictionaryVariableContainer
+    {
+        ["x"] = new VariableValue(10),
+        ["y"] = new VariableValue(i)
+    };
+    var script = compiler.Compile("x + y", Compiler.Options.Immutable, variables); // データ競合が発生します
+});
+```
+
+**CompiledScriptを複数スレッドで実行:**
+```csharp
+var compiler = new Compiler();
+var script = compiler.Compile("x + y", Compiler.Options.Immutable); // 危険: 実行状態が共有されます
+Parallel.For(0, 100, i =>
+{
+    var variables = new DictionaryVariableContainer
+    {
+        ["x"] = new VariableValue(10),
+        ["y"] = new VariableValue(i)
+    };
+    script.Execute(variables); // 予期しない結果になります
+});
+```
+
+### ガイドライン
+
+- 各スレッドで新しい`Compiler`インスタンスを作成してください
+- 各スレッドで新しい`CompiledScript`を作成してください
+- 各スレッドで新しい`DictionaryVariableContainer`を作成してください
 
 ## 設計思想
 

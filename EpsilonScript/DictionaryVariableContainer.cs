@@ -3,6 +3,13 @@ using System.Collections.Generic;
 
 namespace EpsilonScript
 {
+  /// <summary>
+  /// Dictionary-based implementation of IVariableContainer for storing script variables.
+  /// </summary>
+  /// <remarks>
+  /// Thread Safety: NOT thread-safe. Each thread should use its own instance,
+  /// or use external synchronization for shared access.
+  /// </remarks>
   public class DictionaryVariableContainer : IVariableContainer, IDictionary<VariableId, VariableValue>
   {
     private readonly IDictionary<VariableId, VariableValue> _container = new Dictionary<VariableId, VariableValue>();

@@ -6,6 +6,12 @@ using EpsilonScript.Parser;
 
 namespace EpsilonScript
 {
+  /// <summary>
+  /// Compiles EpsilonScript source code into executable scripts.
+  /// </summary>
+  /// <remarks>
+  /// Thread Safety: NOT thread-safe. Each thread must create its own Compiler instance.
+  /// </remarks>
   public class Compiler
   {
     /// <summary>

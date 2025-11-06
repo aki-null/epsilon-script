@@ -2,6 +2,12 @@ using EpsilonScript.AST;
 
 namespace EpsilonScript
 {
+  /// <summary>
+  /// Represents a compiled EpsilonScript that can be executed.
+  /// </summary>
+  /// <remarks>
+  /// Thread Safety: Execute() is NOT thread-safe due to mutable state.
+  /// </remarks>
   public class CompiledScript
   {
     private readonly Node _rootNode;

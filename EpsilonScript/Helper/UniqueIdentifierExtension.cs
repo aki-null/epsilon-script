@@ -4,6 +4,13 @@ using System.Threading;
 
 namespace EpsilonScript.Helper
 {
+  /// <summary>
+  /// Extension methods for converting strings to unique integer identifiers.
+  /// </summary>
+  /// <remarks>
+  /// Thread Safety: GetUniqueIdentifier() is thread-safe.
+  /// ResetUniqueIdentifierCache() is NOT thread-safe and should only be called during test setup.
+  /// </remarks>
   public static class UniqueIdentifierExtension
   {
     private static readonly ConcurrentDictionary<string, uint> StringIdCache = new ConcurrentDictionary<string, uint>();
