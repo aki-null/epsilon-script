@@ -138,7 +138,7 @@ namespace EpsilonScript.AST.Comparison
         ExtendedType.Boolean => CompareBoolean(),
         ExtendedType.String => CompareString(),
         _ => throw new ArgumentOutOfRangeException(nameof(comparisonType), comparisonType,
-          $"Unsupported type for comparison")
+          "Unsupported type for comparison")
       };
     }
 

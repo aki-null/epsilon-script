@@ -32,15 +32,6 @@ namespace EpsilonScript.AST
     internal SourceLocation Location = SourceLocation.Unknown;
 
     /// <summary>
-    /// Captures location information from a token for runtime error reporting.
-    /// Call this in Build() methods to store location context without holding token references.
-    /// </summary>
-    protected void CaptureLocation(in Token token)
-    {
-      Location = token.Location;
-    }
-
-    /// <summary>
     /// Creates a RuntimeException with this node's location context.
     /// </summary>
     protected RuntimeException CreateRuntimeException(string message)
@@ -288,7 +279,7 @@ namespace EpsilonScript.AST
     public void Build(Stack<Node> rpnStack, Element element, CompilerContext context,
       Compiler.Options options, IVariableContainer variables)
     {
-      CaptureLocation(element.Token);
+      Location = element.Token.Location;
       BuildCore(rpnStack, element, context, options, variables);
     }
 
