@@ -8,27 +8,27 @@ namespace EpsilonScript.AST.Arithmetic
 
     protected override void CalculateInteger()
     {
-      IntegerValue = _leftNode.IntegerValue + _rightNode.IntegerValue;
+      IntegerValue = LeftNode.IntegerValue + RightNode.IntegerValue;
     }
 
     protected override void CalculateLong()
     {
-      LongValue = _leftNode.LongValue + _rightNode.LongValue;
+      LongValue = LeftNode.LongValue + RightNode.LongValue;
     }
 
     protected override void CalculateFloat()
     {
-      FloatValue = _leftNode.FloatValue + _rightNode.FloatValue;
+      FloatValue = LeftNode.FloatValue + RightNode.FloatValue;
     }
 
     protected override void CalculateDouble()
     {
-      DoubleValue = _leftNode.DoubleValue + _rightNode.DoubleValue;
+      DoubleValue = LeftNode.DoubleValue + RightNode.DoubleValue;
     }
 
     protected override void CalculateDecimal()
     {
-      DecimalValue = _leftNode.DecimalValue + _rightNode.DecimalValue;
+      DecimalValue = LeftNode.DecimalValue + RightNode.DecimalValue;
     }
 
     protected override void CalculateString()
@@ -37,32 +37,32 @@ namespace EpsilonScript.AST.Arithmetic
       sb.Clear();
 
       // The left node is guaranteed to be a string node
-      sb.Append(_leftNode.StringValue);
-      switch (_rightNode.ValueType)
+      sb.Append(LeftNode.StringValue);
+      switch (RightNode.ValueType)
       {
         case ExtendedType.Integer:
-          sb.Append(_rightNode.IntegerValue);
+          sb.Append(RightNode.IntegerValue);
           break;
         case ExtendedType.Long:
-          sb.Append(_rightNode.LongValue);
+          sb.Append(RightNode.LongValue);
           break;
         case ExtendedType.Float:
-          sb.AppendFloatInvariant(_rightNode.FloatValue, Context);
+          sb.AppendFloatInvariant(RightNode.FloatValue, Context);
           break;
         case ExtendedType.Double:
-          sb.AppendDoubleInvariant(_rightNode.DoubleValue, Context);
+          sb.AppendDoubleInvariant(RightNode.DoubleValue, Context);
           break;
         case ExtendedType.Decimal:
-          sb.AppendDecimalInvariant(_rightNode.DecimalValue, Context);
+          sb.AppendDecimalInvariant(RightNode.DecimalValue, Context);
           break;
         case ExtendedType.String:
-          sb.Append(_rightNode.StringValue);
+          sb.Append(RightNode.StringValue);
           break;
         case ExtendedType.Boolean:
-          sb.Append(_rightNode.BooleanValue ? "true" : "false");
+          sb.Append(RightNode.BooleanValue ? "true" : "false");
           break;
         default:
-          throw new ArgumentOutOfRangeException(nameof(_rightNode.ValueType), _rightNode.ValueType,
+          throw new ArgumentOutOfRangeException(nameof(RightNode.ValueType), RightNode.ValueType,
             "Unsupported value type for string concatenation");
       }
 
@@ -78,20 +78,20 @@ namespace EpsilonScript.AST.Arithmetic
       }
 
       // Optimize children first
-      _leftNode = _leftNode.Optimize();
-      _rightNode = _rightNode.Optimize();
+      LeftNode = LeftNode.Optimize();
+      RightNode = RightNode.Optimize();
 
       // Try Multiply-Add optimization for addition operations
       // Pattern: (a * b) + c
-      if (_leftNode is MultiplyNode left)
+      if (LeftNode is MultiplyNode left)
       {
-        return new MultiplyAddNode(left.LeftNode, left.RightNode, _rightNode, left, this, Context).Optimize();
+        return new MultiplyAddNode(RightNode, left, this, Context).Optimize();
       }
 
       // Pattern: c + (a * b)
-      if (_rightNode is MultiplyNode right)
+      if (RightNode is MultiplyNode right)
       {
-        return new AddMultiplyNode(right.LeftNode, right.RightNode, _leftNode, right, this, Context).Optimize();
+        return new AddMultiplyNode(LeftNode, right, this, Context).Optimize();
       }
 
       return this;

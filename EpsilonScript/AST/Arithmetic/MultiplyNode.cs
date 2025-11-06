@@ -4,29 +4,32 @@ namespace EpsilonScript.AST.Arithmetic
   {
     protected override string GetOperatorName() => "multiplication";
 
+    internal Node LeftChildNode => LeftNode;
+    internal Node RightChildNode => RightNode;
+
     protected override void CalculateInteger()
     {
-      IntegerValue = _leftNode.IntegerValue * _rightNode.IntegerValue;
+      IntegerValue = LeftNode.IntegerValue * RightNode.IntegerValue;
     }
 
     protected override void CalculateLong()
     {
-      LongValue = _leftNode.LongValue * _rightNode.LongValue;
+      LongValue = LeftNode.LongValue * RightNode.LongValue;
     }
 
     protected override void CalculateFloat()
     {
-      FloatValue = _leftNode.FloatValue * _rightNode.FloatValue;
+      FloatValue = LeftNode.FloatValue * RightNode.FloatValue;
     }
 
     protected override void CalculateDouble()
     {
-      DoubleValue = _leftNode.DoubleValue * _rightNode.DoubleValue;
+      DoubleValue = LeftNode.DoubleValue * RightNode.DoubleValue;
     }
 
     protected override void CalculateDecimal()
     {
-      DecimalValue = _leftNode.DecimalValue * _rightNode.DecimalValue;
+      DecimalValue = LeftNode.DecimalValue * RightNode.DecimalValue;
     }
 
     public override Node Optimize()
@@ -37,8 +40,8 @@ namespace EpsilonScript.AST.Arithmetic
         return CreateValueNode();
       }
 
-      _leftNode = _leftNode.Optimize();
-      _rightNode = _rightNode.Optimize();
+      LeftNode = LeftNode.Optimize();
+      RightNode = RightNode.Optimize();
       return this;
     }
   }

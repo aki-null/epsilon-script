@@ -29,11 +29,11 @@ namespace EpsilonScript.AST.Arithmetic
     /// <summary>
     /// Constructor used during optimization phase to create multiply-add node.
     /// </summary>
-    protected MultiplyAddOperationNode(Node multiplier1, Node multiplier2, Node addend,
-      MultiplyNode multiplyNode, ArithmeticOperationNode addSubtractNode, CompilerContext context)
+    protected MultiplyAddOperationNode(Node addend, MultiplyNode multiplyNode, ArithmeticOperationNode addSubtractNode,
+      CompilerContext context)
     {
-      Multiplier1 = multiplier1;
-      Multiplier2 = multiplier2;
+      Multiplier1 = multiplyNode.LeftChildNode;
+      Multiplier2 = multiplyNode.RightChildNode;
       Addend = addend;
       Context = context;
       _configuredIntegerType = context.ConfiguredIntegerType;
@@ -54,7 +54,7 @@ namespace EpsilonScript.AST.Arithmetic
     }
 
     [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-    protected ExtendedType PromoteType(ExtendedType left, ExtendedType right)
+    private ExtendedType PromoteType(ExtendedType left, ExtendedType right)
     {
       if (left == ExtendedType.String || right == ExtendedType.String)
         return ExtendedType.String;

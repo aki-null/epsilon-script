@@ -8,8 +8,8 @@ namespace EpsilonScript.AST.Arithmetic
 
     protected override void CalculateInteger()
     {
-      var leftInt = _leftNode.IntegerValue;
-      var rightInt = _rightNode.IntegerValue;
+      var leftInt = LeftNode.IntegerValue;
+      var rightInt = RightNode.IntegerValue;
       if (rightInt == 0)
         throw new DivideByZeroException("Modulo by zero");
       IntegerValue = leftInt % rightInt;
@@ -17,8 +17,8 @@ namespace EpsilonScript.AST.Arithmetic
 
     protected override void CalculateLong()
     {
-      var leftLong = _leftNode.LongValue;
-      var rightLong = _rightNode.LongValue;
+      var leftLong = LeftNode.LongValue;
+      var rightLong = RightNode.LongValue;
       if (rightLong == 0)
         throw new DivideByZeroException("Modulo by zero");
       LongValue = leftLong % rightLong;
@@ -26,8 +26,8 @@ namespace EpsilonScript.AST.Arithmetic
 
     protected override void CalculateFloat()
     {
-      var leftFloat = _leftNode.FloatValue;
-      var rightFloat = _rightNode.FloatValue;
+      var leftFloat = LeftNode.FloatValue;
+      var rightFloat = RightNode.FloatValue;
       if (rightFloat == 0.0f)
         throw new DivideByZeroException("Modulo by zero");
       FloatValue = leftFloat % rightFloat;
@@ -35,8 +35,8 @@ namespace EpsilonScript.AST.Arithmetic
 
     protected override void CalculateDouble()
     {
-      var leftDouble = _leftNode.DoubleValue;
-      var rightDouble = _rightNode.DoubleValue;
+      var leftDouble = LeftNode.DoubleValue;
+      var rightDouble = RightNode.DoubleValue;
       if (rightDouble == 0.0)
         throw new DivideByZeroException("Modulo by zero");
       DoubleValue = leftDouble % rightDouble;
@@ -44,8 +44,8 @@ namespace EpsilonScript.AST.Arithmetic
 
     protected override void CalculateDecimal()
     {
-      var leftDecimal = _leftNode.DecimalValue;
-      var rightDecimal = _rightNode.DecimalValue;
+      var leftDecimal = LeftNode.DecimalValue;
+      var rightDecimal = RightNode.DecimalValue;
       if (rightDecimal == 0m)
         throw new DivideByZeroException("Modulo by zero");
       DecimalValue = leftDecimal % rightDecimal;
@@ -59,8 +59,8 @@ namespace EpsilonScript.AST.Arithmetic
         return CreateValueNode();
       }
 
-      _leftNode = _leftNode.Optimize();
-      _rightNode = _rightNode.Optimize();
+      LeftNode = LeftNode.Optimize();
+      RightNode = RightNode.Optimize();
       return this;
     }
   }

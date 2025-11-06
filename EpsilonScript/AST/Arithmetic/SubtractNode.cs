@@ -6,27 +6,27 @@ namespace EpsilonScript.AST.Arithmetic
 
     protected override void CalculateInteger()
     {
-      IntegerValue = _leftNode.IntegerValue - _rightNode.IntegerValue;
+      IntegerValue = LeftNode.IntegerValue - RightNode.IntegerValue;
     }
 
     protected override void CalculateLong()
     {
-      LongValue = _leftNode.LongValue - _rightNode.LongValue;
+      LongValue = LeftNode.LongValue - RightNode.LongValue;
     }
 
     protected override void CalculateFloat()
     {
-      FloatValue = _leftNode.FloatValue - _rightNode.FloatValue;
+      FloatValue = LeftNode.FloatValue - RightNode.FloatValue;
     }
 
     protected override void CalculateDouble()
     {
-      DoubleValue = _leftNode.DoubleValue - _rightNode.DoubleValue;
+      DoubleValue = LeftNode.DoubleValue - RightNode.DoubleValue;
     }
 
     protected override void CalculateDecimal()
     {
-      DecimalValue = _leftNode.DecimalValue - _rightNode.DecimalValue;
+      DecimalValue = LeftNode.DecimalValue - RightNode.DecimalValue;
     }
 
     public override Node Optimize()
@@ -38,20 +38,20 @@ namespace EpsilonScript.AST.Arithmetic
       }
 
       // Optimize children first
-      _leftNode = _leftNode.Optimize();
-      _rightNode = _rightNode.Optimize();
+      LeftNode = LeftNode.Optimize();
+      RightNode = RightNode.Optimize();
 
       // Try Multiply-Subtract optimization for subtraction operations
       // Pattern: (a * b) - c
-      if (_leftNode is MultiplyNode left)
+      if (LeftNode is MultiplyNode left)
       {
-        return new MultiplySubtractNode(left.LeftNode, left.RightNode, _rightNode, left, this, Context).Optimize();
+        return new MultiplySubtractNode(RightNode, left, this, Context).Optimize();
       }
 
       // Pattern: c - (a * b)
-      if (_rightNode is MultiplyNode right)
+      if (RightNode is MultiplyNode right)
       {
-        return new SubtractMultiplyNode(right.LeftNode, right.RightNode, _leftNode, right, this, Context).Optimize();
+        return new SubtractMultiplyNode(LeftNode, right, this, Context).Optimize();
       }
 
       return this;

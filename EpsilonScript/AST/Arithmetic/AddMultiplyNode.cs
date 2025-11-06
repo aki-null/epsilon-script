@@ -9,9 +9,8 @@ namespace EpsilonScript.AST.Arithmetic
   /// </summary>
   internal sealed class AddMultiplyNode : MultiplyAddOperationNode
   {
-    public AddMultiplyNode(Node multiplier1, Node multiplier2, Node addend,
-      MultiplyNode multiplyNode, ArithmeticOperationNode addSubtractNode, CompilerContext context)
-      : base(multiplier1, multiplier2, addend, multiplyNode, addSubtractNode, context)
+    public AddMultiplyNode(Node addend, MultiplyNode multiplyNode, ArithmeticOperationNode addSubtractNode,
+      CompilerContext context) : base(addend, multiplyNode, addSubtractNode, context)
     {
     }
 

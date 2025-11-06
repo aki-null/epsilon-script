@@ -11,17 +11,14 @@ namespace EpsilonScript.AST.Arithmetic
   /// </summary>
   internal abstract class ArithmeticOperationNode : Node
   {
-    protected Node _leftNode;
-    protected Node _rightNode;
+    protected Node LeftNode;
+    protected Node RightNode;
     private ExtendedType _configuredIntegerType;
     private ExtendedType _configuredFloatType;
     private bool _noAllocMode;
     protected CompilerContext Context;
 
-    internal Node LeftNode => _leftNode;
-    internal Node RightNode => _rightNode;
-
-    public override bool IsPrecomputable => _leftNode.IsPrecomputable && _rightNode.IsPrecomputable;
+    public override bool IsPrecomputable => LeftNode.IsPrecomputable && RightNode.IsPrecomputable;
 
     /// <summary>
     /// Returns the human-readable name of this operation for error messages.
@@ -43,7 +40,7 @@ namespace EpsilonScript.AST.Arithmetic
     protected override void BuildCore(Stack<Node> rpnStack, Element element, CompilerContext context,
       Compiler.Options options, IVariableContainer variables)
     {
-      if (!rpnStack.TryPop(out _rightNode) || !rpnStack.TryPop(out _leftNode))
+      if (!rpnStack.TryPop(out RightNode) || !rpnStack.TryPop(out LeftNode))
       {
         throw new ParserException(element.Token, "Cannot find values to perform arithmetic operation on");
       }
@@ -71,14 +68,14 @@ namespace EpsilonScript.AST.Arithmetic
 
     public override void Execute(IVariableContainer variablesOverride)
     {
-      _leftNode.Execute(variablesOverride);
-      _rightNode.Execute(variablesOverride);
+      LeftNode.Execute(variablesOverride);
+      RightNode.Execute(variablesOverride);
 
-      ValueType = PromoteType(_leftNode.ValueType, _rightNode.ValueType);
+      ValueType = PromoteType(LeftNode.ValueType, RightNode.ValueType);
 
-      if ((!_leftNode.IsNumeric || !_rightNode.IsNumeric) && _leftNode.ValueType != ExtendedType.String)
+      if ((!LeftNode.IsNumeric || !RightNode.IsNumeric) && LeftNode.ValueType != ExtendedType.String)
       {
-        if (_leftNode.ValueType == ExtendedType.Boolean || _rightNode.ValueType == ExtendedType.Boolean)
+        if (LeftNode.ValueType == ExtendedType.Boolean || RightNode.ValueType == ExtendedType.Boolean)
         {
           throw CreateRuntimeException(
             $"Boolean values cannot be used in arithmetic operations ({GetOperatorName()})");
@@ -157,15 +154,15 @@ namespace EpsilonScript.AST.Arithmetic
 
     public override void Validate()
     {
-      _leftNode?.Validate();
-      _rightNode?.Validate();
+      LeftNode?.Validate();
+      RightNode?.Validate();
     }
 
     public override void ConfigureNoAlloc()
     {
       _noAllocMode = true;
-      _leftNode?.ConfigureNoAlloc();
-      _rightNode?.ConfigureNoAlloc();
+      LeftNode?.ConfigureNoAlloc();
+      RightNode?.ConfigureNoAlloc();
     }
   }
 }
