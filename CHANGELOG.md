@@ -23,10 +23,12 @@
 - **Function Validation Timing**: Type mismatches in function calls with constant parameters now detected at compile time
 - **Custom Function Registration**: Functions with mismatched precision now rejected at registration with `ArgumentException`
 - **String Formatting**: Improved performance with reduced allocations
+- **Function Overload Caching**: Added caching for function overload lookups to improve performance
 
 ### Fixed
 - **Comparison Validation**: Boolean vs String comparisons now properly rejected in both directions
   - Previously `true == "hello"` incorrectly succeeded without throwing exception
+- **Function Overload Cache**: Cache now properly invalidates when overloads are added dynamically
 
 ## [2.0.0] - 2025-10-31
 
