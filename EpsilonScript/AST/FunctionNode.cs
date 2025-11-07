@@ -238,6 +238,7 @@ namespace EpsilonScript.AST
         // Match found - cache it (might be exact match or first candidate with Undefined params)
         _cachedFunction = function;
         _cachedPackedTypes = packedTypes;
+        _cachedVersion = _functionOverload.Version;
         ValueType = (ExtendedType)function.ReturnType;
       }
       else
