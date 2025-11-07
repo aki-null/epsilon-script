@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
 namespace EpsilonScript.Function
@@ -89,6 +90,21 @@ namespace EpsilonScript.Function
       }
 
       return string.Join(", ", types);
+    }
+  }
+
+  internal sealed class PackedParameterTypesComparer : IEqualityComparer<PackedParameterTypes>
+  {
+    public static readonly PackedParameterTypesComparer Instance = new PackedParameterTypesComparer();
+
+    public bool Equals(PackedParameterTypes x, PackedParameterTypes y)
+    {
+      return x.Equals(y);
+    }
+
+    public int GetHashCode(PackedParameterTypes obj)
+    {
+      return obj.GetHashCode();
     }
   }
 }

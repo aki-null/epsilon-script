@@ -6,6 +6,9 @@ namespace EpsilonScript.Function
   {
     private readonly CustomFunctionOverloadNode _rootNode;
 
+    private readonly Dictionary<PackedParameterTypes, CustomFunction> _lookupCache =
+      new Dictionary<PackedParameterTypes, CustomFunction>(PackedParameterTypesComparer.Instance);
+
     public VariableId Name { get; }
     public bool IsDeterministic { get; }
 
@@ -29,11 +32,23 @@ namespace EpsilonScript.Function
       }
 
       _rootNode.Build(function);
+      _lookupCache.Clear(); // New overloads invalidate cached lookups
     }
 
     internal CustomFunction Find(PackedParameterTypes packedTypes)
     {
-      return _rootNode.Find(packedTypes);
+      if (_lookupCache.TryGetValue(packedTypes, out var cached))
+      {
+        return cached;
+      }
+
+      var function = _rootNode.Find(packedTypes);
+      if (function != null)
+      {
+        _lookupCache[packedTypes] = function;
+      }
+
+      return function;
     }
 
     internal System.Collections.Generic.List<CustomFunction> GetAllOverloads()
