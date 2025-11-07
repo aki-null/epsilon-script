@@ -3,7 +3,7 @@ using EpsilonScript.Intermediate;
 
 namespace EpsilonScript.AST.Boolean
 {
-  internal class NegateNode : Node
+  internal sealed class NegateNode : Node
   {
     private Node _childNode;
 

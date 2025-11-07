@@ -6,7 +6,7 @@ using EpsilonScript.Intermediate;
 
 namespace EpsilonScript.AST
 {
-  internal class FunctionNode : Node
+  internal sealed class FunctionNode : Node
   {
     public override bool IsPrecomputable => _functionOverload.IsDeterministic && AreParametersPrecomputable;
 

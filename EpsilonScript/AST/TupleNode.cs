@@ -3,7 +3,7 @@ using EpsilonScript.Intermediate;
 
 namespace EpsilonScript.AST
 {
-  internal class TupleNode : Node
+  internal sealed class TupleNode : Node
   {
     public override bool IsPrecomputable
     {
