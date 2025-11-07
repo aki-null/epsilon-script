@@ -17,6 +17,7 @@ namespace EpsilonScript.AST
     // Cache resolved function using packed types for fast comparison
     private CustomFunction _cachedFunction;
     private PackedParameterTypes _cachedPackedTypes;
+    private int _cachedVersion;
 
     private bool AreParametersPrecomputable
     {
@@ -86,9 +87,8 @@ namespace EpsilonScript.AST
       }
 
       // Fast path: Check cache for previously resolved function
-      if (_cachedFunction != null && _cachedPackedTypes == packedTypes)
+      if (_cachedFunction != null && _cachedPackedTypes == packedTypes && _cachedVersion == _functionOverload.Version)
       {
-        // Use cached function
         ExecuteFunction(variablesOverride);
         return;
       }
@@ -103,6 +103,7 @@ namespace EpsilonScript.AST
       // Cache resolved function for performance
       _cachedFunction = function;
       _cachedPackedTypes = packedTypes;
+      _cachedVersion = _functionOverload.Version;
       ValueType = (ExtendedType)function.ReturnType;
       ExecuteFunction(variablesOverride);
     }

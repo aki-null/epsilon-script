@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace EpsilonScript.Function
 {
@@ -11,6 +12,7 @@ namespace EpsilonScript.Function
 
     public VariableId Name { get; }
     public bool IsDeterministic { get; }
+    public int Version { get; private set; }
 
     public CustomFunctionOverload(CustomFunction function, Compiler.IntegerPrecision intPrecision,
       Compiler.FloatPrecision floatPrecision)
@@ -33,6 +35,10 @@ namespace EpsilonScript.Function
 
       _rootNode.Build(function);
       _lookupCache.Clear(); // New overloads invalidate cached lookups
+      unchecked
+      {
+        Version++;
+      }
     }
 
     internal CustomFunction Find(PackedParameterTypes packedTypes)
