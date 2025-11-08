@@ -97,13 +97,17 @@ Console.WriteLine(script.FloatValue); // 150
 - [Development](#development)
 
 ## Features
-- Mathematical expressions
-- Boolean expressions
-- Variables with read/write support
 - Intentionally simple syntax
+- Arithmetic expressions (`+`, `-`, `*`, `/`, `%`) and boolean operations (`&&`, `||`, `!`, comparisons)
+- Variables with dynamic typing and assignment operators (`=`, `+=`, `-=`, `*=`, `/=`, `%=`)
+- String support with concatenation
+- Custom functions with overloading support
+- Configurable numeric precision (int/long, float/double/decimal)
+- Immutable mode prevents variable modification; NoAlloc mode prevents runtime heap allocations
+- Zero-allocation execution after compilation (except string concatenation with variables or converting values to strings)
+- Compile-time optimization (constant folding, deterministic function evaluation, dead code elimination)
+- Variable container override pattern (compile once, execute with different containers)
 - Unity support
-- No heap allocation after compilation (with exceptions)
-- Configurable numeric precision
 
 ## Installation
 
