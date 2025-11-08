@@ -12,7 +12,8 @@ namespace EpsilonScript.Tests.AST
   {
     [Theory]
     [MemberData(nameof(CorrectData))]
-    internal void IntegerNode_BuildFromElement_CreatesCorrectNode(Element element, ExtendedType expectedNodeType, int expectedInt,
+    internal void IntegerNode_BuildFromElement_CreatesCorrectNode(Element element, ExtendedType expectedNodeType,
+      int expectedInt,
       float expectedFloat, bool expectedBool)
     {
       var node = new IntegerNode();

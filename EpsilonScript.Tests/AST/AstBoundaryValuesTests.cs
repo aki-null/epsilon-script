@@ -225,7 +225,8 @@ namespace EpsilonScript.Tests.AST
     [InlineData(int.MaxValue, 3, 1)]
     [InlineData(int.MinValue, 2, 0)]
     [InlineData(int.MinValue, 3, -2)]
-    internal void ArithmeticNode_IntegerBoundaryModulo_ReturnsRemainder(int dividend, int divisor, int expectedRemainder)
+    internal void ArithmeticNode_IntegerBoundaryModulo_ReturnsRemainder(int dividend, int divisor,
+      int expectedRemainder)
     {
       var node = CreateArithmeticNode(ElementType.ModuloOperator);
       var rpn = CreateStack(new FakeIntegerNode(dividend), new FakeIntegerNode(divisor));
