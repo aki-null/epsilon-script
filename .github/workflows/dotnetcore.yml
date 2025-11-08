@@ -16,6 +16,9 @@ jobs:
       run: dotnet build --configuration Release --no-restore
     - name: Test
       run: dotnet test --no-restore --verbosity normal --logger "trx;LogFileName=test-results.trx"
+    - name: Fix Git ownership
+      if: always()
+      run: git config --global --add safe.directory /__w/epsilon-script/epsilon-script
     - name: Test Report
       uses: dorny/test-reporter@v1
       if: always()
