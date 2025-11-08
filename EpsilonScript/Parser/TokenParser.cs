@@ -31,11 +31,11 @@ namespace EpsilonScript.Parser
   /// - Precedence-based evaluation happens in a later compilation phase, not in the parser.
   ///
   /// Error Handling Policy:
-  /// - ParserException: Thrown for invalid user input (syntax errors) - see ValidationEngine
-  /// - ArgumentException: Thrown for programming errors (null tokens, invalid state)
+  /// - ParserException: Syntax and structural errors (invalid tokens, grammar violations)
+  /// - RuntimeException: Semantic and type errors (thrown during Compile() via constant folding or Execute())
+  /// - ArgumentException: Programming errors (null parameters, invalid state)
   ///
-  /// This distinction ensures that syntax errors are user-recoverable while
-  /// programming errors fail fast during development.
+  /// This ensures consistent exception types for the same logical error regardless of when it's caught.
   /// </summary>
   internal class TokenParser : ITokenReader
   {
