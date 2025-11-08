@@ -20,7 +20,7 @@ jobs:
       if: always()
       run: git config --global --add safe.directory /__w/epsilon-script/epsilon-script
     - name: Test Report
-      uses: dorny/test-reporter@v1
+      uses: dorny/test-reporter@v2
       if: always()
       with:
         name: .NET Tests
