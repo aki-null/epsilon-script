@@ -9,7 +9,7 @@ namespace EpsilonScript.Tests.RpnConverter
   {
     [Theory]
     [MemberData(nameof(CorrectData))]
-    internal void BooleanLiterals_ConvertCorrectly(Element[] input, Element[] expected)
+    internal void RpnConverter_BooleanLiterals_ConvertCorrectly(Element[] input, Element[] expected)
     {
       AssertRpnSucceeds(input, expected);
     }

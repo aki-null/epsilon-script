@@ -12,7 +12,7 @@ namespace EpsilonScript.Tests.AST
   {
     [Theory]
     [MemberData(nameof(CorrectData))]
-    internal void AST_BuildInteger_Succeeds(Element element, ExtendedType expectedNodeType, int expectedInt,
+    internal void IntegerNode_BuildFromElement_CreatesCorrectNode(Element element, ExtendedType expectedNodeType, int expectedInt,
       float expectedFloat, bool expectedBool)
     {
       var node = new IntegerNode();
@@ -30,7 +30,7 @@ namespace EpsilonScript.Tests.AST
     [InlineData(0)]
     [InlineData(1)]
     [InlineData(2147483647)]
-    internal void AST_CreateInteger_Succeeds(int value)
+    internal void IntegerNode_Constructor_InitializesCorrectly(int value)
     {
       var node = new IntegerNode(value);
       var expectedFloat = (float)value;

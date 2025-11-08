@@ -9,7 +9,7 @@ namespace EpsilonScript.Tests.RpnConverter
   {
     [Theory]
     [MemberData(nameof(CorrectData))]
-    internal void SignOperators_ConvertCorrectly(Element[] input, Element[] expected)
+    internal void RpnConverter_SignOperators_ConvertCorrectly(Element[] input, Element[] expected)
     {
       AssertRpnSucceeds(input, expected);
     }

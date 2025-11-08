@@ -9,14 +9,14 @@ namespace EpsilonScript.Tests.RpnConverter
   {
     [Theory]
     [MemberData(nameof(CorrectData))]
-    internal void ParenthesizedExpressions_ConvertCorrectly(Element[] input, Element[] expected)
+    internal void RpnConverter_ParenthesizedExpressions_ConvertCorrectly(Element[] input, Element[] expected)
     {
       AssertRpnSucceeds(input, expected);
     }
 
     [Theory]
     [MemberData(nameof(IncorrectData))]
-    internal void ParsesParenthesis_Failes(Element[] input)
+    internal void RpnConverter_ParsesParenthesis_Failes(Element[] input)
     {
       AssertRpnFails(input);
     }

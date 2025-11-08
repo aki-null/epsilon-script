@@ -13,6 +13,8 @@ namespace EpsilonScript.Tests.Threading
   [Trait("Component", "Compiler")]
   public class MultithreadingTests
   {
+    #region Parallel Compilation Tests
+
     /// <summary>
     /// Tests that multiple threads can each create their own compiler instance
     /// and compile scripts without interference.
@@ -49,6 +51,10 @@ namespace EpsilonScript.Tests.Threading
         Assert.True(scriptArray[i].IntegerValue >= 10 && scriptArray[i].IntegerValue < 10 + threadCount);
       }
     }
+
+    #endregion
+
+    #region Parallel Execution Tests
 
     /// <summary>
     /// Tests that the same script compiled and executed on multiple threads
@@ -145,6 +151,10 @@ namespace EpsilonScript.Tests.Threading
       }
     }
 
+    #endregion
+
+    #region Stress & Performance Tests
+
     /// <summary>
     /// Stress test with many threads compiling and executing complex scripts.
     /// </summary>
@@ -184,6 +194,10 @@ namespace EpsilonScript.Tests.Threading
       Assert.Empty(exceptions);
       Assert.Equal(threadCount, successCount);
     }
+
+    #endregion
+
+    #region Custom Functions & Variables Tests
 
     /// <summary>
     /// Tests that each thread should compile its own script for thread safety.
@@ -410,6 +424,10 @@ namespace EpsilonScript.Tests.Threading
       Assert.True(!validResults.IsEmpty, "Should have some valid compilations");
       Assert.True(!invalidResults.IsEmpty, "Should have some invalid compilations");
     }
+
+    #endregion
+
+    #region Edge Cases & Configuration Tests
 
     /// <summary>
     /// Rapid compilation/execution cycles to try to expose race conditions.
@@ -662,5 +680,7 @@ namespace EpsilonScript.Tests.Threading
       Assert.Empty(exceptions);
       Assert.Equal(threadCount, results.Count);
     }
+
+    #endregion
   }
 }

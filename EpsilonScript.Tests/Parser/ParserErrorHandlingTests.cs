@@ -8,7 +8,7 @@ namespace EpsilonScript.Tests.Parser
   public class ParserErrorHandlingTests : TokenParserTestBase
   {
     [Fact]
-    internal void EmptyTokenList_HandlesGracefully()
+    internal void Parser_EmptyTokenList_HandlesGracefully()
     {
       // Empty token list should not throw during parsing
       var tokens = new Token[0];
@@ -30,7 +30,7 @@ namespace EpsilonScript.Tests.Parser
 
     [Theory]
     [MemberData(nameof(ValidTokenSequences))]
-    internal void ValidTokenSequences_ParseCorrectly(Token[] tokens, Element[] expected)
+    internal void Parser_ValidTokenSequences_ParseCorrectly(Token[] tokens, Element[] expected)
     {
       AssertParseSucceeds(tokens, expected);
     }

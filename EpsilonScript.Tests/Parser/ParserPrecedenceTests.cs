@@ -80,14 +80,14 @@ namespace EpsilonScript.Tests.Parser
 
     [Theory]
     [MemberData(nameof(MixedPrecedenceData))]
-    internal void MixedPrecedenceLevels_CorrectOrderOfOperations(Token[] input, Element[] expected)
+    internal void Parser_MixedPrecedenceLevels_CorrectOrderOfOperations(Token[] input, Element[] expected)
     {
       AssertParseSucceeds(input, expected);
     }
 
     [Theory]
     [MemberData(nameof(AssociativityData))]
-    internal void Associativity_CorrectEvaluation(Token[] input, Element[] expected)
+    internal void Parser_Associativity_CorrectEvaluation(Token[] input, Element[] expected)
     {
       AssertParseSucceeds(input, expected);
     }

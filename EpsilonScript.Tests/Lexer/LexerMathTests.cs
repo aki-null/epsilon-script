@@ -11,7 +11,7 @@ namespace EpsilonScript.Tests.Lexer
   {
     [Theory]
     [MemberData(nameof(CorrectData))]
-    internal void MathOperators_TokenizeCorrectly(string input, params Token[] expected)
+    internal void Lexer_MathOperators_TokenizesCorrectly(string input, params Token[] expected)
     {
       AssertLexSucceeds(input, expected);
     }

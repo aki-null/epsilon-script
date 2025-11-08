@@ -11,7 +11,7 @@ namespace EpsilonScript.Tests.Lexer
   {
     [Theory]
     [MemberData(nameof(CorrectData))]
-    internal void BooleanLiterals_TokenizeCorrectly(string input, params Token[] expected)
+    internal void Lexer_BooleanLiterals_TokenizeCorrectly(string input, params Token[] expected)
     {
       AssertLexSucceeds(input, expected);
     }

@@ -10,7 +10,7 @@ namespace EpsilonScript.Tests.ScriptSystem
   public class ScriptFunctionTests : ScriptTestBase
   {
     [Fact]
-    public void BuiltInSin_ReturnsExpectedValue()
+    public void BuiltInFunction_SinWithZero_ReturnsZero()
     {
       var result = CompileAndExecute("sin(0.0)", Compiler.Options.Immutable);
       Assert.Equal(Type.Float, result.Type);
@@ -18,7 +18,7 @@ namespace EpsilonScript.Tests.ScriptSystem
     }
 
     [Fact]
-    public void BuiltInCos_ReturnsExpectedValue()
+    public void BuiltInFunction_CosWithZero_ReturnsOne()
     {
       var result = CompileAndExecute("cos(0.0)", Compiler.Options.Immutable);
       Assert.Equal(Type.Float, result.Type);
@@ -26,7 +26,7 @@ namespace EpsilonScript.Tests.ScriptSystem
     }
 
     [Fact]
-    public void BuiltInAbsOverloads_ReturnCorrectTypes()
+    public void FunctionOverload_AbsWithIntAndFloat_SelectsCorrectType()
     {
       var intResult = CompileAndExecute("abs(-5)", Compiler.Options.Immutable);
       Assert.Equal(Type.Integer, intResult.Type);
@@ -38,7 +38,7 @@ namespace EpsilonScript.Tests.ScriptSystem
     }
 
     [Fact]
-    public void BuiltInSqrt_ReturnsExpectedValue()
+    public void BuiltInFunction_SqrtOfNine_ReturnsThree()
     {
       var result = CompileAndExecute("sqrt(9.0)", Compiler.Options.Immutable);
       Assert.Equal(Type.Float, result.Type);
@@ -62,7 +62,7 @@ namespace EpsilonScript.Tests.ScriptSystem
     }
 
     [Fact]
-    public void BuiltInMin_EvaluatesCompositeArguments()
+    public void BuiltInFunction_MinWithExpressions_EvaluatesArgumentsFirst()
     {
       var result = CompileAndExecute("min(1 + 2, 3 + 4)", Compiler.Options.Immutable);
       Assert.Equal(Type.Integer, result.Type);
@@ -70,7 +70,7 @@ namespace EpsilonScript.Tests.ScriptSystem
     }
 
     [Fact]
-    public void BuiltInMax_HandlesMixedNumericArguments()
+    public void BuiltInFunction_MaxWithMixedTypes_ConvertsToFloat()
     {
       var result = CompileAndExecute("max(1.5, 2)", Compiler.Options.Immutable);
       Assert.Equal(Type.Float, result.Type);
@@ -78,7 +78,7 @@ namespace EpsilonScript.Tests.ScriptSystem
     }
 
     [Fact]
-    public void BuiltInStringHelpers_ReturnExpectedValues()
+    public void StringFunction_LowerUpperLen_ReturnCorrectResults()
     {
       var lower = CompileAndExecute("lower(\"HeLLo\")", Compiler.Options.Immutable);
       Assert.Equal("hello", lower.StringValue);
@@ -92,7 +92,7 @@ namespace EpsilonScript.Tests.ScriptSystem
     }
 
     [Fact]
-    public void BuiltInPow_ReturnsExponentiation()
+    public void BuiltInFunction_PowWithTwoAndThree_ReturnsEight()
     {
       var result = CompileAndExecute("pow(2, 3)", Compiler.Options.Immutable);
       Assert.Equal(Type.Float, result.Type);
@@ -118,7 +118,7 @@ namespace EpsilonScript.Tests.ScriptSystem
     }
 
     [Fact]
-    public void TupleArguments_CallCustomFunctionWithMultipleParameters()
+    public void CustomFunction_WithTupleArguments_ReceivesAllParameters()
     {
       var (function, counter) = TestFunctions.CreateTupleProbe("sum");
       var compiler = CreateCompiler(function);
@@ -130,7 +130,7 @@ namespace EpsilonScript.Tests.ScriptSystem
     }
 
     [Fact]
-    public void CustomFunctionFloatFallback_IsSelectedWhenIntegerOverloadMissing()
+    public void FunctionOverload_IntegerArgument_FallsBackToFloatOverload()
     {
       var compiler = CreateCompiler();
       compiler.AddCustomFunction(CustomFunction.Create("echo", (float value) => value + 0.25f));
@@ -143,7 +143,7 @@ namespace EpsilonScript.Tests.ScriptSystem
     }
 
     [Fact]
-    public void CustomFunctionConstnessMismatch_ThrowsArgumentException()
+    public void CustomFunction_DeterministicMismatch_ThrowsArgumentException()
     {
       var compiler = CreateCompiler();
       compiler.AddCustomFunction(CustomFunction.Create("probe", (int value) => value, isDeterministic: true));
@@ -165,7 +165,7 @@ namespace EpsilonScript.Tests.ScriptSystem
     }
 
     [Fact]
-    public void FiveArgumentCustomFunction_ReceivesAllArguments()
+    public void CustomFunction_WithFiveArguments_ReceivesAllParameters()
     {
       var counter = new TestFunctions.CallCounter();
       var fiveArgFunction = CustomFunction.Create("sum5", (float a, float b, float c, float d, float e) =>
@@ -184,7 +184,7 @@ namespace EpsilonScript.Tests.ScriptSystem
     }
 
     [Fact]
-    public void ZeroParameterFunction_WithParentheses_ExecutesCorrectly()
+    public void CustomFunction_ZeroParameters_ExecutesCorrectly()
     {
       var getAnswer = CustomFunction.Create("getAnswer", () => 42);
       var getPi = CustomFunction.Create("getPi", () => 3.14159f);
@@ -231,14 +231,14 @@ namespace EpsilonScript.Tests.ScriptSystem
     }
 
     [Fact]
-    public void AddCustomFunctionRange_WithNullCollection_ThrowsArgumentNullException()
+    public void Compiler_AddFunctionRangeWithNull_ThrowsArgumentNullException()
     {
       var compiler = CreateCompiler();
       Assert.Throws<ArgumentNullException>(() => compiler.AddCustomFunctionRange(null));
     }
 
     [Fact]
-    public void AddCustomFunctionRange_WithEmptyCollection_DoesNotThrow()
+    public void Compiler_AddFunctionRangeWithEmpty_Succeeds()
     {
       var compiler = CreateCompiler();
       var emptyFunctions = new CustomFunction[] { };
@@ -246,7 +246,7 @@ namespace EpsilonScript.Tests.ScriptSystem
     }
 
     [Fact]
-    public void AddCustomFunctionRange_WithMultipleFunctions_AddsAllFunctions()
+    public void Compiler_AddFunctionRange_AddsAllFunctions()
     {
       var compiler = CreateCompiler();
       var functions = new[]
@@ -275,7 +275,7 @@ namespace EpsilonScript.Tests.ScriptSystem
     }
 
     [Fact]
-    public void AddCustomFunctionRange_WithOverloads_CreatesProperOverloads()
+    public void Compiler_AddFunctionRangeWithOverloads_CreatesOverloads()
     {
       var compiler = CreateCompiler();
       var functions = new[]
@@ -304,7 +304,7 @@ namespace EpsilonScript.Tests.ScriptSystem
     }
 
     [Fact]
-    public void AddCustomFunctionRange_MixedWithIndividualAdditions_WorksCorrectly()
+    public void Compiler_AddFunctionRangeMixedWithIndividual_WorksCorrectly()
     {
       var compiler = CreateCompiler();
 
@@ -337,7 +337,7 @@ namespace EpsilonScript.Tests.ScriptSystem
     }
 
     [Fact]
-    public void PeriodInFunctionNames_EvaluatesCorrectly()
+    public void FunctionName_WithPeriods_EvaluatesCorrectly()
     {
       var utilDouble = CustomFunction.Create("util.double", (int x) => x * 2);
       var stringConcat = CustomFunction.Create("string.concat", (string a, string b) => a + b);
@@ -352,7 +352,7 @@ namespace EpsilonScript.Tests.ScriptSystem
     }
 
     [Fact]
-    public void ComplexPeriodIdentifiers_WorkCorrectly()
+    public void Identifier_ComplexPeriodNames_EvaluatesCorrectly()
     {
       var mathSquare = CustomFunction.Create("math.square", (float x) => x * x);
       var variables = Variables()

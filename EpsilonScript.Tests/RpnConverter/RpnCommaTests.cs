@@ -9,7 +9,7 @@ namespace EpsilonScript.Tests.RpnConverter
   {
     [Theory]
     [MemberData(nameof(CorrectData))]
-    internal void CommaOperator_ConvertsCorrectly(Element[] input, Element[] expected)
+    internal void RpnConverter_CommaOperator_ConvertsCorrectly(Element[] input, Element[] expected)
     {
       AssertRpnSucceeds(input, expected);
     }

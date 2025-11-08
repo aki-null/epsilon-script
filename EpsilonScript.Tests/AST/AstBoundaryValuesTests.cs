@@ -76,7 +76,7 @@ namespace EpsilonScript.Tests.AST
     }
 
     [Fact]
-    internal void AST_Arithmetic_IntegerMaxValue_Addition_AllowsOverflow()
+    internal void ArithmeticNode_IntegerMaxAddition_AllowsOverflow()
     {
       // Test int.MaxValue + 1 should wrap to int.MinValue (overflow behavior)
       var node = CreateArithmeticNode(ElementType.AddOperator);
@@ -93,7 +93,7 @@ namespace EpsilonScript.Tests.AST
     }
 
     [Fact]
-    internal void AST_Arithmetic_IntegerMinValue_Subtraction_AllowsOverflow()
+    internal void ArithmeticNode_IntegerMinSubtraction_AllowsOverflow()
     {
       // Test int.MinValue - 1 should wrap to int.MaxValue (overflow behavior)
       var node = CreateArithmeticNode(ElementType.SubtractOperator);
@@ -110,7 +110,7 @@ namespace EpsilonScript.Tests.AST
     }
 
     [Fact]
-    internal void AST_Arithmetic_IntegerMaxValue_Multiplication_AllowsOverflow()
+    internal void ArithmeticNode_IntegerMaxMultiplication_AllowsOverflow()
     {
       // Test int.MaxValue * 2 should overflow (wraparound behavior)
       var node = CreateArithmeticNode(ElementType.MultiplyOperator);
@@ -128,7 +128,7 @@ namespace EpsilonScript.Tests.AST
     }
 
     [Fact]
-    internal void AST_Arithmetic_FloatMaxValue_Addition_ReturnsInfinity()
+    internal void ArithmeticNode_FloatMaxAddition_ReturnsInfinity()
     {
       // Test float.MaxValue + float.MaxValue = Infinity
       var node = CreateArithmeticNode(ElementType.AddOperator);
@@ -145,7 +145,7 @@ namespace EpsilonScript.Tests.AST
     }
 
     [Fact]
-    internal void AST_Arithmetic_FloatMinValue_Subtraction_ReturnsNegativeInfinity()
+    internal void ArithmeticNode_FloatMinSubtraction_ReturnsNegativeInfinity()
     {
       // Test (-float.MaxValue) - float.MaxValue = -Infinity
       var node = CreateArithmeticNode(ElementType.SubtractOperator);
@@ -162,7 +162,7 @@ namespace EpsilonScript.Tests.AST
     }
 
     [Fact]
-    internal void AST_Arithmetic_FloatMaxValue_Multiplication_ReturnsInfinity()
+    internal void ArithmeticNode_FloatMaxMultiplication_ReturnsInfinity()
     {
       // Test float.MaxValue * 2 = Infinity
       var node = CreateArithmeticNode(ElementType.MultiplyOperator);
@@ -179,7 +179,7 @@ namespace EpsilonScript.Tests.AST
     }
 
     [Fact]
-    internal void AST_Arithmetic_FloatEpsilon_Addition_PreservesValue()
+    internal void ArithmeticNode_FloatEpsilonAddition_PreservesValue()
     {
       // Test 1.0f + float.Epsilon behavior
       var node = CreateArithmeticNode(ElementType.AddOperator);
@@ -203,7 +203,7 @@ namespace EpsilonScript.Tests.AST
     [InlineData(int.MaxValue, 3)]
     [InlineData(int.MinValue, 2)]
     [InlineData(int.MinValue, -2)]
-    internal void AST_Arithmetic_IntegerBoundary_Division_Succeeds(int dividend, int divisor)
+    internal void ArithmeticNode_IntegerBoundaryDivision_ReturnsQuotient(int dividend, int divisor)
     {
       var node = CreateArithmeticNode(ElementType.DivideOperator);
       var rpn = CreateStack(new FakeIntegerNode(dividend), new FakeIntegerNode(divisor));
@@ -225,7 +225,7 @@ namespace EpsilonScript.Tests.AST
     [InlineData(int.MaxValue, 3, 1)]
     [InlineData(int.MinValue, 2, 0)]
     [InlineData(int.MinValue, 3, -2)]
-    internal void AST_Arithmetic_IntegerBoundary_Modulo_Succeeds(int dividend, int divisor, int expectedRemainder)
+    internal void ArithmeticNode_IntegerBoundaryModulo_ReturnsRemainder(int dividend, int divisor, int expectedRemainder)
     {
       var node = CreateArithmeticNode(ElementType.ModuloOperator);
       var rpn = CreateStack(new FakeIntegerNode(dividend), new FakeIntegerNode(divisor));
@@ -245,7 +245,7 @@ namespace EpsilonScript.Tests.AST
     [InlineData(-float.MaxValue, 2.0f)]
     [InlineData(float.MaxValue, -1.0f)]
     [InlineData(-float.MaxValue, -1.0f)]
-    internal void AST_Arithmetic_FloatBoundary_Division_HandlesExtremes(float dividend, float divisor)
+    internal void ArithmeticNode_FloatBoundaryDivision_HandlesExtremes(float dividend, float divisor)
     {
       var node = CreateArithmeticNode(ElementType.DivideOperator);
       var rpn = CreateStack(new FakeFloatNode(dividend), new FakeFloatNode(divisor));

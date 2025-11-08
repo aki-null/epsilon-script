@@ -14,7 +14,7 @@ namespace EpsilonScript.Tests.AST
   {
     [Theory]
     [MemberData(nameof(CorrectData))]
-    internal void BasicOperations_ReturnCorrectResults(Element element, Node leftNode, Node rightNode,
+    internal void ArithmeticNode_BasicOperations_ReturnsCorrectResults(Element element, Node leftNode, Node rightNode,
       ExtendedType expectedNodeType,
       int expectedInt, float expectedFloat, bool expectedBool, string expectedString)
     {

@@ -12,7 +12,7 @@ namespace EpsilonScript.Tests.AST
   {
     [Theory]
     [MemberData(nameof(CorrectData))]
-    internal void AST_FloatNode_WithValidElement_CreatesCorrectValue(Element element, ExtendedType expectedNodeType,
+    internal void FloatNode_BuildFromElement_CreatesCorrectNode(Element element, ExtendedType expectedNodeType,
       int expectedInt,
       float expectedFloat, bool expectedBool)
     {
@@ -30,7 +30,7 @@ namespace EpsilonScript.Tests.AST
     [InlineData(0.0f)]
     [InlineData(1.0f)]
     [InlineData(1.2f)]
-    internal void AST_FloatNode_WithConstructorValue_CreatesCorrectNode(float value)
+    internal void FloatNode_Constructor_InitializesCorrectly(float value)
     {
       var node = new FloatNode(value);
       var expectedInt = (int)value;
@@ -45,7 +45,7 @@ namespace EpsilonScript.Tests.AST
     [InlineData(float.PositiveInfinity)]
     [InlineData(float.NegativeInfinity)]
     [InlineData(float.NaN)]
-    internal void AST_FloatNode_WithSpecialValues_HasSafeIntegerConversion(float inputValue)
+    internal void FloatNode_SpecialValues_ConvertsSafelyToInteger(float inputValue)
     {
       // Test special float values convert to 0
       var node = new FloatNode(inputValue);

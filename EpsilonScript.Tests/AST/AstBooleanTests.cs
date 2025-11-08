@@ -12,7 +12,7 @@ namespace EpsilonScript.Tests.AST
   {
     [Theory]
     [MemberData(nameof(CorrectData))]
-    internal void AST_BuildBoolean_Succeeds(Element element, ExtendedType expectedNodeType, int expectedInt,
+    internal void BooleanNode_BuildFromElement_CreatesCorrectNode(Element element, ExtendedType expectedNodeType, int expectedInt,
       float expectedFloat, bool expectedBool)
     {
       var node = new BooleanNode();
@@ -28,7 +28,7 @@ namespace EpsilonScript.Tests.AST
     [Theory]
     [InlineData(true)]
     [InlineData(false)]
-    internal void AST_CreateBoolean_Succeeds(bool value)
+    internal void BooleanNode_Constructor_InitializesCorrectly(bool value)
     {
       var node = new BooleanNode(value);
       var expectedInt = value ? 1 : 0;

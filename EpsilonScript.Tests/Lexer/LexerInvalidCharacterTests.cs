@@ -8,7 +8,7 @@ namespace EpsilonScript.Tests.Lexer
   {
     [Theory]
     [MemberData(nameof(IncorrectData))]
-    internal void InvalidCharacter_AssertLexFails(string input)
+    internal void Lexer_InvalidCharacter_AssertLexFails(string input)
     {
       AssertLexFails(input);
     }

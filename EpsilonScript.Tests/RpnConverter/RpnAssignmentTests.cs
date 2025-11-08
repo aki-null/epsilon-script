@@ -11,7 +11,7 @@ namespace EpsilonScript.Tests.RpnConverter
   {
     [Theory]
     [MemberData(nameof(CorrectData))]
-    internal void AssignmentExpression_ConvertsCorrectly(Element[] input, Element[] expected)
+    internal void RpnConverter_AssignmentExpression_ConvertsCorrectly(Element[] input, Element[] expected)
     {
       AssertRpnSucceeds(input, expected);
     }

@@ -9,7 +9,7 @@ namespace EpsilonScript.Tests.Lexer
   {
     [Theory]
     [MemberData(nameof(CorrectData))]
-    internal void NegateOperator_TokenizesCorrectly(string input, params Token[] expected)
+    internal void Lexer_NegateOperator_TokenizesCorrectly(string input, params Token[] expected)
     {
       AssertLexSucceeds(input, expected);
     }

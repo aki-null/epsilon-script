@@ -9,7 +9,7 @@ namespace EpsilonScript.Tests.AST
   {
     [Theory]
     [MemberData(nameof(SuccessData))]
-    internal void AST_Build_Succeeds(List<Element> elements, ExtendedType expectedType)
+    internal void AstBuilder_ValidElements_BuildsSuccessfully(List<Element> elements, ExtendedType expectedType)
     {
       var context = new CompilerContext(Compiler.IntegerPrecision.Integer,
         Compiler.FloatPrecision.Float, null);
@@ -31,7 +31,7 @@ namespace EpsilonScript.Tests.AST
 
     [Theory]
     [MemberData(nameof(FailData))]
-    internal void AST_Build_Fails(List<Element> elements)
+    internal void AstBuilder_InvalidElements_ThrowsRuntimeException(List<Element> elements)
     {
       Assert.Throws<RuntimeException>(() =>
       {
