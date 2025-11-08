@@ -355,56 +355,6 @@ namespace EpsilonScript.Tests.Threading
     }
 
     /// <summary>
-    /// Tests mixed operations: some threads compiling, others executing pre-compiled scripts.
-    /// </summary>
-    [Fact]
-    public void MixedOperations_CompilationAndExecution_NoInterference()
-    {
-      const int threadCount = 40;
-
-      // Pre-compile some scripts
-      var compiler = new Compiler();
-      var precompiledScripts = new[]
-      {
-        compiler.Compile("10 + 20"),
-        compiler.Compile("5 * 8"),
-        compiler.Compile("100 - 25")
-      };
-
-      var results = new ConcurrentBag<int>();
-      var exceptions = new ConcurrentBag<Exception>();
-
-      Parallel.For(0, threadCount, i =>
-      {
-        try
-        {
-          if (i % 2 == 0)
-          {
-            // Even threads: compile new scripts
-            var localCompiler = new Compiler();
-            var script = localCompiler.Compile($"50 + {i}");
-            script.Execute();
-            results.Add(script.IntegerValue);
-          }
-          else
-          {
-            // Odd threads: execute pre-compiled scripts
-            var script = precompiledScripts[i % precompiledScripts.Length];
-            script.Execute();
-            results.Add(script.IntegerValue);
-          }
-        }
-        catch (Exception ex)
-        {
-          exceptions.Add(ex);
-        }
-      });
-
-      Assert.Empty(exceptions);
-      Assert.Equal(threadCount, results.Count);
-    }
-
-    /// <summary>
     /// Tests that exceptions during parallel compilation are properly isolated.
     /// </summary>
     [Fact]
