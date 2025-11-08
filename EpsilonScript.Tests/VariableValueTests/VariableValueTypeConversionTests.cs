@@ -161,34 +161,40 @@ namespace EpsilonScript.Tests.VariableValueTests
 
     #endregion
 
-    #region Cross-Caching Verification Tests
+    #region On-Demand Type Conversion Tests
 
     [Fact]
-    public void IntegerValue_PopulatesCrossCache()
+    public void IntegerValue_ConvertsToAllNumericTypes_Correctly()
     {
+      // Verifies that when a VariableValue stores an integer,
+      // it can be read as long, float, double, or boolean
+      // through on-demand type conversion (no caching involved)
       var variable = new VariableValue(0);
       variable.IntegerValue = 42;
 
       Assert.Equal(Type.Integer, variable.Type);
-      Assert.Equal(42, variable.IntegerValue);
-      Assert.Equal(42L, variable.LongValue);
-      Assert.Equal(42.0f, variable.FloatValue);
-      Assert.Equal(42.0, variable.DoubleValue);
-      Assert.True(variable.BooleanValue);
+      Assert.Equal(42, variable.IntegerValue); // Direct read
+      Assert.Equal(42L, variable.LongValue); // On-demand conversion to long
+      Assert.Equal(42.0f, variable.FloatValue); // On-demand conversion to float
+      Assert.Equal(42.0, variable.DoubleValue); // On-demand conversion to double
+      Assert.True(variable.BooleanValue); // On-demand conversion to bool (42 != 0)
     }
 
     [Fact]
-    public void DecimalValue_DoesNotPopulateCrossCache()
+    public void DecimalValue_AssignedToIntegerVariable_ConvertsAndPreservesIntegerType()
     {
+      // Verifies that assigning a decimal value to an integer-typed variable
+      // converts the value to integer and preserves the Integer type.
+      // Reading as decimal performs on-demand conversion back.
       var variable = new VariableValue(0);
-      variable.DecimalValue = 42m;
+      variable.DecimalValue = 42m; // Converts: _value.IntValue = (long)42m
 
       // Type should be preserved as Integer
       Assert.Equal(Type.Integer, variable.Type);
       // Value is stored as integer, converts when accessed as decimal
-      Assert.Equal(42m, variable.DecimalValue);
-      Assert.Equal(42, variable.IntegerValue);
-      Assert.Equal(42L, variable.LongValue);
+      Assert.Equal(42m, variable.DecimalValue); // On-demand: (decimal)_value.IntValue
+      Assert.Equal(42, variable.IntegerValue); // Direct: (int)_value.IntValue
+      Assert.Equal(42L, variable.LongValue); // Direct: _value.IntValue
     }
 
     #endregion
