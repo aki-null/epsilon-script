@@ -103,8 +103,8 @@ Console.WriteLine(script.FloatValue); // 150
 - String support with concatenation
 - Custom functions with overloading support
 - Configurable numeric precision (int/long, float/double/decimal)
-- Immutable mode prevents variable modification; NoAlloc mode prevents runtime heap allocations
 - Zero-allocation execution after compilation (except string concatenation with variables or converting values to strings)
+- Immutable mode prevents variable modification; NoAlloc mode prevents runtime heap allocations
 - Compile-time optimization (constant folding, deterministic function evaluation, dead code elimination)
 - Variable container override pattern (compile once, execute with different containers)
 - Unity support
