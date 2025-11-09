@@ -191,7 +191,7 @@ script.Execute();
 Console.WriteLine(script.StringValue);  // "John:localhost"
 ```
 
-#### Immutable Mode
+### Immutable Mode
 
 Two modes for variables:
 
