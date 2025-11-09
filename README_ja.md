@@ -2,7 +2,7 @@
 
 EpsilonScriptは、C#アプリケーションに組み込んで使える式評価ライブラリです。カスタム関数の定義が可能で、コンパイル後の実行時にはメモリ割り当てが発生しません。
 
-.NET Standard 2.1に対応しています。
+.NET Standard 2.1に対応しています。バージョン履歴は[変更履歴](CHANGELOG.md)を参照してください。
 
 **基本的な式の評価:**
 ```c#
@@ -80,14 +80,12 @@ Console.WriteLine(script.FloatValue); // 150
 - [機能](#機能)
 - [インストール](#インストール)
   - [Unity](#unity)
-- [プロジェクトの状態](#プロジェクトの状態)
-- [サンプル](#サンプル)
-  - [算術演算](#算術演算)
-  - [変数](#変数)
-  - [比較演算](#比較演算)
-  - [関数](#関数)
-  - [文字列](#文字列)
-  - [式の連続実行](#式の連続実行)
+- [算術演算](#算術演算)
+- [変数](#変数)
+- [比較演算](#比較演算)
+- [関数](#関数)
+- [文字列](#文字列)
+- [式の連続実行](#式の連続実行)
 - [数値精度](#数値精度)
 - [ヒープアロケーション](#ヒープアロケーション)
 - [スレッドセーフティ](#スレッドセーフティ)
@@ -95,16 +93,16 @@ Console.WriteLine(script.FloatValue); // 150
 - [開発](#開発)
 
 ## 機能
-- シンプルに設計された構文
-- 算術式（`+`、`-`、`*`、`/`、`%`）と論理演算（`&&`、`||`、`!`、比較演算子）
-- 動的型付けの変数と代入演算子（`=`、`+=`、`-=`、`*=`、`/=`、`%=`）
-- 文字列のサポートと文字列連結
+- シンプルな構文
+- 算術演算子（`+`、`-`、`*`、`/`、`%`）と論理演算子（`&&`、`||`、`!`、比較演算子）
+- 動的型付けと代入演算子（`=`、`+=`、`-=`、`*=`、`/=`、`%=`）
+- 文字列連結
 - オーバーロード可能なカスタム関数
 - 数値精度の設定が可能（int/long、float/double/decimal）
-- コンパイル後はゼロアロケーションで実行（変数を含む文字列連結や値の文字列化を除く）
-- Immutableモードで変数の変更を禁止、NoAllocモードで実行時のヒープ割り当てを禁止
-- コンパイル時の最適化（定数畳み込み、決定的な関数の評価、デッドコード削除）
-- 変数コンテナのオーバーライド（一度コンパイルして、異なるコンテナで実行）
+- コンパイル後はゼロアロケーションで実行（変数を含む文字列操作を除く）
+- Immutableモードで変数の変更を禁止、NoAllocモードで実行時のメモリ割り当てを禁止
+- コンパイル時の最適化（定数畳み込み、決定的な関数、デッドコード削除）
+- 実行時に変数コンテナを切り替え可能（一度コンパイルして、異なるデータで実行）
 - Unityに対応
 
 ## インストール
@@ -128,39 +126,22 @@ Unity Package Managerからパッケージを追加できます:
 }
 ```
 
-## プロジェクトの状態
-すべての機能は安定して動作します。
+## 算術演算
 
-リリースノートとバージョン履歴は[変更履歴](CHANGELOG.md)を参照してください。
-
-## サンプル
-
-### 算術演算
-
-基本的な算術演算子(`+`、`-`、`*`、`/`、`%`)と括弧(`(`、`)`)がサポートされています。
-
-#### コード
+基本的な演算子(`+`、`-`、`*`、`/`、`%`)と括弧をサポートしています。
 
 ```c#
 var compiler = new Compiler();
 var script = compiler.Compile("(1 + 2 + 3 * 2) * 2", Compiler.Options.Immutable);
 script.Execute();
-Console.WriteLine(script.IntegerValue);
+Console.WriteLine(script.IntegerValue);  // 18
 ```
 
-#### 結果
+## 変数
 
-```
-18
-```
+変数は代入(`=`)と複合演算子(`+=`、`-=`、`*=`、`/=`、`%=`)をサポートしています。
 
-### 変数
-
-変数の読み取りと代入(`=`)が可能です。複合代入演算子(`+=`、`-=`、`*=`、`/=`、`%=`)もサポートされています。
-
-変数は`IVariableContainer`に格納されます。簡単に使える実装として`DictionaryVariableContainer`が用意されています。
-
-#### コード
+変数は`IVariableContainer`に格納されます（基本的な実装として`DictionaryVariableContainer`を使用）。
 
 ```c#
 var compiler = new Compiler();
@@ -168,22 +149,16 @@ VariableId valId = "val"; // 文字列からの暗黙的な変換
 var variables = new DictionaryVariableContainer { [valId] = new VariableValue(43.0f) };
 var script = compiler.Compile("val = val * 10.0", Compiler.Options.None, variables);
 script.Execute();
-Console.WriteLine(variables[valId].FloatValue);
+Console.WriteLine(variables[valId].FloatValue);  // 430.0
 ```
 
-#### 結果
+`VariableId`は文字列のようなシンプルなインターフェースを提供しながら、内部では整数IDによる高速な検索を行います。パフォーマンスが重要な箇所で推奨されます。
 
-```
-430.0
-```
+スクリプト内で新しい変数を定義することはできません - これにより式がシンプルに保たれます。
 
-`VariableId`構造体は、文字列のような使いやすいインターフェースを保ちながら、内部的には整数識別子を使うことで型安全性と高いパフォーマンスを実現しています。パフォーマンスが重要な箇所では、こちらの使用を推奨します。
+### 文字列ベースの変数アクセス
 
-スクリプト内で新しい変数を定義することはできません。式が複雑になりすぎないようにするための設計です。
-
-#### 文字列ベースの変数アクセス
-
-パフォーマンスがそれほど重要でない場合は、`VariableId`を使わずに直接文字列を使うこともできます:
+パフォーマンスが重要でない場合は、直接文字列を使用できます:
 
 ```c#
 var compiler = new Compiler();
@@ -193,18 +168,37 @@ script.Execute();
 Console.WriteLine(variables["val"].FloatValue);
 ```
 
-注意: 文字列を直接使用すると内部で変換処理が発生するため、`VariableId`を使用するよりも遅くなります。パフォーマンスが重要な場合は`VariableId`を使ってください。
+文字列での検索は内部的な変換のオーバーヘッドにより、`VariableId`よりも遅くなります。
 
-#### イミュータブルモード
+### ピリオドを含む変数名
 
-コンパイラは変数の扱いについて、2つのモードをサポートしています:
+変数名にはピリオド(`.`)を含めることができます。関連する値をグループ化するのに便利です:
+
+```c#
+var compiler = new Compiler();
+var variables = new DictionaryVariableContainer
+{
+    ["user.name"] = new VariableValue("John"),
+    ["user.level"] = new VariableValue(5),
+    ["config.server.port"] = new VariableValue(8080),
+    ["config.server.host"] = new VariableValue("localhost")
+};
+
+var script = compiler.Compile("user.name + ':' + config.server.host", Compiler.Options.Immutable, variables);
+script.Execute();
+Console.WriteLine(script.StringValue);  // "John:localhost"
+```
+
+### イミュータブルモード
+
+コンパイラは変数の扱いについて、2つのモードをサポートしています。
 
 ミュータブルモード(デフォルト):
-- 変数への代入や変更が可能
+- 変数を変更できます
 
 イミュータブルモード:
-- 変数の変更を一切禁止
-- 代入演算子を使うとコンパイル時にエラーになる
+- すべての変数の変更を禁止します
+- 代入演算子を使うとコンパイル時にエラーになります
 
 ```c#
 // イミュータブルモード - 変数の読み取りのみ
@@ -220,11 +214,11 @@ var script3 = compiler.Compile(
     "health -= damage", Compiler.Options.Immutable, variables); // エラー!
 ```
 
-#### 変数コンテナのオーバーライド
+### 変数コンテナのオーバーライド
 
-実行時に`Execute()`へ`IVariableContainer`を渡すことで、変数の値を上書きできます。実行時のコンテナが優先的に参照され、変数が見つからない場合はコンパイル時のコンテナを参照します。
+実行時に`Execute()`へ異なる`IVariableContainer`を渡すと、変数の値を上書きできます。渡されたコンテナを最初に参照し、見つからない場合はコンパイル時のコンテナにフォールバックします。
 
-グローバルな変数でコンパイルしておき、インスタンスごとの変数を渡して実行する、といった使い方ができます。
+グローバルな変数でコンパイルしておき、インスタンスごとのデータで何度も実行する、といった使い方ができます。
 
 ```c#
 // グローバル設定でコンパイル
@@ -249,14 +243,16 @@ foreach (var user in users)
 }
 ```
 
-#### 動的型付け
+### 動的型付け
 
-変数は動的に型付けされます。型はコンパイル時ではなく、実行時に`VariableValue`から決まります。同じコンパイル済みスクリプトを、異なる型の変数で実行することもできます。
+変数は動的に型付けされます。型はコンパイル時ではなく、実行時に決まります。
+
+同じコンパイル済みスクリプトを、異なる型の変数で実行できます。たとえば、式`a + b`はデータに応じて数値の加算または文字列の連結を実行します:
 
 ```c#
 var script = compiler.Compile("a + b", Compiler.Options.None, null);
 
-// 浮動小数点数で実行
+// 浮動小数点数で実行 - 加算を実行
 var floatVars = new DictionaryVariableContainer
 {
   ["a"] = new VariableValue(1.5f),
@@ -265,7 +261,7 @@ var floatVars = new DictionaryVariableContainer
 script.Execute(floatVars);
 Console.WriteLine(script.FloatValue);  // 3.8
 
-// 文字列で実行(同じスクリプト)
+// 文字列で実行(同じコンパイル済みスクリプト) - 連結を実行
 var stringVars = new DictionaryVariableContainer
 {
   ["a"] = new VariableValue("Hello"),
@@ -275,11 +271,9 @@ script.Execute(stringVars);
 Console.WriteLine(script.StringValue);  // "Hello World"
 ```
 
-### 比較演算
+## 比較演算
 
-比較演算子(`==`、`!=`、`<`、`<=`、`>`、`>=`)と論理演算子(`!`、`&&`、`||`)がサポートされています。
-
-#### コード
+比較演算子(`==`、`!=`、`<`、`<=`、`>`、`>=`)と論理演算子(`!`、`&&`、`||`)をサポートしています。
 
 ```c#
 var compiler = new Compiler();
@@ -290,18 +284,12 @@ var script = compiler.Compile(
     Compiler.Options.Immutable,
     variables);
 script.Execute();
-Console.WriteLine(script.BooleanValue);
+Console.WriteLine(script.BooleanValue);  // True
 ```
 
-#### 結果
+## 関数
 
-```
-True
-```
-
-### 関数
-
-EpsilonScriptは組み込み関数とカスタム関数をサポートしています。
+組み込み関数とカスタム関数を含みます。
 
 ```c#
 var compiler = new Compiler();
@@ -316,9 +304,9 @@ script.Execute();
 Console.WriteLine(script.FloatValue); // 75
 ```
 
-#### 関数の要件
+### 関数の要件
 
-カスタム関数は状態を変更してはいけません。外部データの読み取りは可能ですが、何かを変更することはできません。
+カスタム関数は状態を変更できません。外部データの読み取りは許可されていますが、何かを変更することはできません。
 
 ```c#
 // OK: 純粋な計算
@@ -334,26 +322,28 @@ CustomFunction.Create("rand", (float max) => Random.Range(0.0f, max))
 CustomFunction.Create("set_score", (int score) => { gameState.Score = score; return score; })
 ```
 
-#### 組み込み関数
+カスタム関数は0〜5個のパラメータをサポートします。コンテキスト型関数はコンテキスト変数を最大3つ、スクリプトパラメータを最大3つまでサポートします。
+
+### 組み込み関数
 
 - 三角関数: `sin`、`cos`、`tan`、`asin`、`acos`、`atan`、`atan2`、`sinh`、`cosh`、`tanh`
 - 数学関数: `sqrt`、`abs`、`floor`、`ceil`、`trunc`、`pow`、`min`、`max`
 - 文字列関数: `lower`、`upper`、`len`
 - ユーティリティ: `ifelse`(三項演算子の代替)
 
-完全なリストは[Compiler.cs](https://github.com/aki-null/epsilon-script/blob/master/EpsilonScript/Compiler.cs)で確認できます。
+完全なリストは[Compiler.cs](https://github.com/aki-null/epsilon-script/blob/master/EpsilonScript/Compiler.cs)を参照してください。
 
-#### オーバーロード
+### オーバーロード
 
-関数は同じ名前で異なるシグネチャ(パラメータの型と数)を持つようにオーバーロードできます。
+関数は同じ名前で異なるパラメータの型や数を持つことができます。
 
 `abs`、`min`、`max`、`ifelse`などの組み込み関数はオーバーロードを使用しています。
 
-#### 決定的関数
+### 決定的関数
 
-コンパイル時の最適化のために、関数を**決定的**としてマークできます。決定的な関数とは、同じ入力に対して常に同じ結果を返す関数です。
+関数を**決定的**（同じ入力=同じ出力）としてマークすることで、コンパイル時最適化を有効にできます。
 
-関数を決定的としてマークするには、`isDeterministic: true`を渡します:
+`isDeterministic: true`を渡すことで有効になります:
 
 ```c#
 // 決定的関数 - 同じ入力には常に同じ出力
@@ -363,7 +353,7 @@ CustomFunction.Create("clamp", (float val, float min, float max) =>
     Math.Max(min, Math.Min(max, val)), isDeterministic: true)
 ```
 
-すべてのパラメータが定数の場合、決定的関数はコンパイル時に評価されます:
+定数パラメータを持つ決定的関数は、コンパイル時に評価されます:
 
 ```c#
 compiler.AddCustomFunction(
@@ -373,7 +363,7 @@ compiler.AddCustomFunction(
 var script = compiler.Compile("sin(3.141592 / 2) * 10");
 ```
 
-#### メソッドグループ
+### メソッドグループ
 
 ラムダの代わりにメソッドグループを使用できます:
 
@@ -384,16 +374,16 @@ public int GetScore(string level) => CalculateScore(level);
 compiler.AddCustomFunction(CustomFunction.Create<string, int>("score", GetScore));
 ```
 
-注意: パラメータを持つメソッドグループを使う場合は、ジェネリック型パラメータを明示する必要があります。ただし、パラメータなしのメソッドグループは明示不要です:
+パラメータを持つメソッドグループには、明示的なジェネリック型パラメータが必要です（上記参照）。パラメータなしのメソッドグループの場合は不要です:
 
 ```c#
 public int GetConstant() => 42;
 
-// パラメータなしのメソッドグループ - ジェネリクスの明示は不要
+// パラメータなし - 型推論が機能
 compiler.AddCustomFunction(CustomFunction.Create("constant", GetConstant));
 ```
 
-#### コンテキスト型カスタム関数
+### コンテキスト型カスタム関数
 
 コンテキスト型関数は、変数をパラメータとして受け取らずに、実行環境から直接読み取ることができます。
 
@@ -431,11 +421,30 @@ var script = compiler.Compile("IsAfter(5)", Compiler.Options.Immutable, variable
 
 コンテキスト変数を最大3つ、スクリプトパラメータを最大3つまでサポートします。
 
-### 文字列
+### 一括関数登録
 
-文字列もサポートされており、主に関数の引数として使用します。
+`AddCustomFunctionRange`を使用すると、複数の関数を一度に登録できます:
 
-文字列リテラルはダブルクォート（`"..."`）またはシングルクォート（`'...'`）のどちらでも記述できます:
+```c#
+var compiler = new Compiler();
+
+var functions = new[]
+{
+    CustomFunction.Create("double", (int x) => x * 2),
+    CustomFunction.Create("triple", (int x) => x * 3),
+    CustomFunction.Create("square", (int x) => x * x)
+};
+
+compiler.AddCustomFunctionRange(functions);
+
+var script = compiler.Compile("double(5) + triple(3) + square(2)");
+script.Execute();
+Console.WriteLine(script.IntegerValue); // 10 + 9 + 4 = 23
+```
+
+## 文字列
+
+ダブルクォート（`"..."`）とシングルクォート（`'...'`）の両方で文字列を扱えます:
 
 ```
 "Hello World"
@@ -446,71 +455,35 @@ var script = compiler.Compile("IsAfter(5)", Compiler.Options.Immutable, variable
 
 注意: エスケープシーケンスはサポートされていません。バックスラッシュやその他の特殊文字はそのまま扱われます。これにより、パスを簡単に記述できます。
 
-#### コード
+### 文字列の操作
+
+文字列は連結、数値との組み合わせ、比較をサポートしています:
+
+```c#
+// 連結
+"Hello " + "World"  // "Hello World"
+
+// 文字列と数値の組み合わせ
+"Debug: " + 128  // "Debug: 128"
+
+// 比較
+"Hello" == "Hello"  // true
+```
+
+### 関数での文字列の使用
 
 ```c#
 var compiler = new Compiler();
 compiler.AddCustomFunction(CustomFunction.Create("read_save_data",
   (string flag) => SaveData.Instance.GetIntegerData(flag)));
-var script = compiler.Compile(@"read_save_data(""LVL00_PLAYCOUNT"") > 5");
+var script = compiler.Compile("read_save_data('LVL00_PLAYCOUNT') > 5", Compiler.Options.Immutable);
 script.Execute();
-Console.WriteLine(script.BooleanValue);
+Console.WriteLine(script.BooleanValue);  // True (GetIntegerDataが10を返す場合)
 ```
 
-#### 結果
+## 式の連続実行
 
-`SaveData.Instance.GetIntegerData("LVL00_PLAYCOUNT")`が10を返す場合:
-```
-True
-```
-
-文字列の連結がサポートされています:
-
-#### コード
-
-```
-"Hello " + "World"
-```
-
-#### 結果
-
-```
-"Hello World"
-```
-
-文字列は数値と連結できます:
-
-#### コード
-
-```
-"Debug: " + 128
-```
-
-#### 結果
-
-```
-"Debug: 128"
-```
-
-文字列の比較がサポートされています:
-
-#### コード
-
-```
-"Hello" == "Hello"
-```
-
-#### 結果
-
-```
-true
-```
-
-### 式の連続実行
-
-セミコロン(`;`)で複数の式を並べて実行できます。結果は最後の式の値になります。
-
-#### コード
+セミコロン(`;`)を使うと、複数の式を順番に実行できます。結果は最後の式の値になります。
 
 ```c#
 var compiler = new Compiler();
@@ -529,15 +502,9 @@ script.Execute();
 Console.WriteLine(script.IntegerValue); // 26 (xは6、yは20)
 ```
 
-#### 結果
-
-```
-26
-```
-
 ## 数値精度
 
-コンパイラの作成時に数値精度を指定することで、式で使用する整数型と浮動小数点型を選択できます。
+コンパイラを作成する際に、整数と浮動小数点の精度を指定できます。
 
 ### 精度のオプション
 
@@ -566,7 +533,7 @@ script.Execute();
 Console.WriteLine(script.DecimalValue); // 0.3
 ```
 
-すべての演算は、設定した精度に自動的に変換されます。
+すべての演算は、設定した精度で自動的に実行されます。
 
 ### カスタム関数と精度
 
@@ -586,7 +553,7 @@ script.Execute();
 Console.WriteLine(script.DoubleValue); // 26.25
 ```
 
-パラメータ型が一致しない場合、実行時エラーになります。なお、整数の引数は必要に応じて浮動小数点型に自動変換されます。
+型が一致しない場合、実行時エラーになります。なお、整数の引数は必要に応じて浮動小数点型に自動変換されます。
 
 ## ヒープアロケーション
 
@@ -594,7 +561,7 @@ EpsilonScriptは、コンパイル後の実行時にはメモリ割り当てが�
 
 文字列連結で変数を含む場合はメモリを割り当てます:
 ```csharp
-"Debug: " + variable  // 実行時にメモリ割り当て
+'Debug: ' + variable  // 実行時にメモリ割り当て
 ```
 
 `ToString()`呼び出しによる型変換はメモリを割り当てます:
@@ -604,14 +571,14 @@ stringVar = 42  // ToString()を呼び出し、メモリ割り当て
 
 カスタム関数は、実装次第でメモリを割り当てます。
 
-定数式はコンパイル時に最適化され、メモリを割り当てません:
+定数はコンパイル時に最適化されます:
 ```csharp
-"BUILD_FLAG_" + 4  // "BUILD_FLAG_4"に最適化、実行時にメモリ割り当てなし
+'BUILD_FLAG_' + 4  // 'BUILD_FLAG_4'に最適化、実行時にメモリ割り当てなし
 ```
 
 ### ゼロアロケーションの強制
 
-`Compiler.Options.NoAlloc`を使用すると、メモリ割り当てを行う操作の実行時にRuntimeExceptionをスローします:
+`Compiler.Options.NoAlloc`を使用すると、実行時にメモリを割り当てる操作がある場合にRuntimeExceptionをスローします:
 
 ```csharp
 // メモリ割り当てなし:
@@ -619,18 +586,18 @@ var script = compiler.Compile("x * 2 + 1", Compiler.Options.NoAlloc, variables);
 script.Execute();
 
 // RuntimeExceptionをスロー:
-compiler.Compile("\"Debug: \" + variable", Compiler.Options.NoAlloc, variables).Execute();
+compiler.Compile("'Debug: ' + variable", Compiler.Options.NoAlloc, variables).Execute();
 compiler.Compile("stringVar = 42", Compiler.Options.NoAlloc, variables).Execute();
 
 // 例外なし - 定数に最適化される:
-compiler.Compile("\"BUILD_FLAG_\" + 4", Compiler.Options.NoAlloc).Execute();
+compiler.Compile("'BUILD_FLAG_' + 4", Compiler.Options.NoAlloc).Execute();
 ```
 
 NoAllocモードはカスタム関数の内部を検証しません。
 
 ## スレッドセーフティ
 
-EpsilonScriptは、各スレッドが独自のコンパイラインスタンスを作成することを前提としたマルチスレッド環境で使用できます。
+各スレッドごとに`Compiler`インスタンスを作成してください。
 
 ### 推奨パターン
 
@@ -716,7 +683,7 @@ EpsilonScriptは、スコープを「式」だけに絞り込みます。ルー�
 - `EpsilonScript/Function/CustomFunction.Generated.tt`
 - `EpsilonScript/Function/CustomFunction.Contextual.Generated.tt`
 
-#### 前提条件
+#### 前提
 
 T4コマンドラインツールをインストールします:
 ```bash
