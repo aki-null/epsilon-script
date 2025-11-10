@@ -83,8 +83,8 @@ Console.WriteLine(script.FloatValue); // 150
 - [Installation](#installation)
   - [Unity](#unity)
 - [Arithmetic](#arithmetic)
-- [Variables](#variables)
 - [Comparison](#comparison)
+- [Variables](#variables)
 - [Functions](#functions)
 - [Strings](#strings)
 - [Expression Sequencing](#expression-sequencing)
@@ -137,6 +137,17 @@ var compiler = new Compiler();
 var script = compiler.Compile("(1 + 2 + 3 * 2) * 2", Compiler.Options.Immutable);
 script.Execute();
 Console.WriteLine(script.IntegerValue);  // 18
+```
+
+## Comparison
+
+Supports comparison (`==`, `!=`, `<`, `<=`, `>`, `>=`) and logical operators (`!`, `&&`, `||`).
+
+```c#
+var compiler = new Compiler();
+var script = compiler.Compile("10 >= 5 && 10 < 50");
+script.Execute();
+Console.WriteLine(script.BooleanValue);  // True
 ```
 
 ## Variables
@@ -273,25 +284,9 @@ script.Execute(stringVars);
 Console.WriteLine(script.StringValue);  // "Hello World"
 ```
 
-## Comparison
-
-Supports comparison (`==`, `!=`, `<`, `<=`, `>`, `>=`) and logical operators (`!`, `&&`, `||`).
-
-```c#
-var compiler = new Compiler();
-VariableId valId = "val";
-var variables = new DictionaryVariableContainer { [valId] = new VariableValue(43.0f) };
-var script = compiler.Compile(
-    "val >= 0.0 && val < 50.0",
-    Compiler.Options.Immutable,
-    variables);
-script.Execute();
-Console.WriteLine(script.BooleanValue);  // True
-```
-
 ## Functions
 
-Includes built-in functions and custom functions.
+Define custom functions in C# to extend scripts with your own logic.
 
 ```c#
 var compiler = new Compiler();
@@ -324,7 +319,9 @@ CustomFunction.Create("rand", (float max) => Random.Range(0.0f, max))
 CustomFunction.Create("set_score", (int score) => { gameState.Score = score; return score; })
 ```
 
-Custom functions support 0-5 parameters. Contextual functions support up to 3 context variables and 3 script parameters.
+Custom functions support 0-5 parameters.
+
+Parameter types must match the function signature. Mismatched types throw a runtime error. Integers auto-convert to floats when needed.
 
 ### Built-in Functions
 
@@ -348,22 +345,32 @@ Mark functions as **deterministic** (same inputs = same output) to enable compil
 Pass `isDeterministic: true` to enable:
 
 ```c#
-// Deterministic - same input always produces same output
-CustomFunction.Create("sin", (float v) => MathF.Sin(v), isDeterministic: true)
-
-CustomFunction.Create("clamp", (float val, float min, float max) =>
-    Math.Max(min, Math.Min(max, val)), isDeterministic: true)
-```
-
-Deterministic functions with constant parameters get evaluated at compile time:
-
-```c#
 compiler.AddCustomFunction(
     CustomFunction.Create("sin", (float v) => MathF.Sin(v), isDeterministic: true));
 
-// Evaluated at compile time - sin(1.5708) is cached as ~1.0
-var script = compiler.Compile("sin(3.141592 / 2) * 10");
+// Compile time: sin(1.5708) -> ~1.0
+// The compiled script contains just the constant value
+var script = compiler.Compile("sin(1.5708) * 10");
 ```
+
+Deterministic functions with constant parameters get pre-evaluated at compile time. For example, you can create a const() function to fetch configuration values and bake them into scripts:
+
+```c#
+var config = new Dictionary<string, float> { ["GRAVITY"] = 9.8f };
+
+compiler.AddCustomFunction(
+    CustomFunction.Create("const", (string name) => config[name], isDeterministic: true));
+
+var variables = new DictionaryVariableContainer { ["jump_force"] = new VariableValue(20) };
+var script = compiler.Compile("jump_force - const('GRAVITY')", Compiler.Options.Immutable, variables);
+
+// Compile time: const('GRAVITY') -> 9.8
+// Runtime: evaluates 20 - 9.8 = 10.2
+script.Execute();
+Console.WriteLine(script.FloatValue); // 10.2
+```
+
+Only const() calls with constant values get pre-evaluated. Variables like `jump_force` remain dynamic and evaluate at runtime.
 
 ### Method Groups
 
@@ -554,8 +561,6 @@ var script = compiler.Compile("calc(10.5)");
 script.Execute();
 Console.WriteLine(script.DoubleValue); // 26.25
 ```
-
-Mismatched types throw a runtime error. Integers auto-convert to floats when needed.
 
 ## Heap Allocations
 

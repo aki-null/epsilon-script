@@ -81,8 +81,8 @@ Console.WriteLine(script.FloatValue); // 150
 - [インストール](#インストール)
   - [Unity](#unity)
 - [算術演算](#算術演算)
-- [変数](#変数)
 - [比較演算](#比較演算)
+- [変数](#変数)
 - [関数](#関数)
 - [文字列](#文字列)
 - [式の連続実行](#式の連続実行)
@@ -135,6 +135,17 @@ var compiler = new Compiler();
 var script = compiler.Compile("(1 + 2 + 3 * 2) * 2", Compiler.Options.Immutable);
 script.Execute();
 Console.WriteLine(script.IntegerValue);  // 18
+```
+
+## 比較演算
+
+比較演算子(`==`、`!=`、`<`、`<=`、`>`、`>=`)と論理演算子(`!`、`&&`、`||`)をサポートしています。
+
+```c#
+var compiler = new Compiler();
+var script = compiler.Compile("10 >= 5 && 10 < 50");
+script.Execute();
+Console.WriteLine(script.BooleanValue);  // True
 ```
 
 ## 変数
@@ -271,25 +282,9 @@ script.Execute(stringVars);
 Console.WriteLine(script.StringValue);  // "Hello World"
 ```
 
-## 比較演算
-
-比較演算子(`==`、`!=`、`<`、`<=`、`>`、`>=`)と論理演算子(`!`、`&&`、`||`)をサポートしています。
-
-```c#
-var compiler = new Compiler();
-VariableId valId = "val";
-var variables = new DictionaryVariableContainer { [valId] = new VariableValue(43.0f) };
-var script = compiler.Compile(
-    "val >= 0.0 && val < 50.0",
-    Compiler.Options.Immutable,
-    variables);
-script.Execute();
-Console.WriteLine(script.BooleanValue);  // True
-```
-
 ## 関数
 
-組み込み関数とカスタム関数を含みます。
+C#でカスタム関数を定義して、独自のロジックでスクリプトを拡張できます。
 
 ```c#
 var compiler = new Compiler();
@@ -322,7 +317,9 @@ CustomFunction.Create("rand", (float max) => Random.Range(0.0f, max))
 CustomFunction.Create("set_score", (int score) => { gameState.Score = score; return score; })
 ```
 
-カスタム関数は0〜5個のパラメータをサポートします。コンテキスト型関数はコンテキスト変数を最大3つ、スクリプトパラメータを最大3つまでサポートします。
+カスタム関数は0〜5個のパラメータをサポートします。
+
+パラメータの型は関数シグネチャと一致する必要があります。型が一致しない場合、実行時エラーになります。なお、整数の引数は必要に応じて浮動小数点型に自動変換されます。
 
 ### 組み込み関数
 
@@ -346,22 +343,32 @@ CustomFunction.Create("set_score", (int score) => { gameState.Score = score; ret
 `isDeterministic: true`を渡すことで有効になります:
 
 ```c#
-// 決定的関数 - 同じ入力には常に同じ出力
-CustomFunction.Create("sin", (float v) => MathF.Sin(v), isDeterministic: true)
-
-CustomFunction.Create("clamp", (float val, float min, float max) =>
-    Math.Max(min, Math.Min(max, val)), isDeterministic: true)
-```
-
-定数パラメータを持つ決定的関数は、コンパイル時に評価されます:
-
-```c#
 compiler.AddCustomFunction(
     CustomFunction.Create("sin", (float v) => MathF.Sin(v), isDeterministic: true));
 
-// コンパイル時に評価される - sin(1.5708)の結果(約1.0)がキャッシュされる
-var script = compiler.Compile("sin(3.141592 / 2) * 10");
+// コンパイル時: sin(1.5708) -> 約1.0
+// コンパイルされたスクリプトには定数値のみが含まれる
+var script = compiler.Compile("sin(1.5708) * 10");
 ```
+
+定数パラメータを持つ決定的関数は、コンパイル時に事前評価されます。例えば、const()関数を作成して設定値を取得し、スクリプトに焼き込むことができます:
+
+```c#
+var config = new Dictionary<string, float> { ["GRAVITY"] = 9.8f };
+
+compiler.AddCustomFunction(
+    CustomFunction.Create("const", (string name) => config[name], isDeterministic: true));
+
+var variables = new DictionaryVariableContainer { ["jump_force"] = new VariableValue(20) };
+var script = compiler.Compile("jump_force - const('GRAVITY')", Compiler.Options.Immutable, variables);
+
+// コンパイル時: const('GRAVITY') -> 9.8
+// 実行時: 20 - 9.8 = 10.2 を評価
+script.Execute();
+Console.WriteLine(script.FloatValue); // 10.2
+```
+
+定数値を使ったconst()呼び出しのみが事前評価されます。`jump_force`のような変数は動的なままで、実行時に評価されます。
 
 ### メソッドグループ
 
@@ -552,8 +559,6 @@ var script = compiler.Compile("calc(10.5)");
 script.Execute();
 Console.WriteLine(script.DoubleValue); // 26.25
 ```
-
-型が一致しない場合、実行時エラーになります。なお、整数の引数は必要に応じて浮動小数点型に自動変換されます。
 
 ## ヒープアロケーション
 
