@@ -56,5 +56,59 @@ namespace EpsilonScript.Tests.ScriptSystem
       Assert.Equal(Type.String, result.Type);
       Assert.Equal("Hello 10!", result.StringValue);
     }
+
+    [Fact]
+    public void IntegerResult_StringValue_ReturnsStringRepresentation()
+    {
+      var result = CompileAndExecute("42");
+      Assert.Equal(Type.Integer, result.Type);
+      Assert.Equal(42, result.IntegerValue);
+      Assert.Equal("42", result.StringValue);
+    }
+
+    [Fact]
+    public void IntegerExpression_StringValue_ReturnsStringRepresentation()
+    {
+      var result = CompileAndExecute("42 + 8");
+      Assert.Equal(Type.Integer, result.Type);
+      Assert.Equal(50, result.IntegerValue);
+      Assert.Equal("50", result.StringValue);
+    }
+
+    [Fact]
+    public void FloatResult_StringValue_ReturnsStringRepresentation()
+    {
+      var result = CompileAndExecute("3.14");
+      Assert.Equal(Type.Float, result.Type);
+      AssertNearlyEqual(3.14f, result.FloatValue);
+      Assert.Equal("3.14", result.StringValue);
+    }
+
+    [Fact]
+    public void BooleanResult_StringValue_ReturnsStringRepresentation()
+    {
+      var result = CompileAndExecute("5 > 3");
+      Assert.Equal(Type.Boolean, result.Type);
+      Assert.True(result.BooleanValue);
+      Assert.Equal("True", result.StringValue);
+    }
+
+    [Fact]
+    public void BooleanFalse_StringValue_ReturnsStringRepresentation()
+    {
+      var result = CompileAndExecute("5 < 3");
+      Assert.Equal(Type.Boolean, result.Type);
+      Assert.False(result.BooleanValue);
+      Assert.Equal("False", result.StringValue);
+    }
+
+    [Fact]
+    public void NegativeInteger_StringValue_ReturnsStringRepresentation()
+    {
+      var result = CompileAndExecute("-123");
+      Assert.Equal(Type.Integer, result.Type);
+      Assert.Equal(-123, result.IntegerValue);
+      Assert.Equal("-123", result.StringValue);
+    }
   }
 }

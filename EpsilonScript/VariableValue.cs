@@ -72,7 +72,7 @@ namespace EpsilonScript
             _value.BoolValue = value != 0;
             break;
           case Type.String:
-            _stringValue = value.ToString();
+            _stringValue = value.ToString(CultureInfo.InvariantCulture);
             break;
           default:
             throw new InvalidCastException($"Cannot assign integer to {_type}");
@@ -131,7 +131,7 @@ namespace EpsilonScript
             _value.BoolValue = value != 0;
             break;
           case Type.String:
-            _stringValue = value.ToString();
+            _stringValue = value.ToString(CultureInfo.InvariantCulture);
             break;
           default:
             throw new InvalidCastException($"Cannot assign long to {_type}");
@@ -185,6 +185,9 @@ namespace EpsilonScript
           case Type.Boolean:
             _value.BoolValue = value != 0.0f;
             break;
+          case Type.String:
+            _stringValue = value.ToString(CultureInfo.InvariantCulture);
+            break;
           default:
             throw new InvalidCastException($"Cannot assign float to {_type}");
         }
@@ -237,6 +240,9 @@ namespace EpsilonScript
           case Type.Boolean:
             _value.BoolValue = value != 0.0;
             break;
+          case Type.String:
+            _stringValue = value.ToString(CultureInfo.InvariantCulture);
+            break;
           default:
             throw new InvalidCastException($"Cannot assign double to {_type}");
         }
@@ -288,6 +294,9 @@ namespace EpsilonScript
             break;
           case Type.Boolean:
             _value.BoolValue = value != 0m;
+            break;
+          case Type.String:
+            _stringValue = value.ToString(CultureInfo.InvariantCulture);
             break;
           default:
             throw new InvalidCastException($"Cannot assign decimal to {_type}");
@@ -345,7 +354,27 @@ namespace EpsilonScript
 
     public string StringValue
     {
-      get => _stringValue;
+      get
+      {
+        switch (_type)
+        {
+          case Type.String:
+            return _stringValue;
+          case Type.Integer:
+          case Type.Long:
+            return _value.IntValue.ToString(CultureInfo.InvariantCulture);
+          case Type.Float:
+            return ((float)_value.FloatValue).ToString(CultureInfo.InvariantCulture);
+          case Type.Double:
+            return _value.FloatValue.ToString(CultureInfo.InvariantCulture);
+          case Type.Decimal:
+            return _decimalValue.ToString(CultureInfo.InvariantCulture);
+          case Type.Boolean:
+            return _value.BoolValue.ToString();
+          default:
+            throw new InvalidCastException($"Cannot convert {_type} to string");
+        }
+      }
       set
       {
         switch (_type)

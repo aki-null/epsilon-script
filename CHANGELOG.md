@@ -29,6 +29,10 @@
 - **Comparison Validation**: Boolean vs String comparisons now properly rejected in both directions
   - Previously `true == "hello"` incorrectly succeeded without throwing exception
 - **Function Overload Cache**: Cache now properly invalidates when overloads are added dynamically
+- **VariableValue String Conversion**: Fixed asymmetric getter/setter behavior
+  - StringValue getter now converts all types to string (previously returned `null`)
+  - Float/Double/Decimal setters now support String-typed variables (previously threw exception)
+  - All setters use InvariantCulture for culture-safe round-trip conversion
 
 ## [2.0.0] - 2025-10-31
 

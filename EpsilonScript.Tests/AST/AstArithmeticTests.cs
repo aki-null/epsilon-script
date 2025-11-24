@@ -46,7 +46,7 @@ namespace EpsilonScript.Tests.AST
             0,
             0.0f,
             false,
-            null
+            "0"
           },
           new object[]
           {
@@ -57,7 +57,7 @@ namespace EpsilonScript.Tests.AST
             384,
             384.0f,
             true,
-            null
+            "384"
           },
           new object[]
           {
@@ -68,7 +68,7 @@ namespace EpsilonScript.Tests.AST
             128,
             128.0f,
             true,
-            null
+            "128"
           },
           new object[]
           {
@@ -79,7 +79,7 @@ namespace EpsilonScript.Tests.AST
             0,
             0.0f,
             false,
-            null
+            "0"
           },
           new object[]
           {
@@ -90,7 +90,7 @@ namespace EpsilonScript.Tests.AST
             0,
             0.0f,
             false,
-            null
+            "0"
           },
           new object[]
           {
@@ -101,7 +101,7 @@ namespace EpsilonScript.Tests.AST
             0,
             0.0f,
             false,
-            null
+            "0"
           },
           new object[]
           {
@@ -112,7 +112,7 @@ namespace EpsilonScript.Tests.AST
             6,
             6.0f,
             true,
-            null
+            "6"
           },
           new object[]
           {
@@ -123,7 +123,7 @@ namespace EpsilonScript.Tests.AST
             2147483647,
             2147483647.0f,
             true,
-            null
+            "2147483647"
           },
           new object[]
           {
@@ -255,7 +255,7 @@ namespace EpsilonScript.Tests.AST
             0,
             0.0f,
             false,
-            null
+            "0"
           },
           new object[]
           {
@@ -266,7 +266,7 @@ namespace EpsilonScript.Tests.AST
             0,
             0.0f,
             false,
-            null
+            "0"
           },
           new object[]
           {
@@ -277,7 +277,7 @@ namespace EpsilonScript.Tests.AST
             0,
             0.0f,
             false,
-            null
+            "0"
           },
           new object[]
           {
@@ -288,7 +288,7 @@ namespace EpsilonScript.Tests.AST
             0,
             0.0f,
             false,
-            null
+            "0"
           },
           new object[]
           {
@@ -299,7 +299,7 @@ namespace EpsilonScript.Tests.AST
             -4,
             -4.0f,
             true,
-            null
+            "-4"
           },
           new object[]
           {
@@ -310,7 +310,7 @@ namespace EpsilonScript.Tests.AST
             6,
             6.0f,
             true,
-            null
+            "6"
           },
           new object[]
           {
@@ -321,7 +321,7 @@ namespace EpsilonScript.Tests.AST
             -2147483648,
             -2147483648.0f,
             true,
-            null
+            "-2147483648"
           },
           new object[]
           {
@@ -332,7 +332,7 @@ namespace EpsilonScript.Tests.AST
             0,
             0.0f,
             false,
-            null
+            "0"
           },
           new object[]
           {
@@ -343,7 +343,7 @@ namespace EpsilonScript.Tests.AST
             32768,
             32768.0f,
             true,
-            null
+            "32768"
           },
           new object[]
           {
@@ -354,7 +354,7 @@ namespace EpsilonScript.Tests.AST
             0,
             0.0f,
             false,
-            null
+            "0"
           },
           new object[]
           {
@@ -365,7 +365,7 @@ namespace EpsilonScript.Tests.AST
             0,
             0.0f,
             false,
-            null
+            "0"
           },
           new object[]
           {
@@ -376,7 +376,7 @@ namespace EpsilonScript.Tests.AST
             0,
             0.0f,
             false,
-            null
+            "0"
           },
           new object[]
           {
@@ -387,7 +387,7 @@ namespace EpsilonScript.Tests.AST
             -10,
             -10.0f,
             true,
-            null
+            "-10"
           },
           new object[]
           {
@@ -398,7 +398,7 @@ namespace EpsilonScript.Tests.AST
             3,
             3.0f,
             true,
-            null
+            "3"
           },
           new object[]
           {
@@ -409,7 +409,7 @@ namespace EpsilonScript.Tests.AST
             3,
             3.0f,
             true,
-            null
+            "3"
           },
           new object[]
           {
@@ -420,7 +420,7 @@ namespace EpsilonScript.Tests.AST
             3,
             3.0f,
             true,
-            null
+            "3"
           },
           new object[]
           {
@@ -431,7 +431,7 @@ namespace EpsilonScript.Tests.AST
             3,
             3.5f,
             true,
-            null
+            "3.5"
           },
           new object[]
           {
@@ -442,7 +442,7 @@ namespace EpsilonScript.Tests.AST
             3,
             3.5f,
             true,
-            null
+            "3.5"
           },
           new object[]
           {
@@ -453,7 +453,7 @@ namespace EpsilonScript.Tests.AST
             3,
             3.5f,
             true,
-            null
+            "3.5"
           },
           new object[]
           {
@@ -464,7 +464,7 @@ namespace EpsilonScript.Tests.AST
             0,
             0.0f,
             false,
-            null
+            "0"
           },
           new object[]
           {
@@ -475,7 +475,7 @@ namespace EpsilonScript.Tests.AST
             0,
             0.0f,
             false,
-            null
+            "0"
           },
           new object[]
           {
@@ -486,7 +486,7 @@ namespace EpsilonScript.Tests.AST
             1,
             1.0f,
             true,
-            null
+            "1"
           },
           new object[]
           {
@@ -497,7 +497,7 @@ namespace EpsilonScript.Tests.AST
             0,
             0.0f,
             false,
-            null
+            "0"
           },
           new object[]
           {
@@ -508,7 +508,7 @@ namespace EpsilonScript.Tests.AST
             1,
             1.5f,
             true,
-            null
+            "1.5"
           },
           new object[]
           {
@@ -519,7 +519,7 @@ namespace EpsilonScript.Tests.AST
             0,
             0.0f,
             false,
-            null
+            "0"
           },
           new object[]
           {
@@ -530,7 +530,7 @@ namespace EpsilonScript.Tests.AST
             1,
             1.0f,
             true,
-            null
+            "1"
           },
           new object[]
           {
@@ -541,7 +541,7 @@ namespace EpsilonScript.Tests.AST
             1,
             1.0f,
             true,
-            null
+            "1"
           },
           new object[]
           {
@@ -552,7 +552,7 @@ namespace EpsilonScript.Tests.AST
             0,
             0.0f,
             false,
-            null
+            "0"
           },
           new object[]
           {
@@ -563,7 +563,7 @@ namespace EpsilonScript.Tests.AST
             0,
             0.0f,
             false,
-            null
+            "0"
           }
         };
       }

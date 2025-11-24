@@ -346,5 +346,209 @@ namespace EpsilonScript.Tests.VariableValueTests
     }
 
     #endregion
+
+    #region Numeric to String Conversion Tests
+
+    [Fact]
+    public void IntegerToString_ConvertsCorrectly()
+    {
+      var variable = new VariableValue(42);
+
+      Assert.Equal("42", variable.StringValue);
+    }
+
+    [Fact]
+    public void IntegerToString_NegativeValue_ConvertsCorrectly()
+    {
+      var variable = new VariableValue(-123);
+
+      Assert.Equal("-123", variable.StringValue);
+    }
+
+    [Fact]
+    public void LongToString_ConvertsCorrectly()
+    {
+      var variable = new VariableValue(3000000000L);
+
+      Assert.Equal("3000000000", variable.StringValue);
+    }
+
+    [Fact]
+    public void LongToString_NegativeValue_ConvertsCorrectly()
+    {
+      var variable = new VariableValue(-9223372036854775808L);
+
+      Assert.Equal("-9223372036854775808", variable.StringValue);
+    }
+
+    [Fact]
+    public void FloatToString_ConvertsCorrectly()
+    {
+      var variable = new VariableValue(3.14f);
+
+      Assert.Equal("3.14", variable.StringValue);
+    }
+
+    [Fact]
+    public void DoubleToString_ConvertsCorrectly()
+    {
+      var variable = new VariableValue(3.141592653589793);
+
+      Assert.Equal("3.141592653589793", variable.StringValue);
+    }
+
+    [Fact]
+    public void DecimalToString_ConvertsCorrectly()
+    {
+      var variable = new VariableValue(123.456789m);
+
+      Assert.Equal("123.456789", variable.StringValue);
+    }
+
+    [Fact]
+    public void BooleanToString_TrueValue_ConvertsCorrectly()
+    {
+      var variable = new VariableValue(true);
+
+      Assert.Equal("True", variable.StringValue);
+    }
+
+    [Fact]
+    public void BooleanToString_FalseValue_ConvertsCorrectly()
+    {
+      var variable = new VariableValue(false);
+
+      Assert.Equal("False", variable.StringValue);
+    }
+
+    [Fact]
+    public void StringValue_OnStringType_ReturnsOriginalValue()
+    {
+      var variable = new VariableValue("hello world");
+
+      Assert.Equal("hello world", variable.StringValue);
+    }
+
+    #endregion
+
+    #region Setter on String-Typed Variable Tests
+
+    [Fact]
+    public void StringVariable_IntegerSetter_ConvertsToString()
+    {
+      var variable = new VariableValue("original");
+      variable.IntegerValue = 42;
+
+      Assert.Equal(Type.String, variable.Type);
+      Assert.Equal("42", variable.StringValue);
+      Assert.Equal(42, variable.IntegerValue);
+    }
+
+    [Fact]
+    public void StringVariable_NegativeIntegerSetter_ConvertsToString()
+    {
+      var variable = new VariableValue("original");
+      variable.IntegerValue = -123;
+
+      Assert.Equal(Type.String, variable.Type);
+      Assert.Equal("-123", variable.StringValue);
+      Assert.Equal(-123, variable.IntegerValue);
+    }
+
+    [Fact]
+    public void StringVariable_LongSetter_ConvertsToString()
+    {
+      var variable = new VariableValue("original");
+      variable.LongValue = 3000000000L;
+
+      Assert.Equal(Type.String, variable.Type);
+      Assert.Equal("3000000000", variable.StringValue);
+      Assert.Equal(3000000000L, variable.LongValue);
+    }
+
+    [Fact]
+    public void StringVariable_FloatSetter_ConvertsToString()
+    {
+      var variable = new VariableValue("original");
+      variable.FloatValue = 3.14f;
+
+      Assert.Equal(Type.String, variable.Type);
+      Assert.Equal("3.14", variable.StringValue);
+      Assert.Equal(3.14f, variable.FloatValue, precision: 5);
+    }
+
+    [Fact]
+    public void StringVariable_DoubleSetter_ConvertsToString()
+    {
+      var variable = new VariableValue("original");
+      variable.DoubleValue = 3.141592653589793;
+
+      Assert.Equal(Type.String, variable.Type);
+      Assert.Equal("3.141592653589793", variable.StringValue);
+      Assert.Equal(3.141592653589793, variable.DoubleValue);
+    }
+
+    [Fact]
+    public void StringVariable_DecimalSetter_ConvertsToString()
+    {
+      var variable = new VariableValue("original");
+      variable.DecimalValue = 123.456789m;
+
+      Assert.Equal(Type.String, variable.Type);
+      Assert.Equal("123.456789", variable.StringValue);
+      Assert.Equal(123.456789m, variable.DecimalValue);
+    }
+
+    [Fact]
+    public void StringVariable_RoundTrip_Integer_PreservesValue()
+    {
+      var variable = new VariableValue("test");
+      variable.IntegerValue = 42;
+      int result = variable.IntegerValue;
+
+      Assert.Equal(42, result);
+    }
+
+    [Fact]
+    public void StringVariable_RoundTrip_Long_PreservesValue()
+    {
+      var variable = new VariableValue("test");
+      variable.LongValue = 9223372036854775807L;
+      long result = variable.LongValue;
+
+      Assert.Equal(9223372036854775807L, result);
+    }
+
+    [Fact]
+    public void StringVariable_RoundTrip_Float_PreservesValue()
+    {
+      var variable = new VariableValue("test");
+      variable.FloatValue = 3.14f;
+      float result = variable.FloatValue;
+
+      Assert.Equal(3.14f, result, precision: 5);
+    }
+
+    [Fact]
+    public void StringVariable_RoundTrip_Double_PreservesValue()
+    {
+      var variable = new VariableValue("test");
+      variable.DoubleValue = 2.718281828459045;
+      double result = variable.DoubleValue;
+
+      Assert.Equal(2.718281828459045, result);
+    }
+
+    [Fact]
+    public void StringVariable_RoundTrip_Decimal_PreservesValue()
+    {
+      var variable = new VariableValue("test");
+      variable.DecimalValue = 123.456789012345678901234567890m;
+      decimal result = variable.DecimalValue;
+
+      Assert.Equal(123.456789012345678901234567890m, result);
+    }
+
+    #endregion
   }
 }

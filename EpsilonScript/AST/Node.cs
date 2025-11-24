@@ -41,7 +41,30 @@ namespace EpsilonScript.AST
 
     public string StringValue
     {
-      get => _stringValue;
+      get
+      {
+        switch (_type)
+        {
+          case ExtendedType.String:
+            return _stringValue;
+          case ExtendedType.Integer:
+          case ExtendedType.Long:
+            return _value.IntValue.ToString(System.Globalization.CultureInfo.InvariantCulture);
+          case ExtendedType.Float:
+            return ((float)_value.FloatValue).ToString(System.Globalization.CultureInfo.InvariantCulture);
+          case ExtendedType.Double:
+            return _value.FloatValue.ToString(System.Globalization.CultureInfo.InvariantCulture);
+          case ExtendedType.Decimal:
+            return _decimalValue.ToString(System.Globalization.CultureInfo.InvariantCulture);
+          case ExtendedType.Boolean:
+            return (_value.IntValue != 0).ToString();
+          case ExtendedType.Null:
+          case ExtendedType.Undefined:
+            return null;
+          default:
+            throw new InvalidOperationException($"Cannot convert {_type} to string");
+        }
+      }
       protected set
       {
         _type = ExtendedType.String;
