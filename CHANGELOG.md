@@ -33,6 +33,9 @@
   - StringValue getter now converts all types to string (previously returned `null`)
   - Float/Double/Decimal setters now support String-typed variables (previously threw exception)
   - All setters use InvariantCulture for culture-safe round-trip conversion
+- **Assignment Operators Divide/Modulo by Zero**: `/=` and `%=` now throw `DivideByZeroException` for all numeric types
+  - Previously only integer types threw; float/double/decimal returned Infinity or NaN
+  - Now consistent with regular `/` and `%` operators
 
 ## [2.0.0] - 2025-10-31
 

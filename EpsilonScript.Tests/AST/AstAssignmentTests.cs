@@ -254,6 +254,82 @@ namespace EpsilonScript.Tests.AST
       };
     }
 
+    [Fact]
+    public void DivideAssignment_IntegerDivideByZero_ThrowsException()
+    {
+      var variable = new VariableValue(10);
+      var leftNode = new FakeVariableNode(variable);
+      var rightNode = new FakeIntegerNode(0);
+
+      var node = CreateAssignmentNode("/=");
+      var rpn = CreateStack(leftNode, rightNode);
+      var element = new Element(new Token("/=", TokenType.AssignmentDivideOperator),
+        ElementType.AssignmentDivideOperator);
+
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, null),
+        Compiler.Options.None, null);
+
+      Assert.Throws<DivideByZeroException>(() => node.Execute(null));
+    }
+
+    [Fact]
+    public void DivideAssignment_FloatDivideByZero_ThrowsException()
+    {
+      var variable = new VariableValue(10.0f);
+      var leftNode = new FakeVariableNode(variable);
+      var rightNode = new FakeFloatNode(0.0f);
+
+      var node = CreateAssignmentNode("/=");
+      var rpn = CreateStack(leftNode, rightNode);
+      var element = new Element(new Token("/=", TokenType.AssignmentDivideOperator),
+        ElementType.AssignmentDivideOperator);
+
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, null),
+        Compiler.Options.None, null);
+
+      Assert.Throws<DivideByZeroException>(() => node.Execute(null));
+    }
+
+    [Fact]
+    public void ModuloAssignment_IntegerModuloByZero_ThrowsException()
+    {
+      var variable = new VariableValue(10);
+      var leftNode = new FakeVariableNode(variable);
+      var rightNode = new FakeIntegerNode(0);
+
+      var node = CreateAssignmentNode("%=");
+      var rpn = CreateStack(leftNode, rightNode);
+      var element = new Element(new Token("%=", TokenType.AssignmentModuloOperator),
+        ElementType.AssignmentModuloOperator);
+
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, null),
+        Compiler.Options.None, null);
+
+      Assert.Throws<DivideByZeroException>(() => node.Execute(null));
+    }
+
+    [Fact]
+    public void ModuloAssignment_FloatModuloByZero_ThrowsException()
+    {
+      var variable = new VariableValue(10.0f);
+      var leftNode = new FakeVariableNode(variable);
+      var rightNode = new FakeFloatNode(0.0f);
+
+      var node = CreateAssignmentNode("%=");
+      var rpn = CreateStack(leftNode, rightNode);
+      var element = new Element(new Token("%=", TokenType.AssignmentModuloOperator),
+        ElementType.AssignmentModuloOperator);
+
+      node.Build(rpn, element,
+        new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float, null),
+        Compiler.Options.None, null);
+
+      Assert.Throws<DivideByZeroException>(() => node.Execute(null));
+    }
+
     private static TokenType GetTokenType(ElementType operatorType)
     {
       return operatorType switch

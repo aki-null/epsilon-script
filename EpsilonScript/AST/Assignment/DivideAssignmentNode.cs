@@ -15,20 +15,45 @@ namespace EpsilonScript.AST.Assignment
       switch (variable.Type)
       {
         case Type.Integer:
-          variable.IntegerValue /= RightNode.IntegerValue;
+        {
+          var rightValue = RightNode.IntegerValue;
+          if (rightValue == 0)
+            throw new DivideByZeroException("Division by zero");
+          variable.IntegerValue /= rightValue;
           break;
+        }
         case Type.Long:
-          variable.LongValue /= RightNode.LongValue;
+        {
+          var rightValue = RightNode.LongValue;
+          if (rightValue == 0)
+            throw new DivideByZeroException("Division by zero");
+          variable.LongValue /= rightValue;
           break;
+        }
         case Type.Float:
-          variable.FloatValue /= RightNode.FloatValue;
+        {
+          var rightValue = RightNode.FloatValue;
+          if (rightValue == 0.0f)
+            throw new DivideByZeroException("Division by zero");
+          variable.FloatValue /= rightValue;
           break;
+        }
         case Type.Double:
-          variable.DoubleValue /= RightNode.DoubleValue;
+        {
+          var rightValue = RightNode.DoubleValue;
+          if (rightValue == 0.0)
+            throw new DivideByZeroException("Division by zero");
+          variable.DoubleValue /= rightValue;
           break;
+        }
         case Type.Decimal:
-          variable.DecimalValue /= RightNode.DecimalValue;
+        {
+          var rightValue = RightNode.DecimalValue;
+          if (rightValue == 0m)
+            throw new DivideByZeroException("Division by zero");
+          variable.DecimalValue /= rightValue;
           break;
+        }
         default:
           throw new ArgumentOutOfRangeException(nameof(variable.Type), variable.Type, "Unsupported variable type");
       }
