@@ -29,10 +29,20 @@ jobs:
         run: |
           # Remove old source files but keep .meta files
           find unity-package/Runtime -type f ! -name '*.meta' ! -name '*.asmdef' -delete
+          # Remove empty directories left behind after deleting files
+          find unity-package/Runtime -mindepth 1 -type d -empty -delete
 
           # Copy new source files
           rsync -av --exclude='bin' --exclude='obj' --exclude='*.csproj' --exclude='.DS_Store' \
             EpsilonScript/ unity-package/Runtime/
+
+          # Remove orphaned .meta files for assets that no longer exist
+          find unity-package/Runtime -type f -name '*.meta' | while read -r meta; do
+            target="${meta%.meta}"
+            if [ ! -e "$target" ]; then
+              rm "$meta"
+            fi
+          done
 
       - name: Update package.json
         run: |
