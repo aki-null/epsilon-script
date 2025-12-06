@@ -1,6 +1,6 @@
 # Changelog
 
-## [2.1.0] - 2025-XX-XX
+## [2.1.0] - 2025-12-06
 
 ### Added
 - **NoAlloc Compiler Option**: Blocks runtime heap allocations
