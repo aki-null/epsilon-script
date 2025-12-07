@@ -303,7 +303,7 @@ Console.WriteLine(script.FloatValue); // 75
 
 ### Function Requirements
 
-Custom functions can't mutate state. Read external data is fine, but don't modify anything.
+Custom functions shouldn't mutate state. Reading external data is fine, but don't modify anything.
 
 ```c#
 // Allowed: pure calculation
@@ -492,7 +492,7 @@ Console.WriteLine(script.BooleanValue);  // True (if GetIntegerData returns 10)
 
 ## Expression Sequencing
 
-Use semicolons (`;`) to run multiple expressions. Returns the last expression's value.
+Use semicolons (`;`) to run multiple expressions. Execution returns the value of the last expression.
 
 ```c#
 var compiler = new Compiler();
