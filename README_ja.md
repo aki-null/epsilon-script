@@ -89,6 +89,7 @@ Console.WriteLine(script.FloatValue); // 150
 - [数値精度](#数値精度)
 - [ヒープアロケーション](#ヒープアロケーション)
 - [スレッドセーフティ](#スレッドセーフティ)
+- [キャッシュ付きコンパイラ](#キャッシュ付きコンパイラ)
 - [設計思想](#設計思想)
 - [開発](#開発)
 
@@ -670,6 +671,31 @@ Parallel.For(0, 100, i =>
 - 各スレッドで新しい`Compiler`インスタンスを作成してください
 - 各スレッドで新しい`CompiledScript`を作成してください
 - 各スレッドで新しい`DictionaryVariableContainer`を作成してください
+
+## キャッシュ付きコンパイラ
+
+`CachingCompiler` は `Compiler` をラップし、ソース文字列・コンパイラオプション・変数コンテナごとにコンパイル結果をキャッシュします。同じスクリプトを繰り返しコンパイルする場合にのみ利用してください。
+
+```csharp
+var caching = new CachingCompiler();
+var script1 = caching.Compile("damage * 2", Compiler.Options.Immutable);
+var script2 = caching.Compile("damage * 2", Compiler.Options.Immutable);
+
+Console.WriteLine(ReferenceEquals(script1, script2)); // True
+```
+
+ハッシュを使い回す場合:
+```csharp
+var caching = new CachingCompiler();
+var source = CachedSourceText.From("damage * 2");
+
+var script1 = caching.Compile(source, Compiler.Options.Immutable);
+var script2 = caching.Compile(source, Compiler.Options.Immutable);
+```
+
+メモ:
+- キャッシュキーは変数コンテナを参照で比較するため、異なるコンテナでは共有されません。
+- カスタム関数を追加するとキャッシュをクリアします（定数畳み込みでオーバーロードがコンパイル時に選択されるため）。
 
 ## 設計思想
 

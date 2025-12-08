@@ -1,5 +1,14 @@
 # Changelog
 
+# Changelog
+
+## [2.2.0] - 202X-XX-XX
+
+### Added
+- **CachingCompiler**: Opt-in compiler wrapper that caches compiled scripts by source, options, and variable container identity
+  - Supports pre-hashed `CachedSourceText` to avoid repeated O(n) hashing when generating cache keys
+  - Cache invalidates when custom functions are added (constant folding selects overloads at compile time)
+
 ## [2.1.0] - 2025-12-06
 
 ### Added

@@ -91,6 +91,7 @@ Console.WriteLine(script.FloatValue); // 150
 - [Numeric Precision](#numeric-precision)
 - [Heap Allocations](#heap-allocations)
 - [Thread Safety](#thread-safety)
+- [Caching Compiler](#caching-compiler)
 - [Motivation](#motivation)
 - [Development](#development)
 
@@ -672,6 +673,31 @@ Parallel.For(0, 100, i =>
 - Create a new `Compiler` instance per thread
 - Create a new `CompiledScript` per thread
 - Create a new `DictionaryVariableContainer` per thread
+
+## Caching Compiler
+
+`CachingCompiler` wraps `Compiler` and caches compiled scripts by source text, compiler options, and variable container identity. Use it when compiling the same script repeatedly; otherwise stick with `Compiler` directly.
+
+```csharp
+var caching = new CachingCompiler();
+var script1 = caching.Compile("damage * 2", Compiler.Options.Immutable);
+var script2 = caching.Compile("damage * 2", Compiler.Options.Immutable);
+
+Console.WriteLine(ReferenceEquals(script1, script2)); // True
+```
+
+Pre-hashing to reuse a key:
+```csharp
+var caching = new CachingCompiler();
+var source = CachedSourceText.From("damage * 2");
+
+var script1 = caching.Compile(source, Compiler.Options.Immutable);
+var script2 = caching.Compile(source, Compiler.Options.Immutable);
+```
+
+Notes:
+- Cache keys include the variable container by reference; different containers do not share entries.
+- Adding custom functions clears the cache because constant folding selects overloads at compile time.
 
 ## Motivation
 
