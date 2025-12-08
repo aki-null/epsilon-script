@@ -111,7 +111,18 @@ Console.WriteLine(script.FloatValue); // 150
 
 ### Unity
 
-Add the package via Unity Package Manager:
+Install via OpenUPM:
+
+- Package is available on [OpenUPM](https://openupm.com). If you have [openupm-cli](https://github.com/openupm/openupm-cli#openupm-cli) installed, run this in your Unity project root:
+  ```
+  openupm add com.akinull.epsilonscript
+  ```
+- To update, specify the version you want:
+  ```
+  openupm add com.akinull.epsilonscript@2.1.0
+  ```
+
+Install via UPM (Git URL):
 
 1. Open **Window > Package Manager**
 2. Click the **+** button in the top-left corner

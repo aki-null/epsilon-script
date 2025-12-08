@@ -109,14 +109,25 @@ Console.WriteLine(script.FloatValue); // 150
 
 ### Unity
 
-Unity Package Managerからパッケージを追加できます:
+OpenUPM経由でインストール:
 
-1. **Window > Package Manager**を開きます
+- このパッケージは [OpenUPM](https://openupm.com) に公開されています。[openupm-cli](https://github.com/openupm/openupm-cli#openupm-cli) を使う場合、Unityプロジェクトのルートで次を実行します:
+  ```
+  openupm add com.akinull.epsilonscript
+  ```
+- 更新する場合はバージョンを指定できます:
+  ```
+  openupm add com.akinull.epsilonscript@2.1.0
+  ```
+
+UPM (Git URL) からインストール:
+
+1. **Window > Package Manager** を開きます
 2. 左上の **+** ボタンをクリックします
-3. **Add package from git URL**を選択します
-4. 以下のURLを入力します: `https://github.com/aki-null/epsilon-script-unity.git`
+3. **Add package from git URL** を選択します
+4. 次のURLを入力します: `https://github.com/aki-null/epsilon-script-unity.git`
 
-または、`Packages/manifest.json`に直接追加することもできます:
+または、`Packages/manifest.json` に直接追加します:
 
 ```json
 {
