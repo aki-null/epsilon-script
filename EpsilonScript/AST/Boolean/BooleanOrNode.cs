@@ -1,4 +1,5 @@
 using EpsilonScript.AST.Literal;
+using EpsilonScript.VirtualMachine;
 
 namespace EpsilonScript.AST.Boolean
 {
@@ -8,29 +9,8 @@ namespace EpsilonScript.AST.Boolean
   /// </summary>
   internal sealed class BooleanOrNode : BooleanOperationNode
   {
-    public override void Execute(IVariableContainer variablesOverride)
-    {
-      LeftNode.Execute(variablesOverride);
-      if (LeftNode.ValueType != ExtendedType.Boolean)
-      {
-        throw CreateRuntimeException(OperationTypeErrorMessage);
-      }
-
-      // Short-circuit: if left is true, result is true without evaluating right
-      if (LeftNode.BooleanValue)
-      {
-        BooleanValue = true;
-        return;
-      }
-
-      RightNode.Execute(variablesOverride);
-      if (RightNode.ValueType != ExtendedType.Boolean)
-      {
-        throw CreateRuntimeException(OperationTypeErrorMessage);
-      }
-
-      BooleanValue = RightNode.BooleanValue;
-    }
+    internal override int Lower(RegisterCompiler compiler) =>
+      compiler.LowerBoolean(this, OpCode.OrLeft, LeftNode, RightNode);
 
     public override Node Optimize()
     {
@@ -42,13 +22,13 @@ namespace EpsilonScript.AST.Boolean
       // true || anything => true (don't need to optimize right side)
       if (LeftNode.IsPrecomputable && LeftNode.ValueType == ExtendedType.Boolean && LeftNode.BooleanValue)
       {
-        return new BooleanNode(true);
+        return CreateBooleanNode(true);
       }
 
       // anything || true => true (don't need to optimize left side)
       if (RightNode.IsPrecomputable && RightNode.ValueType == ExtendedType.Boolean && RightNode.BooleanValue)
       {
-        return new BooleanNode(true);
+        return CreateBooleanNode(true);
       }
 
       // Optimize child nodes

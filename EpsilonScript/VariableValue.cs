@@ -19,12 +19,40 @@ namespace EpsilonScript
     private decimal _decimalValue; // Separate field for Decimal (16 bytes)
     private string _stringValue; // Reference type
 
-    public Type Type => _type;
+    public Type Type
+    {
+      [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+      get => _type;
+    }
+
+    // Raw union reads for hot paths that have already checked Type. Integer/Long live in RawInteger,
+    // Float/Double in RawFloat.
+    internal long RawInteger
+    {
+      [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+      get => _value.IntValue;
+    }
+
+    internal double RawFloat
+    {
+      [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+      get => _value.FloatValue;
+    }
+
+    // Raw union writes matching the typed setters when the value already has the target type: Integer/Long store
+    // RawInteger, Float/Double store RawFloat.
+    [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+    internal void StoreRawInteger(long value) => _value.IntValue = value;
+
+    [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+    internal void StoreRawFloat(double value) => _value.FloatValue = value;
 
     public int IntegerValue
     {
       get
       {
+        if (_type == Type.Integer) return (int)_value.IntValue;
+
         switch (_type)
         {
           case Type.Integer:
@@ -84,6 +112,8 @@ namespace EpsilonScript
     {
       get
       {
+        if (_type == Type.Long) return _value.IntValue;
+
         switch (_type)
         {
           case Type.Integer:
@@ -143,6 +173,8 @@ namespace EpsilonScript
     {
       get
       {
+        if (_type == Type.Float) return (float)_value.FloatValue;
+
         switch (_type)
         {
           case Type.Integer:
@@ -198,6 +230,8 @@ namespace EpsilonScript
     {
       get
       {
+        if (_type == Type.Double) return _value.FloatValue;
+
         switch (_type)
         {
           case Type.Integer:
@@ -253,6 +287,8 @@ namespace EpsilonScript
     {
       get
       {
+        if (_type == Type.Decimal) return _decimalValue;
+
         switch (_type)
         {
           case Type.Integer:
@@ -308,6 +344,8 @@ namespace EpsilonScript
     {
       get
       {
+        if (_type == Type.Boolean) return _value.BoolValue;
+
         switch (_type)
         {
           case Type.Boolean:
@@ -356,6 +394,8 @@ namespace EpsilonScript
     {
       get
       {
+        if (_type == Type.String) return _stringValue;
+
         switch (_type)
         {
           case Type.String:

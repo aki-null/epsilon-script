@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using EpsilonScript.Helper;
 
 namespace EpsilonScript
 {
@@ -53,22 +54,25 @@ namespace EpsilonScript
         }
       }
 
-      return x.Source.Span.SequenceEqual(y.Source.Span);
+      return SpanText.AreEqual(x.Source.FastSpan(), y.Source.FastSpan());
     }
 
     public int GetHashCode(CachingCompilerKey obj)
     {
-      var hash = new HashCode();
-      hash.Add(obj.SourceHash);
-      hash.Add(obj.Options);
-      hash.Add(obj.Source.Length);
-
-      if (obj.Variables != null)
+      // Plain integer mixing: System.HashCode.Add<T> goes through EqualityComparer<T>.Default per field, which is
+      // slow under IL2CPP. The value only feeds the cache dictionary.
+      unchecked
       {
-        hash.Add(RuntimeHelpers.GetHashCode(obj.Variables));
-      }
+        var hash = obj.SourceHash;
+        hash = hash * 31 + (int)obj.Options;
+        hash = hash * 31 + obj.Source.Length;
+        if (obj.Variables != null)
+        {
+          hash = hash * 31 + RuntimeHelpers.GetHashCode(obj.Variables);
+        }
 
-      return hash.ToHashCode();
+        return hash;
+      }
     }
   }
 }

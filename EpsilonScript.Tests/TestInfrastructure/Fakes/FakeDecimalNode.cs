@@ -5,7 +5,7 @@ using EpsilonScript.Intermediate;
 
 namespace EpsilonScript.Tests.TestInfrastructure.Fakes
 {
-  internal class FakeDecimalNode : Node
+  internal class FakeDecimalNode : FakeNode
   {
     public FakeDecimalNode(decimal value)
     {

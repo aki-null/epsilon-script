@@ -1,11 +1,5 @@
 using System;
 using System.Collections.Generic;
-using EpsilonScript.AST.Arithmetic;
-using EpsilonScript.AST.Assignment;
-using EpsilonScript.AST.Boolean;
-using EpsilonScript.AST.Comparison;
-using EpsilonScript.AST.Literal;
-using EpsilonScript.AST.Sign;
 using EpsilonScript.Intermediate;
 
 namespace EpsilonScript.AST
@@ -13,6 +7,9 @@ namespace EpsilonScript.AST
   internal class AstBuilder : IElementReader
   {
     public Node Result { get; private set; }
+
+    // Nodes are rented per compilation; Compiler returns them once the tree is lowered
+    public NodePool Pool { get; } = new NodePool();
 
     private readonly Stack<Node> _rpnStack = new Stack<Node>();
     private readonly CompilerContext _context;
@@ -40,7 +37,7 @@ namespace EpsilonScript.AST
 
     public void Push(Element element)
     {
-      var node = CreateNode(element.Type);
+      var node = Pool.Rent(KindOf(element.Type));
       node.Build(_rpnStack, element, _context, _options, _variables);
       _rpnStack.Push(node);
     }
@@ -55,73 +52,73 @@ namespace EpsilonScript.AST
       Result = _rpnStack.Pop();
     }
 
-    private static Node CreateNode(ElementType type)
+    private static NodeKind KindOf(ElementType type)
     {
       switch (type)
       {
         case ElementType.None:
-          return new NullNode();
+          return NodeKind.Null;
         case ElementType.Variable:
-          return new VariableNode();
+          return NodeKind.Variable;
         case ElementType.Function:
-          return new FunctionNode();
+          return NodeKind.Function;
         case ElementType.Comma:
-          return new TupleNode();
+          return NodeKind.Tuple;
         case ElementType.Semicolon:
-          return new SequenceNode();
+          return NodeKind.Sequence;
         case ElementType.ComparisonEqual:
-          return new EqualComparisonNode();
+          return NodeKind.Equal;
         case ElementType.ComparisonNotEqual:
-          return new NotEqualComparisonNode();
+          return NodeKind.NotEqual;
         case ElementType.ComparisonLessThan:
-          return new LessThanComparisonNode();
+          return NodeKind.LessThan;
         case ElementType.ComparisonGreaterThan:
-          return new GreaterThanComparisonNode();
+          return NodeKind.GreaterThan;
         case ElementType.ComparisonLessThanOrEqualTo:
-          return new LessThanOrEqualComparisonNode();
+          return NodeKind.LessThanOrEqual;
         case ElementType.ComparisonGreaterThanOrEqualTo:
-          return new GreaterThanOrEqualComparisonNode();
+          return NodeKind.GreaterThanOrEqual;
         case ElementType.NegateOperator:
-          return new NegateNode();
+          return NodeKind.Negate;
         case ElementType.PositiveOperator:
-          return new PositiveSignNode();
+          return NodeKind.Positive;
         case ElementType.NegativeOperator:
-          return new NegativeSignNode();
+          return NodeKind.Negative;
         case ElementType.BooleanOrOperator:
-          return new BooleanOrNode();
+          return NodeKind.BooleanOr;
         case ElementType.BooleanAndOperator:
-          return new BooleanAndNode();
+          return NodeKind.BooleanAnd;
         case ElementType.BooleanLiteralTrue:
         case ElementType.BooleanLiteralFalse:
-          return new BooleanNode();
+          return NodeKind.Boolean;
         case ElementType.AssignmentOperator:
-          return new DirectAssignmentNode();
+          return NodeKind.DirectAssignment;
         case ElementType.AssignmentAddOperator:
-          return new AddAssignmentNode();
+          return NodeKind.AddAssignment;
         case ElementType.AssignmentSubtractOperator:
-          return new SubtractAssignmentNode();
+          return NodeKind.SubtractAssignment;
         case ElementType.AssignmentMultiplyOperator:
-          return new MultiplyAssignmentNode();
+          return NodeKind.MultiplyAssignment;
         case ElementType.AssignmentDivideOperator:
-          return new DivideAssignmentNode();
+          return NodeKind.DivideAssignment;
         case ElementType.AssignmentModuloOperator:
-          return new ModuloAssignmentNode();
+          return NodeKind.ModuloAssignment;
         case ElementType.AddOperator:
-          return new AddNode();
+          return NodeKind.Add;
         case ElementType.SubtractOperator:
-          return new SubtractNode();
+          return NodeKind.Subtract;
         case ElementType.MultiplyOperator:
-          return new MultiplyNode();
+          return NodeKind.Multiply;
         case ElementType.DivideOperator:
-          return new DivideNode();
+          return NodeKind.Divide;
         case ElementType.ModuloOperator:
-          return new ModuloNode();
+          return NodeKind.Modulo;
         case ElementType.Integer:
-          return new IntegerNode();
+          return NodeKind.Integer;
         case ElementType.Float:
-          return new FloatNode();
+          return NodeKind.Float;
         case ElementType.String:
-          return new StringNode();
+          return NodeKind.String;
         default:
           throw new ArgumentOutOfRangeException();
       }

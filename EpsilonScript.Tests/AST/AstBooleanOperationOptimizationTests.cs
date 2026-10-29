@@ -391,7 +391,7 @@ namespace EpsilonScript.Tests.AST
     }
 
     // Simulates a node that returns an unexecuted constant from Optimize()
-    private class FakeNodeReturningUnexecutedNode : Node
+    private class FakeNodeReturningUnexecutedNode : FakeNode
     {
       private readonly bool _value;
 
@@ -417,7 +417,7 @@ namespace EpsilonScript.Tests.AST
       }
     }
 
-    private class FakeComparisonNode : Node
+    private class FakeComparisonNode : ScriptedFakeNode
     {
       private readonly int _left, _right;
       private readonly bool _expectedResult;
@@ -434,7 +434,7 @@ namespace EpsilonScript.Tests.AST
 
       public override bool IsPrecomputable => true;
 
-      public override void Execute(IVariableContainer variablesOverride)
+      protected override void OnExecute()
       {
         // Simulate comparison execution
         BooleanValue = _expectedResult;
@@ -448,7 +448,7 @@ namespace EpsilonScript.Tests.AST
     }
 
     // Helper class to simulate a non-constant boolean node (like a variable or function call)
-    private class NonConstantBooleanNode : Node
+    private class NonConstantBooleanNode : FakeNode
     {
       public NonConstantBooleanNode(bool value)
       {

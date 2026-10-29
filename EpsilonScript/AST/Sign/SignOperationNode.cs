@@ -1,6 +1,6 @@
-using System;
 using System.Collections.Generic;
 using EpsilonScript.Intermediate;
+using EpsilonScript.VirtualMachine;
 
 namespace EpsilonScript.AST.Sign
 {
@@ -14,6 +14,16 @@ namespace EpsilonScript.AST.Sign
 
     public override bool IsPrecomputable => ChildNode.IsPrecomputable;
 
+    internal abstract OpCode LoweredOp { get; }
+
+    internal override int Lower(RegisterCompiler compiler) => compiler.LowerOperation(this, LoweredOp, ChildNode);
+
+    internal override void Reset()
+    {
+      base.Reset();
+      ChildNode = null;
+    }
+
     protected override void BuildCore(Stack<Node> rpnStack, Element element, CompilerContext context,
       Compiler.Options options, IVariableContainer variables)
     {
@@ -23,71 +33,9 @@ namespace EpsilonScript.AST.Sign
       }
     }
 
-    public override void Execute(IVariableContainer variablesOverride)
-    {
-      ChildNode.Execute(variablesOverride);
-
-      if (!ChildNode.IsNumeric)
-      {
-        throw CreateRuntimeException("Sign of a non-numeric value cannot be changed");
-      }
-
-      switch (ChildNode.ValueType)
-      {
-        case ExtendedType.Integer:
-          ApplySignInteger();
-          break;
-        case ExtendedType.Long:
-          ApplySignLong();
-          break;
-        case ExtendedType.Float:
-          ApplySignFloat();
-          break;
-        case ExtendedType.Double:
-          ApplySignDouble();
-          break;
-        case ExtendedType.Decimal:
-          ApplySignDecimal();
-          break;
-        default:
-          throw new ArgumentOutOfRangeException(nameof(ChildNode.ValueType), ChildNode.ValueType,
-            "Unsupported value type for sign change");
-      }
-    }
-
-    /// <summary>
-    /// Apply the sign operation to an integer value.
-    /// </summary>
-    protected abstract void ApplySignInteger();
-
-    /// <summary>
-    /// Apply the sign operation to a long value.
-    /// </summary>
-    protected abstract void ApplySignLong();
-
-    /// <summary>
-    /// Apply the sign operation to a float value.
-    /// </summary>
-    protected abstract void ApplySignFloat();
-
-    /// <summary>
-    /// Apply the sign operation to a double value.
-    /// </summary>
-    protected abstract void ApplySignDouble();
-
-    /// <summary>
-    /// Apply the sign operation to a decimal value.
-    /// </summary>
-    protected abstract void ApplySignDecimal();
-
     public override void Validate()
     {
       ChildNode?.Validate();
-    }
-
-    public override void ConfigureNoAlloc()
-    {
-      ChildNode?.ConfigureNoAlloc();
     }
   }
 }

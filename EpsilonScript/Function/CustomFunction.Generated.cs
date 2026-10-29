@@ -8,7 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using EpsilonScript.AST;
+using EpsilonScript.VirtualMachine;
 
 namespace EpsilonScript.Function
 {
@@ -56,60 +56,18 @@ namespace EpsilonScript.Function
   public sealed class CustomFunction<TResult> : CustomFunction
   {
     private readonly Func<TResult> _func;
+    private readonly ValueConverter<TResult> _resultConverter;
 
     public CustomFunction(string name, Func<TResult> func, bool isDeterministic = false)
       : base(name, isDeterministic, Array.Empty<Type>(), TypeTraits<TResult>.ValueType)
     {
       _func = func ?? throw new ArgumentNullException(nameof(func));
+      _resultConverter = TypeTraits<TResult>.Converter;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private TResult Invoke(List<Node> parameters)
+    internal override void Invoke(RegisterProgram program, int[] arguments, int destination)
     {
-      EnsureParameterCount(parameters);
-      return _func();
-    }
-
-    internal override int ExecuteInt(List<Node> parameters)
-    {
-      EnsureReturnType(Type.Integer);
-      return TypeTraits<TResult>.ToInt(Invoke(parameters));
-    }
-
-    internal override long ExecuteLong(List<Node> parameters)
-    {
-      EnsureReturnType(Type.Long);
-      return TypeTraits<TResult>.ToLong(Invoke(parameters));
-    }
-
-    internal override float ExecuteFloat(List<Node> parameters)
-    {
-      EnsureReturnType(Type.Float);
-      return TypeTraits<TResult>.ToFloat(Invoke(parameters));
-    }
-
-    internal override double ExecuteDouble(List<Node> parameters)
-    {
-      EnsureReturnType(Type.Double);
-      return TypeTraits<TResult>.ToDouble(Invoke(parameters));
-    }
-
-    internal override decimal ExecuteDecimal(List<Node> parameters)
-    {
-      EnsureReturnType(Type.Decimal);
-      return TypeTraits<TResult>.ToDecimal(Invoke(parameters));
-    }
-
-    internal override string ExecuteString(List<Node> parameters)
-    {
-      EnsureReturnType(Type.String);
-      return TypeTraits<TResult>.ToStringValue(Invoke(parameters));
-    }
-
-    internal override bool ExecuteBool(List<Node> parameters)
-    {
-      EnsureReturnType(Type.Boolean);
-      return TypeTraits<TResult>.ToBool(Invoke(parameters));
+      _resultConverter.Write(program, destination, _func());
     }
   }
   // ==========================================================================
@@ -126,60 +84,20 @@ namespace EpsilonScript.Function
       TypeTraits<T1>.ValueType
     };
     private readonly Func<T1, TResult> _func;
+    private readonly ValueConverter<T1> _converter1;
+    private readonly ValueConverter<TResult> _resultConverter;
 
     public CustomFunction(string name, Func<T1, TResult> func, bool isDeterministic = false)
       : base(name, isDeterministic, ParameterCache, TypeTraits<TResult>.ValueType)
     {
       _func = func ?? throw new ArgumentNullException(nameof(func));
+      _converter1 = TypeTraits<T1>.Converter;
+      _resultConverter = TypeTraits<TResult>.Converter;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private TResult Invoke(List<Node> parameters)
+    internal override void Invoke(RegisterProgram program, int[] arguments, int destination)
     {
-      EnsureParameterCount(parameters);
-      return _func(TypeTraits<T1>.Read(parameters[0]));
-    }
-
-    internal override int ExecuteInt(List<Node> parameters)
-    {
-      EnsureReturnType(Type.Integer);
-      return TypeTraits<TResult>.ToInt(Invoke(parameters));
-    }
-
-    internal override long ExecuteLong(List<Node> parameters)
-    {
-      EnsureReturnType(Type.Long);
-      return TypeTraits<TResult>.ToLong(Invoke(parameters));
-    }
-
-    internal override float ExecuteFloat(List<Node> parameters)
-    {
-      EnsureReturnType(Type.Float);
-      return TypeTraits<TResult>.ToFloat(Invoke(parameters));
-    }
-
-    internal override double ExecuteDouble(List<Node> parameters)
-    {
-      EnsureReturnType(Type.Double);
-      return TypeTraits<TResult>.ToDouble(Invoke(parameters));
-    }
-
-    internal override decimal ExecuteDecimal(List<Node> parameters)
-    {
-      EnsureReturnType(Type.Decimal);
-      return TypeTraits<TResult>.ToDecimal(Invoke(parameters));
-    }
-
-    internal override string ExecuteString(List<Node> parameters)
-    {
-      EnsureReturnType(Type.String);
-      return TypeTraits<TResult>.ToStringValue(Invoke(parameters));
-    }
-
-    internal override bool ExecuteBool(List<Node> parameters)
-    {
-      EnsureReturnType(Type.Boolean);
-      return TypeTraits<TResult>.ToBool(Invoke(parameters));
+      _resultConverter.Write(program, destination, _func(_converter1.Read(program, arguments[0])));
     }
   }
   // ==========================================================================
@@ -197,60 +115,22 @@ namespace EpsilonScript.Function
       TypeTraits<T2>.ValueType
     };
     private readonly Func<T1, T2, TResult> _func;
+    private readonly ValueConverter<T1> _converter1;
+    private readonly ValueConverter<T2> _converter2;
+    private readonly ValueConverter<TResult> _resultConverter;
 
     public CustomFunction(string name, Func<T1, T2, TResult> func, bool isDeterministic = false)
       : base(name, isDeterministic, ParameterCache, TypeTraits<TResult>.ValueType)
     {
       _func = func ?? throw new ArgumentNullException(nameof(func));
+      _converter1 = TypeTraits<T1>.Converter;
+      _converter2 = TypeTraits<T2>.Converter;
+      _resultConverter = TypeTraits<TResult>.Converter;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private TResult Invoke(List<Node> parameters)
+    internal override void Invoke(RegisterProgram program, int[] arguments, int destination)
     {
-      EnsureParameterCount(parameters);
-      return _func(TypeTraits<T1>.Read(parameters[0]), TypeTraits<T2>.Read(parameters[1]));
-    }
-
-    internal override int ExecuteInt(List<Node> parameters)
-    {
-      EnsureReturnType(Type.Integer);
-      return TypeTraits<TResult>.ToInt(Invoke(parameters));
-    }
-
-    internal override long ExecuteLong(List<Node> parameters)
-    {
-      EnsureReturnType(Type.Long);
-      return TypeTraits<TResult>.ToLong(Invoke(parameters));
-    }
-
-    internal override float ExecuteFloat(List<Node> parameters)
-    {
-      EnsureReturnType(Type.Float);
-      return TypeTraits<TResult>.ToFloat(Invoke(parameters));
-    }
-
-    internal override double ExecuteDouble(List<Node> parameters)
-    {
-      EnsureReturnType(Type.Double);
-      return TypeTraits<TResult>.ToDouble(Invoke(parameters));
-    }
-
-    internal override decimal ExecuteDecimal(List<Node> parameters)
-    {
-      EnsureReturnType(Type.Decimal);
-      return TypeTraits<TResult>.ToDecimal(Invoke(parameters));
-    }
-
-    internal override string ExecuteString(List<Node> parameters)
-    {
-      EnsureReturnType(Type.String);
-      return TypeTraits<TResult>.ToStringValue(Invoke(parameters));
-    }
-
-    internal override bool ExecuteBool(List<Node> parameters)
-    {
-      EnsureReturnType(Type.Boolean);
-      return TypeTraits<TResult>.ToBool(Invoke(parameters));
+      _resultConverter.Write(program, destination, _func(_converter1.Read(program, arguments[0]), _converter2.Read(program, arguments[1])));
     }
   }
   // ==========================================================================
@@ -269,60 +149,24 @@ namespace EpsilonScript.Function
       TypeTraits<T3>.ValueType
     };
     private readonly Func<T1, T2, T3, TResult> _func;
+    private readonly ValueConverter<T1> _converter1;
+    private readonly ValueConverter<T2> _converter2;
+    private readonly ValueConverter<T3> _converter3;
+    private readonly ValueConverter<TResult> _resultConverter;
 
     public CustomFunction(string name, Func<T1, T2, T3, TResult> func, bool isDeterministic = false)
       : base(name, isDeterministic, ParameterCache, TypeTraits<TResult>.ValueType)
     {
       _func = func ?? throw new ArgumentNullException(nameof(func));
+      _converter1 = TypeTraits<T1>.Converter;
+      _converter2 = TypeTraits<T2>.Converter;
+      _converter3 = TypeTraits<T3>.Converter;
+      _resultConverter = TypeTraits<TResult>.Converter;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private TResult Invoke(List<Node> parameters)
+    internal override void Invoke(RegisterProgram program, int[] arguments, int destination)
     {
-      EnsureParameterCount(parameters);
-      return _func(TypeTraits<T1>.Read(parameters[0]), TypeTraits<T2>.Read(parameters[1]), TypeTraits<T3>.Read(parameters[2]));
-    }
-
-    internal override int ExecuteInt(List<Node> parameters)
-    {
-      EnsureReturnType(Type.Integer);
-      return TypeTraits<TResult>.ToInt(Invoke(parameters));
-    }
-
-    internal override long ExecuteLong(List<Node> parameters)
-    {
-      EnsureReturnType(Type.Long);
-      return TypeTraits<TResult>.ToLong(Invoke(parameters));
-    }
-
-    internal override float ExecuteFloat(List<Node> parameters)
-    {
-      EnsureReturnType(Type.Float);
-      return TypeTraits<TResult>.ToFloat(Invoke(parameters));
-    }
-
-    internal override double ExecuteDouble(List<Node> parameters)
-    {
-      EnsureReturnType(Type.Double);
-      return TypeTraits<TResult>.ToDouble(Invoke(parameters));
-    }
-
-    internal override decimal ExecuteDecimal(List<Node> parameters)
-    {
-      EnsureReturnType(Type.Decimal);
-      return TypeTraits<TResult>.ToDecimal(Invoke(parameters));
-    }
-
-    internal override string ExecuteString(List<Node> parameters)
-    {
-      EnsureReturnType(Type.String);
-      return TypeTraits<TResult>.ToStringValue(Invoke(parameters));
-    }
-
-    internal override bool ExecuteBool(List<Node> parameters)
-    {
-      EnsureReturnType(Type.Boolean);
-      return TypeTraits<TResult>.ToBool(Invoke(parameters));
+      _resultConverter.Write(program, destination, _func(_converter1.Read(program, arguments[0]), _converter2.Read(program, arguments[1]), _converter3.Read(program, arguments[2])));
     }
   }
   // ==========================================================================
@@ -342,60 +186,26 @@ namespace EpsilonScript.Function
       TypeTraits<T4>.ValueType
     };
     private readonly Func<T1, T2, T3, T4, TResult> _func;
+    private readonly ValueConverter<T1> _converter1;
+    private readonly ValueConverter<T2> _converter2;
+    private readonly ValueConverter<T3> _converter3;
+    private readonly ValueConverter<T4> _converter4;
+    private readonly ValueConverter<TResult> _resultConverter;
 
     public CustomFunction(string name, Func<T1, T2, T3, T4, TResult> func, bool isDeterministic = false)
       : base(name, isDeterministic, ParameterCache, TypeTraits<TResult>.ValueType)
     {
       _func = func ?? throw new ArgumentNullException(nameof(func));
+      _converter1 = TypeTraits<T1>.Converter;
+      _converter2 = TypeTraits<T2>.Converter;
+      _converter3 = TypeTraits<T3>.Converter;
+      _converter4 = TypeTraits<T4>.Converter;
+      _resultConverter = TypeTraits<TResult>.Converter;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private TResult Invoke(List<Node> parameters)
+    internal override void Invoke(RegisterProgram program, int[] arguments, int destination)
     {
-      EnsureParameterCount(parameters);
-      return _func(TypeTraits<T1>.Read(parameters[0]), TypeTraits<T2>.Read(parameters[1]), TypeTraits<T3>.Read(parameters[2]), TypeTraits<T4>.Read(parameters[3]));
-    }
-
-    internal override int ExecuteInt(List<Node> parameters)
-    {
-      EnsureReturnType(Type.Integer);
-      return TypeTraits<TResult>.ToInt(Invoke(parameters));
-    }
-
-    internal override long ExecuteLong(List<Node> parameters)
-    {
-      EnsureReturnType(Type.Long);
-      return TypeTraits<TResult>.ToLong(Invoke(parameters));
-    }
-
-    internal override float ExecuteFloat(List<Node> parameters)
-    {
-      EnsureReturnType(Type.Float);
-      return TypeTraits<TResult>.ToFloat(Invoke(parameters));
-    }
-
-    internal override double ExecuteDouble(List<Node> parameters)
-    {
-      EnsureReturnType(Type.Double);
-      return TypeTraits<TResult>.ToDouble(Invoke(parameters));
-    }
-
-    internal override decimal ExecuteDecimal(List<Node> parameters)
-    {
-      EnsureReturnType(Type.Decimal);
-      return TypeTraits<TResult>.ToDecimal(Invoke(parameters));
-    }
-
-    internal override string ExecuteString(List<Node> parameters)
-    {
-      EnsureReturnType(Type.String);
-      return TypeTraits<TResult>.ToStringValue(Invoke(parameters));
-    }
-
-    internal override bool ExecuteBool(List<Node> parameters)
-    {
-      EnsureReturnType(Type.Boolean);
-      return TypeTraits<TResult>.ToBool(Invoke(parameters));
+      _resultConverter.Write(program, destination, _func(_converter1.Read(program, arguments[0]), _converter2.Read(program, arguments[1]), _converter3.Read(program, arguments[2]), _converter4.Read(program, arguments[3])));
     }
   }
   // ==========================================================================
@@ -416,60 +226,28 @@ namespace EpsilonScript.Function
       TypeTraits<T5>.ValueType
     };
     private readonly Func<T1, T2, T3, T4, T5, TResult> _func;
+    private readonly ValueConverter<T1> _converter1;
+    private readonly ValueConverter<T2> _converter2;
+    private readonly ValueConverter<T3> _converter3;
+    private readonly ValueConverter<T4> _converter4;
+    private readonly ValueConverter<T5> _converter5;
+    private readonly ValueConverter<TResult> _resultConverter;
 
     public CustomFunction(string name, Func<T1, T2, T3, T4, T5, TResult> func, bool isDeterministic = false)
       : base(name, isDeterministic, ParameterCache, TypeTraits<TResult>.ValueType)
     {
       _func = func ?? throw new ArgumentNullException(nameof(func));
+      _converter1 = TypeTraits<T1>.Converter;
+      _converter2 = TypeTraits<T2>.Converter;
+      _converter3 = TypeTraits<T3>.Converter;
+      _converter4 = TypeTraits<T4>.Converter;
+      _converter5 = TypeTraits<T5>.Converter;
+      _resultConverter = TypeTraits<TResult>.Converter;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private TResult Invoke(List<Node> parameters)
+    internal override void Invoke(RegisterProgram program, int[] arguments, int destination)
     {
-      EnsureParameterCount(parameters);
-      return _func(TypeTraits<T1>.Read(parameters[0]), TypeTraits<T2>.Read(parameters[1]), TypeTraits<T3>.Read(parameters[2]), TypeTraits<T4>.Read(parameters[3]), TypeTraits<T5>.Read(parameters[4]));
-    }
-
-    internal override int ExecuteInt(List<Node> parameters)
-    {
-      EnsureReturnType(Type.Integer);
-      return TypeTraits<TResult>.ToInt(Invoke(parameters));
-    }
-
-    internal override long ExecuteLong(List<Node> parameters)
-    {
-      EnsureReturnType(Type.Long);
-      return TypeTraits<TResult>.ToLong(Invoke(parameters));
-    }
-
-    internal override float ExecuteFloat(List<Node> parameters)
-    {
-      EnsureReturnType(Type.Float);
-      return TypeTraits<TResult>.ToFloat(Invoke(parameters));
-    }
-
-    internal override double ExecuteDouble(List<Node> parameters)
-    {
-      EnsureReturnType(Type.Double);
-      return TypeTraits<TResult>.ToDouble(Invoke(parameters));
-    }
-
-    internal override decimal ExecuteDecimal(List<Node> parameters)
-    {
-      EnsureReturnType(Type.Decimal);
-      return TypeTraits<TResult>.ToDecimal(Invoke(parameters));
-    }
-
-    internal override string ExecuteString(List<Node> parameters)
-    {
-      EnsureReturnType(Type.String);
-      return TypeTraits<TResult>.ToStringValue(Invoke(parameters));
-    }
-
-    internal override bool ExecuteBool(List<Node> parameters)
-    {
-      EnsureReturnType(Type.Boolean);
-      return TypeTraits<TResult>.ToBool(Invoke(parameters));
+      _resultConverter.Write(program, destination, _func(_converter1.Read(program, arguments[0]), _converter2.Read(program, arguments[1]), _converter3.Read(program, arguments[2]), _converter4.Read(program, arguments[3]), _converter5.Read(program, arguments[4])));
     }
   }
 }

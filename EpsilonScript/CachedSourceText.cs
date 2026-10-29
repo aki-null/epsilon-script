@@ -1,4 +1,5 @@
 using System;
+using EpsilonScript.Helper;
 
 namespace EpsilonScript
 {
@@ -14,7 +15,7 @@ namespace EpsilonScript
     public ReadOnlyMemory<char> Source { get; }
     public int Hash { get; }
 
-    public CachedSourceText(string source, int hash)
+    internal CachedSourceText(string source, int hash)
     {
       if (source == null)
       {
@@ -32,26 +33,7 @@ namespace EpsilonScript
         throw new ArgumentNullException(nameof(source));
       }
 
-      return new CachedSourceText(source, ComputeHash(source.AsSpan()));
-    }
-
-    private static int ComputeHash(ReadOnlySpan<char> source)
-    {
-      // FNV-1a 32-bit over UTF-16 chars (fast, deterministic, no extra deps).
-      unchecked
-      {
-        const int offset = unchecked((int)2166136261);
-        const int prime = 16777619;
-
-        var hash = offset ^ source.Length;
-        for (var i = 0; i < source.Length; i++)
-        {
-          hash ^= source[i];
-          hash *= prime;
-        }
-
-        return hash;
-      }
+      return new CachedSourceText(source, SpanText.Hash(source.AsSpan()));
     }
   }
 }

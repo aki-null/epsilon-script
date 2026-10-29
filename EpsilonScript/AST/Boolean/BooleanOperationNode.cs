@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using EpsilonScript.AST.Literal;
 using EpsilonScript.Intermediate;
 
 namespace EpsilonScript.AST.Boolean
@@ -17,6 +18,13 @@ namespace EpsilonScript.AST.Boolean
 
     public override bool IsPrecomputable => LeftNode.IsPrecomputable && RightNode.IsPrecomputable;
 
+    internal override void Reset()
+    {
+      base.Reset();
+      LeftNode = null;
+      RightNode = null;
+    }
+
     protected override void BuildCore(Stack<Node> rpnStack, Element element, CompilerContext context,
       Compiler.Options options, IVariableContainer variables)
     {
@@ -29,13 +37,14 @@ namespace EpsilonScript.AST.Boolean
     }
 
     /// <summary>
-    /// Helper to ensure constant boolean node is executed.
+    /// Helper to ensure constant boolean node is executed. A literal already holds its value; executing one would
+    /// lower and run it on the VM.
     /// </summary>
     protected void EnsureExecuted(Node node)
     {
-      if (node.IsPrecomputable && node.ValueType == ExtendedType.Boolean)
+      if (node.IsPrecomputable && node.ValueType == ExtendedType.Boolean && !(node is BooleanNode))
       {
-        node.Execute(null);
+        node.ExecuteInPlace();
       }
     }
 
@@ -43,12 +52,6 @@ namespace EpsilonScript.AST.Boolean
     {
       LeftNode?.Validate();
       RightNode?.Validate();
-    }
-
-    public override void ConfigureNoAlloc()
-    {
-      LeftNode?.ConfigureNoAlloc();
-      RightNode?.ConfigureNoAlloc();
     }
   }
 }

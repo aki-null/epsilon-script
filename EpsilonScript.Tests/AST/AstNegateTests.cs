@@ -207,7 +207,7 @@ namespace EpsilonScript.Tests.AST
     }
 
     // Helper class for testing non-constant nodes
-    private class TestVariableNode : Node
+    private class TestVariableNode : FakeNode
     {
       public override bool IsPrecomputable => false; // Not constant
 
@@ -222,11 +222,6 @@ namespace EpsilonScript.Tests.AST
         Compiler.Options options, IVariableContainer variables)
       {
         throw new NotImplementedException("Test node should not be built from RPN");
-      }
-
-      public override void Execute(IVariableContainer variablesOverride)
-      {
-        // No-op for testing
       }
     }
   }

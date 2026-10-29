@@ -5,7 +5,7 @@ using EpsilonScript.Intermediate;
 
 namespace EpsilonScript.Tests.TestInfrastructure.Fakes
 {
-  internal class FakeBooleanNode : Node
+  internal class FakeBooleanNode : FakeNode
   {
     public FakeBooleanNode(bool value)
     {

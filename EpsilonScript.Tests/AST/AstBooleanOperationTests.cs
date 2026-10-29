@@ -184,7 +184,7 @@ namespace EpsilonScript.Tests.AST
     }
 
     // Helper class to track whether a node was executed (for testing short-circuit behavior)
-    private class TrackingBooleanNode : Node
+    private class TrackingBooleanNode : ScriptedFakeNode
     {
       private readonly bool _value;
       public bool WasExecuted { get; private set; }
@@ -203,7 +203,7 @@ namespace EpsilonScript.Tests.AST
         throw new NotImplementedException("Fake nodes cannot be built from RPN stack");
       }
 
-      public override void Execute(IVariableContainer variablesOverride)
+      protected override void OnExecute()
       {
         WasExecuted = true;
       }

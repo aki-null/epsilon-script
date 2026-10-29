@@ -224,8 +224,7 @@ namespace EpsilonScript.Tests.AST
         Compiler.Options.None, null);
       node.Execute(null);
 
-      Assert.NotNull(node.TupleValue);
-      Assert.Equal(2, node.TupleValue.Count);
+      Assert.Equal(ExtendedType.Tuple, node.ValueType);
     }
 
     [Fact]
@@ -313,7 +312,7 @@ namespace EpsilonScript.Tests.AST
     }
 
     // Helper classes for testing
-    private class TrackingIntegerNode : Node
+    private class TrackingIntegerNode : ScriptedFakeNode
     {
       public bool WasExecuted { get; private set; }
       private readonly int _value;
@@ -330,13 +329,13 @@ namespace EpsilonScript.Tests.AST
         throw new NotImplementedException("Test node should not be built from RPN");
       }
 
-      public override void Execute(IVariableContainer variablesOverride)
+      protected override void OnExecute()
       {
         WasExecuted = true;
       }
     }
 
-    private class TestVariableNode : Node
+    private class TestVariableNode : FakeNode
     {
       public override bool IsPrecomputable => false; // Not constant
 
@@ -351,11 +350,6 @@ namespace EpsilonScript.Tests.AST
         Compiler.Options options, IVariableContainer variables)
       {
         throw new NotImplementedException("Test node should not be built from RPN");
-      }
-
-      public override void Execute(IVariableContainer variablesOverride)
-      {
-        // No-op for testing
       }
     }
   }

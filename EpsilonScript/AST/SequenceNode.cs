@@ -1,16 +1,27 @@
 using System.Collections.Generic;
 using EpsilonScript.Intermediate;
+using EpsilonScript.VirtualMachine;
 
 namespace EpsilonScript.AST
 {
   internal sealed class SequenceNode : Node
   {
-    private Node _leftNode;
+    internal override int Lower(RegisterCompiler compiler) => compiler.LowerSequence(_leftNode, _rightNode);
+
+    private Node _leftNode; // Null when the sequence has a single element
     private Node _rightNode;
     private bool _isSingleNode;
 
     public override bool IsPrecomputable =>
       _isSingleNode ? _rightNode.IsPrecomputable : (_leftNode.IsPrecomputable && _rightNode.IsPrecomputable);
+
+    internal override void Reset()
+    {
+      base.Reset();
+      _leftNode = null;
+      _rightNode = null;
+      _isSingleNode = false;
+    }
 
     protected override void BuildCore(Stack<Node> rpnStack, Element element, CompilerContext context,
       Compiler.Options options, IVariableContainer variables)
@@ -25,51 +36,6 @@ namespace EpsilonScript.AST
       {
         _isSingleNode = true;
         _leftNode = null;
-      }
-    }
-
-    public override void Execute(IVariableContainer variablesOverride)
-    {
-      if (!_isSingleNode)
-      {
-        _leftNode.Execute(variablesOverride);
-      }
-
-      _rightNode.Execute(variablesOverride);
-
-      switch (_rightNode.ValueType)
-      {
-        case ExtendedType.Integer:
-          IntegerValue = _rightNode.IntegerValue;
-          break;
-        case ExtendedType.Long:
-          LongValue = _rightNode.LongValue;
-          break;
-        case ExtendedType.Float:
-          FloatValue = _rightNode.FloatValue;
-          break;
-        case ExtendedType.Double:
-          DoubleValue = _rightNode.DoubleValue;
-          break;
-        case ExtendedType.Decimal:
-          DecimalValue = _rightNode.DecimalValue;
-          break;
-        case ExtendedType.Boolean:
-          BooleanValue = _rightNode.BooleanValue;
-          break;
-        case ExtendedType.String:
-          StringValue = _rightNode.StringValue;
-          break;
-        case ExtendedType.Tuple:
-          TupleValue = _rightNode.TupleValue;
-          ValueType = ExtendedType.Tuple;
-          break;
-        case ExtendedType.Null:
-          ValueType = ExtendedType.Null;
-          break;
-        default:
-          ValueType = _rightNode.ValueType;
-          break;
       }
     }
 
@@ -95,12 +61,6 @@ namespace EpsilonScript.AST
     {
       _leftNode?.Validate();
       _rightNode?.Validate();
-    }
-
-    public override void ConfigureNoAlloc()
-    {
-      _leftNode?.ConfigureNoAlloc();
-      _rightNode?.ConfigureNoAlloc();
     }
   }
 }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
@@ -16,6 +17,42 @@ namespace EpsilonScript.Helper
     private static readonly ConcurrentDictionary<string, uint> StringIdCache = new ConcurrentDictionary<string, uint>();
     private static readonly ConcurrentDictionary<uint, string> IdStringCache = new ConcurrentDictionary<uint, string>();
     private static int _currentId = 0;
+
+    // Per-thread memo of identifier text to id, so compiling an already-known identifier from a token span neither
+    // allocates a string nor takes the ConcurrentDictionary path. Invalidated by ResetUniqueIdentifierCache.
+    private const int SpanCacheSize = 256;
+    [ThreadStatic] private static SpanCacheEntry[] _spanCache;
+    [ThreadStatic] private static int _spanCacheGeneration;
+    private static int _generation;
+
+    private struct SpanCacheEntry
+    {
+      public string Text;
+      public uint Id;
+    }
+
+    internal static uint GetUniqueIdentifier(ReadOnlySpan<char> s)
+    {
+      var generation = Volatile.Read(ref _generation);
+      var cache = _spanCache;
+      if (cache == null || _spanCacheGeneration != generation)
+      {
+        cache = _spanCache = new SpanCacheEntry[SpanCacheSize];
+        _spanCacheGeneration = generation;
+      }
+
+      ref var entry = ref cache[SpanText.Hash(s) & (SpanCacheSize - 1)];
+      if (entry.Text != null && SpanText.AreEqual(s, entry.Text.AsSpan()))
+      {
+        return entry.Id;
+      }
+
+      var text = new string(s);
+      var id = text.GetUniqueIdentifier();
+      entry.Text = text;
+      entry.Id = id;
+      return id;
+    }
 
     public static uint GetUniqueIdentifier(this string s)
     {
@@ -46,6 +83,7 @@ namespace EpsilonScript.Helper
       StringIdCache.Clear();
       IdStringCache.Clear();
       _currentId = 0;
+      Interlocked.Increment(ref _generation);
     }
   }
 }

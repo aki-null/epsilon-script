@@ -173,7 +173,9 @@ namespace EpsilonScript.Lexer
 
       // Get raw token text from cursor
       var rawToken = _cursor.GetTokenText(_buffer);
-      var tokenSpan = rawToken.Span;
+      // The cursor's span covers the same range; ReadOnlyMemory<char>.Span does a runtime type check that costs a
+      // locked metadata lookup under IL2CPP.
+      var tokenSpan = _cursor.GetTokenSpan();
 
       // Trim leading whitespace
       var startIdx = 0;

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using EpsilonScript.AST;
 using EpsilonScript.Function;
 using EpsilonScript.Parser;
+using EpsilonScript.VirtualMachine;
 
 namespace EpsilonScript
 {
@@ -52,6 +53,8 @@ namespace EpsilonScript
     private readonly TokenParser _tokenParser;
     private readonly RpnConverter _rpnConverter;
     private readonly AstBuilder _astBuilder;
+    private readonly CompilerContext _context;
+    private readonly RegisterCompiler _registerCompiler = new RegisterCompiler();
 
     private readonly Dictionary<VariableId, CustomFunctionOverload> _functions =
       new Dictionary<VariableId, CustomFunctionOverload>();
@@ -73,6 +76,7 @@ namespace EpsilonScript
 
       var context =
         new CompilerContext(integerPrecision, floatPrecision, _functions);
+      _context = context;
       _astBuilder = new AstBuilder(context);
       _rpnConverter = new RpnConverter(_astBuilder);
       _tokenParser = new TokenParser(_rpnConverter);
@@ -225,6 +229,42 @@ namespace EpsilonScript
     public CompiledScript Compile(ReadOnlyMemory<char> source, Options options = Options.None,
       IVariableContainer variables = null)
     {
+      var mark = _astBuilder.Pool.Mark;
+      try
+      {
+        var rootNode = BuildTree(source, options, variables);
+
+        // Precomputable status is cached, because this information is gathered from each AST node O(n).
+        var isPrecomputable = rootNode.IsPrecomputable;
+        var program = _registerCompiler.Compile(rootNode, _context, (options & Options.NoAlloc) == Options.NoAlloc);
+        return new CompiledScript(program, isPrecomputable, DefaultIntegerType, DefaultFloatType);
+      }
+      finally
+      {
+        // The program does not refer to the tree, so its nodes are reused by the next compilation
+        _astBuilder.Pool.ReturnAll(mark);
+      }
+    }
+
+    /// <summary>
+    /// Parses, optimizes and validates a script into the AST that Compile lowers. The caller owns the nodes.
+    /// </summary>
+    internal Node CompileTree(ReadOnlyMemory<char> source, Options options = Options.None,
+      IVariableContainer variables = null)
+    {
+      var mark = _astBuilder.Pool.Mark;
+      try
+      {
+        return BuildTree(source, options, variables);
+      }
+      finally
+      {
+        _astBuilder.Pool.Abandon(mark);
+      }
+    }
+
+    private Node BuildTree(ReadOnlyMemory<char> source, Options options, IVariableContainer variables)
+    {
       _astBuilder.Reset();
       _rpnConverter.Reset();
       _tokenParser.Reset();
@@ -238,20 +278,21 @@ namespace EpsilonScript
       // Validate AST after optimization (when types are resolved for constant expressions)
       rootNode.Validate();
 
-      // Configure NoAlloc validation after optimization completes
-      if ((options & Options.NoAlloc) == Options.NoAlloc)
-      {
-        rootNode.ConfigureNoAlloc();
-      }
-
       _astBuilder.Reset();
       _rpnConverter.Reset();
-
-      return new CompiledScript(rootNode, DefaultIntegerType, DefaultFloatType);
+      return rootNode;
     }
+
+    /// <summary>
+    /// Incremented by every function registration. Constant folding resolves overloads at compile time, so a
+    /// CachingCompiler drops its scripts when this changes.
+    /// </summary>
+    internal int FunctionsVersion { get; private set; }
 
     public void AddCustomFunction(CustomFunction func)
     {
+      // Before the registration, which may throw after changing the overload set
+      ++FunctionsVersion;
       if (_functions.TryGetValue(func.Name, out var overload))
       {
         overload.Add(func);

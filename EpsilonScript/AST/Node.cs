@@ -1,16 +1,16 @@
-using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using EpsilonScript.AST.Literal;
+using System;
+using EpsilonScript.AST.Assignment;
 using EpsilonScript.Intermediate;
+using EpsilonScript.VirtualMachine;
 
 namespace EpsilonScript.AST
 {
   internal abstract class Node
   {
     /// Value storage using union approach for memory efficiency
-    /// - Union stores long/double (8 bytes, overlapping)
-    /// - Decimal stored separately (16 bytes, cannot overlap safely)
+    /// - Union stores long/double/decimal (16 bytes, overlapping; none hold references)
     /// - Type field indicates which value is semantically valid
     /// - Conversions happen on-demand during read operations
     [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Explicit)]
@@ -21,15 +21,24 @@ namespace EpsilonScript.AST
 
       [System.Runtime.InteropServices.FieldOffset(0)]
       public double FloatValue;
+
+      [System.Runtime.InteropServices.FieldOffset(0)]
+      public decimal DecimalValue;
     }
 
     private ExtendedType _type;
     private ValueUnion _value;
-    private decimal _decimalValue;
     private string _stringValue;
 
     // Location context for runtime error reporting
     internal SourceLocation Location = SourceLocation.Unknown;
+
+    // Set by Build; nodes created during optimization inherit it. Null for nodes constructed directly.
+    internal CompilerContext Context;
+
+    // The pool that created this node; null for nodes constructed directly
+    internal NodePool Pool;
+    internal NodeKind PoolKind;
 
     /// <summary>
     /// Creates a RuntimeException with this node's location context.
@@ -55,7 +64,7 @@ namespace EpsilonScript.AST
           case ExtendedType.Double:
             return _value.FloatValue.ToString(System.Globalization.CultureInfo.InvariantCulture);
           case ExtendedType.Decimal:
-            return _decimalValue.ToString(System.Globalization.CultureInfo.InvariantCulture);
+            return _value.DecimalValue.ToString(System.Globalization.CultureInfo.InvariantCulture);
           case ExtendedType.Boolean:
             return (_value.IntValue != 0).ToString();
           case ExtendedType.Null:
@@ -72,9 +81,8 @@ namespace EpsilonScript.AST
       }
     }
 
-    public List<Node> TupleValue { get; protected set; }
-
-    public VariableValue Variable { get; protected set; }
+    // Only tuple nodes carry this; virtual keeps the field out of every other node.
+    public virtual List<Node> TupleValue => null;
 
     internal ExtendedType ValueType
     {
@@ -102,7 +110,7 @@ namespace EpsilonScript.AST
               return 0;
             return (int)floatVal;
           case ExtendedType.Decimal:
-            return (int)_decimalValue;
+            return (int)_value.DecimalValue;
           case ExtendedType.Boolean:
             return _value.IntValue != 0 ? 1 : 0;
           case ExtendedType.String:
@@ -139,7 +147,7 @@ namespace EpsilonScript.AST
               return 0;
             return (long)floatVal;
           case ExtendedType.Decimal:
-            return (long)_decimalValue;
+            return (long)_value.DecimalValue;
           case ExtendedType.Boolean:
             return _value.IntValue;
           case ExtendedType.String:
@@ -173,7 +181,7 @@ namespace EpsilonScript.AST
           case ExtendedType.Double:
             return (float)_value.FloatValue;
           case ExtendedType.Decimal:
-            return (float)_decimalValue;
+            return (float)_value.DecimalValue;
           case ExtendedType.Boolean:
             return _value.IntValue != 0 ? 1.0f : 0.0f;
           case ExtendedType.String:
@@ -207,7 +215,7 @@ namespace EpsilonScript.AST
           case ExtendedType.Double:
             return _value.FloatValue;
           case ExtendedType.Decimal:
-            return (double)_decimalValue;
+            return (double)_value.DecimalValue;
           case ExtendedType.Boolean:
             return _value.IntValue != 0 ? 1.0 : 0.0;
           case ExtendedType.String:
@@ -241,7 +249,7 @@ namespace EpsilonScript.AST
           case ExtendedType.Double:
             return (decimal)_value.FloatValue;
           case ExtendedType.Decimal:
-            return _decimalValue;
+            return _value.DecimalValue;
           case ExtendedType.Boolean:
             return _value.IntValue != 0 ? 1m : 0m;
           case ExtendedType.String:
@@ -257,7 +265,7 @@ namespace EpsilonScript.AST
       protected set
       {
         _type = ExtendedType.Decimal;
-        _decimalValue = value;
+        _value.DecimalValue = value;
       }
     }
 
@@ -277,7 +285,7 @@ namespace EpsilonScript.AST
             var val = _value.FloatValue;
             return val != 0.0 && !double.IsNaN(val);
           case ExtendedType.Decimal:
-            return _decimalValue != 0m;
+            return _value.DecimalValue != 0m;
           case ExtendedType.String:
           case ExtendedType.Null:
           case ExtendedType.Undefined:
@@ -303,6 +311,7 @@ namespace EpsilonScript.AST
       Compiler.Options options, IVariableContainer variables)
     {
       Location = element.Token.Location;
+      Context = context;
       BuildCore(rpnStack, element, context, options, variables);
     }
 
@@ -313,9 +322,65 @@ namespace EpsilonScript.AST
     protected abstract void BuildCore(Stack<Node> rpnStack, Element element, CompilerContext context,
       Compiler.Options options, IVariableContainer variables);
 
-    public virtual void Execute(IVariableContainer variablesOverride)
+    /// <summary>
+    /// Evaluates this subtree on the register VM, the only implementation of the language semantics, and keeps
+    /// the result as this node's value. Constant folding and tests use it; compiled scripts run their own program.
+    /// </summary>
+    internal void Execute(IVariableContainer variablesOverride) => Evaluate(variablesOverride, false);
+
+    /// <summary>
+    /// Execute for a subtree that stays in the tree: every executed descendant also keeps its value, as the tree
+    /// interpreter left one in each node it ran, and the subtree's later Optimize calls read them. A folded subtree
+    /// is replaced by its value node, so plain Execute skips that work.
+    /// </summary>
+    internal void ExecuteInPlace() => Evaluate(null, true);
+
+    private void Evaluate(IVariableContainer variablesOverride, bool inPlace)
     {
+      // Only nodes constructed directly, rather than built from source, have no context
+      var context = Context ?? new CompilerContext(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float,
+        null);
+      context.Evaluate(this, variablesOverride, inPlace);
     }
+
+    /// <summary>
+    /// Keeps the value this node computed in an evaluated program as its value.
+    /// </summary>
+    internal void SetResult(RegisterProgram program, int register)
+    {
+      _type = program.ReadType(register);
+      switch (_type)
+      {
+        case ExtendedType.String:
+          _stringValue = program.ReadString(register);
+          break;
+        case ExtendedType.Decimal:
+          _value.DecimalValue = program.ReadDecimal(register);
+          break;
+        default:
+          _value.IntValue = program.ReadRawBits(register);
+          break;
+      }
+    }
+
+    // Raw access for seeding VM registers; the integer and binary float members of the union share the same 8 bytes
+    internal long RawBits => _value.IntValue;
+
+    /// <summary>
+    /// Emits this node into a register program and returns its result register.
+    /// </summary>
+    internal virtual int Lower(RegisterCompiler compiler) =>
+      throw new InvalidOperationException($"{GetType().Name} cannot be lowered");
+
+    /// <summary>
+    /// Emits an assignment of value to this node. Only variables can be assigned; the VM reports the error for
+    /// anything else when the assignment runs.
+    /// </summary>
+    internal virtual int LowerAssignmentTarget(RegisterCompiler compiler, AssignmentOperationNode assignment,
+      Node value) => compiler.LowerAssignNonVariable(assignment, this, value);
+
+    // Multiply-add forms report multiply errors at the multiply operator
+    internal virtual SourceLocation MultiplyLocation => Location;
 
     // IMPORTANT: When overriding Optimize(), always follow these rules:
     // 1. Call child.Optimize() before returning or using children
@@ -341,27 +406,71 @@ namespace EpsilonScript.AST
     }
 
     /// <summary>
-    /// Configures NoAlloc validation on this node and all child nodes recursively.
-    /// Called after optimization phase completes to enable runtime allocation checking.
+    /// Restores the state of a newly constructed node so the pool can build it again.
+    /// Overrides clear their own fields and call the base implementation.
     /// </summary>
-    public virtual void ConfigureNoAlloc()
+    internal virtual void Reset()
     {
-      // Base implementation does nothing - leaf nodes don't need validation
+      _type = ExtendedType.Undefined;
+      _value = default;
+      _stringValue = null;
+      Location = SourceLocation.Unknown;
+      Context = null;
+    }
+
+    /// <summary>
+    /// Creates a node during optimization, from this node's pool when it has one.
+    /// </summary>
+    protected Node RentNode(NodeKind kind)
+    {
+      var node = Pool != null ? Pool.Rent(kind) : NodePool.Create(kind);
+      node.Context = Context;
+      return node;
+    }
+
+    protected Node CreateBooleanNode(bool value)
+    {
+      var node = RentNode(NodeKind.Boolean);
+      node.BooleanValue = value;
+      return node;
     }
 
     protected Node CreateValueNode()
     {
-      Node node = ValueType switch
+      Node node;
+      switch (ValueType)
       {
-        ExtendedType.Integer => new IntegerNode(IntegerValue),
-        ExtendedType.Long => new IntegerNode(LongValue),
-        ExtendedType.Float => new FloatNode(FloatValue),
-        ExtendedType.Double => new FloatNode(DoubleValue),
-        ExtendedType.Decimal => new FloatNode(DecimalValue),
-        ExtendedType.Boolean => new BooleanNode(BooleanValue),
-        ExtendedType.String => new StringNode(StringValue),
-        _ => throw new ArgumentOutOfRangeException(nameof(ValueType), ValueType, "Unsupported value type")
-      };
+        case ExtendedType.Integer:
+          node = RentNode(NodeKind.Integer);
+          node.IntegerValue = IntegerValue;
+          break;
+        case ExtendedType.Long:
+          node = RentNode(NodeKind.Integer);
+          node.LongValue = LongValue;
+          break;
+        case ExtendedType.Float:
+          node = RentNode(NodeKind.Float);
+          node.FloatValue = FloatValue;
+          break;
+        case ExtendedType.Double:
+          node = RentNode(NodeKind.Float);
+          node.DoubleValue = DoubleValue;
+          break;
+        case ExtendedType.Decimal:
+          node = RentNode(NodeKind.Float);
+          node.DecimalValue = DecimalValue;
+          break;
+        case ExtendedType.Boolean:
+          node = RentNode(NodeKind.Boolean);
+          node.BooleanValue = BooleanValue;
+          break;
+        case ExtendedType.String:
+          node = RentNode(NodeKind.String);
+          node.StringValue = StringValue;
+          break;
+        default:
+          throw new ArgumentOutOfRangeException(nameof(ValueType), ValueType, "Unsupported value type");
+      }
 
       // Preserve location information from the original node
       node.Location = Location;

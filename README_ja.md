@@ -674,28 +674,49 @@ Parallel.For(0, 100, i =>
 
 ## キャッシュ付きコンパイラ
 
-`CachingCompiler` は `Compiler` をラップし、ソース文字列・コンパイラオプション・変数コンテナごとにコンパイル結果をキャッシュします。同じスクリプトを繰り返しコンパイルする場合にのみ利用してください。
+`CachingCompiler` はスクリプトを一度だけコンパイルし、ソース文字列・コンパイラオプション・コンパイル時の変数コンテナが同じ要求には同じコンパイル済みスクリプトを返します。データから読み込んだスクリプトなど、同じスクリプトを繰り返し要求する場合に利用してください。それ以外は `Compiler` を直接使ってください。
 
 ```csharp
 var caching = new CachingCompiler();
-var script1 = caching.Compile("damage * 2", Compiler.Options.Immutable);
-var script2 = caching.Compile("damage * 2", Compiler.Options.Immutable);
+var script1 = caching.GetOrCompile("damage * 2", Compiler.Options.Immutable);
+var script2 = caching.GetOrCompile("damage * 2", Compiler.Options.Immutable);
 
 Console.WriteLine(ReferenceEquals(script1, script2)); // True
 ```
 
-ハッシュを使い回す場合:
+同じキーの呼び出し元はすべて、結果を含めて 1 つの `CompiledScript` を共有します。ある参照から実行すると、他の参照から読める結果も変わります:
+
+```csharp
+var a = caching.GetOrCompile("x * 2", Compiler.Options.Immutable);
+var b = caching.GetOrCompile("x * 2", Compiler.Options.Immutable); // a と同じインスタンス
+a.Execute(first);
+b.Execute(second);
+// a.FloatValue は second に対する結果になっている
+```
+
+結果は各 `Execute` の直後に読み取り、共有されたスクリプトを並行実行しないでください。
+
+既存のコンパイラをラップすることもできます。そのコンパイラに直接追加した関数も検知され、それ以前にコンパイルしたスクリプトは破棄されます:
+
+```csharp
+var compiler = new Compiler();
+var caching = new CachingCompiler(compiler);
+compiler.AddCustomFunction(CustomFunction.Create("double", (float v) => v * 2, isDeterministic: true));
+```
+
+以前と同じ文字列インスタンスで検索した場合、ソースのハッシュ計算は省かれます。呼び出しごとに新しく作られるソースは、一度だけ事前にハッシュしてください:
 ```csharp
 var caching = new CachingCompiler();
 var source = CachedSourceText.From("damage * 2");
 
-var script1 = caching.Compile(source, Compiler.Options.Immutable);
-var script2 = caching.Compile(source, Compiler.Options.Immutable);
+var script1 = caching.GetOrCompile(source, Compiler.Options.Immutable);
+var script2 = caching.GetOrCompile(source, Compiler.Options.Immutable);
 ```
 
 メモ:
-- キャッシュキーは変数コンテナを参照で比較するため、異なるコンテナでは共有されません。
-- カスタム関数を追加するとキャッシュをクリアします（定数畳み込みでオーバーロードがコンパイル時に選択されるため）。
+- キャッシュキーはコンパイル時の変数コンテナを参照で比較するため、異なるコンテナでは共有されず、キャッシュがそのコンテナを保持し続けます。共有のコンテナ 1 つで（またはコンテナなしで）コンパイルし、エンティティごとのコンテナは `Execute` に渡してください。
+- カスタム関数を追加するとキャッシュ済みスクリプトを破棄します（定数畳み込みでオーバーロードがコンパイル時に選択されるため）。
+- キャッシュは異なるキーごとに増え、自動では破棄しません。スクリプト数が分かっている場合は、辞書のリサイズ割り当てを避けるため `new CachingCompiler(capacity)` を使い、キャッシュメモリの確認と制御には `Count`、`Clear()`、`TrimExcess()` を使ってください。
 
 ## 設計思想
 

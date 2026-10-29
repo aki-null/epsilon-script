@@ -676,28 +676,49 @@ Parallel.For(0, 100, i =>
 
 ## Caching Compiler
 
-`CachingCompiler` wraps `Compiler` and caches compiled scripts by source text, compiler options, and variable container identity. Use it when compiling the same script repeatedly; otherwise stick with `Compiler` directly.
+`CachingCompiler` compiles each script once and returns the same compiled script for later requests with the same source text, compiler options, and compile-time variable container. Use it when the same scripts are requested repeatedly, such as scripts loaded from data; otherwise stick with `Compiler` directly.
 
 ```csharp
 var caching = new CachingCompiler();
-var script1 = caching.Compile("damage * 2", Compiler.Options.Immutable);
-var script2 = caching.Compile("damage * 2", Compiler.Options.Immutable);
+var script1 = caching.GetOrCompile("damage * 2", Compiler.Options.Immutable);
+var script2 = caching.GetOrCompile("damage * 2", Compiler.Options.Immutable);
 
 Console.WriteLine(ReferenceEquals(script1, script2)); // True
 ```
 
-Pre-hashing to reuse a key:
+Every caller of the same key shares one `CompiledScript`, including its results. Executing it through one reference changes what the others read:
+
+```csharp
+var a = caching.GetOrCompile("x * 2", Compiler.Options.Immutable);
+var b = caching.GetOrCompile("x * 2", Compiler.Options.Immutable); // same instance as a
+a.Execute(first);
+b.Execute(second);
+// a.FloatValue is now the result for second
+```
+
+Read results right after each `Execute`, and do not execute a shared script concurrently.
+
+An existing compiler can be wrapped. Functions added to it directly are noticed, and scripts compiled before are dropped:
+
+```csharp
+var compiler = new Compiler();
+var caching = new CachingCompiler(compiler);
+compiler.AddCustomFunction(CustomFunction.Create("double", (float v) => v * 2, isDeterministic: true));
+```
+
+A lookup with the same string instance as an earlier one skips hashing the source. For a source built anew on every call, pre-hash it once:
 ```csharp
 var caching = new CachingCompiler();
 var source = CachedSourceText.From("damage * 2");
 
-var script1 = caching.Compile(source, Compiler.Options.Immutable);
-var script2 = caching.Compile(source, Compiler.Options.Immutable);
+var script1 = caching.GetOrCompile(source, Compiler.Options.Immutable);
+var script2 = caching.GetOrCompile(source, Compiler.Options.Immutable);
 ```
 
 Notes:
-- Cache keys include the variable container by reference; different containers do not share entries.
-- Adding custom functions clears the cache because constant folding selects overloads at compile time.
+- Cache keys include the compile-time variable container by reference; different containers do not share entries, and the cache keeps them alive. Compile with one shared container (or none) and pass per-entity containers to `Execute`.
+- Adding custom functions drops cached scripts because constant folding selects overloads at compile time.
+- The cache grows with each distinct key and never evicts. Use `new CachingCompiler(capacity)` when the number of scripts is known to avoid dictionary resize allocations, and `Count`, `Clear()`, and `TrimExcess()` to inspect and control cache memory.
 
 ## Motivation
 

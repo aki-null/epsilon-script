@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using EpsilonScript.Intermediate;
+using EpsilonScript.VirtualMachine;
 
 namespace EpsilonScript.AST.Boolean
 {
@@ -8,6 +9,14 @@ namespace EpsilonScript.AST.Boolean
     private Node _childNode;
 
     public override bool IsPrecomputable => _childNode.IsPrecomputable;
+
+    internal override int Lower(RegisterCompiler compiler) => compiler.LowerOperation(this, OpCode.Not, _childNode);
+
+    internal override void Reset()
+    {
+      base.Reset();
+      _childNode = null;
+    }
 
     protected override void BuildCore(Stack<Node> rpnStack, Element element, CompilerContext context,
       Compiler.Options options, IVariableContainer variables)
@@ -18,17 +27,6 @@ namespace EpsilonScript.AST.Boolean
       {
         throw new ParserException(element.Token, "Cannot find value to perform negate operation on");
       }
-    }
-
-    public override void Execute(IVariableContainer variablesOverride)
-    {
-      _childNode.Execute(variablesOverride);
-      if (_childNode.ValueType != ExtendedType.Boolean)
-      {
-        throw CreateRuntimeException("Cannot negate a non-boolean value");
-      }
-
-      BooleanValue = !_childNode.BooleanValue;
     }
 
     public override Node Optimize()
@@ -46,11 +44,6 @@ namespace EpsilonScript.AST.Boolean
     public override void Validate()
     {
       _childNode?.Validate();
-    }
-
-    public override void ConfigureNoAlloc()
-    {
-      _childNode?.ConfigureNoAlloc();
     }
   }
 }

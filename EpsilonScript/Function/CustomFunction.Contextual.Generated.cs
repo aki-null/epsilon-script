@@ -8,7 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using EpsilonScript.AST;
+using EpsilonScript.VirtualMachine;
 
 namespace EpsilonScript.Function
 {
@@ -146,6 +146,8 @@ namespace EpsilonScript.Function
   internal sealed class ContextualCustomFunction<T1, TResult> : CustomFunction
   {
     private readonly Func<T1, TResult> _func;
+    private ValueConverter<T1> _converter1; // Looked up once a context variable is found
+    private readonly ValueConverter<TResult> _resultConverter;
     private readonly VariableId _contextVar1;
 
     public ContextualCustomFunction(string name, VariableId contextVar1, Func<T1, TResult> func, bool isDeterministic)
@@ -153,61 +155,22 @@ namespace EpsilonScript.Function
     {
       _func = func ?? throw new ArgumentNullException(nameof(func));
       _contextVar1 = contextVar1;
+      _resultConverter = TypeTraits<TResult>.Converter;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private TResult Invoke(VariableContextAdapter context, List<Node> parameters)
+    internal override void Invoke(RegisterProgram program, VariableContextAdapter context, int[] arguments,
+      int destination)
     {
-      EnsureParameterCount(parameters);
-
-      if (!context.TryGetVariable(_contextVar1, out T1 ctx1))
+      var variable1 = context.GetVariable(_contextVar1, out var found1);
+      if (!found1)
       {
         throw new RuntimeException($"Context variable '{_contextVar1}' not found");
       }
 
-      return _func(ctx1);
-    }
+      var ctx1 = (_converter1 ?? (_converter1 = TypeTraits<T1>.Converter))
+        .FromVariableValue(variable1);
 
-    internal override int ExecuteInt(VariableContextAdapter context, List<Node> parameters)
-    {
-      EnsureReturnType(Type.Integer);
-      return TypeTraits<TResult>.ToInt(Invoke(context, parameters));
-    }
-
-    internal override long ExecuteLong(VariableContextAdapter context, List<Node> parameters)
-    {
-      EnsureReturnType(Type.Long);
-      return TypeTraits<TResult>.ToLong(Invoke(context, parameters));
-    }
-
-    internal override float ExecuteFloat(VariableContextAdapter context, List<Node> parameters)
-    {
-      EnsureReturnType(Type.Float);
-      return TypeTraits<TResult>.ToFloat(Invoke(context, parameters));
-    }
-
-    internal override double ExecuteDouble(VariableContextAdapter context, List<Node> parameters)
-    {
-      EnsureReturnType(Type.Double);
-      return TypeTraits<TResult>.ToDouble(Invoke(context, parameters));
-    }
-
-    internal override decimal ExecuteDecimal(VariableContextAdapter context, List<Node> parameters)
-    {
-      EnsureReturnType(Type.Decimal);
-      return TypeTraits<TResult>.ToDecimal(Invoke(context, parameters));
-    }
-
-    internal override string ExecuteString(VariableContextAdapter context, List<Node> parameters)
-    {
-      EnsureReturnType(Type.String);
-      return TypeTraits<TResult>.ToStringValue(Invoke(context, parameters));
-    }
-
-    internal override bool ExecuteBool(VariableContextAdapter context, List<Node> parameters)
-    {
-      EnsureReturnType(Type.Boolean);
-      return TypeTraits<TResult>.ToBool(Invoke(context, parameters));
+      _resultConverter.Write(program, destination, _func(ctx1));
     }
   }
   /// <summary>
@@ -220,6 +183,9 @@ namespace EpsilonScript.Function
       TypeTraits<T2>.ValueType
     };
     private readonly Func<T1, T2, TResult> _func;
+    private ValueConverter<T1> _converter1; // Looked up once a context variable is found
+    private readonly ValueConverter<T2> _converter2;
+    private readonly ValueConverter<TResult> _resultConverter;
     private readonly VariableId _contextVar1;
 
     public ContextualCustomFunction(string name, VariableId contextVar1, Func<T1, T2, TResult> func, bool isDeterministic)
@@ -227,61 +193,23 @@ namespace EpsilonScript.Function
     {
       _func = func ?? throw new ArgumentNullException(nameof(func));
       _contextVar1 = contextVar1;
+      _converter2 = TypeTraits<T2>.Converter;
+      _resultConverter = TypeTraits<TResult>.Converter;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private TResult Invoke(VariableContextAdapter context, List<Node> parameters)
+    internal override void Invoke(RegisterProgram program, VariableContextAdapter context, int[] arguments,
+      int destination)
     {
-      EnsureParameterCount(parameters);
-
-      if (!context.TryGetVariable(_contextVar1, out T1 ctx1))
+      var variable1 = context.GetVariable(_contextVar1, out var found1);
+      if (!found1)
       {
         throw new RuntimeException($"Context variable '{_contextVar1}' not found");
       }
 
-      return _func(ctx1, TypeTraits<T2>.Read(parameters[0]));
-    }
+      var ctx1 = (_converter1 ?? (_converter1 = TypeTraits<T1>.Converter))
+        .FromVariableValue(variable1);
 
-    internal override int ExecuteInt(VariableContextAdapter context, List<Node> parameters)
-    {
-      EnsureReturnType(Type.Integer);
-      return TypeTraits<TResult>.ToInt(Invoke(context, parameters));
-    }
-
-    internal override long ExecuteLong(VariableContextAdapter context, List<Node> parameters)
-    {
-      EnsureReturnType(Type.Long);
-      return TypeTraits<TResult>.ToLong(Invoke(context, parameters));
-    }
-
-    internal override float ExecuteFloat(VariableContextAdapter context, List<Node> parameters)
-    {
-      EnsureReturnType(Type.Float);
-      return TypeTraits<TResult>.ToFloat(Invoke(context, parameters));
-    }
-
-    internal override double ExecuteDouble(VariableContextAdapter context, List<Node> parameters)
-    {
-      EnsureReturnType(Type.Double);
-      return TypeTraits<TResult>.ToDouble(Invoke(context, parameters));
-    }
-
-    internal override decimal ExecuteDecimal(VariableContextAdapter context, List<Node> parameters)
-    {
-      EnsureReturnType(Type.Decimal);
-      return TypeTraits<TResult>.ToDecimal(Invoke(context, parameters));
-    }
-
-    internal override string ExecuteString(VariableContextAdapter context, List<Node> parameters)
-    {
-      EnsureReturnType(Type.String);
-      return TypeTraits<TResult>.ToStringValue(Invoke(context, parameters));
-    }
-
-    internal override bool ExecuteBool(VariableContextAdapter context, List<Node> parameters)
-    {
-      EnsureReturnType(Type.Boolean);
-      return TypeTraits<TResult>.ToBool(Invoke(context, parameters));
+      _resultConverter.Write(program, destination, _func(ctx1, _converter2.Read(program, arguments[0])));
     }
   }
   /// <summary>
@@ -295,6 +223,10 @@ namespace EpsilonScript.Function
       TypeTraits<T3>.ValueType
     };
     private readonly Func<T1, T2, T3, TResult> _func;
+    private ValueConverter<T1> _converter1; // Looked up once a context variable is found
+    private readonly ValueConverter<T2> _converter2;
+    private readonly ValueConverter<T3> _converter3;
+    private readonly ValueConverter<TResult> _resultConverter;
     private readonly VariableId _contextVar1;
 
     public ContextualCustomFunction(string name, VariableId contextVar1, Func<T1, T2, T3, TResult> func, bool isDeterministic)
@@ -302,61 +234,24 @@ namespace EpsilonScript.Function
     {
       _func = func ?? throw new ArgumentNullException(nameof(func));
       _contextVar1 = contextVar1;
+      _converter2 = TypeTraits<T2>.Converter;
+      _converter3 = TypeTraits<T3>.Converter;
+      _resultConverter = TypeTraits<TResult>.Converter;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private TResult Invoke(VariableContextAdapter context, List<Node> parameters)
+    internal override void Invoke(RegisterProgram program, VariableContextAdapter context, int[] arguments,
+      int destination)
     {
-      EnsureParameterCount(parameters);
-
-      if (!context.TryGetVariable(_contextVar1, out T1 ctx1))
+      var variable1 = context.GetVariable(_contextVar1, out var found1);
+      if (!found1)
       {
         throw new RuntimeException($"Context variable '{_contextVar1}' not found");
       }
 
-      return _func(ctx1, TypeTraits<T2>.Read(parameters[0]), TypeTraits<T3>.Read(parameters[1]));
-    }
+      var ctx1 = (_converter1 ?? (_converter1 = TypeTraits<T1>.Converter))
+        .FromVariableValue(variable1);
 
-    internal override int ExecuteInt(VariableContextAdapter context, List<Node> parameters)
-    {
-      EnsureReturnType(Type.Integer);
-      return TypeTraits<TResult>.ToInt(Invoke(context, parameters));
-    }
-
-    internal override long ExecuteLong(VariableContextAdapter context, List<Node> parameters)
-    {
-      EnsureReturnType(Type.Long);
-      return TypeTraits<TResult>.ToLong(Invoke(context, parameters));
-    }
-
-    internal override float ExecuteFloat(VariableContextAdapter context, List<Node> parameters)
-    {
-      EnsureReturnType(Type.Float);
-      return TypeTraits<TResult>.ToFloat(Invoke(context, parameters));
-    }
-
-    internal override double ExecuteDouble(VariableContextAdapter context, List<Node> parameters)
-    {
-      EnsureReturnType(Type.Double);
-      return TypeTraits<TResult>.ToDouble(Invoke(context, parameters));
-    }
-
-    internal override decimal ExecuteDecimal(VariableContextAdapter context, List<Node> parameters)
-    {
-      EnsureReturnType(Type.Decimal);
-      return TypeTraits<TResult>.ToDecimal(Invoke(context, parameters));
-    }
-
-    internal override string ExecuteString(VariableContextAdapter context, List<Node> parameters)
-    {
-      EnsureReturnType(Type.String);
-      return TypeTraits<TResult>.ToStringValue(Invoke(context, parameters));
-    }
-
-    internal override bool ExecuteBool(VariableContextAdapter context, List<Node> parameters)
-    {
-      EnsureReturnType(Type.Boolean);
-      return TypeTraits<TResult>.ToBool(Invoke(context, parameters));
+      _resultConverter.Write(program, destination, _func(ctx1, _converter2.Read(program, arguments[0]), _converter3.Read(program, arguments[1])));
     }
   }
   /// <summary>
@@ -371,6 +266,11 @@ namespace EpsilonScript.Function
       TypeTraits<T4>.ValueType
     };
     private readonly Func<T1, T2, T3, T4, TResult> _func;
+    private ValueConverter<T1> _converter1; // Looked up once a context variable is found
+    private readonly ValueConverter<T2> _converter2;
+    private readonly ValueConverter<T3> _converter3;
+    private readonly ValueConverter<T4> _converter4;
+    private readonly ValueConverter<TResult> _resultConverter;
     private readonly VariableId _contextVar1;
 
     public ContextualCustomFunction(string name, VariableId contextVar1, Func<T1, T2, T3, T4, TResult> func, bool isDeterministic)
@@ -378,61 +278,25 @@ namespace EpsilonScript.Function
     {
       _func = func ?? throw new ArgumentNullException(nameof(func));
       _contextVar1 = contextVar1;
+      _converter2 = TypeTraits<T2>.Converter;
+      _converter3 = TypeTraits<T3>.Converter;
+      _converter4 = TypeTraits<T4>.Converter;
+      _resultConverter = TypeTraits<TResult>.Converter;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private TResult Invoke(VariableContextAdapter context, List<Node> parameters)
+    internal override void Invoke(RegisterProgram program, VariableContextAdapter context, int[] arguments,
+      int destination)
     {
-      EnsureParameterCount(parameters);
-
-      if (!context.TryGetVariable(_contextVar1, out T1 ctx1))
+      var variable1 = context.GetVariable(_contextVar1, out var found1);
+      if (!found1)
       {
         throw new RuntimeException($"Context variable '{_contextVar1}' not found");
       }
 
-      return _func(ctx1, TypeTraits<T2>.Read(parameters[0]), TypeTraits<T3>.Read(parameters[1]), TypeTraits<T4>.Read(parameters[2]));
-    }
+      var ctx1 = (_converter1 ?? (_converter1 = TypeTraits<T1>.Converter))
+        .FromVariableValue(variable1);
 
-    internal override int ExecuteInt(VariableContextAdapter context, List<Node> parameters)
-    {
-      EnsureReturnType(Type.Integer);
-      return TypeTraits<TResult>.ToInt(Invoke(context, parameters));
-    }
-
-    internal override long ExecuteLong(VariableContextAdapter context, List<Node> parameters)
-    {
-      EnsureReturnType(Type.Long);
-      return TypeTraits<TResult>.ToLong(Invoke(context, parameters));
-    }
-
-    internal override float ExecuteFloat(VariableContextAdapter context, List<Node> parameters)
-    {
-      EnsureReturnType(Type.Float);
-      return TypeTraits<TResult>.ToFloat(Invoke(context, parameters));
-    }
-
-    internal override double ExecuteDouble(VariableContextAdapter context, List<Node> parameters)
-    {
-      EnsureReturnType(Type.Double);
-      return TypeTraits<TResult>.ToDouble(Invoke(context, parameters));
-    }
-
-    internal override decimal ExecuteDecimal(VariableContextAdapter context, List<Node> parameters)
-    {
-      EnsureReturnType(Type.Decimal);
-      return TypeTraits<TResult>.ToDecimal(Invoke(context, parameters));
-    }
-
-    internal override string ExecuteString(VariableContextAdapter context, List<Node> parameters)
-    {
-      EnsureReturnType(Type.String);
-      return TypeTraits<TResult>.ToStringValue(Invoke(context, parameters));
-    }
-
-    internal override bool ExecuteBool(VariableContextAdapter context, List<Node> parameters)
-    {
-      EnsureReturnType(Type.Boolean);
-      return TypeTraits<TResult>.ToBool(Invoke(context, parameters));
+      _resultConverter.Write(program, destination, _func(ctx1, _converter2.Read(program, arguments[0]), _converter3.Read(program, arguments[1]), _converter4.Read(program, arguments[2])));
     }
   }
   // ===========================================================================
@@ -445,6 +309,9 @@ namespace EpsilonScript.Function
   internal sealed class ContextualCustomFunction2<T1, T2, TResult> : CustomFunction
   {
     private readonly Func<T1, T2, TResult> _func;
+    private ValueConverter<T1> _converter1; // Looked up once a context variable is found
+    private ValueConverter<T2> _converter2; // Looked up once a context variable is found
+    private readonly ValueConverter<TResult> _resultConverter;
     private readonly VariableId _contextVar1;
     private readonly VariableId _contextVar2;
 
@@ -454,66 +321,31 @@ namespace EpsilonScript.Function
       _func = func ?? throw new ArgumentNullException(nameof(func));
       _contextVar1 = contextVar1;
       _contextVar2 = contextVar2;
+      _resultConverter = TypeTraits<TResult>.Converter;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private TResult Invoke(VariableContextAdapter context, List<Node> parameters)
+    internal override void Invoke(RegisterProgram program, VariableContextAdapter context, int[] arguments,
+      int destination)
     {
-      EnsureParameterCount(parameters);
-
-      if (!context.TryGetVariable(_contextVar1, out T1 ctx1))
+      var variable1 = context.GetVariable(_contextVar1, out var found1);
+      if (!found1)
       {
         throw new RuntimeException($"Context variable '{_contextVar1}' not found");
       }
 
-      if (!context.TryGetVariable(_contextVar2, out T2 ctx2))
+      var ctx1 = (_converter1 ?? (_converter1 = TypeTraits<T1>.Converter))
+        .FromVariableValue(variable1);
+
+      var variable2 = context.GetVariable(_contextVar2, out var found2);
+      if (!found2)
       {
         throw new RuntimeException($"Context variable '{_contextVar2}' not found");
       }
 
-      return _func(ctx1, ctx2);
-    }
+      var ctx2 = (_converter2 ?? (_converter2 = TypeTraits<T2>.Converter))
+        .FromVariableValue(variable2);
 
-    internal override int ExecuteInt(VariableContextAdapter context, List<Node> parameters)
-    {
-      EnsureReturnType(Type.Integer);
-      return TypeTraits<TResult>.ToInt(Invoke(context, parameters));
-    }
-
-    internal override long ExecuteLong(VariableContextAdapter context, List<Node> parameters)
-    {
-      EnsureReturnType(Type.Long);
-      return TypeTraits<TResult>.ToLong(Invoke(context, parameters));
-    }
-
-    internal override float ExecuteFloat(VariableContextAdapter context, List<Node> parameters)
-    {
-      EnsureReturnType(Type.Float);
-      return TypeTraits<TResult>.ToFloat(Invoke(context, parameters));
-    }
-
-    internal override double ExecuteDouble(VariableContextAdapter context, List<Node> parameters)
-    {
-      EnsureReturnType(Type.Double);
-      return TypeTraits<TResult>.ToDouble(Invoke(context, parameters));
-    }
-
-    internal override decimal ExecuteDecimal(VariableContextAdapter context, List<Node> parameters)
-    {
-      EnsureReturnType(Type.Decimal);
-      return TypeTraits<TResult>.ToDecimal(Invoke(context, parameters));
-    }
-
-    internal override string ExecuteString(VariableContextAdapter context, List<Node> parameters)
-    {
-      EnsureReturnType(Type.String);
-      return TypeTraits<TResult>.ToStringValue(Invoke(context, parameters));
-    }
-
-    internal override bool ExecuteBool(VariableContextAdapter context, List<Node> parameters)
-    {
-      EnsureReturnType(Type.Boolean);
-      return TypeTraits<TResult>.ToBool(Invoke(context, parameters));
+      _resultConverter.Write(program, destination, _func(ctx1, ctx2));
     }
   }
   /// <summary>
@@ -526,6 +358,10 @@ namespace EpsilonScript.Function
       TypeTraits<T3>.ValueType
     };
     private readonly Func<T1, T2, T3, TResult> _func;
+    private ValueConverter<T1> _converter1; // Looked up once a context variable is found
+    private ValueConverter<T2> _converter2; // Looked up once a context variable is found
+    private readonly ValueConverter<T3> _converter3;
+    private readonly ValueConverter<TResult> _resultConverter;
     private readonly VariableId _contextVar1;
     private readonly VariableId _contextVar2;
 
@@ -535,66 +371,32 @@ namespace EpsilonScript.Function
       _func = func ?? throw new ArgumentNullException(nameof(func));
       _contextVar1 = contextVar1;
       _contextVar2 = contextVar2;
+      _converter3 = TypeTraits<T3>.Converter;
+      _resultConverter = TypeTraits<TResult>.Converter;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private TResult Invoke(VariableContextAdapter context, List<Node> parameters)
+    internal override void Invoke(RegisterProgram program, VariableContextAdapter context, int[] arguments,
+      int destination)
     {
-      EnsureParameterCount(parameters);
-
-      if (!context.TryGetVariable(_contextVar1, out T1 ctx1))
+      var variable1 = context.GetVariable(_contextVar1, out var found1);
+      if (!found1)
       {
         throw new RuntimeException($"Context variable '{_contextVar1}' not found");
       }
 
-      if (!context.TryGetVariable(_contextVar2, out T2 ctx2))
+      var ctx1 = (_converter1 ?? (_converter1 = TypeTraits<T1>.Converter))
+        .FromVariableValue(variable1);
+
+      var variable2 = context.GetVariable(_contextVar2, out var found2);
+      if (!found2)
       {
         throw new RuntimeException($"Context variable '{_contextVar2}' not found");
       }
 
-      return _func(ctx1, ctx2, TypeTraits<T3>.Read(parameters[0]));
-    }
+      var ctx2 = (_converter2 ?? (_converter2 = TypeTraits<T2>.Converter))
+        .FromVariableValue(variable2);
 
-    internal override int ExecuteInt(VariableContextAdapter context, List<Node> parameters)
-    {
-      EnsureReturnType(Type.Integer);
-      return TypeTraits<TResult>.ToInt(Invoke(context, parameters));
-    }
-
-    internal override long ExecuteLong(VariableContextAdapter context, List<Node> parameters)
-    {
-      EnsureReturnType(Type.Long);
-      return TypeTraits<TResult>.ToLong(Invoke(context, parameters));
-    }
-
-    internal override float ExecuteFloat(VariableContextAdapter context, List<Node> parameters)
-    {
-      EnsureReturnType(Type.Float);
-      return TypeTraits<TResult>.ToFloat(Invoke(context, parameters));
-    }
-
-    internal override double ExecuteDouble(VariableContextAdapter context, List<Node> parameters)
-    {
-      EnsureReturnType(Type.Double);
-      return TypeTraits<TResult>.ToDouble(Invoke(context, parameters));
-    }
-
-    internal override decimal ExecuteDecimal(VariableContextAdapter context, List<Node> parameters)
-    {
-      EnsureReturnType(Type.Decimal);
-      return TypeTraits<TResult>.ToDecimal(Invoke(context, parameters));
-    }
-
-    internal override string ExecuteString(VariableContextAdapter context, List<Node> parameters)
-    {
-      EnsureReturnType(Type.String);
-      return TypeTraits<TResult>.ToStringValue(Invoke(context, parameters));
-    }
-
-    internal override bool ExecuteBool(VariableContextAdapter context, List<Node> parameters)
-    {
-      EnsureReturnType(Type.Boolean);
-      return TypeTraits<TResult>.ToBool(Invoke(context, parameters));
+      _resultConverter.Write(program, destination, _func(ctx1, ctx2, _converter3.Read(program, arguments[0])));
     }
   }
   /// <summary>
@@ -608,6 +410,11 @@ namespace EpsilonScript.Function
       TypeTraits<T4>.ValueType
     };
     private readonly Func<T1, T2, T3, T4, TResult> _func;
+    private ValueConverter<T1> _converter1; // Looked up once a context variable is found
+    private ValueConverter<T2> _converter2; // Looked up once a context variable is found
+    private readonly ValueConverter<T3> _converter3;
+    private readonly ValueConverter<T4> _converter4;
+    private readonly ValueConverter<TResult> _resultConverter;
     private readonly VariableId _contextVar1;
     private readonly VariableId _contextVar2;
 
@@ -617,66 +424,33 @@ namespace EpsilonScript.Function
       _func = func ?? throw new ArgumentNullException(nameof(func));
       _contextVar1 = contextVar1;
       _contextVar2 = contextVar2;
+      _converter3 = TypeTraits<T3>.Converter;
+      _converter4 = TypeTraits<T4>.Converter;
+      _resultConverter = TypeTraits<TResult>.Converter;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private TResult Invoke(VariableContextAdapter context, List<Node> parameters)
+    internal override void Invoke(RegisterProgram program, VariableContextAdapter context, int[] arguments,
+      int destination)
     {
-      EnsureParameterCount(parameters);
-
-      if (!context.TryGetVariable(_contextVar1, out T1 ctx1))
+      var variable1 = context.GetVariable(_contextVar1, out var found1);
+      if (!found1)
       {
         throw new RuntimeException($"Context variable '{_contextVar1}' not found");
       }
 
-      if (!context.TryGetVariable(_contextVar2, out T2 ctx2))
+      var ctx1 = (_converter1 ?? (_converter1 = TypeTraits<T1>.Converter))
+        .FromVariableValue(variable1);
+
+      var variable2 = context.GetVariable(_contextVar2, out var found2);
+      if (!found2)
       {
         throw new RuntimeException($"Context variable '{_contextVar2}' not found");
       }
 
-      return _func(ctx1, ctx2, TypeTraits<T3>.Read(parameters[0]), TypeTraits<T4>.Read(parameters[1]));
-    }
+      var ctx2 = (_converter2 ?? (_converter2 = TypeTraits<T2>.Converter))
+        .FromVariableValue(variable2);
 
-    internal override int ExecuteInt(VariableContextAdapter context, List<Node> parameters)
-    {
-      EnsureReturnType(Type.Integer);
-      return TypeTraits<TResult>.ToInt(Invoke(context, parameters));
-    }
-
-    internal override long ExecuteLong(VariableContextAdapter context, List<Node> parameters)
-    {
-      EnsureReturnType(Type.Long);
-      return TypeTraits<TResult>.ToLong(Invoke(context, parameters));
-    }
-
-    internal override float ExecuteFloat(VariableContextAdapter context, List<Node> parameters)
-    {
-      EnsureReturnType(Type.Float);
-      return TypeTraits<TResult>.ToFloat(Invoke(context, parameters));
-    }
-
-    internal override double ExecuteDouble(VariableContextAdapter context, List<Node> parameters)
-    {
-      EnsureReturnType(Type.Double);
-      return TypeTraits<TResult>.ToDouble(Invoke(context, parameters));
-    }
-
-    internal override decimal ExecuteDecimal(VariableContextAdapter context, List<Node> parameters)
-    {
-      EnsureReturnType(Type.Decimal);
-      return TypeTraits<TResult>.ToDecimal(Invoke(context, parameters));
-    }
-
-    internal override string ExecuteString(VariableContextAdapter context, List<Node> parameters)
-    {
-      EnsureReturnType(Type.String);
-      return TypeTraits<TResult>.ToStringValue(Invoke(context, parameters));
-    }
-
-    internal override bool ExecuteBool(VariableContextAdapter context, List<Node> parameters)
-    {
-      EnsureReturnType(Type.Boolean);
-      return TypeTraits<TResult>.ToBool(Invoke(context, parameters));
+      _resultConverter.Write(program, destination, _func(ctx1, ctx2, _converter3.Read(program, arguments[0]), _converter4.Read(program, arguments[1])));
     }
   }
   /// <summary>
@@ -691,6 +465,12 @@ namespace EpsilonScript.Function
       TypeTraits<T5>.ValueType
     };
     private readonly Func<T1, T2, T3, T4, T5, TResult> _func;
+    private ValueConverter<T1> _converter1; // Looked up once a context variable is found
+    private ValueConverter<T2> _converter2; // Looked up once a context variable is found
+    private readonly ValueConverter<T3> _converter3;
+    private readonly ValueConverter<T4> _converter4;
+    private readonly ValueConverter<T5> _converter5;
+    private readonly ValueConverter<TResult> _resultConverter;
     private readonly VariableId _contextVar1;
     private readonly VariableId _contextVar2;
 
@@ -700,66 +480,34 @@ namespace EpsilonScript.Function
       _func = func ?? throw new ArgumentNullException(nameof(func));
       _contextVar1 = contextVar1;
       _contextVar2 = contextVar2;
+      _converter3 = TypeTraits<T3>.Converter;
+      _converter4 = TypeTraits<T4>.Converter;
+      _converter5 = TypeTraits<T5>.Converter;
+      _resultConverter = TypeTraits<TResult>.Converter;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private TResult Invoke(VariableContextAdapter context, List<Node> parameters)
+    internal override void Invoke(RegisterProgram program, VariableContextAdapter context, int[] arguments,
+      int destination)
     {
-      EnsureParameterCount(parameters);
-
-      if (!context.TryGetVariable(_contextVar1, out T1 ctx1))
+      var variable1 = context.GetVariable(_contextVar1, out var found1);
+      if (!found1)
       {
         throw new RuntimeException($"Context variable '{_contextVar1}' not found");
       }
 
-      if (!context.TryGetVariable(_contextVar2, out T2 ctx2))
+      var ctx1 = (_converter1 ?? (_converter1 = TypeTraits<T1>.Converter))
+        .FromVariableValue(variable1);
+
+      var variable2 = context.GetVariable(_contextVar2, out var found2);
+      if (!found2)
       {
         throw new RuntimeException($"Context variable '{_contextVar2}' not found");
       }
 
-      return _func(ctx1, ctx2, TypeTraits<T3>.Read(parameters[0]), TypeTraits<T4>.Read(parameters[1]), TypeTraits<T5>.Read(parameters[2]));
-    }
+      var ctx2 = (_converter2 ?? (_converter2 = TypeTraits<T2>.Converter))
+        .FromVariableValue(variable2);
 
-    internal override int ExecuteInt(VariableContextAdapter context, List<Node> parameters)
-    {
-      EnsureReturnType(Type.Integer);
-      return TypeTraits<TResult>.ToInt(Invoke(context, parameters));
-    }
-
-    internal override long ExecuteLong(VariableContextAdapter context, List<Node> parameters)
-    {
-      EnsureReturnType(Type.Long);
-      return TypeTraits<TResult>.ToLong(Invoke(context, parameters));
-    }
-
-    internal override float ExecuteFloat(VariableContextAdapter context, List<Node> parameters)
-    {
-      EnsureReturnType(Type.Float);
-      return TypeTraits<TResult>.ToFloat(Invoke(context, parameters));
-    }
-
-    internal override double ExecuteDouble(VariableContextAdapter context, List<Node> parameters)
-    {
-      EnsureReturnType(Type.Double);
-      return TypeTraits<TResult>.ToDouble(Invoke(context, parameters));
-    }
-
-    internal override decimal ExecuteDecimal(VariableContextAdapter context, List<Node> parameters)
-    {
-      EnsureReturnType(Type.Decimal);
-      return TypeTraits<TResult>.ToDecimal(Invoke(context, parameters));
-    }
-
-    internal override string ExecuteString(VariableContextAdapter context, List<Node> parameters)
-    {
-      EnsureReturnType(Type.String);
-      return TypeTraits<TResult>.ToStringValue(Invoke(context, parameters));
-    }
-
-    internal override bool ExecuteBool(VariableContextAdapter context, List<Node> parameters)
-    {
-      EnsureReturnType(Type.Boolean);
-      return TypeTraits<TResult>.ToBool(Invoke(context, parameters));
+      _resultConverter.Write(program, destination, _func(ctx1, ctx2, _converter3.Read(program, arguments[0]), _converter4.Read(program, arguments[1]), _converter5.Read(program, arguments[2])));
     }
   }
   // ===========================================================================
@@ -772,6 +520,10 @@ namespace EpsilonScript.Function
   internal sealed class ContextualCustomFunction3<T1, T2, T3, TResult> : CustomFunction
   {
     private readonly Func<T1, T2, T3, TResult> _func;
+    private ValueConverter<T1> _converter1; // Looked up once a context variable is found
+    private ValueConverter<T2> _converter2; // Looked up once a context variable is found
+    private ValueConverter<T3> _converter3; // Looked up once a context variable is found
+    private readonly ValueConverter<TResult> _resultConverter;
     private readonly VariableId _contextVar1;
     private readonly VariableId _contextVar2;
     private readonly VariableId _contextVar3;
@@ -783,71 +535,40 @@ namespace EpsilonScript.Function
       _contextVar1 = contextVar1;
       _contextVar2 = contextVar2;
       _contextVar3 = contextVar3;
+      _resultConverter = TypeTraits<TResult>.Converter;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private TResult Invoke(VariableContextAdapter context, List<Node> parameters)
+    internal override void Invoke(RegisterProgram program, VariableContextAdapter context, int[] arguments,
+      int destination)
     {
-      EnsureParameterCount(parameters);
-
-      if (!context.TryGetVariable(_contextVar1, out T1 ctx1))
+      var variable1 = context.GetVariable(_contextVar1, out var found1);
+      if (!found1)
       {
         throw new RuntimeException($"Context variable '{_contextVar1}' not found");
       }
 
-      if (!context.TryGetVariable(_contextVar2, out T2 ctx2))
+      var ctx1 = (_converter1 ?? (_converter1 = TypeTraits<T1>.Converter))
+        .FromVariableValue(variable1);
+
+      var variable2 = context.GetVariable(_contextVar2, out var found2);
+      if (!found2)
       {
         throw new RuntimeException($"Context variable '{_contextVar2}' not found");
       }
 
-      if (!context.TryGetVariable(_contextVar3, out T3 ctx3))
+      var ctx2 = (_converter2 ?? (_converter2 = TypeTraits<T2>.Converter))
+        .FromVariableValue(variable2);
+
+      var variable3 = context.GetVariable(_contextVar3, out var found3);
+      if (!found3)
       {
         throw new RuntimeException($"Context variable '{_contextVar3}' not found");
       }
 
-      return _func(ctx1, ctx2, ctx3);
-    }
+      var ctx3 = (_converter3 ?? (_converter3 = TypeTraits<T3>.Converter))
+        .FromVariableValue(variable3);
 
-    internal override int ExecuteInt(VariableContextAdapter context, List<Node> parameters)
-    {
-      EnsureReturnType(Type.Integer);
-      return TypeTraits<TResult>.ToInt(Invoke(context, parameters));
-    }
-
-    internal override long ExecuteLong(VariableContextAdapter context, List<Node> parameters)
-    {
-      EnsureReturnType(Type.Long);
-      return TypeTraits<TResult>.ToLong(Invoke(context, parameters));
-    }
-
-    internal override float ExecuteFloat(VariableContextAdapter context, List<Node> parameters)
-    {
-      EnsureReturnType(Type.Float);
-      return TypeTraits<TResult>.ToFloat(Invoke(context, parameters));
-    }
-
-    internal override double ExecuteDouble(VariableContextAdapter context, List<Node> parameters)
-    {
-      EnsureReturnType(Type.Double);
-      return TypeTraits<TResult>.ToDouble(Invoke(context, parameters));
-    }
-
-    internal override decimal ExecuteDecimal(VariableContextAdapter context, List<Node> parameters)
-    {
-      EnsureReturnType(Type.Decimal);
-      return TypeTraits<TResult>.ToDecimal(Invoke(context, parameters));
-    }
-
-    internal override string ExecuteString(VariableContextAdapter context, List<Node> parameters)
-    {
-      EnsureReturnType(Type.String);
-      return TypeTraits<TResult>.ToStringValue(Invoke(context, parameters));
-    }
-
-    internal override bool ExecuteBool(VariableContextAdapter context, List<Node> parameters)
-    {
-      EnsureReturnType(Type.Boolean);
-      return TypeTraits<TResult>.ToBool(Invoke(context, parameters));
+      _resultConverter.Write(program, destination, _func(ctx1, ctx2, ctx3));
     }
   }
   /// <summary>
@@ -860,6 +581,11 @@ namespace EpsilonScript.Function
       TypeTraits<T4>.ValueType
     };
     private readonly Func<T1, T2, T3, T4, TResult> _func;
+    private ValueConverter<T1> _converter1; // Looked up once a context variable is found
+    private ValueConverter<T2> _converter2; // Looked up once a context variable is found
+    private ValueConverter<T3> _converter3; // Looked up once a context variable is found
+    private readonly ValueConverter<T4> _converter4;
+    private readonly ValueConverter<TResult> _resultConverter;
     private readonly VariableId _contextVar1;
     private readonly VariableId _contextVar2;
     private readonly VariableId _contextVar3;
@@ -871,71 +597,41 @@ namespace EpsilonScript.Function
       _contextVar1 = contextVar1;
       _contextVar2 = contextVar2;
       _contextVar3 = contextVar3;
+      _converter4 = TypeTraits<T4>.Converter;
+      _resultConverter = TypeTraits<TResult>.Converter;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private TResult Invoke(VariableContextAdapter context, List<Node> parameters)
+    internal override void Invoke(RegisterProgram program, VariableContextAdapter context, int[] arguments,
+      int destination)
     {
-      EnsureParameterCount(parameters);
-
-      if (!context.TryGetVariable(_contextVar1, out T1 ctx1))
+      var variable1 = context.GetVariable(_contextVar1, out var found1);
+      if (!found1)
       {
         throw new RuntimeException($"Context variable '{_contextVar1}' not found");
       }
 
-      if (!context.TryGetVariable(_contextVar2, out T2 ctx2))
+      var ctx1 = (_converter1 ?? (_converter1 = TypeTraits<T1>.Converter))
+        .FromVariableValue(variable1);
+
+      var variable2 = context.GetVariable(_contextVar2, out var found2);
+      if (!found2)
       {
         throw new RuntimeException($"Context variable '{_contextVar2}' not found");
       }
 
-      if (!context.TryGetVariable(_contextVar3, out T3 ctx3))
+      var ctx2 = (_converter2 ?? (_converter2 = TypeTraits<T2>.Converter))
+        .FromVariableValue(variable2);
+
+      var variable3 = context.GetVariable(_contextVar3, out var found3);
+      if (!found3)
       {
         throw new RuntimeException($"Context variable '{_contextVar3}' not found");
       }
 
-      return _func(ctx1, ctx2, ctx3, TypeTraits<T4>.Read(parameters[0]));
-    }
+      var ctx3 = (_converter3 ?? (_converter3 = TypeTraits<T3>.Converter))
+        .FromVariableValue(variable3);
 
-    internal override int ExecuteInt(VariableContextAdapter context, List<Node> parameters)
-    {
-      EnsureReturnType(Type.Integer);
-      return TypeTraits<TResult>.ToInt(Invoke(context, parameters));
-    }
-
-    internal override long ExecuteLong(VariableContextAdapter context, List<Node> parameters)
-    {
-      EnsureReturnType(Type.Long);
-      return TypeTraits<TResult>.ToLong(Invoke(context, parameters));
-    }
-
-    internal override float ExecuteFloat(VariableContextAdapter context, List<Node> parameters)
-    {
-      EnsureReturnType(Type.Float);
-      return TypeTraits<TResult>.ToFloat(Invoke(context, parameters));
-    }
-
-    internal override double ExecuteDouble(VariableContextAdapter context, List<Node> parameters)
-    {
-      EnsureReturnType(Type.Double);
-      return TypeTraits<TResult>.ToDouble(Invoke(context, parameters));
-    }
-
-    internal override decimal ExecuteDecimal(VariableContextAdapter context, List<Node> parameters)
-    {
-      EnsureReturnType(Type.Decimal);
-      return TypeTraits<TResult>.ToDecimal(Invoke(context, parameters));
-    }
-
-    internal override string ExecuteString(VariableContextAdapter context, List<Node> parameters)
-    {
-      EnsureReturnType(Type.String);
-      return TypeTraits<TResult>.ToStringValue(Invoke(context, parameters));
-    }
-
-    internal override bool ExecuteBool(VariableContextAdapter context, List<Node> parameters)
-    {
-      EnsureReturnType(Type.Boolean);
-      return TypeTraits<TResult>.ToBool(Invoke(context, parameters));
+      _resultConverter.Write(program, destination, _func(ctx1, ctx2, ctx3, _converter4.Read(program, arguments[0])));
     }
   }
   /// <summary>
@@ -949,6 +645,12 @@ namespace EpsilonScript.Function
       TypeTraits<T5>.ValueType
     };
     private readonly Func<T1, T2, T3, T4, T5, TResult> _func;
+    private ValueConverter<T1> _converter1; // Looked up once a context variable is found
+    private ValueConverter<T2> _converter2; // Looked up once a context variable is found
+    private ValueConverter<T3> _converter3; // Looked up once a context variable is found
+    private readonly ValueConverter<T4> _converter4;
+    private readonly ValueConverter<T5> _converter5;
+    private readonly ValueConverter<TResult> _resultConverter;
     private readonly VariableId _contextVar1;
     private readonly VariableId _contextVar2;
     private readonly VariableId _contextVar3;
@@ -960,71 +662,42 @@ namespace EpsilonScript.Function
       _contextVar1 = contextVar1;
       _contextVar2 = contextVar2;
       _contextVar3 = contextVar3;
+      _converter4 = TypeTraits<T4>.Converter;
+      _converter5 = TypeTraits<T5>.Converter;
+      _resultConverter = TypeTraits<TResult>.Converter;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private TResult Invoke(VariableContextAdapter context, List<Node> parameters)
+    internal override void Invoke(RegisterProgram program, VariableContextAdapter context, int[] arguments,
+      int destination)
     {
-      EnsureParameterCount(parameters);
-
-      if (!context.TryGetVariable(_contextVar1, out T1 ctx1))
+      var variable1 = context.GetVariable(_contextVar1, out var found1);
+      if (!found1)
       {
         throw new RuntimeException($"Context variable '{_contextVar1}' not found");
       }
 
-      if (!context.TryGetVariable(_contextVar2, out T2 ctx2))
+      var ctx1 = (_converter1 ?? (_converter1 = TypeTraits<T1>.Converter))
+        .FromVariableValue(variable1);
+
+      var variable2 = context.GetVariable(_contextVar2, out var found2);
+      if (!found2)
       {
         throw new RuntimeException($"Context variable '{_contextVar2}' not found");
       }
 
-      if (!context.TryGetVariable(_contextVar3, out T3 ctx3))
+      var ctx2 = (_converter2 ?? (_converter2 = TypeTraits<T2>.Converter))
+        .FromVariableValue(variable2);
+
+      var variable3 = context.GetVariable(_contextVar3, out var found3);
+      if (!found3)
       {
         throw new RuntimeException($"Context variable '{_contextVar3}' not found");
       }
 
-      return _func(ctx1, ctx2, ctx3, TypeTraits<T4>.Read(parameters[0]), TypeTraits<T5>.Read(parameters[1]));
-    }
+      var ctx3 = (_converter3 ?? (_converter3 = TypeTraits<T3>.Converter))
+        .FromVariableValue(variable3);
 
-    internal override int ExecuteInt(VariableContextAdapter context, List<Node> parameters)
-    {
-      EnsureReturnType(Type.Integer);
-      return TypeTraits<TResult>.ToInt(Invoke(context, parameters));
-    }
-
-    internal override long ExecuteLong(VariableContextAdapter context, List<Node> parameters)
-    {
-      EnsureReturnType(Type.Long);
-      return TypeTraits<TResult>.ToLong(Invoke(context, parameters));
-    }
-
-    internal override float ExecuteFloat(VariableContextAdapter context, List<Node> parameters)
-    {
-      EnsureReturnType(Type.Float);
-      return TypeTraits<TResult>.ToFloat(Invoke(context, parameters));
-    }
-
-    internal override double ExecuteDouble(VariableContextAdapter context, List<Node> parameters)
-    {
-      EnsureReturnType(Type.Double);
-      return TypeTraits<TResult>.ToDouble(Invoke(context, parameters));
-    }
-
-    internal override decimal ExecuteDecimal(VariableContextAdapter context, List<Node> parameters)
-    {
-      EnsureReturnType(Type.Decimal);
-      return TypeTraits<TResult>.ToDecimal(Invoke(context, parameters));
-    }
-
-    internal override string ExecuteString(VariableContextAdapter context, List<Node> parameters)
-    {
-      EnsureReturnType(Type.String);
-      return TypeTraits<TResult>.ToStringValue(Invoke(context, parameters));
-    }
-
-    internal override bool ExecuteBool(VariableContextAdapter context, List<Node> parameters)
-    {
-      EnsureReturnType(Type.Boolean);
-      return TypeTraits<TResult>.ToBool(Invoke(context, parameters));
+      _resultConverter.Write(program, destination, _func(ctx1, ctx2, ctx3, _converter4.Read(program, arguments[0]), _converter5.Read(program, arguments[1])));
     }
   }
   /// <summary>
@@ -1039,6 +712,13 @@ namespace EpsilonScript.Function
       TypeTraits<T6>.ValueType
     };
     private readonly Func<T1, T2, T3, T4, T5, T6, TResult> _func;
+    private ValueConverter<T1> _converter1; // Looked up once a context variable is found
+    private ValueConverter<T2> _converter2; // Looked up once a context variable is found
+    private ValueConverter<T3> _converter3; // Looked up once a context variable is found
+    private readonly ValueConverter<T4> _converter4;
+    private readonly ValueConverter<T5> _converter5;
+    private readonly ValueConverter<T6> _converter6;
+    private readonly ValueConverter<TResult> _resultConverter;
     private readonly VariableId _contextVar1;
     private readonly VariableId _contextVar2;
     private readonly VariableId _contextVar3;
@@ -1050,71 +730,43 @@ namespace EpsilonScript.Function
       _contextVar1 = contextVar1;
       _contextVar2 = contextVar2;
       _contextVar3 = contextVar3;
+      _converter4 = TypeTraits<T4>.Converter;
+      _converter5 = TypeTraits<T5>.Converter;
+      _converter6 = TypeTraits<T6>.Converter;
+      _resultConverter = TypeTraits<TResult>.Converter;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private TResult Invoke(VariableContextAdapter context, List<Node> parameters)
+    internal override void Invoke(RegisterProgram program, VariableContextAdapter context, int[] arguments,
+      int destination)
     {
-      EnsureParameterCount(parameters);
-
-      if (!context.TryGetVariable(_contextVar1, out T1 ctx1))
+      var variable1 = context.GetVariable(_contextVar1, out var found1);
+      if (!found1)
       {
         throw new RuntimeException($"Context variable '{_contextVar1}' not found");
       }
 
-      if (!context.TryGetVariable(_contextVar2, out T2 ctx2))
+      var ctx1 = (_converter1 ?? (_converter1 = TypeTraits<T1>.Converter))
+        .FromVariableValue(variable1);
+
+      var variable2 = context.GetVariable(_contextVar2, out var found2);
+      if (!found2)
       {
         throw new RuntimeException($"Context variable '{_contextVar2}' not found");
       }
 
-      if (!context.TryGetVariable(_contextVar3, out T3 ctx3))
+      var ctx2 = (_converter2 ?? (_converter2 = TypeTraits<T2>.Converter))
+        .FromVariableValue(variable2);
+
+      var variable3 = context.GetVariable(_contextVar3, out var found3);
+      if (!found3)
       {
         throw new RuntimeException($"Context variable '{_contextVar3}' not found");
       }
 
-      return _func(ctx1, ctx2, ctx3, TypeTraits<T4>.Read(parameters[0]), TypeTraits<T5>.Read(parameters[1]), TypeTraits<T6>.Read(parameters[2]));
-    }
+      var ctx3 = (_converter3 ?? (_converter3 = TypeTraits<T3>.Converter))
+        .FromVariableValue(variable3);
 
-    internal override int ExecuteInt(VariableContextAdapter context, List<Node> parameters)
-    {
-      EnsureReturnType(Type.Integer);
-      return TypeTraits<TResult>.ToInt(Invoke(context, parameters));
-    }
-
-    internal override long ExecuteLong(VariableContextAdapter context, List<Node> parameters)
-    {
-      EnsureReturnType(Type.Long);
-      return TypeTraits<TResult>.ToLong(Invoke(context, parameters));
-    }
-
-    internal override float ExecuteFloat(VariableContextAdapter context, List<Node> parameters)
-    {
-      EnsureReturnType(Type.Float);
-      return TypeTraits<TResult>.ToFloat(Invoke(context, parameters));
-    }
-
-    internal override double ExecuteDouble(VariableContextAdapter context, List<Node> parameters)
-    {
-      EnsureReturnType(Type.Double);
-      return TypeTraits<TResult>.ToDouble(Invoke(context, parameters));
-    }
-
-    internal override decimal ExecuteDecimal(VariableContextAdapter context, List<Node> parameters)
-    {
-      EnsureReturnType(Type.Decimal);
-      return TypeTraits<TResult>.ToDecimal(Invoke(context, parameters));
-    }
-
-    internal override string ExecuteString(VariableContextAdapter context, List<Node> parameters)
-    {
-      EnsureReturnType(Type.String);
-      return TypeTraits<TResult>.ToStringValue(Invoke(context, parameters));
-    }
-
-    internal override bool ExecuteBool(VariableContextAdapter context, List<Node> parameters)
-    {
-      EnsureReturnType(Type.Boolean);
-      return TypeTraits<TResult>.ToBool(Invoke(context, parameters));
+      _resultConverter.Write(program, destination, _func(ctx1, ctx2, ctx3, _converter4.Read(program, arguments[0]), _converter5.Read(program, arguments[1]), _converter6.Read(program, arguments[2])));
     }
   }
 }

@@ -1,13 +1,23 @@
 # Changelog
 
-# Changelog
-
-## [2.2.0] - 202X-XX-XX
+## [2.2.0] - 2026-10-29
 
 ### Added
-- **CachingCompiler**: Opt-in compiler wrapper that caches compiled scripts by source, options, and variable container identity
+- **CachingCompiler**: Opt-in compiler wrapper that compiles each script once and returns the same compiled script for later requests with the same source, options, and compile-time variable container
+  - `GetOrCompile` returns the cached script, compiling it on first use; every caller of the same key shares the instance and its results
+  - Wraps a new `Compiler` or an existing one (`new CachingCompiler(compiler)`)
+  - Drops cached scripts when custom functions are added, including functions added to the wrapped compiler directly (constant folding selects overloads at compile time)
+  - Remembers the hashes of recently used source strings, so a lookup with the same string instance does not hash it again
   - Supports pre-hashed `CachedSourceText` to avoid repeated O(n) hashing when generating cache keys
-  - Cache invalidates when custom functions are added (constant folding selects overloads at compile time)
+  - Supports optional initial capacity to avoid dictionary resize allocations
+  - Exposes `Count`, `Clear()` and `TrimExcess()` for caller-controlled cache memory management
+
+### Changed
+- **Script Execution**: Compiled scripts run on a register-based virtual machine instead of walking the syntax tree
+  - Under IL2CPP, most scripts execute 10-45% faster; trivial scripts (a constant, a single variable, a call with no arguments) take about 1 ns longer
+  - Compilation allocates 20-70% less memory
+  - Results, result types, error messages and locations, and allocation behaviour (including `Compiler.Options.NoAlloc`) are unchanged
+- **Unsafe Code**: The library now contains unsafe code; projects that build it from source need `AllowUnsafeBlocks` (the Unity package's assembly definition already enables it)
 
 ## [2.1.0] - 2025-12-06
 

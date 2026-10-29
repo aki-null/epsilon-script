@@ -32,7 +32,6 @@ namespace EpsilonScript.Tests.AST
       node.Execute(null);
 
       Assert.Equal(GetExpectedValueType(variableType), node.ValueType);
-      Assert.Equal(variableValue, node.Variable);
       AssertVariableValue(node, variableType, value);
     }
 
@@ -79,7 +78,6 @@ namespace EpsilonScript.Tests.AST
       node.Execute(variableOverride);
 
       Assert.Equal(GetExpectedValueType(variableType), node.ValueType);
-      Assert.Equal(overrideVariableValue, node.Variable);
       AssertVariableValue(node, variableType, overrideValue);
     }
 

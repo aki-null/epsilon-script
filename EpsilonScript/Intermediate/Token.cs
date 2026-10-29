@@ -1,4 +1,5 @@
 using System;
+using EpsilonScript.Helper;
 
 namespace EpsilonScript.Intermediate
 {
@@ -36,7 +37,7 @@ namespace EpsilonScript.Intermediate
 
     public static bool operator ==(Token lhs, Token rhs)
     {
-      return lhs.Text.Span == rhs.Text.Span && lhs.Type == rhs.Type;
+      return lhs.Text.FastSpan() == rhs.Text.FastSpan() && lhs.Type == rhs.Type;
     }
 
     public static bool operator !=(Token lhs, Token rhs)
@@ -51,7 +52,7 @@ namespace EpsilonScript.Intermediate
         return false;
       }
 
-      return Text.Span == rhs.Text.Span && Type == rhs.Type;
+      return Text.FastSpan() == rhs.Text.FastSpan() && Type == rhs.Type;
     }
 
     public override int GetHashCode()

@@ -1,10 +1,14 @@
 using System.Collections.Generic;
+using EpsilonScript.Helper;
 using EpsilonScript.Intermediate;
+using EpsilonScript.VirtualMachine;
 
 namespace EpsilonScript.AST.Literal
 {
   internal class IntegerNode : Node
   {
+    internal override int Lower(RegisterCompiler compiler) => compiler.LowerConstant(this);
+
     public IntegerNode()
     {
     }
@@ -22,7 +26,7 @@ namespace EpsilonScript.AST.Literal
     protected override void BuildCore(Stack<Node> rpnStack, Element element, CompilerContext context,
       Compiler.Options options, IVariableContainer variables)
     {
-      var value = long.Parse(element.Token.Text.Span);
+      var value = long.Parse(element.Token.Text.FastSpan());
 
       if (context.IntegerPrecision == Compiler.IntegerPrecision.Integer)
       {

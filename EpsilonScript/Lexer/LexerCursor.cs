@@ -1,5 +1,6 @@
 using System;
 using System.Runtime.CompilerServices;
+using EpsilonScript.Helper;
 
 namespace EpsilonScript.Lexer
 {
@@ -14,7 +15,7 @@ namespace EpsilonScript.Lexer
 
     public LexerCursor(ReadOnlyMemory<char> buffer)
     {
-      _buffer = buffer.Span;
+      _buffer = buffer.FastSpan();
       _current = LexerPosition.Start;
       _tokenStart = LexerPosition.Start;
     }

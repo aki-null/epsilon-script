@@ -1,441 +1,167 @@
 using System;
-using System.Runtime.CompilerServices;
-using EpsilonScript.AST;
-#if UNITY_2018_1_OR_NEWER
-using Unity.Collections.LowLevel.Unsafe;
-#endif
+using EpsilonScript.VirtualMachine;
 
 namespace EpsilonScript.Function
 {
   internal static class TypeTraits<T>
   {
-    private static readonly Func<Node, T> ReadFunc;
-    private static readonly Func<VariableValue, T> FromVariableValueFunc;
-    private static readonly Func<T, int> ToIntFunc;
-    private static readonly Func<T, long> ToLongFunc;
-    private static readonly Func<T, float> ToFloatFunc;
-    private static readonly Func<T, double> ToDoubleFunc;
-    private static readonly Func<T, decimal> ToDecimalFunc;
-    private static readonly Func<T, bool> ToBoolFunc;
-    private static readonly Func<T, string> ToStringFunc;
-
     // ReSharper disable once StaticMemberInGenericType
     public static Type ValueType { get; }
 
+    /// <summary>
+    /// Conversion strategy for <typeparamref name="T"/>. Hot paths should cache this in an instance field:
+    /// static fields of a generic class cost a runtime generic context lookup and class initialization check per
+    /// access under IL2CPP shared generics.
+    /// </summary>
+    public static readonly ValueConverter<T> Converter;
+
     static TypeTraits()
     {
-      ReadFunc = ThrowRead;
-      FromVariableValueFunc = ThrowFromVariableValue;
-      ToIntFunc = ThrowToInt;
-      ToLongFunc = ThrowToLong;
-      ToFloatFunc = ThrowToFloat;
-      ToDoubleFunc = ThrowToDouble;
-      ToDecimalFunc = ThrowToDecimal;
-      ToBoolFunc = ThrowToBool;
-      ToStringFunc = ThrowToString;
-
       if (typeof(T) == typeof(int))
       {
         ValueType = Type.Integer;
-        ReadFunc = ReadInt;
-        FromVariableValueFunc = FromVariableValueInt;
-        ToIntFunc = ToIntIdentity;
-        ToLongFunc = ToIntAsLong;
+        Converter = (ValueConverter<T>)(object)IntConverter.Instance;
         return;
       }
 
       if (typeof(T) == typeof(long))
       {
         ValueType = Type.Long;
-        ReadFunc = ReadLong;
-        FromVariableValueFunc = FromVariableValueLong;
-        ToIntFunc = ToLongAsInt;
-        ToLongFunc = ToLongIdentity;
+        Converter = (ValueConverter<T>)(object)LongConverter.Instance;
         return;
       }
 
       if (typeof(T) == typeof(float))
       {
         ValueType = Type.Float;
-        ReadFunc = ReadFloat;
-        FromVariableValueFunc = FromVariableValueFloat;
-        ToFloatFunc = ToFloatIdentity;
-        ToDoubleFunc = ToFloatAsDouble;
+        Converter = (ValueConverter<T>)(object)FloatConverter.Instance;
         return;
       }
 
       if (typeof(T) == typeof(double))
       {
         ValueType = Type.Double;
-        ReadFunc = ReadDouble;
-        FromVariableValueFunc = FromVariableValueDouble;
-        ToFloatFunc = ToDoubleAsFloat;
-        ToDoubleFunc = ToDoubleIdentity;
+        Converter = (ValueConverter<T>)(object)DoubleConverter.Instance;
         return;
       }
 
       if (typeof(T) == typeof(decimal))
       {
         ValueType = Type.Decimal;
-        ReadFunc = ReadDecimal;
-        FromVariableValueFunc = FromVariableValueDecimal;
-        ToDecimalFunc = ToDecimalIdentity;
+        Converter = (ValueConverter<T>)(object)DecimalConverter.Instance;
         return;
       }
 
       if (typeof(T) == typeof(bool))
       {
         ValueType = Type.Boolean;
-        ReadFunc = ReadBool;
-        FromVariableValueFunc = FromVariableValueBool;
-        ToBoolFunc = ToBoolIdentity;
+        Converter = (ValueConverter<T>)(object)BoolConverter.Instance;
         return;
       }
 
       if (typeof(T) == typeof(string))
       {
         ValueType = Type.String;
-        ReadFunc = ReadString;
-        FromVariableValueFunc = FromVariableValueString;
-        ToStringFunc = ToStringIdentity;
+        Converter = (ValueConverter<T>)(object)StringConverter.Instance;
         return;
       }
 
       throw new NotSupportedException($"Type {typeof(T)} is not supported by EpsilonScript custom functions");
     }
+  }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static T Read(Node node)
-    {
-      return ReadFunc(node);
-    }
+  /// <summary>
+  /// Converts between script values and <typeparamref name="T"/>. Each supported type has a sealed, non-generic
+  /// subclass, so a call is one virtual dispatch into a direct field read with no generic context lookups.
+  /// </summary>
+  internal abstract class ValueConverter<T>
+  {
+    public abstract T Read(RegisterProgram program, int register);
+    public abstract void Write(RegisterProgram program, int register, T value);
+    public abstract T FromVariableValue(VariableValue variableValue);
+  }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static T FromVariableValue(VariableValue variableValue)
-    {
-      return FromVariableValueFunc(variableValue);
-    }
+  internal sealed class IntConverter : ValueConverter<int>
+  {
+    public static readonly IntConverter Instance = new IntConverter();
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static int ToInt(T value)
-    {
-      return ToIntFunc(value);
-    }
+    public override int Read(RegisterProgram program, int register) => program.ReadInteger(register);
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static long ToLong(T value)
-    {
-      return ToLongFunc(value);
-    }
+    public override void Write(RegisterProgram program, int register, int value) =>
+      program.WriteInteger(register, value);
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static float ToFloat(T value)
-    {
-      return ToFloatFunc(value);
-    }
+    public override int FromVariableValue(VariableValue variableValue) => variableValue.IntegerValue;
+  }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static double ToDouble(T value)
-    {
-      return ToDoubleFunc(value);
-    }
+  internal sealed class LongConverter : ValueConverter<long>
+  {
+    public static readonly LongConverter Instance = new LongConverter();
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static decimal ToDecimal(T value)
-    {
-      return ToDecimalFunc(value);
-    }
+    public override long Read(RegisterProgram program, int register) => program.ReadLong(register);
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool ToBool(T value)
-    {
-      return ToBoolFunc(value);
-    }
+    public override void Write(RegisterProgram program, int register, long value) =>
+      program.WriteLong(register, value);
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static string ToStringValue(T value)
-    {
-      return ToStringFunc(value);
-    }
+    public override long FromVariableValue(VariableValue variableValue) => variableValue.LongValue;
+  }
 
-    private static T ThrowRead(Node _)
-    {
-      throw new InvalidOperationException($"Unsupported script type: {ValueType}");
-    }
+  internal sealed class FloatConverter : ValueConverter<float>
+  {
+    public static readonly FloatConverter Instance = new FloatConverter();
 
-    private static T ThrowFromVariableValue(VariableValue _)
-    {
-      throw new InvalidOperationException($"Unsupported variable type: {ValueType}");
-    }
+    public override float Read(RegisterProgram program, int register) => program.ReadFloat(register);
 
-    private static int ThrowToInt(T _)
-    {
-      throw new InvalidOperationException("Attempted to extract integer value from non-integer type");
-    }
+    public override void Write(RegisterProgram program, int register, float value) =>
+      program.WriteFloat(register, value);
 
-    private static long ThrowToLong(T _)
-    {
-      throw new InvalidOperationException("Attempted to extract long value from non-long type");
-    }
+    public override float FromVariableValue(VariableValue variableValue) => variableValue.FloatValue;
+  }
 
-    private static float ThrowToFloat(T _)
-    {
-      throw new InvalidOperationException("Attempted to extract float value from non-float type");
-    }
+  internal sealed class DoubleConverter : ValueConverter<double>
+  {
+    public static readonly DoubleConverter Instance = new DoubleConverter();
 
-    private static double ThrowToDouble(T _)
-    {
-      throw new InvalidOperationException("Attempted to extract double value from non-double type");
-    }
+    public override double Read(RegisterProgram program, int register) => program.ReadDouble(register);
 
-    private static decimal ThrowToDecimal(T _)
-    {
-      throw new InvalidOperationException("Attempted to extract decimal value from non-decimal type");
-    }
+    public override void Write(RegisterProgram program, int register, double value) =>
+      program.WriteDouble(register, value);
 
-    private static bool ThrowToBool(T _)
-    {
-      throw new InvalidOperationException("Attempted to extract boolean value from non-boolean type");
-    }
+    public override double FromVariableValue(VariableValue variableValue) => variableValue.DoubleValue;
+  }
 
-    private static string ThrowToString(T _)
-    {
-      throw new InvalidOperationException("Attempted to extract string value from non-string type");
-    }
+  internal sealed class DecimalConverter : ValueConverter<decimal>
+  {
+    public static readonly DecimalConverter Instance = new DecimalConverter();
 
-    private static T ReadInt(Node node)
-    {
-      var value = node.IntegerValue;
-#if UNITY_2018_1_OR_NEWER
-      return UnsafeUtility.As<int, T>(ref value);
-#else
-      return Unsafe.As<int, T>(ref value);
-#endif
-    }
+    public override decimal Read(RegisterProgram program, int register) => program.ReadDecimal(register);
 
-    private static int ToIntIdentity(T value)
-    {
-      var temp = value;
-#if UNITY_2018_1_OR_NEWER
-      return UnsafeUtility.As<T, int>(ref temp);
-#else
-      return Unsafe.As<T, int>(ref temp);
-#endif
-    }
+    public override void Write(RegisterProgram program, int register, decimal value) =>
+      program.WriteDecimal(register, value);
 
-    private static T ReadFloat(Node node)
-    {
-      var value = node.FloatValue;
-#if UNITY_2018_1_OR_NEWER
-      return UnsafeUtility.As<float, T>(ref value);
-#else
-      return Unsafe.As<float, T>(ref value);
-#endif
-    }
+    public override decimal FromVariableValue(VariableValue variableValue) => variableValue.DecimalValue;
+  }
 
-    private static float ToFloatIdentity(T value)
-    {
-      var temp = value;
-#if UNITY_2018_1_OR_NEWER
-      return UnsafeUtility.As<T, float>(ref temp);
-#else
-      return Unsafe.As<T, float>(ref temp);
-#endif
-    }
+  internal sealed class BoolConverter : ValueConverter<bool>
+  {
+    public static readonly BoolConverter Instance = new BoolConverter();
 
-    private static T ReadBool(Node node)
-    {
-      var value = node.BooleanValue;
-#if UNITY_2018_1_OR_NEWER
-      return UnsafeUtility.As<bool, T>(ref value);
-#else
-      return Unsafe.As<bool, T>(ref value);
-#endif
-    }
+    public override bool Read(RegisterProgram program, int register) => program.ReadBoolean(register);
 
-    private static bool ToBoolIdentity(T value)
-    {
-      var temp = value;
-#if UNITY_2018_1_OR_NEWER
-      return UnsafeUtility.As<T, bool>(ref temp);
-#else
-      return Unsafe.As<T, bool>(ref temp);
-#endif
-    }
+    public override void Write(RegisterProgram program, int register, bool value) =>
+      program.WriteBoolean(register, value);
 
-    private static T ReadLong(Node node)
-    {
-      var value = node.LongValue;
-#if UNITY_2018_1_OR_NEWER
-      return UnsafeUtility.As<long, T>(ref value);
-#else
-      return Unsafe.As<long, T>(ref value);
-#endif
-    }
+    public override bool FromVariableValue(VariableValue variableValue) => variableValue.BooleanValue;
+  }
 
-    private static int ToLongAsInt(T value)
-    {
-      var temp = value;
-#if UNITY_2018_1_OR_NEWER
-      return (int)UnsafeUtility.As<T, long>(ref temp);
-#else
-      return (int)Unsafe.As<T, long>(ref temp);
-#endif
-    }
+  internal sealed class StringConverter : ValueConverter<string>
+  {
+    public static readonly StringConverter Instance = new StringConverter();
 
-    private static T ReadDouble(Node node)
-    {
-      var value = node.DoubleValue;
-#if UNITY_2018_1_OR_NEWER
-      return UnsafeUtility.As<double, T>(ref value);
-#else
-      return Unsafe.As<double, T>(ref value);
-#endif
-    }
+    public override string Read(RegisterProgram program, int register) => program.ReadString(register);
 
-    private static float ToDoubleAsFloat(T value)
-    {
-      var temp = value;
-#if UNITY_2018_1_OR_NEWER
-      return (float)UnsafeUtility.As<T, double>(ref temp);
-#else
-      return (float)Unsafe.As<T, double>(ref temp);
-#endif
-    }
+    public override void Write(RegisterProgram program, int register, string value) =>
+      program.WriteString(register, value);
 
-    private static T ReadDecimal(Node node)
-    {
-      var value = node.DecimalValue;
-#if UNITY_2018_1_OR_NEWER
-      return UnsafeUtility.As<decimal, T>(ref value);
-#else
-      return Unsafe.As<decimal, T>(ref value);
-#endif
-    }
-
-    private static T ReadString(Node node)
-    {
-      return (T)(object)node.StringValue;
-    }
-
-    private static long ToIntAsLong(T value)
-    {
-      var temp = value;
-#if UNITY_2018_1_OR_NEWER
-      return UnsafeUtility.As<T, int>(ref temp);
-#else
-      return Unsafe.As<T, int>(ref temp);
-#endif
-    }
-
-    private static long ToLongIdentity(T value)
-    {
-      var temp = value;
-#if UNITY_2018_1_OR_NEWER
-      return UnsafeUtility.As<T, long>(ref temp);
-#else
-      return Unsafe.As<T, long>(ref temp);
-#endif
-    }
-
-    private static double ToFloatAsDouble(T value)
-    {
-      var temp = value;
-#if UNITY_2018_1_OR_NEWER
-      return UnsafeUtility.As<T, float>(ref temp);
-#else
-      return Unsafe.As<T, float>(ref temp);
-#endif
-    }
-
-    private static double ToDoubleIdentity(T value)
-    {
-      var temp = value;
-#if UNITY_2018_1_OR_NEWER
-      return UnsafeUtility.As<T, double>(ref temp);
-#else
-      return Unsafe.As<T, double>(ref temp);
-#endif
-    }
-
-    private static decimal ToDecimalIdentity(T value)
-    {
-      var temp = value;
-#if UNITY_2018_1_OR_NEWER
-      return UnsafeUtility.As<T, decimal>(ref temp);
-#else
-      return Unsafe.As<T, decimal>(ref temp);
-#endif
-    }
-
-    private static string ToStringIdentity(T value)
-    {
-      return (string)(object)value;
-    }
-
-    private static T FromVariableValueInt(VariableValue variableValue)
-    {
-      var value = variableValue.IntegerValue;
-#if UNITY_2018_1_OR_NEWER
-      return UnsafeUtility.As<int, T>(ref value);
-#else
-      return Unsafe.As<int, T>(ref value);
-#endif
-    }
-
-    private static T FromVariableValueLong(VariableValue variableValue)
-    {
-      var value = variableValue.LongValue;
-#if UNITY_2018_1_OR_NEWER
-      return UnsafeUtility.As<long, T>(ref value);
-#else
-      return Unsafe.As<long, T>(ref value);
-#endif
-    }
-
-    private static T FromVariableValueFloat(VariableValue variableValue)
-    {
-      var value = variableValue.FloatValue;
-#if UNITY_2018_1_OR_NEWER
-      return UnsafeUtility.As<float, T>(ref value);
-#else
-      return Unsafe.As<float, T>(ref value);
-#endif
-    }
-
-    private static T FromVariableValueDouble(VariableValue variableValue)
-    {
-      var value = variableValue.DoubleValue;
-#if UNITY_2018_1_OR_NEWER
-      return UnsafeUtility.As<double, T>(ref value);
-#else
-      return Unsafe.As<double, T>(ref value);
-#endif
-    }
-
-    private static T FromVariableValueDecimal(VariableValue variableValue)
-    {
-      var value = variableValue.DecimalValue;
-#if UNITY_2018_1_OR_NEWER
-      return UnsafeUtility.As<decimal, T>(ref value);
-#else
-      return Unsafe.As<decimal, T>(ref value);
-#endif
-    }
-
-    private static T FromVariableValueBool(VariableValue variableValue)
-    {
-      var value = variableValue.BooleanValue;
-#if UNITY_2018_1_OR_NEWER
-      return UnsafeUtility.As<bool, T>(ref value);
-#else
-      return Unsafe.As<bool, T>(ref value);
-#endif
-    }
-
-    private static T FromVariableValueString(VariableValue variableValue)
-    {
-      return (T)(object)variableValue.StringValue;
-    }
+    public override string FromVariableValue(VariableValue variableValue) => variableValue.StringValue;
   }
 }

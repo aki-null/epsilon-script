@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace EpsilonScript.Function
 {
@@ -12,7 +13,7 @@ namespace EpsilonScript.Function
 
     public VariableId Name { get; }
     public bool IsDeterministic { get; }
-    public int Version { get; private set; }
+    public int Version { [MethodImpl(MethodImplOptions.AggressiveInlining)] get; private set; }
 
     public CustomFunctionOverload(CustomFunction function, Compiler.IntegerPrecision intPrecision,
       Compiler.FloatPrecision floatPrecision)
@@ -62,6 +63,13 @@ namespace EpsilonScript.Function
       var functions = new System.Collections.Generic.List<CustomFunction>();
       _rootNode.CollectAllFunctions(functions);
       return functions;
+    }
+
+    internal string CreateMismatchMessage(PackedParameterTypes packedTypes)
+    {
+      var overloadList = string.Join(", ", GetAllOverloads());
+      return $"No overload of function '{Name}' matches parameter types: ({packedTypes}).\n" +
+             $"Available overloads: {overloadList}";
     }
   }
 }

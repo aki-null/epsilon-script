@@ -1,4 +1,5 @@
 using System;
+using EpsilonScript.AST;
 using EpsilonScript.Function;
 using EpsilonScript.Tests.TestInfrastructure;
 using Xunit;
@@ -26,6 +27,16 @@ namespace EpsilonScript.Tests.ScriptSystem
     {
       var compiler = CreateCompiler(extraFunctions);
       return compiler.Compile(source, options, variables);
+    }
+
+    /// <summary>
+    /// Compiles to the optimized AST, for tests that verify tree structure and optimizations
+    /// </summary>
+    internal static Node CompileTree(string source, Compiler.Options options = Compiler.Options.None,
+      DictionaryVariableContainer variables = null, params CustomFunction[] extraFunctions)
+    {
+      var compiler = CreateCompiler(extraFunctions);
+      return compiler.CompileTree(source.AsMemory(), options, variables);
     }
 
     protected static ScriptExecutionResult CompileAndExecute(string source,

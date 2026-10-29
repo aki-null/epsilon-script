@@ -6,9 +6,6 @@
   const int maxContextVars = 3;
   const int maxContextParams = 3;
 
-  // Return types supported by the system
-  var returnTypes = new[] { "Int", "Long", "Float", "Double", "Decimal", "String", "Bool" };
-
   // Generate type parameter list: T1, T2, ..., TN
   string TypeParams(int count)
   {
@@ -50,39 +47,6 @@
     return contextCount == 1 ? string.Empty : contextCount.ToString();
   }
 
-  // Map return type to C# type
-  string GetCSharpType(string returnType)
-  {
-    return returnType switch
-    {
-      "Int" => "int",
-      "Long" => "long",
-      "Float" => "float",
-      "Double" => "double",
-      "Decimal" => "decimal",
-      "String" => "string",
-      "Bool" => "bool",
-      _ => "object"
-      };
-  }
-
-  // Map return type to Type enum value
-  string GetTypeEnumValue(string returnType)
-  {
-    return returnType switch
-    {
-      "Int" => "Integer",
-      "Bool" => "Boolean",
-      _ => returnType
-      };
-  }
-
-  // Map return type to TypeTraits method
-  string GetTraitMethod(string returnType)
-  {
-    return returnType == "String" ? "ToStringValue" : $"To{returnType}";
-  }
-
   // Add 's' suffix for plural when count != 1
   string Plural(int count)
   {
@@ -99,7 +63,7 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using EpsilonScript.AST;
+using EpsilonScript.VirtualMachine;
 
 namespace EpsilonScript.Function
 {
@@ -188,6 +152,21 @@ namespace EpsilonScript.Function
       for (var i = 1; i <= contextCount; i++)
       {
 #>
+    private ValueConverter<T<#= i #>> _converter<#= i #>; // Looked up once a context variable is found
+<#
+      }
+      for (var i = contextCount + 1; i <= totalTypeParams; i++)
+      {
+#>
+    private readonly ValueConverter<T<#= i #>> _converter<#= i #>;
+<#
+      }
+#>
+    private readonly ValueConverter<TResult> _resultConverter;
+<#
+      for (var i = 1; i <= contextCount; i++)
+      {
+#>
     private readonly VariableId _contextVar<#= i #>;
 <#
       }
@@ -205,53 +184,49 @@ namespace EpsilonScript.Function
       _contextVar<#= i #> = contextVar<#= i #>;
 <#
       }
+      // Context variable types are checked only when a variable is found, so an unsupported one fails at the call
+      for (var i = contextCount + 1; i <= totalTypeParams; i++)
+      {
 #>
+      _converter<#= i #> = TypeTraits<T<#= i #>>.Converter;
+<#
+      }
+#>
+      _resultConverter = TypeTraits<TResult>.Converter;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private TResult Invoke(VariableContextAdapter context, List<Node> parameters)
+    internal override void Invoke(RegisterProgram program, VariableContextAdapter context, int[] arguments,
+      int destination)
     {
-      EnsureParameterCount(parameters);
 <#
       for (var i = 1; i <= contextCount; i++)
       {
 #>
-
-      if (!context.TryGetVariable(_contextVar<#= i #>, out T<#= i #> ctx<#= i #>))
+      var variable<#= i #> = context.GetVariable(_contextVar<#= i #>, out var found<#= i #>);
+      if (!found<#= i #>)
       {
         throw new RuntimeException($"Context variable '{_contextVar<#= i #>}' not found");
       }
+
+      var ctx<#= i #> = (_converter<#= i #> ?? (_converter<#= i #> = TypeTraits<T<#= i #>>.Converter))
+        .FromVariableValue(variable<#= i #>);
+
 <#
       }
 #>
-
-      return _func(<#
-      var argList = new System.Collections.Generic.List<string>();
+      _resultConverter.Write(program, destination, _func(<#
+      var registerArgs = new System.Collections.Generic.List<string>();
       for (var i = 1; i <= contextCount; i++)
       {
-        argList.Add($"ctx{i}");
+        registerArgs.Add($"ctx{i}");
       }
       for (var i = 0; i < paramCount; i++)
       {
-        var typeIndex = contextCount + i + 1;
-        argList.Add($"TypeTraits<T{typeIndex}>.Read(parameters[{i}])");
+        registerArgs.Add($"_converter{contextCount + i + 1}.Read(program, arguments[{i}])");
       }
-      Write(string.Join(", ", argList));
-#>);
+      Write(string.Join(", ", registerArgs));
+#>));
     }
-<#
-      foreach (var returnType in returnTypes)
-      {
-#>
-
-    internal override <#= GetCSharpType(returnType) #> Execute<#= returnType #>(VariableContextAdapter context, List<Node> parameters)
-    {
-      EnsureReturnType(Type.<#= GetTypeEnumValue(returnType) #>);
-      return TypeTraits<TResult>.<#= GetTraitMethod(returnType) #>(Invoke(context, parameters));
-    }
-<#
-      }
-#>
   }
 <#
     } // end paramCount loop

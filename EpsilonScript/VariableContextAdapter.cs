@@ -17,25 +17,27 @@ namespace EpsilonScript
       _compileTimeContainer = compileTimeContainer;
     }
 
+    /// <summary>
+    /// The variable from the override container, else the compile-time one. Returned rather than through an out
+    /// parameter, which under IL2CPP costs a GC write barrier. An entry is used even when its value is null, which
+    /// then fails in the conversion.
+    /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool TryGetVariable<T>(VariableId variableId, out T value)
+    public VariableValue GetVariable(VariableId variableId, out bool found)
     {
-      // Check override container first
-      if (_overrideContainer != null && _overrideContainer.TryGetValue(variableId, out var variableValue))
+      found = false;
+      VariableValue value = null;
+      if (_overrideContainer != null)
       {
-        value = TypeTraits<T>.FromVariableValue(variableValue);
-        return true;
+        value = DictionaryVariableContainer.Lookup(_overrideContainer, variableId, out found);
       }
 
-      // Fall back to compile-time container
-      if (_compileTimeContainer != null && _compileTimeContainer.TryGetValue(variableId, out variableValue))
+      if (!found && _compileTimeContainer != null)
       {
-        value = TypeTraits<T>.FromVariableValue(variableValue);
-        return true;
+        value = DictionaryVariableContainer.Lookup(_compileTimeContainer, variableId, out found);
       }
 
-      value = default;
-      return false;
+      return value;
     }
   }
 }

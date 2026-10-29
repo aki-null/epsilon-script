@@ -1,10 +1,13 @@
 using System.Collections.Generic;
 using EpsilonScript.Intermediate;
+using EpsilonScript.VirtualMachine;
 
 namespace EpsilonScript.AST.Literal
 {
   internal class BooleanNode : Node
   {
+    internal override int Lower(RegisterCompiler compiler) => compiler.LowerConstant(this);
+
     public BooleanNode()
     {
     }

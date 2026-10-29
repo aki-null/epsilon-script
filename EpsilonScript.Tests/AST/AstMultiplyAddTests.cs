@@ -1,3 +1,4 @@
+using EpsilonScript.AST;
 using EpsilonScript.AST.Arithmetic;
 using EpsilonScript.AST.Literal;
 using Xunit;
@@ -12,18 +13,18 @@ namespace EpsilonScript.Tests.AST
     /// <summary>
     /// Verifies that the compiled script has been optimized to use a multiply-add operation node
     /// </summary>
-    private static void AssertIsMultiplyAddNode(CompiledScript script)
+    private static void AssertIsMultiplyAddNode(Node root)
     {
-      Assert.IsAssignableFrom<MultiplyAddOperationNode>(script.RootNode);
+      Assert.IsAssignableFrom<MultiplyAddOperationNode>(root);
     }
 
     /// <summary>
     /// Verifies that the compiled script uses ArithmeticNode (not optimized to a multiply-add operation)
     /// </summary>
-    private static void AssertIsNotMultiplyAddNode(CompiledScript script)
+    private static void AssertIsNotMultiplyAddNode(Node root)
     {
-      Assert.False(script.RootNode is MultiplyAddOperationNode,
-        $"Expected node to NOT be a multiply-add operation, but got {script.RootNode.GetType().Name}");
+      Assert.False(root is MultiplyAddOperationNode,
+        $"Expected node to NOT be a multiply-add operation, but got {root.GetType().Name}");
     }
 
     [Fact]
@@ -495,9 +496,9 @@ namespace EpsilonScript.Tests.AST
         .WithInteger("c", 4)
         .Build();
 
-      var script = Compile("(a * b) + c", Compiler.Options.None, vars);
+      var root = CompileTree("(a * b) + c", Compiler.Options.None, vars);
 
-      AssertIsMultiplyAddNode(script);
+      AssertIsMultiplyAddNode(root);
     }
 
     [Fact]
@@ -510,9 +511,9 @@ namespace EpsilonScript.Tests.AST
         .WithInteger("c", 4)
         .Build();
 
-      var script = Compile("c + (a * b)", Compiler.Options.None, vars);
+      var root = CompileTree("c + (a * b)", Compiler.Options.None, vars);
 
-      AssertIsMultiplyAddNode(script);
+      AssertIsMultiplyAddNode(root);
     }
 
     [Fact]
@@ -525,9 +526,9 @@ namespace EpsilonScript.Tests.AST
         .WithInteger("c", 4)
         .Build();
 
-      var script = Compile("(a * b) - c", Compiler.Options.None, vars);
+      var root = CompileTree("(a * b) - c", Compiler.Options.None, vars);
 
-      AssertIsMultiplyAddNode(script);
+      AssertIsMultiplyAddNode(root);
     }
 
     [Fact]
@@ -540,9 +541,9 @@ namespace EpsilonScript.Tests.AST
         .WithInteger("c", 10)
         .Build();
 
-      var script = Compile("c - (a * b)", Compiler.Options.None, vars);
+      var root = CompileTree("c - (a * b)", Compiler.Options.None, vars);
 
-      AssertIsMultiplyAddNode(script);
+      AssertIsMultiplyAddNode(root);
     }
 
     [Fact]
@@ -555,20 +556,20 @@ namespace EpsilonScript.Tests.AST
         .WithInteger("c", 4)
         .Build();
 
-      var script = Compile("(a + b) * c", Compiler.Options.None, vars);
+      var root = CompileTree("(a + b) * c", Compiler.Options.None, vars);
 
-      AssertIsNotMultiplyAddNode(script);
+      AssertIsNotMultiplyAddNode(root);
     }
 
     [Fact]
     public void MA_Optimization_ConstantExpression_FoldsToConstant()
     {
       // Verify that (2 * 3) + 4 gets folded to a constant (not a multiply-add operation)
-      var script = Compile("(2 * 3) + 4");
+      var root = CompileTree("(2 * 3) + 4");
 
       // Should be a constant node (IntegerNode), not a multiply-add operation node
-      Assert.False(script.RootNode is MultiplyAddOperationNode);
-      Assert.IsType<IntegerNode>(script.RootNode);
+      Assert.False(root is MultiplyAddOperationNode);
+      Assert.IsType<IntegerNode>(root);
     }
 
     [Fact]
@@ -581,9 +582,9 @@ namespace EpsilonScript.Tests.AST
         .WithFloat("c", 1.5f)
         .Build();
 
-      var script = Compile("(a * b) + c", Compiler.Options.None, vars);
+      var root = CompileTree("(a * b) + c", Compiler.Options.None, vars);
 
-      AssertIsMultiplyAddNode(script);
+      AssertIsMultiplyAddNode(root);
     }
 
     [Fact]
@@ -596,9 +597,9 @@ namespace EpsilonScript.Tests.AST
         .WithFloat("c", 1.5f)
         .Build();
 
-      var script = Compile("(a * b) + c", Compiler.Options.None, vars);
+      var root = CompileTree("(a * b) + c", Compiler.Options.None, vars);
 
-      AssertIsMultiplyAddNode(script);
+      AssertIsMultiplyAddNode(root);
     }
 
     [Fact]
@@ -613,10 +614,10 @@ namespace EpsilonScript.Tests.AST
         .WithInteger("d", 5)
         .Build();
 
-      var script = Compile("(a * b) + (c * d)", Compiler.Options.None, vars);
+      var root = CompileTree("(a * b) + (c * d)", Compiler.Options.None, vars);
 
       // The root should be MultiplyAddNode (for the right-hand multiply)
-      AssertIsMultiplyAddNode(script);
+      AssertIsMultiplyAddNode(root);
     }
   }
 }

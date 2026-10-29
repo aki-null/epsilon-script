@@ -1,10 +1,14 @@
 using System.Collections.Generic;
+using EpsilonScript.Helper;
 using EpsilonScript.Intermediate;
+using EpsilonScript.VirtualMachine;
 
 namespace EpsilonScript.AST.Literal
 {
   internal class StringNode : Node
   {
+    internal override int Lower(RegisterCompiler compiler) => compiler.LowerConstant(this);
+
     public StringNode()
     {
     }
@@ -19,7 +23,7 @@ namespace EpsilonScript.AST.Literal
     {
       var span = element.Token.Text;
       // Slicing accounts for quotation marks
-      StringValue = span.Slice(1, span.Length - 2).ToString();
+      StringValue = span.Slice(1, span.Length - 2).FastToString();
     }
   }
 }

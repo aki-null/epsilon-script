@@ -22,7 +22,6 @@ namespace EpsilonScript.Tests.AST
 
       Assert.Null(node.TupleValue);
       Assert.Null(node.StringValue);
-      Assert.Null(node.Variable);
     }
 
     [Fact]
@@ -49,7 +48,6 @@ namespace EpsilonScript.Tests.AST
 
       Assert.Null(node.TupleValue);
       Assert.Null(node.StringValue);
-      Assert.Null(node.Variable);
     }
 
     [Theory]
@@ -67,7 +65,6 @@ namespace EpsilonScript.Tests.AST
 
       Assert.Null(node.TupleValue);
       Assert.Null(node.StringValue);
-      Assert.Null(node.Variable);
     }
 
     [Fact]
@@ -87,7 +84,6 @@ namespace EpsilonScript.Tests.AST
       Assert.IsAssignableFrom<Node>(optimizedNode);
       Assert.Null(optimizedNode.TupleValue);
       Assert.Null(optimizedNode.StringValue);
-      Assert.Null(optimizedNode.Variable);
     }
 
     [Fact]
@@ -104,7 +100,6 @@ namespace EpsilonScript.Tests.AST
 
       Assert.Null(node.TupleValue);
       Assert.Null(node.StringValue);
-      Assert.Null(node.Variable);
     }
 
     [Fact]
@@ -121,7 +116,6 @@ namespace EpsilonScript.Tests.AST
 
       Assert.Null(node.TupleValue);
       Assert.Null(node.StringValue);
-      Assert.Null(node.Variable);
       // Stack should still contain the integer node since null doesn't consume it
       Assert.True(rpn.TryPop(out var remainingNode));
       Assert.IsAssignableFrom<Node>(remainingNode);
@@ -143,7 +137,6 @@ namespace EpsilonScript.Tests.AST
       Assert.False(node.BooleanValue);
       Assert.Null(node.StringValue);
       Assert.Null(node.TupleValue);
-      Assert.Null(node.Variable);
     }
 
     [Fact]
@@ -165,7 +158,6 @@ namespace EpsilonScript.Tests.AST
       // Should remain null
       Assert.Null(node.TupleValue);
       Assert.Null(node.StringValue);
-      Assert.Null(node.Variable);
     }
 
     [Fact]
@@ -182,7 +174,6 @@ namespace EpsilonScript.Tests.AST
 
       Assert.Null(node.TupleValue);
       Assert.Null(node.StringValue);
-      Assert.Null(node.Variable);
     }
   }
 }

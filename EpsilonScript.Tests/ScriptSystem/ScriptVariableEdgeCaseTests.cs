@@ -350,5 +350,79 @@ namespace EpsilonScript.Tests.ScriptSystem
     }
 
     #endregion
+
+    #region Container Mutation After Execution
+
+    [Fact]
+    public void Variable_EntryReplacedAfterExecute_UsesNewEntry()
+    {
+      var variables = new DictionaryVariableContainer { ["x"] = new VariableValue(1) };
+      var script = Compile("x + 1", Compiler.Options.Immutable, variables);
+      script.Execute();
+      Assert.Equal(2, script.IntegerValue);
+
+      variables["x"] = new VariableValue(10);
+      script.Execute();
+      Assert.Equal(11, script.IntegerValue);
+    }
+
+    [Fact]
+    public void Variable_EntryRemovedAfterExecute_Throws()
+    {
+      var variables = new DictionaryVariableContainer { ["x"] = new VariableValue(1) };
+      var script = Compile("x", Compiler.Options.Immutable, variables);
+      script.Execute();
+
+      variables.Remove("x");
+      Assert.Throws<RuntimeException>(() => script.Execute());
+    }
+
+    [Fact]
+    public void Variable_ContainerClearedAndRefilled_UsesNewEntry()
+    {
+      var variables = new DictionaryVariableContainer { ["x"] = new VariableValue(1.5f) };
+      var script = Compile("x * 2.0", Compiler.Options.Immutable, variables);
+      script.Execute();
+      Assert.Equal(3.0f, script.FloatValue);
+
+      variables.Clear();
+      variables.Add(new System.Collections.Generic.KeyValuePair<VariableId, VariableValue>("x", new VariableValue(4f)));
+      script.Execute();
+      Assert.Equal(8.0f, script.FloatValue);
+    }
+
+    [Fact]
+    public void Variable_OverrideTakesPrecedenceOverCachedEntry()
+    {
+      var variables = new DictionaryVariableContainer { ["x"] = new VariableValue(1) };
+      var script = Compile("x", Compiler.Options.Immutable, variables);
+      script.Execute();
+      Assert.Equal(1, script.IntegerValue);
+
+      script.Execute(new DictionaryVariableContainer { ["x"] = new VariableValue(5) });
+      Assert.Equal(5, script.IntegerValue);
+
+      script.Execute(new DictionaryVariableContainer { ["y"] = new VariableValue(5) });
+      Assert.Equal(1, script.IntegerValue);
+    }
+
+    [Fact]
+    public void Variable_AssignmentAfterEntryReplaced_WritesNewEntry()
+    {
+      var original = new VariableValue(1);
+      var variables = new DictionaryVariableContainer { ["x"] = original };
+      var script = Compile("x = x + 1", Compiler.Options.None, variables);
+      script.Execute();
+      Assert.Equal(2, original.IntegerValue);
+
+      var replacement = new VariableValue(10);
+      variables["x"] = replacement;
+      script.Execute();
+      Assert.Equal(11, replacement.IntegerValue);
+      Assert.Equal(2, original.IntegerValue);
+    }
+
+    #endregion
+
   }
 }

@@ -8,7 +8,7 @@ namespace EpsilonScript.Parser
   /// Validates parser syntax rules.
   /// Throws ParserException for syntax and structural errors.
   /// Throws ArgumentException for programming errors (null parameters, invalid state).
-  /// Note: Semantic/type errors throw RuntimeException (in AST nodes during Execute()).
+  /// Note: Semantic/type errors throw RuntimeException (from the register VM, when folding constants or executing).
   /// </summary>
   internal static class Validator
   {

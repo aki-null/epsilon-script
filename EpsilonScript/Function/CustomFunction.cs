@@ -1,6 +1,5 @@
 using System;
-using System.Collections.Generic;
-using EpsilonScript.AST;
+using EpsilonScript.VirtualMachine;
 
 namespace EpsilonScript.Function
 {
@@ -28,16 +27,6 @@ namespace EpsilonScript.Function
     public Type ReturnType { get; }
     public bool IsContextual { get; }
 
-    private protected void EnsureParameterCount(List<Node> parameters)
-    {
-      var actualCount = parameters?.Count ?? 0;
-      if (actualCount != ParameterTypes.Length)
-      {
-        throw new RuntimeException(
-          $"Function '{Name}' expects {ParameterTypes.Length} parameter(s) but received {actualCount}");
-      }
-    }
-
     protected void EnsureReturnType(Type expected)
     {
       if (ReturnType != expected)
@@ -46,80 +35,37 @@ namespace EpsilonScript.Function
       }
     }
 
-    internal virtual int ExecuteInt(List<Node> parameters)
+    /// <summary>
+    /// Calls the function with arguments read from VM registers and writes the result to a register.
+    /// </summary>
+    internal virtual void Invoke(RegisterProgram program, int[] arguments, int destination)
     {
-      throw new InvalidOperationException($"Function '{Name}' does not return integer");
+      throw new InvalidOperationException($"Function '{Name}' does not return {ReturnTypeName()}");
     }
 
-    internal virtual long ExecuteLong(List<Node> parameters)
-    {
-      throw new InvalidOperationException($"Function '{Name}' does not return long");
-    }
-
-    internal virtual float ExecuteFloat(List<Node> parameters)
-    {
-      throw new InvalidOperationException($"Function '{Name}' does not return float");
-    }
-
-    internal virtual double ExecuteDouble(List<Node> parameters)
-    {
-      throw new InvalidOperationException($"Function '{Name}' does not return double");
-    }
-
-    internal virtual decimal ExecuteDecimal(List<Node> parameters)
-    {
-      throw new InvalidOperationException($"Function '{Name}' does not return decimal");
-    }
-
-    internal virtual string ExecuteString(List<Node> parameters)
-    {
-      throw new InvalidOperationException($"Function '{Name}' does not return string");
-    }
-
-    internal virtual bool ExecuteBool(List<Node> parameters)
-    {
-      throw new InvalidOperationException($"Function '{Name}' does not return boolean");
-    }
-
-    // Contextual execution methods (with VariableContextAdapter)
-    internal virtual int ExecuteInt(VariableContextAdapter context, List<Node> parameters)
+    internal virtual void Invoke(RegisterProgram program, VariableContextAdapter context, int[] arguments,
+      int destination)
     {
       throw new InvalidOperationException(
-        $"Function '{Name}' does not support contextual execution with integer return");
+        $"Function '{Name}' does not support contextual execution with {ReturnTypeName()} return");
     }
 
-    internal virtual long ExecuteLong(VariableContextAdapter context, List<Node> parameters)
+    // Only a subclass outside this assembly lacks Invoke; these are the messages its calls have always thrown
+    private string ReturnTypeName()
     {
-      throw new InvalidOperationException($"Function '{Name}' does not support contextual execution with long return");
-    }
-
-    internal virtual float ExecuteFloat(VariableContextAdapter context, List<Node> parameters)
-    {
-      throw new InvalidOperationException($"Function '{Name}' does not support contextual execution with float return");
-    }
-
-    internal virtual double ExecuteDouble(VariableContextAdapter context, List<Node> parameters)
-    {
-      throw new InvalidOperationException(
-        $"Function '{Name}' does not support contextual execution with double return");
-    }
-
-    internal virtual decimal ExecuteDecimal(VariableContextAdapter context, List<Node> parameters)
-    {
-      throw new InvalidOperationException(
-        $"Function '{Name}' does not support contextual execution with decimal return");
-    }
-
-    internal virtual string ExecuteString(VariableContextAdapter context, List<Node> parameters)
-    {
-      throw new InvalidOperationException(
-        $"Function '{Name}' does not support contextual execution with string return");
-    }
-
-    internal virtual bool ExecuteBool(VariableContextAdapter context, List<Node> parameters)
-    {
-      throw new InvalidOperationException(
-        $"Function '{Name}' does not support contextual execution with boolean return");
+      switch (ReturnType)
+      {
+        case Type.Integer: return "integer";
+        case Type.Long: return "long";
+        case Type.Float: return "float";
+        case Type.Double: return "double";
+        case Type.Decimal: return "decimal";
+        case Type.String: return "string";
+        case Type.Boolean: return "boolean";
+        default:
+          throw new ArgumentOutOfRangeException("ValueType", (ExtendedType)ReturnType,
+            $"Unsupported return type for function: {Name}");
+      }
     }
 
     public override string ToString()

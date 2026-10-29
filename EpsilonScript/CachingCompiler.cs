@@ -1,15 +1,18 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using EpsilonScript.Function;
 
 namespace EpsilonScript
 {
   /// <summary>
-  /// Compiler wrapper that caches compiled scripts when the same
-  /// source/options/variable container are used.
+  /// Compiler wrapper that compiles each source once per options and compile-time variable container, and returns
+  /// the same script for later requests.
   /// </summary>
   /// <remarks>
-  /// Thread Safety: Not thread-safe. Use from a single thread or add your own synchronization if needed.
+  /// Every caller with the same key shares one CompiledScript, including its result values: executing it through
+  /// one reference changes what the others read. Thread Safety: Not thread-safe. Use from a single thread or add
+  /// your own synchronization, and do not execute a shared script concurrently.
   /// </remarks>
   public sealed class CachingCompiler
   {
@@ -17,27 +20,99 @@ namespace EpsilonScript
     private readonly Dictionary<CachingCompilerKey, CompiledScript> _cache;
     private readonly CachingCompilerKeyComparer _keyComparer = CachingCompilerKeyComparer.Instance;
 
-    public CachingCompiler()
+    // The compiler's function set the cached scripts were compiled against
+    private int _functionsVersion;
+
+    // Content hashes of recently seen source strings, by reference. Sources loaded once are passed as the same
+    // string instance on every call, so a hit skips hashing the whole source. Direct-mapped and fixed in size, so
+    // callers building a new string per call only overwrite slots.
+    private const int SourceSlotCount = 64;
+    private readonly string[] _sourceStrings = new string[SourceSlotCount];
+    private readonly int[] _sourceHashes = new int[SourceSlotCount];
+
+    public int Count => _cache.Count;
+
+    public CachingCompiler() : this(new Compiler(), 0)
     {
-      _compiler = new Compiler();
-      _cache = new Dictionary<CachingCompilerKey, CompiledScript>(_keyComparer);
+    }
+
+    public CachingCompiler(int capacity) : this(new Compiler(), capacity)
+    {
     }
 
     public CachingCompiler(Compiler.IntegerPrecision integerPrecision, Compiler.FloatPrecision floatPrecision)
+      : this(new Compiler(integerPrecision, floatPrecision), 0)
     {
-      _compiler = new Compiler(integerPrecision, floatPrecision);
-      _cache = new Dictionary<CachingCompilerKey, CompiledScript>(_keyComparer);
     }
 
-    public CompiledScript Compile(string source, Compiler.Options options = Compiler.Options.None,
-      IVariableContainer variables = null)
+    public CachingCompiler(Compiler.IntegerPrecision integerPrecision, Compiler.FloatPrecision floatPrecision,
+      int capacity) : this(new Compiler(integerPrecision, floatPrecision), capacity)
     {
-      return Compile(CachedSourceText.From(source), options, variables);
     }
 
-    public CompiledScript Compile(CachedSourceText cachedSource, Compiler.Options options = Compiler.Options.None,
+    /// <summary>
+    /// Caches scripts compiled by an existing compiler. Functions may be added to it directly; the cache notices
+    /// and drops scripts compiled before.
+    /// </summary>
+    public CachingCompiler(Compiler compiler) : this(compiler, 0)
+    {
+    }
+
+    public CachingCompiler(Compiler compiler, int capacity)
+    {
+      if (capacity < 0)
+      {
+        throw new ArgumentOutOfRangeException(nameof(capacity));
+      }
+
+      _compiler = compiler ?? throw new ArgumentNullException(nameof(compiler));
+      _functionsVersion = compiler.FunctionsVersion;
+      _cache = capacity > 0
+        ? new Dictionary<CachingCompilerKey, CompiledScript>(capacity, _keyComparer)
+        : new Dictionary<CachingCompilerKey, CompiledScript>(_keyComparer);
+    }
+
+    /// <summary>
+    /// The compiler that compiles cache misses.
+    /// </summary>
+    public Compiler Compiler => _compiler;
+
+    /// <summary>
+    /// Returns the script cached for this source, options and compile-time variable container, compiling it on
+    /// first use. The script is shared with every other caller of the same key.
+    /// </summary>
+    public CompiledScript GetOrCompile(string source, Compiler.Options options = Compiler.Options.None,
       IVariableContainer variables = null)
     {
+      if (source == null)
+      {
+        throw new ArgumentNullException(nameof(source));
+      }
+
+      var slot = RuntimeHelpers.GetHashCode(source) & (SourceSlotCount - 1);
+      if (!ReferenceEquals(_sourceStrings[slot], source))
+      {
+        _sourceStrings[slot] = source;
+        _sourceHashes[slot] = CachedSourceText.From(source).Hash;
+      }
+
+      return GetOrCompile(new CachedSourceText(source, _sourceHashes[slot]), options, variables);
+    }
+
+    /// <summary>
+    /// GetOrCompile with a source hashed in advance, which skips hashing it on every call.
+    /// </summary>
+    public CompiledScript GetOrCompile(CachedSourceText cachedSource, Compiler.Options options = Compiler.Options.None,
+      IVariableContainer variables = null)
+    {
+      // Constant folding picks overloads at compile time: a script compiled before a function was added may
+      // fold differently now, so it must not be returned
+      if (_functionsVersion != _compiler.FunctionsVersion)
+      {
+        _cache.Clear();
+        _functionsVersion = _compiler.FunctionsVersion;
+      }
+
       var key = new CachingCompilerKey(
         cachedSource.Source,
         cachedSource.Hash,
@@ -60,32 +135,32 @@ namespace EpsilonScript
     public void Clear()
     {
       _cache.Clear();
+      Array.Clear(_sourceStrings, 0, SourceSlotCount);
     }
 
     /// <summary>
-    /// Adds a custom function and invalidates cached scripts.
+    /// Releases excess cache storage. Useful after Clear() when the caller wants to return memory.
+    /// </summary>
+    public void TrimExcess()
+    {
+      _cache.TrimExcess();
+    }
+
+    /// <summary>
+    /// Adds a custom function to the compiler. Scripts cached before are dropped on the next lookup.
     /// </summary>
     public void AddCustomFunction(CustomFunction func)
     {
       _compiler.AddCustomFunction(func);
-      InvalidateForCustomFunctionChange();
     }
 
     /// <summary>
-    /// Adds multiple custom functions and invalidates cached scripts.
+    /// Adds custom functions to the compiler. Scripts cached before are dropped on the next lookup, even when
+    /// adding one throws.
     /// </summary>
     public void AddCustomFunctionRange(IEnumerable<CustomFunction> functions)
     {
       _compiler.AddCustomFunctionRange(functions);
-      InvalidateForCustomFunctionChange();
-    }
-
-    private void InvalidateForCustomFunctionChange()
-    {
-      // Needed because constant folding picks an overload at compile-time.
-      // Example: only float overload exists, int call folds via float. Later an int overload is added;
-      // without cache clear, recompiling through the cache would keep the float-folded version.
-      _cache.Clear();
     }
   }
 }

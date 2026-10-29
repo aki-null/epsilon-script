@@ -1,4 +1,4 @@
-using EpsilonScript.AST;
+using EpsilonScript.VirtualMachine;
 
 namespace EpsilonScript
 {
@@ -10,36 +10,32 @@ namespace EpsilonScript
   /// </remarks>
   public class CompiledScript
   {
-    private readonly Node _rootNode;
+    private readonly RegisterProgram _program;
     private bool _isResultCached;
     public Type ValueType { get; private set; } = Type.Undefined;
     public bool IsPrecomputable { get; }
 
-    /// <summary>
-    /// Internal property for testing purposes to verify AST structure and optimizations
-    /// </summary>
-    internal Node RootNode => _rootNode;
+    internal RegisterProgram Program => _program;
 
-    public int IntegerValue => _rootNode.IntegerValue;
-    public long LongValue => _rootNode.LongValue;
-    public float FloatValue => _rootNode.FloatValue;
-    public double DoubleValue => _rootNode.DoubleValue;
-    public decimal DecimalValue => _rootNode.DecimalValue;
-    public bool BooleanValue => _rootNode.BooleanValue;
-    public string StringValue => _rootNode.StringValue;
+    public int IntegerValue => _program.ReadInteger(_program.ResultRegister);
+    public long LongValue => _program.ReadLong(_program.ResultRegister);
+    public float FloatValue => _program.ReadFloat(_program.ResultRegister);
+    public double DoubleValue => _program.ReadDouble(_program.ResultRegister);
+    public decimal DecimalValue => _program.ReadDecimal(_program.ResultRegister);
+    public bool BooleanValue => _program.ReadBoolean(_program.ResultRegister);
+    public string StringValue => _program.ReadString(_program.ResultRegister);
 
     public Compiler.IntegerPrecision IntegerPrecision { get; }
 
     public Compiler.FloatPrecision FloatPrecision { get; }
 
-    internal CompiledScript(Node rootNode, Compiler.IntegerPrecision integerPrecision,
-      Compiler.FloatPrecision floatPrecision)
+    internal CompiledScript(RegisterProgram program, bool isPrecomputable,
+      Compiler.IntegerPrecision integerPrecision, Compiler.FloatPrecision floatPrecision)
     {
-      _rootNode = rootNode;
       IntegerPrecision = integerPrecision;
       FloatPrecision = floatPrecision;
-      // Precomputable status is cached, because this information is gathered from each AST node O(n)
-      IsPrecomputable = rootNode.IsPrecomputable;
+      IsPrecomputable = isPrecomputable;
+      _program = program;
     }
 
     public void Execute(IVariableContainer variablesOverride = null)
@@ -50,11 +46,10 @@ namespace EpsilonScript
         return;
       }
 
-      _rootNode.Execute(variablesOverride);
-
+      var program = _program;
+      program.Execute(variablesOverride);
       // Direct cast from ExtendedType to Type is safe, because they have identical values.
-      ValueType = (Type)_rootNode.ValueType;
-
+      ValueType = (Type)program.ResultType;
       _isResultCached = true;
     }
   }

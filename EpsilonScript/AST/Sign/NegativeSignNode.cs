@@ -1,3 +1,5 @@
+using EpsilonScript.VirtualMachine;
+
 namespace EpsilonScript.AST.Sign
 {
   /// <summary>
@@ -6,30 +8,7 @@ namespace EpsilonScript.AST.Sign
   /// </summary>
   internal sealed class NegativeSignNode : SignOperationNode
   {
-    protected override void ApplySignInteger()
-    {
-      IntegerValue = -ChildNode.IntegerValue;
-    }
-
-    protected override void ApplySignLong()
-    {
-      LongValue = -ChildNode.LongValue;
-    }
-
-    protected override void ApplySignFloat()
-    {
-      FloatValue = -ChildNode.FloatValue;
-    }
-
-    protected override void ApplySignDouble()
-    {
-      DoubleValue = -ChildNode.DoubleValue;
-    }
-
-    protected override void ApplySignDecimal()
-    {
-      DecimalValue = -ChildNode.DecimalValue;
-    }
+    internal override OpCode LoweredOp => OpCode.Negate;
 
     public override Node Optimize()
     {

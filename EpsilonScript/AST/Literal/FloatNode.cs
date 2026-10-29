@@ -1,10 +1,14 @@
 using System.Collections.Generic;
+using EpsilonScript.Helper;
 using EpsilonScript.Intermediate;
+using EpsilonScript.VirtualMachine;
 
 namespace EpsilonScript.AST.Literal
 {
   internal class FloatNode : Node
   {
+    internal override int Lower(RegisterCompiler compiler) => compiler.LowerConstant(this);
+
     public FloatNode()
     {
     }
@@ -30,13 +34,13 @@ namespace EpsilonScript.AST.Literal
       switch (context.FloatPrecision)
       {
         case Compiler.FloatPrecision.Float:
-          FloatValue = float.Parse(element.Token.Text.Span);
+          FloatValue = float.Parse(element.Token.Text.FastSpan());
           break;
         case Compiler.FloatPrecision.Double:
-          DoubleValue = double.Parse(element.Token.Text.Span);
+          DoubleValue = double.Parse(element.Token.Text.FastSpan());
           break;
         case Compiler.FloatPrecision.Decimal:
-          DecimalValue = decimal.Parse(element.Token.Text.Span);
+          DecimalValue = decimal.Parse(element.Token.Text.FastSpan());
           break;
       }
     }

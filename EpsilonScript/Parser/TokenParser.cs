@@ -32,7 +32,7 @@ namespace EpsilonScript.Parser
   ///
   /// Error Handling Policy:
   /// - ParserException: Syntax and structural errors (invalid tokens, grammar violations)
-  /// - RuntimeException: Semantic and type errors (thrown during Compile() via constant folding or Execute())
+  /// - RuntimeException: Semantic and type errors (thrown during Compile() via constant folding, or by Execute())
   /// - ArgumentException: Programming errors (null parameters, invalid state)
   ///
   /// This ensures consistent exception types for the same logical error regardless of when it's caught.
