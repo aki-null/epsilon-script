@@ -16,6 +16,14 @@ jobs:
       run: dotnet build --configuration Release --no-restore
     - name: Test
       run: dotnet test --no-restore --verbosity normal --logger "trx;LogFileName=test-results.trx"
+    - name: Upload baseline traces
+      # BaselineTests writes the trace of every configuration whose hash differs, for diffing against trace.sh
+      if: failure()
+      uses: actions/upload-artifact@v4
+      with:
+        name: baseline-traces
+        path: /tmp/epsilonscript-trace-*.txt
+        if-no-files-found: ignore
     - name: Fix Git ownership
       if: always()
       run: git config --global --add safe.directory /__w/epsilon-script/epsilon-script

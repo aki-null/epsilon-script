@@ -146,12 +146,20 @@ namespace EpsilonScript.Tests.Baseline
       }
     }
 
+    // Raw bits, except that every NaN prints the same: which NaN an operation produces depends on the runtime and
+    // CPU, not on the library
+    private static string Bits(float value) =>
+      float.IsNaN(value) ? "NaN" : BitConverter.SingleToInt32Bits(value).ToString(CultureInfo.InvariantCulture);
+
+    private static string Bits(double value) =>
+      double.IsNaN(value) ? "NaN" : BitConverter.DoubleToInt64Bits(value).ToString(CultureInfo.InvariantCulture);
+
     private static string Describe(VariableValue value)
     {
       switch (value.Type)
       {
-        case Type.Float: return "Float:" + BitConverter.SingleToInt32Bits(value.FloatValue);
-        case Type.Double: return "Double:" + BitConverter.DoubleToInt64Bits(value.DoubleValue);
+        case Type.Float: return "Float:" + Bits(value.FloatValue);
+        case Type.Double: return "Double:" + Bits(value.DoubleValue);
         default: return value.Type + ":" + value.StringValue;
       }
     }
@@ -173,8 +181,8 @@ namespace EpsilonScript.Tests.Baseline
       return "type=" + (int)script.ValueType +
              " int=" + Outcome(() => script.IntegerValue.ToString()) +
              " long=" + Outcome(() => script.LongValue.ToString()) +
-             " float=" + Outcome(() => BitConverter.SingleToInt32Bits(script.FloatValue).ToString()) +
-             " double=" + Outcome(() => BitConverter.DoubleToInt64Bits(script.DoubleValue).ToString()) +
+             " float=" + Outcome(() => Bits(script.FloatValue)) +
+             " double=" + Outcome(() => Bits(script.DoubleValue)) +
              " decimal=" + Outcome(() => script.DecimalValue.ToString(CultureInfo.InvariantCulture)) +
              " bool=" + Outcome(() => script.BooleanValue.ToString()) +
              " string=" + Outcome(() => script.StringValue ?? "null");

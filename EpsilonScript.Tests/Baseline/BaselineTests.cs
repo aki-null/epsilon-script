@@ -17,11 +17,11 @@ namespace EpsilonScript.Tests.Baseline
     // SHA-256 of each trace, printed by: EpsilonScript.Tests/Baseline/trace.sh 03593b8 <output-dir>
     private static readonly Dictionary<string, string> Expected = new Dictionary<string, string>
     {
-      ["Integer-Float"] = "d200268081784c0ca49c26b53905982167da79d3dac56a6d1f0d565d6fbf926c",
-      ["Integer-Double"] = "8f47ef5ef8b2cf7121330af61feba1b0a9e88a40b22be29055aefde25929d724",
+      ["Integer-Float"] = "a9ca5440dafbd06fb43db888345d96171fd1abafbb769c18825dffe55f79db51",
+      ["Integer-Double"] = "e6d682d29c78fb81f61ba63c194ea6f86eb4180b409571c74ece9e74f10075b7",
       ["Integer-Decimal"] = "1c5f20087c6f679c333120cbac823392340a1b13a6a9e5733549524e165b7c1f",
-      ["Long-Float"] = "9994207b894f9de09eca9a3a3a28a650c323b2ba1642fe6efab177a45159433c",
-      ["Long-Double"] = "bd20fd2d626c48cd98e44c9bb89b05402fe27bb8ef9a4b94234103dd3056b040",
+      ["Long-Float"] = "98751d4da3e501029dcb044f68860e9f4246fe45d7998342b25e238f70f2563e",
+      ["Long-Double"] = "cb1e415b9d7a958e24a5c02c47a61c636ea4a36502bc3c3237229dc2c95850db",
       ["Long-Decimal"] = "ea3d8c627e01059474b72036922a805543db7cd361ab12752f810925c046684f",
     };
 
