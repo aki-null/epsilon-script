@@ -49,4 +49,5 @@ internal static class Program
 }
 PROGRAM
 dotnet run --project "$WORK/trace" -c Release -- "$OUT"
-for f in "$OUT"/*.txt; do echo "$(basename "$f" .txt) $(shasum -a 256 "$f" | cut -d' ' -f1)"; done
+if command -v shasum > /dev/null; then sha=(shasum -a 256); else sha=(sha256sum); fi
+for f in "$OUT"/*.txt; do echo "$(basename "$f" .txt) $("${sha[@]}" "$f" | cut -d' ' -f1)"; done

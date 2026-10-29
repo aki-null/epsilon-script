@@ -10,23 +10,31 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+      with:
+        # The baseline comparison builds the library at 03593b8
+        fetch-depth: 0
+    - name: Fix Git ownership
+      run: git config --global --add safe.directory /__w/epsilon-script/epsilon-script
     - name: Install dependencies
       run: dotnet restore
     - name: Build with dotnet
       run: dotnet build --configuration Release --no-restore
     - name: Test
       run: dotnet test --no-restore --verbosity normal --logger "trx;LogFileName=test-results.trx"
+    - name: Compare baseline with 03593b8
+      # The baseline hashes hold only on the platform they were recorded on, so CI compares the corpus traces of
+      # the tree interpreter at 03593b8 and of this commit, both produced here
+      run: |
+        EpsilonScript.Tests/Baseline/trace.sh 03593b8 /tmp/baseline-03593b8
+        EpsilonScript.Tests/Baseline/trace.sh HEAD /tmp/baseline-head
+        diff -r /tmp/baseline-03593b8 /tmp/baseline-head
     - name: Upload baseline traces
-      # BaselineTests writes the trace of every configuration whose hash differs, for diffing against trace.sh
       if: failure()
       uses: actions/upload-artifact@v4
       with:
         name: baseline-traces
-        path: /tmp/epsilonscript-trace-*.txt
+        path: /tmp/baseline-*
         if-no-files-found: ignore
-    - name: Fix Git ownership
-      if: always()
-      run: git config --global --add safe.directory /__w/epsilon-script/epsilon-script
     - name: Test Report
       uses: dorny/test-reporter@v2
       if: always()

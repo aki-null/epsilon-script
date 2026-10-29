@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
 using Xunit;
@@ -10,6 +12,12 @@ namespace EpsilonScript.Tests.Baseline
   /// Requires the corpus trace to match the one recorded from commit 03593b8, before the register VM replaced the
   /// tree interpreter. Any change to compile errors, results, conversions or runtime errors fails here.
   /// </summary>
+  /// <remarks>
+  /// The trace depends on the platform as well as on the library: out-of-range float to integer conversions differ
+  /// between x64 and ARM64, the C math library differs in the last bit, and exception messages differ between .NET
+  /// versions. The hashes hold for the platform they were recorded on; elsewhere, compare the traces trace.sh writes
+  /// for 03593b8 and for the change, as CI does.
+  /// </remarks>
   [Trait("Category", "Integration")]
   [Trait("Component", "Baseline")]
   public class BaselineTests
@@ -25,7 +33,7 @@ namespace EpsilonScript.Tests.Baseline
       ["Long-Decimal"] = "ea3d8c627e01059474b72036922a805543db7cd361ab12752f810925c046684f",
     };
 
-    [Theory]
+    [RecordedPlatformTheory]
     [InlineData(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Float)]
     [InlineData(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Double)]
     [InlineData(Compiler.IntegerPrecision.Integer, Compiler.FloatPrecision.Decimal)]
@@ -60,6 +68,22 @@ namespace EpsilonScript.Tests.Baseline
         Assert.True(false,
           $"Trace differs from the baseline. Current trace: {path}. " +
           "Run EpsilonScript.Tests/Baseline/trace.sh 03593b8 <dir> and diff against <dir>/" + name + ".txt");
+      }
+    }
+  }
+
+  /// <summary>
+  /// Skips the hash comparison on platforms other than the one the hashes were recorded on: ARM64 macOS, .NET 8 or
+  /// later.
+  /// </summary>
+  internal sealed class RecordedPlatformTheoryAttribute : TheoryAttribute
+  {
+    public RecordedPlatformTheoryAttribute()
+    {
+      if (RuntimeInformation.ProcessArchitecture != Architecture.Arm64 ||
+          !RuntimeInformation.IsOSPlatform(OSPlatform.OSX) || Environment.Version.Major < 8)
+      {
+        Skip = "Baseline hashes are recorded on ARM64 macOS with .NET 8 or later; compare trace.sh output instead";
       }
     }
   }
