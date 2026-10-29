@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout main repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
@@ -19,7 +19,7 @@ jobs:
         run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
 
       - name: Checkout unity package repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           repository: aki-null/epsilon-script-unity
           token: ${{ secrets.UNITY_PACKAGE_PAT }}

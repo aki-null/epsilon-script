@@ -9,7 +9,7 @@ jobs:
     container: mcr.microsoft.com/dotnet/sdk:6.0
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v7
       with:
         # The baseline comparison builds the library at 03593b8
         fetch-depth: 0
@@ -30,13 +30,13 @@ jobs:
         diff -r /tmp/baseline-03593b8 /tmp/baseline-head
     - name: Upload baseline traces
       if: failure()
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: baseline-traces
         path: /tmp/baseline-*
         if-no-files-found: ignore
     - name: Test Report
-      uses: dorny/test-reporter@v2
+      uses: dorny/test-reporter@v3
       if: always()
       with:
         name: .NET Tests
